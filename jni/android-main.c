@@ -28,7 +28,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "luajit-2.0/lauxlib.h"
 
 #define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR,"luajit-launcher",__VA_ARGS__)
-#define  LOADER_ASSET "loader.lua"
+#define  LOADER_ASSET "android.lua"
 
 void android_main(struct android_app* state) {
 	lua_State *L;
