@@ -12,12 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
 LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 
 LOCAL_MODULE	:= libluajit-prebuilt
-LOCAL_SRC_FILES	:= luajit-2.0/src/libluajit.a
+LOCAL_SRC_FILES	:= luajit-build/$(TARGET_ARCH_ABI)/lib/libluajit-5.1.a
+LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/luajit-build/$(TARGET_ARCH_ABI)/include
 
 include $(PREBUILT_STATIC_LIBRARY)
 
