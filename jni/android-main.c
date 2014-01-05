@@ -20,24 +20,46 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 #include <android_native_app_glue.h>
+
 #include <android/log.h>
+#include <android/asset_manager.h>
 
 #include "luajit-2.0/lua.h"
 #include "luajit-2.0/lauxlib.h"
 
 #define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR,"luajit-launcher",__VA_ARGS__)
+#define  LOADER_ASSET "loader.lua"
 
 void android_main(struct android_app* state) {
 	lua_State *L;
+	AAsset* luaCode;
+	const void *buf;
+	off_t bufsize;
 	int status;
 
 	// Make sure glue isn't stripped.
 	app_dummy();
 
+	luaCode = AAssetManager_open(state->activity->assetManager, LOADER_ASSET, AASSET_MODE_BUFFER);
+	if (luaCode == NULL) {
+		LOGE("error loading loader asset");
+		return;
+	}
+
+	bufsize = AAsset_getLength(luaCode);
+	buf = AAsset_getBuffer(luaCode);
+	if (buf == NULL) {
+		LOGE("error getting loader asset buffer");
+		return;
+	}
+
+	// Load initial Lua loader from our asset store:
+
 	L = luaL_newstate();
 	luaL_openlibs(L);
 
-	status = luaL_loadfile(L, "/sdcard/luajit-activity/main.lua");
+	status = luaL_loadbuffer(L, (const char*) buf, (size_t) bufsize, LOADER_ASSET);
+	AAsset_close(luaCode);
 	if (status) {
 		LOGE("error loading file: %s", lua_tostring(L, -1));
 		return;
