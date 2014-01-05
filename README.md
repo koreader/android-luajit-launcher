@@ -17,7 +17,41 @@ Have a look at the main.lua file in assets/. You should use this as a starting p
 
 The real starting point, called from JNI/C, is the run() function in android.lua. It sets up a few things, namely FFI definitions for the Android native API (since it uses that itself for a few things) and some wrapper functions for logging. Also, it registers the "android" module in package.loaded, so you can access it in your own code via require("android"). It also registers a new package loader which can load Lua code from the activity's asset store, so you can use require() for Lua code stored there.
 
+
+STARTING:
+========
+* init/update the submodules (LuaJIT for now):
+```
+git submodule init
+git submodule sync
+git submodule update
+```
+
+* update the project for your Android SDK/NDK (needs "android" tool in your PATH):
+```
+android update project --path .
+```
+
+* compile LuaJIT for your target architecture(s):
+```
+./mk-luajit.sh armeabi-v7a
+./mk-luajit.sh clean
+./mk-luajit.sh armeabi
+```
+
+* compile NDK/native code:
+```
+ndk-build
+```
+
+* compile and package APK (debug variant):
+```
+ant debug
+```
+
 TODO:
+========
+
 * a concept to deal with native Lua modules.
 * a loader for native modules that have been put into the activity's library directory?
 * a loader for obb storage, maybe? We could put native Lua modules there, for example.
