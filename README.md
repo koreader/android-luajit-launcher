@@ -12,3 +12,13 @@ A good number of Android native API headers are readily presented via FFI alread
 For now - and probably ever, since Mike Pall recommends strongly to do so - the compilation of LuaJIT is not integrated into the Android build framework and has to be run separately.
 
 A wrapper script for building LuaJIT is provided.
+
+Have a look at the main.lua file in assets/. You should use this as a starting point for your own app.
+
+The real starting point, called from JNI/C, is the run() function in android.lua. It sets up a few things, namely FFI definitions for the Android native API (since it uses that itself for a few things) and some wrapper functions for logging. Also, it registers the "android" module in package.loaded, so you can access it in your own code via require("android"). It also registers a new package loader which can load Lua code from the activity's asset store, so you can use require() for Lua code stored there.
+
+TODO:
+* a concept to deal with native Lua modules.
+* a loader for native modules that have been put into the activity's library directory?
+* a loader for obb storage, maybe? We could put native Lua modules there, for example.
+* example code for framebuffer access and more
