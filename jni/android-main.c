@@ -67,9 +67,8 @@ void android_main(struct android_app* state) {
 
 	// pass the android_app state to Lua land:
 	lua_pushlightuserdata(L, state);
-	lua_setglobal(L, "android_app_state");
 
-	status = lua_pcall(L, 0, LUA_MULTRET, 0);
+	status = lua_pcall(L, 1, LUA_MULTRET, 0);
 	if (status) {
 		LOGE("Failed to run script: %s", lua_tostring(L, -1));
 		return;

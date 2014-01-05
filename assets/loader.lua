@@ -19,8 +19,45 @@ typedef enum android_LogPriority {
 struct AConfiguration;
 typedef struct AConfiguration AConfiguration;
 
+
+// from android-ndk/platforms/android-9/arch-arm/usr/include/asm/posix_types.h:
+typedef long __kernel_off_t;
+
+// from android-ndk/platforms/android-9/arch-arm/usr/include/sys/types.h:
+typedef __kernel_off_t off_t;
+
+// from android-ndk/platforms/android-9/arch-arm/usr/include/android/asset_manager.h:
+
 struct AAssetManager;
 typedef struct AAssetManager AAssetManager;
+
+struct AAssetDir;
+typedef struct AAssetDir AAssetDir;
+
+struct AAsset;
+typedef struct AAsset AAsset;
+
+enum {
+    AASSET_MODE_UNKNOWN      = 0,
+    AASSET_MODE_RANDOM       = 1,
+    AASSET_MODE_STREAMING    = 2,
+    AASSET_MODE_BUFFER       = 3
+};
+
+AAssetDir* AAssetManager_openDir(AAssetManager* mgr, const char* dirName);
+AAsset* AAssetManager_open(AAssetManager* mgr, const char* filename, int mode);
+const char* AAssetDir_getNextFileName(AAssetDir* assetDir);
+void AAssetDir_rewind(AAssetDir* assetDir);
+void AAssetDir_close(AAssetDir* assetDir);
+int AAsset_read(AAsset* asset, void* buf, size_t count);
+off_t AAsset_seek(AAsset* asset, off_t offset, int whence);
+void AAsset_close(AAsset* asset);
+const void* AAsset_getBuffer(AAsset* asset);
+off_t AAsset_getLength(AAsset* asset);
+off_t AAsset_getRemainingLength(AAsset* asset);
+int AAsset_openFileDescriptor(AAsset* asset, off_t* outStart, off_t* outLength);
+int AAsset_isAllocated(AAsset* asset);
+
 
 // from android-ndk/platforms/android-9/arch-arm/usr/include/android/looper.h:
 
@@ -378,9 +415,6 @@ void android_app_pre_exec_cmd(struct android_app* android_app, int8_t cmd);
 void android_app_post_exec_cmd(struct android_app* android_app, int8_t cmd);
 ]]
 
--- change this to the path you want to use:
-package.path = "/sdcard/luajit-activity/?.lua"
-
 local android = {
 	app = nil,
 	log_name = "luajit-launcher",
@@ -402,104 +436,59 @@ function android.LOGE(message)
 	android.LOG(ffi.C.ANDROID_LOG_ERROR, message)
 end
 
-function android.handle_input(app, event)
-	local ev_type = ffi.C.AInputEvent_getType(event)
-	if ev_type == ffi.C.AINPUT_EVENT_TYPE_MOTION then
-		local ptr_count = ffi.C.AMotionEvent_getPointerCount(event)
-		for i = 0, ptr_count-1 do
-			local x = ffi.C.AMotionEvent_getX(event, i)
-			local y = ffi.C.AMotionEvent_getY(event, i)
-			android.LOGI("motion event at " .. tonumber(x) .. "," .. tonumber(y) .. " for ptr no " .. i)
+--[[
+a loader function for Lua which will look for assets when loading modules
+--]]
+function android.asset_loader(modulename)
+	local errmsg = ""
+	-- Find source
+	local modulepath = string.gsub(modulename, "%.", "/")
+	for path in string.gmatch(package.path, "([^;]+)") do
+		local filename = string.gsub(path, "%?", modulepath)
+		local asset = ffi.C.AAssetManager_open(
+			android.app.activity.assetManager,
+			filename, ffi.C.AASSET_MODE_BUFFER)
+		android.LOGI(string.format("trying to open asset %s: %s", filename, tostring(asset)))
+		if asset ~= nil then
+			-- read asset:
+			local assetdata = ffi.C.AAsset_getBuffer(asset)
+			local assetsize = ffi.C.AAsset_getLength(asset)
+			if assetdata ~= nil then
+				-- Compile and return the module
+				local compiled = assert(loadstring(ffi.string(assetdata, assetsize), filename))
+				ffi.C.AAsset_close(asset)
+				return compiled
+			else
+				ffi.C.AAsset_close(asset)
+				errmsg = errmsg.."\n\tunaccessible file '"..filename.."' (tried with asset loader)"
+			end
+		else
+			errmsg = errmsg.."\n\tno file '"..filename.."' (checked with asset loader)"
 		end
-		return 1
-	elseif ev_type == ffi.C.AINPUT_EVENT_TYPE_KEY then
-		android.LOGI("got key event, leaving it unhandled")
 	end
-	return 0
+	return errmsg
 end
 
-function android.draw_frame()
-	if android.app.window == nil then
-		-- No window.
-		return
-	end
-
-	local buffer = ffi.new("ANativeWindow_Buffer[1]")
-	if ffi.C.ANativeWindow_lock(android.app.window, buffer, nil) < 0 then
-		android.LOGW("Unable to lock window buffer");
-		return
-	end
-
-	local bb = nil
-	if buffer[0].format == ffi.C.WINDOW_FORMAT_RGBA_8888
-	or buffer[0].format == ffi.C.WINDOW_FORMAT_RGBX_8888
-	then
-		-- modify buffer[0].bits here
-	elseif buffer[0].format == ffi.C.WINDOW_FORMAT_RGB_565 then
-		-- modify buffer[0].bits here
-	else
-		android.LOGE("unsupported window format!")
-	end
-
-	ffi.C.ANativeWindow_unlockAndPost(android.app.window);
-end
-
-function android.handle_cmd(app, cmd)
-	android.LOGI("got command: " .. tonumber(cmd))
-	if cmd == ffi.C.APP_CMD_INIT_WINDOW then
-		android.draw_frame()
-	elseif cmd == ffi.C.APP_CMD_TERM_WINDOW then
-		-- do nothing for now
-	elseif cmd == ffi.C.APP_CMD_LOST_FOCUS then
-		android.draw_frame()
-	end
-end
-
-function android.init(android_app_state)
+--[[
+the C code will call this function:
+--]]
+local function run(android_app_state)
 	android.app = ffi.cast("struct android_app*", android_app_state)
-	--[[ alternative C-based callback-based way (like in Android NDK example):
-	android.app.onAppCmd = android.handle_cmd
-	android.app.onInputEvent = android.handle_input
-	--]]
-end
 
--- you probably want to integrate the following loop into your own
--- event loop (if you have one already).
--- see the Android NDK documentation (the header files, that is!) in order
--- to get an idea how to use ALooper to poll your filedescriptors, too.
-function android.loop()
-	local events = ffi.new("int[1]")
-	local source = ffi.new("struct android_poll_source*[1]")
-	while true do
-		if ffi.C.ALooper_pollAll(-1, nil, events, ffi.cast("void**", source)) >= 0 then
-			if source[0] ~= nil then
-				--[[ alternative C-based callback-based way (like in Android NDK example):
-				source[0].process(android.app, source[0])
-				--]]
-				--[[ you can comment out this then: ]]
-				if source[0].id == ffi.C.LOOPER_ID_MAIN then
-					local cmd = ffi.C.android_app_read_cmd(android.app)
-					ffi.C.android_app_pre_exec_cmd(android.app, cmd)
-					android.handle_cmd(android.app, cmd)
-					ffi.C.android_app_post_exec_cmd(android.app, cmd)
-				elseif source[0].id == ffi.C.LOOPER_ID_INPUT then
-					local event = ffi.new("AInputEvent*[1]")
-					while ffi.C.AInputQueue_getEvent(android.app.inputQueue, event) >= 0 do
-						if ffi.C.AInputQueue_preDispatchEvent(android.app.inputQueue, event[0]) == 0 then
-							ffi.C.AInputQueue_finishEvent(android.app.inputQueue, event[0],
-								android.handle_input(android.app, event[0]))
-						end
-					end
-				end
-				--]] up to here
-			end
-			if android.app.destroyRequested ~= 0 then
-				android.LOGI("Engine thread destroy requested!")
-				return
-			end
-		end
+	-- set up a sensible package.path
+	package.path = "?.lua"
+	-- register the asset loader
+	table.insert(package.loaders, 2, android.asset_loader)
+
+	-- register the "android" module
+	package.loaded.android = android
+
+	local main = android.asset_loader("main")
+	if type(main) == "function" then
+		return main()
+	else
+		error("error loading main.lua")
 	end
 end
 
-android.init(android_app_state)
-android.loop()
+run(...)
