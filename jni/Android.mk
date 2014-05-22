@@ -25,7 +25,7 @@ include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 
-LOCAL_MODULE    := native-luajit-activity
+LOCAL_MODULE    := koreader-launcher
 LOCAL_SRC_FILES := android-main.c
 # remember to add libraries here that you plan to use via FFI:
 LOCAL_LDLIBS    := -lm -llog -landroid
