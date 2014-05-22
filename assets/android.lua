@@ -1,5 +1,8 @@
 local ffi = require("ffi")
 ffi.cdef[[
+// dlopen that loads library recursiviely
+void * lo_dlopen(char *library);
+
 // logging:
 int __android_log_print(int prio, const char *tag,  const char *fmt, ...);
 typedef enum android_LogPriority {
@@ -416,79 +419,98 @@ void android_app_post_exec_cmd(struct android_app* android_app, int8_t cmd);
 ]]
 
 local android = {
-	app = nil,
-	log_name = "luajit-launcher",
+    app = nil,
+    log_name = "luajit-launcher",
 }
 
 function android.LOG(level, message)
-	ffi.C.__android_log_print(level, android.log_name, "%s", message)
+    ffi.C.__android_log_print(level, android.log_name, "%s", message)
 end
 function android.LOGV(message)
-	android.LOG(ffi.C.ANDROID_LOG_VERBOSE, message)
+    android.LOG(ffi.C.ANDROID_LOG_VERBOSE, message)
 end
 function android.LOGI(message)
-	android.LOG(ffi.C.ANDROID_LOG_INFO, message)
+    android.LOG(ffi.C.ANDROID_LOG_INFO, message)
 end
 function android.LOGW(message)
-	android.LOG(ffi.C.ANDROID_LOG_WARN, message)
+    android.LOG(ffi.C.ANDROID_LOG_WARN, message)
 end
 function android.LOGE(message)
-	android.LOG(ffi.C.ANDROID_LOG_ERROR, message)
+    android.LOG(ffi.C.ANDROID_LOG_ERROR, message)
 end
 
 --[[
 a loader function for Lua which will look for assets when loading modules
 --]]
 function android.asset_loader(modulename)
-	local errmsg = ""
-	-- Find source
-	local modulepath = string.gsub(modulename, "%.", "/")
-	for path in string.gmatch(package.path, "([^;]+)") do
-		local filename = string.gsub(path, "%?", modulepath)
-		local asset = ffi.C.AAssetManager_open(
-			android.app.activity.assetManager,
-			filename, ffi.C.AASSET_MODE_BUFFER)
-		android.LOGI(string.format("trying to open asset %s: %s", filename, tostring(asset)))
-		if asset ~= nil then
-			-- read asset:
-			local assetdata = ffi.C.AAsset_getBuffer(asset)
-			local assetsize = ffi.C.AAsset_getLength(asset)
-			if assetdata ~= nil then
-				-- Compile and return the module
-				local compiled = assert(loadstring(ffi.string(assetdata, assetsize), filename))
-				ffi.C.AAsset_close(asset)
-				return compiled
-			else
-				ffi.C.AAsset_close(asset)
-				errmsg = errmsg.."\n\tunaccessible file '"..filename.."' (tried with asset loader)"
-			end
-		else
-			errmsg = errmsg.."\n\tno file '"..filename.."' (checked with asset loader)"
-		end
-	end
-	return errmsg
+    local errmsg = ""
+    -- Find source
+    local modulepath = string.gsub(modulename, "%.", "/")
+    for path in string.gmatch(package.path, "([^;]+)") do
+        local filename = string.gsub(path, "%?", modulepath)
+        local asset = ffi.C.AAssetManager_open(
+            android.app.activity.assetManager,
+            filename, ffi.C.AASSET_MODE_BUFFER)
+        --android.LOGI(string.format("trying to open asset %s: %s", filename, tostring(asset)))
+        if asset ~= nil then
+            -- read asset:
+            local assetdata = ffi.C.AAsset_getBuffer(asset)
+            local assetsize = ffi.C.AAsset_getLength(asset)
+            if assetdata ~= nil then
+                -- Compile and return the module
+                local compiled = assert(loadstring(ffi.string(assetdata, assetsize), filename))
+                ffi.C.AAsset_close(asset)
+                return compiled
+            else
+                ffi.C.AAsset_close(asset)
+                errmsg = errmsg.."\n\tunaccessible file '"..filename.."' (tried with asset loader)"
+            end
+        else
+            errmsg = errmsg.."\n\tno file '"..filename.."' (checked with asset loader)"
+        end
+    end
+    return errmsg
 end
 
+--[[
+this loader function just loads dependency libraries for C module
+--]]
+function android.deplib_loader(modulename)
+    local modulepath = string.gsub(modulename, "%.", "/")
+    for path in string.gmatch(package.cpath, "([^;]+)") do
+        local module = string.gsub(path, "%?", modulepath)
+        -- load dependencies of this module with lo_dlopen
+        ffi.C.lo_dlopen(ffi.cast("char*", module))
+    end
+end
 --[[
 the C code will call this function:
 --]]
 local function run(android_app_state)
-	android.app = ffi.cast("struct android_app*", android_app_state)
+    android.app = ffi.cast("struct android_app*", android_app_state)
 
-	-- set up a sensible package.path
-	package.path = "?.lua"
-	-- register the asset loader
-	table.insert(package.loaders, 2, android.asset_loader)
+    -- set up a sensible package.path
+    package.path = "?.lua"
+    -- set absolute cpath
+    package.cpath = "?.so;/data/data/org.koreader.launcher/?.so"
+    -- register the asset loader
+    table.insert(package.loaders, 2, android.asset_loader)
+    -- register the dependency lib loader
+    table.insert(package.loaders, 3, android.deplib_loader)
 
-	-- register the "android" module
-	package.loaded.android = android
+    -- register the "android" module
+    package.loaded.android = android
 
-	local main = android.asset_loader("main")
-	if type(main) == "function" then
-		return main()
-	else
-		error("error loading main.lua")
-	end
+    ffi.load = function(library, ...)
+        return ffi.C.lo_dlopen(ffi.cast("char*", library))
+    end
+
+    local main = android.asset_loader("main")
+    if type(main) == "function" then
+        return main()
+    else
+        error("error loading main.lua")
+    end
 end
 
 run(...)
