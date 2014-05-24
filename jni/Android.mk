@@ -30,7 +30,7 @@ LOCAL_SRC_FILES := android-main.c
 # remember to add libraries here that you plan to use via FFI:
 LOCAL_LDLIBS    := -lm -llog -landroid
 LOCAL_STATIC_LIBRARIES := android_native_app_glue
-LOCAL_STATIC_LIBRARIES += libluajit-prebuilt
+LOCAL_WHOLE_STATIC_LIBRARIES += libluajit-prebuilt
 
 include $(BUILD_SHARED_LIBRARY)
 
