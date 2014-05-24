@@ -42,18 +42,18 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 static char* getApplicationDirectory(struct android_app* state);
 
-static const char *library_locations[] = {"/lib", "/system/lib", NULL, NULL, NULL};
+static char* library_locations[] = {"/lib", "/system/lib", NULL, NULL, NULL};
 
 void android_main(struct android_app* state) {
-	lua_State *L;
-	AAsset* luaCode;
-	const void *buf;
-	off_t bufsize;
-	int status;
+    lua_State *L;
+    AAsset* luaCode;
+    const void *buf;
+    off_t bufsize;
+    int status;
     char *libs_dir;
 
-	// Make sure glue isn't stripped.
-	app_dummy();
+    // Make sure glue isn't stripped.
+    app_dummy();
 
     char *base_dir = getApplicationDirectory(state);
     libs_dir = malloc(strlen(base_dir) + 6);
@@ -62,41 +62,43 @@ void android_main(struct android_app* state) {
     library_locations[2] = base_dir;
     library_locations[3] = libs_dir;
 
-	luaCode = AAssetManager_open(state->activity->assetManager, LOADER_ASSET, AASSET_MODE_BUFFER);
-	if (luaCode == NULL) {
-		LOGE("error loading loader asset");
-		return;
-	}
+    luaCode = AAssetManager_open(state->activity->assetManager, LOADER_ASSET, AASSET_MODE_BUFFER);
+    if (luaCode == NULL) {
+        LOGE("error loading loader asset");
+        return;
+    }
 
-	bufsize = AAsset_getLength(luaCode);
-	buf = AAsset_getBuffer(luaCode);
-	if (buf == NULL) {
-		LOGE("error getting loader asset buffer");
-		return;
-	}
+    bufsize = AAsset_getLength(luaCode);
+    buf = AAsset_getBuffer(luaCode);
+    if (buf == NULL) {
+        LOGE("error getting loader asset buffer");
+        return;
+    }
 
-	// Load initial Lua loader from our asset store:
+    // Load initial Lua loader from our asset store:
 
-	L = luaL_newstate();
-	luaL_openlibs(L);
+    L = luaL_newstate();
+    luaL_openlibs(L);
 
-	status = luaL_loadbuffer(L, (const char*) buf, (size_t) bufsize, LOADER_ASSET);
-	AAsset_close(luaCode);
-	if (status) {
-		LOGE("error loading file: %s", lua_tostring(L, -1));
-		return;
-	}
+    status = luaL_loadbuffer(L, (const char*) buf, (size_t) bufsize, LOADER_ASSET);
+    AAsset_close(luaCode);
+    if (status) {
+        LOGE("error loading file: %s", lua_tostring(L, -1));
+        return;
+    }
 
-	// pass the android_app state to Lua land:
-	lua_pushlightuserdata(L, state);
+    // pass the android_app state to Lua land:
+    lua_pushlightuserdata(L, state);
+    // pass application data directory to Lua
+    lua_pushstring(L, base_dir);
 
-	status = lua_pcall(L, 1, LUA_MULTRET, 0);
-	if (status) {
-		LOGE("Failed to run script: %s", lua_tostring(L, -1));
-		return;
-	}
+    status = lua_pcall(L, 2, LUA_MULTRET, 0);
+    if (status) {
+        LOGE("Failed to run script: %s", lua_tostring(L, -1));
+        return;
+    }
 
-	lua_close(L);
+    lua_close(L);
 }
 
 char *getApplicationDirectory(struct android_app* state) {

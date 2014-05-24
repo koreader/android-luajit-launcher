@@ -1,22 +1,7 @@
 local ffi = require("ffi")
 local A = require("android")
 
-local mupdf = ffi.load("libs/libmupdf.so")
-A.LOGI("mupdf library loaded "..tostring(mupdf))
-local leptonica = ffi.load("libs/liblept.so.3")
-A.LOGI("leptonica library loaded "..tostring(leptonica))
-local tesseract = ffi.load("libs/libtesseract.so.3")
-A.LOGI("tesseract library loaded "..tostring(tesseract))
-local k2pdfopt = ffi.load("libs/libk2pdfopt.so.2")
-A.LOGI("k2pdfopt library loaded "..tostring(k2pdfopt))
-local crengine = ffi.load("libs/libcrengine.so")
-A.LOGI("crengine library loaded "..tostring(crengine))
-
-local pdf_loaded = require("libs/libkoreader-pdf")
-A.LOGI("koreader-pdf loaded "..tostring(pdf))
-
-local cre_loaded = require("libs/libkoreader-cre")
-A.LOGI("koreader-cre loaded "..tostring(cre))
+require("test")
 
 local function handle_input(event)
 	local ev_type = ffi.C.AInputEvent_getType(event)
