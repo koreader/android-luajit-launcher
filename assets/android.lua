@@ -486,13 +486,15 @@ end
 --[[
 the C code will call this function:
 --]]
-local function run(android_app_state)
+local function run(android_app_state, app_data_dir)
     android.app = ffi.cast("struct android_app*", android_app_state)
+    android.dir = app_data_dir
+    android.LOGI("Application data directory "..android.dir)
 
     -- set up a sensible package.path
-    package.path = "?.lua"
+    package.path = "?.lua;"
     -- set absolute cpath
-    package.cpath = "?.so;/data/data/org.koreader.launcher/?.so"
+    package.cpath = "?.so;"
     -- register the asset loader
     table.insert(package.loaders, 2, android.asset_loader)
     -- register the dependency lib loader
@@ -501,10 +503,20 @@ local function run(android_app_state)
     -- register the "android" module
     package.loaded.android = android
 
+    -- ffi.load wrapper
+    local ffi_load = ffi.load
     ffi.load = function(library, ...)
-        return ffi.C.lo_dlopen(ffi.cast("char*", library))
+        ffi.C.lo_dlopen(ffi.cast("char*", library))
+        return ffi_load(library)
     end
 
+    -- add installer module that should install native libraries into libs
+    local install = android.asset_loader("install")
+    if type(install) == "function" then
+        install()
+    else
+        error("error loading install.lua")
+    end
     local main = android.asset_loader("main")
     if type(main) == "function" then
         return main()
