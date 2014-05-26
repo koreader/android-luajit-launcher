@@ -33,8 +33,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <android/log.h>
 #include <android/asset_manager.h>
 
-#include "luajit-2.0/lua.h"
-#include "luajit-2.0/lauxlib.h"
+#include "luajit-2.1/lua.h"
+#include "luajit-2.1/lauxlib.h"
 
 #define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO,"luajit-launcher",__VA_ARGS__)
 #define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR,"luajit-launcher",__VA_ARGS__)
