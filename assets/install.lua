@@ -13,10 +13,6 @@ int remove(const char *);
 int __cdecl lzma_main(int numargs, char *args[]);
 ]]
 
-package.path = package.path .. A.dir .. "/?.lua;"
-package.cpath = package.cpath .. A.dir .. "/?.so;"
-
-
 local function install()
     local function check_installed_rev()
         local git_rev = io.open(A.dir .. "/git-rev")
@@ -25,7 +21,7 @@ local function install()
     end
     -- 7z compressed package are stored in module directory in asset
     local module = "module"
-    local package_name = "koreader%-(.*)%.mp3"
+    local package_name = "koreader%-(.*)%.7z"
     local mgr = A.app.activity.assetManager
     local asset_dir = ffi.C.AAssetManager_openDir(mgr,
                     ffi.cast("char*", module))

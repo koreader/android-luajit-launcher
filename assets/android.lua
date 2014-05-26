@@ -442,32 +442,30 @@ end
 --[[
 a loader function for Lua which will look for assets when loading modules
 --]]
-function android.asset_loader(modulename)
+function asset_loader(modulename)
     local errmsg = ""
     -- Find source
     local modulepath = string.gsub(modulename, "%.", "/")
-    for path in string.gmatch(package.path, "([^;]+)") do
-        local filename = string.gsub(path, "%?", modulepath)
-        local asset = ffi.C.AAssetManager_open(
-            android.app.activity.assetManager,
-            filename, ffi.C.AASSET_MODE_BUFFER)
-        --android.LOGI(string.format("trying to open asset %s: %s", filename, tostring(asset)))
-        if asset ~= nil then
-            -- read asset:
-            local assetdata = ffi.C.AAsset_getBuffer(asset)
-            local assetsize = ffi.C.AAsset_getLength(asset)
-            if assetdata ~= nil then
-                -- Compile and return the module
-                local compiled = assert(loadstring(ffi.string(assetdata, assetsize), filename))
-                ffi.C.AAsset_close(asset)
-                return compiled
-            else
-                ffi.C.AAsset_close(asset)
-                errmsg = errmsg.."\n\tunaccessible file '"..filename.."' (tried with asset loader)"
-            end
+    local filename = string.gsub("?.lua", "%?", modulepath)
+    local asset = ffi.C.AAssetManager_open(
+        android.app.activity.assetManager,
+        filename, ffi.C.AASSET_MODE_BUFFER)
+    --android.LOGI(string.format("trying to open asset %s: %s", filename, tostring(asset)))
+    if asset ~= nil then
+        -- read asset:
+        local assetdata = ffi.C.AAsset_getBuffer(asset)
+        local assetsize = ffi.C.AAsset_getLength(asset)
+        if assetdata ~= nil then
+            -- Compile and return the module
+            local compiled = assert(loadstring(ffi.string(assetdata, assetsize), filename))
+            ffi.C.AAsset_close(asset)
+            return compiled
         else
-            errmsg = errmsg.."\n\tno file '"..filename.."' (checked with asset loader)"
+            ffi.C.AAsset_close(asset)
+            errmsg = errmsg.."\n\tunaccessible file '"..filename.."' (tried with asset loader)"
         end
+    else
+        errmsg = errmsg.."\n\tno file '"..filename.."' (checked with asset loader)"
     end
     return errmsg
 end
@@ -475,14 +473,43 @@ end
 --[[
 this loader function just loads dependency libraries for C module
 --]]
-function android.deplib_loader(modulename)
+local function readable(filename)
+    local f = io.open(filename, "r")
+    if f == nil then return false end
+    f:close()
+    return true
+end
+
+function deplib_loader(modulename)
     local modulepath = string.gsub(modulename, "%.", "/")
     for path in string.gmatch(package.cpath, "([^;]+)") do
         local module = string.gsub(path, "%?", modulepath)
         -- load dependencies of this module with lo_dlopen
-        ffi.C.lo_dlopen(ffi.cast("char*", module))
+        if readable(module) then
+            ffi.C.lo_dlopen(ffi.cast("char*", module))
+        end
     end
 end
+
+function abs_path(package_path)
+    local path_mod = ""
+    for path in string.gmatch(package_path, "([^;]+)") do
+        if path:sub(1, 1) ~= "/" then
+            path = android.dir .. "/" .. path
+        end
+        path_mod = path_mod .. path .. ";"
+    end
+    return path_mod
+end
+
+function path_modifier()
+    package.path = abs_path(package.path)
+end
+
+function cpath_modifier()
+    package.cpath = abs_path(package.cpath)
+end
+
 --[[
 the C code will call this function:
 --]]
@@ -492,14 +519,17 @@ local function run(android_app_state, app_data_dir)
     android.LOGI("Application data directory "..android.dir)
 
     -- set up a sensible package.path
-    package.path = "?.lua;"
+    package.path = "?.lua;"..android.dir.."/?.lua;"
     -- set absolute cpath
-    package.cpath = "?.so;"
+    package.cpath = "?.so;"..android.dir.."/?.so;"
+    -- register path modifer
+    table.insert(package.loaders, 2, path_modifier)
+    -- register cpath modifer
+    table.insert(package.loaders, 3, cpath_modifier)
     -- register the asset loader
-    table.insert(package.loaders, 2, android.asset_loader)
+    table.insert(package.loaders, 4, asset_loader)
     -- register the dependency lib loader
-    table.insert(package.loaders, 3, android.deplib_loader)
-
+    table.insert(package.loaders, 5, deplib_loader)
     -- register the "android" module
     package.loaded.android = android
 
@@ -510,14 +540,14 @@ local function run(android_app_state, app_data_dir)
         return ffi_load(library)
     end
 
-    -- add installer module that should install native libraries into libs
-    local install = android.asset_loader("install")
+    -- install native libraries into libs
+    local install = asset_loader("install")
     if type(install) == "function" then
         install()
     else
         error("error loading install.lua")
     end
-    local main = android.asset_loader("main")
+    local main = asset_loader("main")
     if type(main) == "function" then
         return main()
     else
