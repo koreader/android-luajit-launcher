@@ -442,7 +442,7 @@ end
 --[[
 a loader function for Lua which will look for assets when loading modules
 --]]
-function asset_loader(modulename)
+function android.asset_loader(modulename)
     local errmsg = ""
     -- Find source
     local modulepath = string.gsub(modulename, "%.", "/")
@@ -480,7 +480,7 @@ local function readable(filename)
     return true
 end
 
-function deplib_loader(modulename)
+function android.deplib_loader(modulename)
     local modulepath = string.gsub(modulename, "%.", "/")
     for path in string.gmatch(package.cpath, "([^;]+)") do
         local module = string.gsub(path, "%?", modulepath)
@@ -502,11 +502,11 @@ function abs_path(package_path)
     return path_mod
 end
 
-function path_modifier()
+function android.path_modifier()
     package.path = abs_path(package.path)
 end
 
-function cpath_modifier()
+function android.cpath_modifier()
     package.cpath = abs_path(package.cpath)
 end
 
@@ -523,13 +523,13 @@ local function run(android_app_state, app_data_dir)
     -- set absolute cpath
     package.cpath = "?.so;"..android.dir.."/?.so;"
     -- register path modifer
-    table.insert(package.loaders, 2, path_modifier)
+    table.insert(package.loaders, 2, android.path_modifier)
     -- register cpath modifer
-    table.insert(package.loaders, 3, cpath_modifier)
+    table.insert(package.loaders, 3, android.cpath_modifier)
     -- register the asset loader
-    table.insert(package.loaders, 4, asset_loader)
+    table.insert(package.loaders, 4, android.asset_loader)
     -- register the dependency lib loader
-    table.insert(package.loaders, 5, deplib_loader)
+    table.insert(package.loaders, 5, android.deplib_loader)
     -- register the "android" module
     package.loaded.android = android
 
@@ -541,13 +541,13 @@ local function run(android_app_state, app_data_dir)
     end
 
     -- install native libraries into libs
-    local install = asset_loader("install")
+    local install = android.asset_loader("install")
     if type(install) == "function" then
         install()
     else
         error("error loading install.lua")
     end
-    local main = asset_loader("main")
+    local main = android.asset_loader("main")
     if type(main) == "function" then
         return main()
     else

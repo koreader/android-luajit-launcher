@@ -5,10 +5,6 @@ local A = require("android")
 
 require("libs/libkoreader-lfs")
 
-lfs.currentdir = function()
-    return A.dir
-end
-
 -- the default current directory is root so we should first of all
 -- change current directory to application's data directory
 if lfs.chdir(A.dir) then
