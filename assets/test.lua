@@ -13,6 +13,10 @@ A.LOGI("k2pdfopt library loaded "..tostring(k2pdfopt))
 local crengine = ffi.load("libs/libcrengine.so")
 A.LOGI("crengine library loaded "..tostring(crengine))
 
+local lfs_loaded = require("libs/libkoreader-lfs")
+A.LOGI("koreader-lfs loaded "..tostring(lfs))
+A.LOGI("koreader-lfs current dir "..lfs.currentdir())
+
 local pdf_loaded = require("libs/libkoreader-pdf")
 A.LOGI("koreader-pdf loaded "..tostring(pdf))
 A.LOGI("koreader-pdf openDocument "..tostring(pdf.openDocument))
