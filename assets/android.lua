@@ -491,7 +491,7 @@ function android.deplib_loader(modulename)
     end
 end
 
-function abs_path(package_path)
+local function abs_path(package_path)
     local path_mod = ""
     for path in string.gmatch(package_path, "([^;]+)") do
         if path:sub(1, 1) ~= "/" then
