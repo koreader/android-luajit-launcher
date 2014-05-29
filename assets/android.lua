@@ -1000,11 +1000,11 @@ local function run(android_app_state, app_data_dir)
     else
         error("error loading install.lua")
     end
-    local main = android.asset_loader("main")
-    if type(main) == "function" then
-        return main()
+    local launch = android.asset_loader("launcher")
+    if type(launch) == "function" then
+        return launch()
     else
-        error("error loading main.lua")
+        error("error loading launcher.lua")
     end
 end
 
