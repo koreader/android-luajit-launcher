@@ -20,6 +20,9 @@ util = require("ffi/util")
 einkfb = require("ffi/framebuffer")
 input = require("ffi/input_android")
 
-ARGV = {"-d", "/sdcard"}
-dofile(A.dir.."/reader.lua")
+local function launch()
+    ARGV = {"-d", "/sdcard"}
+    dofile(A.dir.."/reader.lua")
+end
 
+launch()
