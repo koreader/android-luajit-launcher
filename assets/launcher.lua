@@ -1,28 +1,39 @@
 local ffi = require("ffi")
 local A = require("android")
 
---require("test")
+ffi.cdef[[
+int chdir(const char *path);
+char *getcwd(char *buf, size_t size);
+char *strerror(int errnum);
+]]
 
-require("libs/libkoreader-lfs")
+function chdir(path)
+    if ffi.C.chdir(path) == 0 then
+        return true
+    else
+        err_msg = "Unable to change working directory to '" ..path.."'"
+        return nil, ffi.string(ffi.C.strerror(ffi.errno()))
+    end
+end
+
+local max_path = 4096
+function currentdir()
+    return ffi.string(
+        ffi.C.getcwd(ffi.new('char[?]', max_path), max_path))
+end
+
+--require("test")
 
 -- the default current directory is root so we should first of all
 -- change current directory to application's data directory
-if lfs.chdir(A.dir) then
-    A.LOGI("Change directory to "..lfs.currentdir())
+if chdir(A.dir) then
+    A.LOGI("Change directory to "..currentdir())
 else
     A.LOGE("Cannot change directory to "..A.dir)
 end
 
-Blitbuffer = require("ffi/blitbuffer")
-freetype = require("ffi/freetype")
-Image = require("ffi/mupdfimg")
-util = require("ffi/util")
-einkfb = require("ffi/framebuffer")
-input = require("ffi/input_android")
-
 local function launch()
-    ARGV = {"-d", "/sdcard"}
-    dofile(A.dir.."/reader.lua")
+    dofile(A.dir.."/llapp_main.lua")
 end
 
 launch()
