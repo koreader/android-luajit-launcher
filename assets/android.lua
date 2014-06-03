@@ -780,6 +780,22 @@ typedef struct ANativeActivity {
     AAssetManager* assetManager;
 } ANativeActivity;
 
+void ANativeActivity_finish(ANativeActivity* activity);
+void ANativeActivity_setWindowFormat(ANativeActivity* activity, int32_t format);
+void ANativeActivity_setWindowFlags(ANativeActivity* activity,
+        uint32_t addFlags, uint32_t removeFlags);
+enum {
+    ANATIVEACTIVITY_SHOW_SOFT_INPUT_IMPLICIT = 0x0001,
+    ANATIVEACTIVITY_SHOW_SOFT_INPUT_FORCED = 0x0002,
+};
+void ANativeActivity_showSoftInput(ANativeActivity* activity, uint32_t flags);
+enum {
+    ANATIVEACTIVITY_HIDE_SOFT_INPUT_IMPLICIT_ONLY = 0x0001,
+    ANATIVEACTIVITY_HIDE_SOFT_INPUT_NOT_ALWAYS = 0x0002,
+};
+void ANativeActivity_hideSoftInput(ANativeActivity* activity, uint32_t flags);
+
+
 // from android-ndk/platforms/android-9/arch-arm/usr/include/pthread.h:
 
 typedef struct {
