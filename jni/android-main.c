@@ -45,14 +45,14 @@ void android_main(struct android_app* state) {
     luaCode = AAssetManager_open(state->activity->assetManager, LOADER_ASSET, AASSET_MODE_BUFFER);
     if (luaCode == NULL) {
         LOGE("error loading loader asset");
-        return;
+        goto quit;
     }
 
     bufsize = AAsset_getLength(luaCode);
     buf = AAsset_getBuffer(luaCode);
     if (buf == NULL) {
         LOGE("error getting loader asset buffer");
-        return;
+        goto quit;
     }
 
     // Load initial Lua loader from our asset store:
@@ -64,7 +64,7 @@ void android_main(struct android_app* state) {
     AAsset_close(luaCode);
     if (status) {
         LOGE("error loading file: %s", lua_tostring(L, -1));
-        return;
+        goto quit;
     }
 
     // pass the android_app state to Lua land:
@@ -73,8 +73,11 @@ void android_main(struct android_app* state) {
     status = lua_pcall(L, 1, LUA_MULTRET, 0);
     if (status) {
         LOGE("Failed to run script: %s", lua_tostring(L, -1));
-        return;
+        goto quit;
     }
 
     lua_close(L);
+
+quit:
+    ANativeActivity_finish(state->activity);
 }
