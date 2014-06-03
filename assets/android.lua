@@ -1102,7 +1102,7 @@ local function run(android_app_state)
 
     -- load the dlopen() implementation
     android.dl = require("dl")
-    android.dl.library_path = "/lib:/system/lib:" .. android.nativeLibraryDir
+    android.dl.library_path = ".:/lib:/system/lib:" .. android.nativeLibraryDir
 
     -- register the dependency lib loader
     table.insert(package.loaders, 3, android.deplib_loader)
