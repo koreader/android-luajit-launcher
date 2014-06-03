@@ -974,7 +974,7 @@ function JNI:context(jvm, runnable)
 
     local env = ffi.new("JNIEnv*[1]")
     self.jvm[0].GetEnv(self.jvm, ffi.cast("void**", env), ffi.C.JNI_VERSION_1_6)
-    
+
     assert(self.jvm[0].AttachCurrentThread(self.jvm, env, nil) ~= ffi.C.JNI_ERR,
         "cannot attach JVM to current thread")
 
@@ -991,6 +991,12 @@ function JNI:callObjectMethod(object, method, signature, ...)
     local clazz = self.env[0].GetObjectClass(self.env, object)
     local methodID = self.env[0].GetMethodID(self.env, clazz, method, signature)
     return self.env[0].CallObjectMethod(self.env, object, methodID, ...)
+end
+
+function JNI:callIntMethod(object, method, signature, ...)
+    local clazz = self.env[0].GetObjectClass(self.env, object)
+    local methodID = self.env[0].GetMethodID(self.env, clazz, method, signature)
+    return self.env[0].CallIntMethod(self.env, object, methodID, ...)
 end
 
 function JNI:getObjectField(object, field, signature)
@@ -1103,8 +1109,25 @@ local function run(android_app_state)
                 JNI:to_string(JNI:getObjectField(app_info, "dataDir", "Ljava/lang/String;")),
                 JNI:to_string(JNI:getObjectField(app_info, "nativeLibraryDir", "Ljava/lang/String;"))
         end)
+    android.screen = {}
+    android.screen.width, android.screen.height =
+        JNI:context(android.app.activity.vm, function(JNI)
+            local display = JNI:callObjectMethod(
+                JNI:callObjectMethod(
+                    android.app.activity.clazz,
+                    "getWindowManager",
+                    "()Landroid/view/WindowManager;"
+                ),
+                "getDefaultDisplay",
+                "()Landroid/view/Display;"
+            )
+            return
+                JNI:callIntMethod(display, "getWidth", "()I"),
+                JNI:callIntMethod(display, "getHeight", "()I")
+        end)
     android.LOGI("Application data directory "..android.dir)
     android.LOGI("Application library directory "..android.nativeLibraryDir)
+    android.LOGI("Screen size "..android.screen.width.."x"..android.screen.height)
 
     -- register the "android" module (ourself)
     package.loaded.android = android
