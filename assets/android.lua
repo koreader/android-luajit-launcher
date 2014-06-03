@@ -1,8 +1,5 @@
 local ffi = require("ffi")
 ffi.cdef[[
-// dlopen that loads library recursiviely
-void * lo_dlopen(char *library);
-
 // logging:
 int __android_log_print(int prio, const char *tag,  const char *fmt, ...);
 typedef enum android_LogPriority {
@@ -952,6 +949,48 @@ int32_t AConfiguration_getScreenSize(AConfiguration* config);
 void AConfiguration_getLanguage(AConfiguration* config, char* outLanguage);
 ]]
 
+-- JNI Interfacing
+
+local JNI = {}
+
+function JNI:context(jvm, runnable)
+    self.jvm = jvm
+
+    local env = ffi.new("JNIEnv*[1]")
+    self.jvm[0].GetEnv(self.jvm, ffi.cast("void**", env), ffi.C.JNI_VERSION_1_6)
+    
+    assert(self.jvm[0].AttachCurrentThread(self.jvm, env, nil) ~= ffi.C.JNI_ERR,
+        "cannot attach JVM to current thread")
+
+    self.env = env[0]
+    local result = { runnable(self) }
+
+    self.jvm[0].DetachCurrentThread(self.jvm)
+    self.env = nil
+
+    return unpack(result)
+end
+
+function JNI:callObjectMethod(object, method, signature, ...)
+    local clazz = self.env[0].GetObjectClass(self.env, object)
+    local methodID = self.env[0].GetMethodID(self.env, clazz, method, signature)
+    return self.env[0].CallObjectMethod(self.env, object, methodID, ...)
+end
+
+function JNI:getObjectField(object, field, signature)
+    local clazz = self.env[0].GetObjectClass(self.env, object)
+    local fieldID = self.env[0].GetFieldID(self.env, clazz, field, signature)
+    return self.env[0].GetObjectField(self.env, object, fieldID)
+end
+
+function JNI:to_string(javastring)
+    return ffi.string(
+        self.env[0].GetStringUTFChars(self.env, javastring, nil),
+        self.env[0].GetStringUTFLength(self.env, javastring))
+end
+
+-- Android specific
+
 local android = {
     app = nil,
     log_name = "luajit-launcher",
@@ -1004,74 +1043,75 @@ function android.asset_loader(modulename)
     return errmsg
 end
 
---[[
-this loader function just loads dependency libraries for C module
---]]
-local function readable(filename)
-    local f = io.open(filename, "r")
-    if f == nil then return false end
-    f:close()
-    return true
-end
-
 function android.deplib_loader(modulename)
     local modulepath = string.gsub(modulename, "%.", "/")
     for path in string.gmatch(package.cpath, "([^;]+)") do
         local module = string.gsub(path, "%?", modulepath)
-        -- load dependencies of this module with lo_dlopen
-        if readable(module) then
-            ffi.C.lo_dlopen(ffi.cast("char*", module))
-        end
+        -- try to load dependencies of this module with our dlopen implementation
+        android.LOGI("try to load module "..module)
+        if pcall(android.dl.dlopen, module) then return end
     end
 end
 
-local function abs_path(package_path)
-    local path_mod = ""
-    for path in string.gmatch(package_path, "([^;]+)") do
-        if path:sub(1, 1) ~= "/" then
-            path = android.dir .. "/" .. path
-        end
-        path_mod = path_mod .. path .. ";"
-    end
-    return path_mod
-end
-
-function android.path_modifier()
-    package.path = abs_path(package.path)
-end
-
-function android.cpath_modifier()
-    package.cpath = abs_path(package.cpath)
+function android.get_application_directory()
 end
 
 --[[
 the C code will call this function:
 --]]
-local function run(android_app_state, app_data_dir)
+local function run(android_app_state)
     android.app = ffi.cast("struct android_app*", android_app_state)
-    android.dir = app_data_dir
+
+    android.dir, android.nativeLibraryDir =
+        JNI:context(android.app.activity.vm, function(JNI)
+            local app_info = JNI:getObjectField(
+                JNI:callObjectMethod(
+                    JNI:callObjectMethod(
+                        android.app.activity.clazz,
+                        "getPackageManager",
+                        "()Landroid/content/pm/PackageManager;"
+                    ),
+                    "getPackageInfo",
+                    "(Ljava/lang/String;I)Landroid/content/pm/PackageInfo;",
+                    JNI:callObjectMethod(
+                        android.app.activity.clazz,
+                        "getPackageName",
+                        "()Ljava/lang/String;"
+                    ),
+                    0
+                ),
+                "applicationInfo",
+                "Landroid/content/pm/ApplicationInfo;"
+            )
+            return
+                JNI:to_string(JNI:getObjectField(app_info, "dataDir", "Ljava/lang/String;")),
+                JNI:to_string(JNI:getObjectField(app_info, "nativeLibraryDir", "Ljava/lang/String;"))
+        end)
     android.LOGI("Application data directory "..android.dir)
+    android.LOGI("Application library directory "..android.nativeLibraryDir)
+
+    -- register the "android" module (ourself)
+    package.loaded.android = android
 
     -- set up a sensible package.path
     package.path = "?.lua;"..android.dir.."/?.lua;"
     -- set absolute cpath
     package.cpath = "?.so;"..android.dir.."/?.so;"
-    -- register path modifer
-    table.insert(package.loaders, 2, android.path_modifier)
-    -- register cpath modifer
-    table.insert(package.loaders, 3, android.cpath_modifier)
     -- register the asset loader
-    table.insert(package.loaders, 4, android.asset_loader)
+    table.insert(package.loaders, 2, android.asset_loader)
+
+    -- load the dlopen() implementation
+    android.dl = require("dl")
+    android.dl.library_path = "/lib:/system/lib:" .. android.nativeLibraryDir
+
     -- register the dependency lib loader
-    table.insert(package.loaders, 5, android.deplib_loader)
-    -- register the "android" module
-    package.loaded.android = android
+    table.insert(package.loaders, 3, android.deplib_loader)
 
     -- ffi.load wrapper
     local ffi_load = ffi.load
     ffi.load = function(library, ...)
-        ffi.C.lo_dlopen(ffi.cast("char*", library))
-        return ffi_load(library)
+        android.LOGI("ffi.load "..library)
+        return android.dl.dlopen(library, ffi_load)
     end
 
     -- install native libraries into libs

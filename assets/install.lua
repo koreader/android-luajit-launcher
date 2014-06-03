@@ -2,8 +2,6 @@ local ffi = require("ffi")
 local A = require("android")
 
 ffi.cdef[[
-void append_ld_path(const char *path);
-
 struct FILE *fopen(const char *, const char *);
 size_t fread(void *, size_t, size_t, struct FILE *);
 size_t fwrite(const void *, size_t, size_t, struct FILE *);
@@ -23,11 +21,12 @@ local function install()
     local module = "module"
     local package_name = "koreader%-(.*)%.7z"
     local mgr = A.app.activity.assetManager
-    local asset_dir = ffi.C.AAssetManager_openDir(mgr,
-                    ffi.cast("char*", module))
-    local filename = ffi.string(ffi.C.AAssetDir_getNextFileName(asset_dir))
-    A.LOGI(string.format("Check file in asset %s: %s", module, filename))
+    local asset_dir = ffi.C.AAssetManager_openDir(mgr, module)
+    assert(asset_dir ~= nil, "could not open module directory in assets")
+    local filename = ffi.C.AAssetDir_getNextFileName(asset_dir)
     while filename ~= nil do
+        filename = ffi.string(filename)
+        A.LOGI(string.format("Check file in asset %s: %s", module, filename))
         local rev = filename:match(package_name)
         if rev then
             if rev == check_installed_rev() then
@@ -62,7 +61,7 @@ local function install()
                     argv[i-1] = ffi.cast("char*", args[i])
                 end
                 A.LOGI("Installing new koreader package to "..args[4])
-                local lzma = ffi.load("lib/liblzma.so")
+                local lzma = ffi.load("liblzma.so")
                 lzma.lzma_main(ffi.new("int", #args), argv)
                 ffi.C.remove(ffi.cast("char*", package))
                 break
