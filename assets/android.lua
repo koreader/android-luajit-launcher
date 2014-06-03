@@ -1006,9 +1006,10 @@ function JNI:getObjectField(object, field, signature)
 end
 
 function JNI:to_string(javastring)
-    return ffi.string(
-        self.env[0].GetStringUTFChars(self.env, javastring, nil),
-        self.env[0].GetStringUTFLength(self.env, javastring))
+    local utf = self.env[0].GetStringUTFChars(self.env, javastring, nil)
+    local luastr = ffi.string(utf, self.env[0].GetStringUTFLength(self.env, javastring))
+    self.env[0].ReleaseStringUTFChars(self.env, javastring, utf)
+    return luastr
 end
 
 -- Android specific
