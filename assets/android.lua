@@ -1099,6 +1099,15 @@ local function run(android_app_state)
 
     android.dir, android.nativeLibraryDir =
         JNI:context(android.app.activity.vm, function(JNI)
+            local files_dir = JNI:callObjectMethod(
+                JNI:callObjectMethod(
+                    android.app.activity.clazz,
+                    "getFilesDir",
+                    "()Ljava/io/File;"
+                ),
+                "getAbsolutePath",
+                "()Ljava/lang/String;"
+            )
             local app_info = JNI:getObjectField(
                 JNI:callObjectMethod(
                     JNI:callObjectMethod(
@@ -1119,7 +1128,7 @@ local function run(android_app_state)
                 "Landroid/content/pm/ApplicationInfo;"
             )
             return
-                JNI:to_string(JNI:getObjectField(app_info, "dataDir", "Ljava/lang/String;")),
+                JNI:to_string(files_dir),
                 JNI:to_string(JNI:getObjectField(app_info, "nativeLibraryDir", "Ljava/lang/String;"))
         end)
     android.screen = {}
