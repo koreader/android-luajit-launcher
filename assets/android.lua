@@ -1066,13 +1066,25 @@ function android.asset_loader(modulename)
     return errmsg
 end
 
+--[[
+this loader function just loads dependency libraries for C module
+--]]
 function android.deplib_loader(modulename)
+    local function readable(filename)
+        local f = io.open(filename, "r")
+        if f == nil then return false end
+        f:close()
+        return true
+    end
+
     local modulepath = string.gsub(modulename, "%.", "/")
     for path in string.gmatch(package.cpath, "([^;]+)") do
         local module = string.gsub(path, "%?", modulepath)
         -- try to load dependencies of this module with our dlopen implementation
-        android.LOGI("try to load module "..module)
-        if pcall(android.dl.dlopen, module) then return end
+        if readable(module) then
+            android.LOGI("try to load module "..module)
+            if pcall(android.dl.dlopen, module) then return end
+        end
     end
 end
 
@@ -1142,7 +1154,7 @@ local function run(android_app_state)
 
     -- load the dlopen() implementation
     android.dl = require("dl")
-    android.dl.library_path = ".:/lib:/system/lib:" .. android.nativeLibraryDir
+    android.dl.library_path = "/lib:/system/lib:"..android.nativeLibraryDir..":"..android.dir
 
     -- register the dependency lib loader
     table.insert(package.loaders, 3, android.deplib_loader)
