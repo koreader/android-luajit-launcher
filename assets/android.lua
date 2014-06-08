@@ -963,6 +963,7 @@ int32_t AConfiguration_getKeyboard(AConfiguration* config);
 int32_t AConfiguration_getTouchscreen(AConfiguration* config);
 int32_t AConfiguration_getScreenSize(AConfiguration* config);
 void AConfiguration_getLanguage(AConfiguration* config, char* outLanguage);
+void AConfiguration_getCountry(AConfiguration* config, char* outCountry);
 ]]
 
 -- JNI Interfacing
