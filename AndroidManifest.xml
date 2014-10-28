@@ -18,6 +18,26 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="file" />
+                <data android:host="*" />
+                <data android:mimeType="*/*" />
+                <data android:pathPattern=".*\\.pdf" />
+                <data android:pathPattern=".*\\.djvu" />
+                <data android:pathPattern=".*\\.epub" />
+                <data android:pathPattern=".*\\.cbz" />
+                <data android:pathPattern=".*\\.zip" />
+                <data android:pathPattern=".*\\.xps" />
+                <data android:pathPattern=".*\\.fb2" />
+                <data android:pathPattern=".*\\.mobi" />
+                <data android:pathPattern=".*\\.chm" />
+                <data android:pathPattern=".*\\.pdb" />
+                <data android:pathPattern=".*\\.doc" />
+                <data android:pathPattern=".*\\.tcr" />
+                <data android:pathPattern=".*\\.rtf" />
+            </intent-filter>
         </activity>
     </application>
 </manifest>

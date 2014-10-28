@@ -1017,6 +1017,7 @@ end
 
 local android = {
     app = nil,
+    jni = JNI,
     log_name = "luajit-launcher",
 }
 
