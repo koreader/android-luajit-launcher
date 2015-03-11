@@ -1088,7 +1088,11 @@ function android.deplib_loader(modulename)
         -- try to load dependencies of this module with our dlopen implementation
         if readable(module) then
             android.LOGI("try to load module "..module)
-            if pcall(android.dl.dlopen, module) then return end
+            local ok, err = pcall(android.dl.dlopen, module)
+            if ok then return end
+            if err then
+                android.LOGI("error: " .. err)
+            end
         end
     end
 end
@@ -1168,7 +1172,9 @@ local function run(android_app_state)
 
     -- load the dlopen() implementation
     android.dl = require("dl")
-    android.dl.library_path = "/lib:/system/lib:"..android.nativeLibraryDir..":"..android.dir
+    android.dl.library_path = android.nativeLibraryDir..":"..
+        android.dir..":"..android.dir.."/libs:"..
+        "/lib:/system/lib:/lib/lib?.so:/system/lib/lib?.so"
 
     -- register the dependency lib loader
     table.insert(package.loaders, 3, android.deplib_loader)
