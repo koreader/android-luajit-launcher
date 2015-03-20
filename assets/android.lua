@@ -1,6 +1,3 @@
-require("jit.opt").start("sizemcode=512","maxmcode=512")
-for i=1,100 do end  -- Force allocation of the first segment
-
 local ffi = require("ffi")
 ffi.cdef[[
 // logging:
