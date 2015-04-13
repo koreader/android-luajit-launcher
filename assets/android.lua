@@ -1000,10 +1000,36 @@ function JNI:callIntMethod(object, method, signature, ...)
     return self.env[0].CallIntMethod(self.env, object, methodID, ...)
 end
 
+function JNI:callStaticIntMethod(class, method, signature, ...)
+    local clazz = self.env[0].FindClass(self.env, class)
+    local methodID = self.env[0].GetStaticMethodID(self.env, clazz, method, signature)
+    return self.env[0].CallStaticIntMethod(self.env, clazz, methodID, ...)
+end
+
+function JNI:callStaticBooleanMethod(class, method, signature, ...)
+    local clazz = self.env[0].FindClass(self.env, class)
+    local methodID = self.env[0].GetStaticMethodID(self.env, clazz, method, signature)
+    return self.env[0].CallStaticBooleanMethod(self.env, clazz, methodID, ...)
+end
+
 function JNI:getObjectField(object, field, signature)
     local clazz = self.env[0].GetObjectClass(self.env, object)
     local fieldID = self.env[0].GetFieldID(self.env, clazz, field, signature)
     return self.env[0].GetObjectField(self.env, object, fieldID)
+end
+
+function JNI:setObjectField(object, field, signature, value)
+    local clazz = self.env[0].GetObjectClass(self.env, object)
+    local fieldID = self.env[0].GetFieldID(self.env, clazz, field, signature)
+    self.env[0].SetObjectField(self.env, object, fieldID, value)
+    return object
+end
+
+function JNI:setFloatField(object, field, signature, value)
+    local clazz = self.env[0].GetObjectClass(self.env, object)
+    local fieldID = self.env[0].GetFieldID(self.env, clazz, field, signature)
+    self.env[0].SetFloatField(self.env, object, fieldID, value)
+    return object
 end
 
 function JNI:to_string(javastring)
@@ -1153,9 +1179,67 @@ local function run(android_app_state)
                 JNI:callIntMethod(display, "getWidth", "()I"),
                 JNI:callIntMethod(display, "getHeight", "()I")
         end)
+    android.get_screen_brightness = function()
+        return JNI:context(android.app.activity.vm, function(JNI)
+            local str_brightness = JNI.env[0].NewStringUTF(JNI.env, "screen_brightness")
+            local res = JNI:callStaticIntMethod(
+                "android/provider/Settings$System",
+                "getInt",
+                "(Landroid/content/ContentResolver;Ljava/lang/String;)I",
+                JNI:callObjectMethod(
+                    android.app.activity.clazz,
+                    "getContentResolver",
+                    "()Landroid/content/ContentResolver;"
+                ),
+                str_brightness
+                )
+            JNI.env[0].DeleteLocalRef(JNI.env, str_brightness)
+            return res
+        end)
+    end
+    android.set_screen_brightness = function(brightness)
+        android.LOGI("set screen brightness "..brightness)
+        return JNI:context(android.app.activity.vm, function(JNI)
+            local str_brightness = JNI.env[0].NewStringUTF(JNI.env, "screen_brightness")
+            local res = JNI:callStaticBooleanMethod(
+                "android/provider/Settings$System",
+                "putInt",
+                "(Landroid/content/ContentResolver;Ljava/lang/String;I)Z",
+                JNI:callObjectMethod(
+                    android.app.activity.clazz,
+                    "getContentResolver",
+                    "()Landroid/content/ContentResolver;"
+                ),
+                str_brightness,
+                brightness
+                )
+            JNI.env[0].DeleteLocalRef(JNI.env, str_brightness)
+            --[[
+            if res then
+                local window = JNI:callObjectMethod(
+                    android.app.activity.clazz,
+                    "getWindow",
+                    "()Landroid/view/Window;"
+                )
+                JNI:callObjectMethod(
+                    window,
+                    "setAttributes",
+                    "(Landroid/view/WindowManager$LayoutParams;)V",
+                    JNI:setFloatField(JNI:callObjectMethod(
+                        window,
+                        "getAttributes",
+                        "()Landroid/view/WindowManager$LayoutParams;"
+                    ), "screenBrightness", "F", brightness/255)
+                )
+            end
+            --]]
+            return res
+        end)
+    end
     android.LOGI("Application data directory "..android.dir)
     android.LOGI("Application library directory "..android.nativeLibraryDir)
     android.LOGI("Screen size "..android.screen.width.."x"..android.screen.height)
+    android.LOGI("Screen brightness "..android.get_screen_brightness())
 
     -- register the "android" module (ourself)
     package.loaded.android = android
