@@ -991,30 +991,44 @@ end
 function JNI:callObjectMethod(object, method, signature, ...)
     local clazz = self.env[0].GetObjectClass(self.env, object)
     local methodID = self.env[0].GetMethodID(self.env, clazz, method, signature)
+    self.env[0].DeleteLocalRef(self.env, clazz)
     return self.env[0].CallObjectMethod(self.env, object, methodID, ...)
 end
 
 function JNI:callIntMethod(object, method, signature, ...)
     local clazz = self.env[0].GetObjectClass(self.env, object)
     local methodID = self.env[0].GetMethodID(self.env, clazz, method, signature)
+    self.env[0].DeleteLocalRef(self.env, clazz)
     return self.env[0].CallIntMethod(self.env, object, methodID, ...)
 end
 
 function JNI:callStaticIntMethod(class, method, signature, ...)
     local clazz = self.env[0].FindClass(self.env, class)
     local methodID = self.env[0].GetStaticMethodID(self.env, clazz, method, signature)
+    self.env[0].DeleteLocalRef(self.env, clazz)
     return self.env[0].CallStaticIntMethod(self.env, clazz, methodID, ...)
 end
 
 function JNI:callStaticBooleanMethod(class, method, signature, ...)
     local clazz = self.env[0].FindClass(self.env, class)
     local methodID = self.env[0].GetStaticMethodID(self.env, clazz, method, signature)
-    return self.env[0].CallStaticBooleanMethod(self.env, clazz, methodID, ...)
+    local res = self.env[0].CallStaticBooleanMethod(self.env, clazz, methodID, ...)
+    self.env[0].DeleteLocalRef(self.env, clazz)
+    return res
+end
+
+function JNI:callStaticObjectMethod(class, method, signature, ...)
+    local clazz = self.env[0].FindClass(self.env, class)
+    local methodID = self.env[0].GetStaticMethodID(self.env, clazz, method, signature)
+    local res = self.env[0].CallStaticObjectMethod(self.env, clazz, methodID, ...)
+    self.env[0].DeleteLocalRef(self.env, clazz)
+    return res
 end
 
 function JNI:getObjectField(object, field, signature)
     local clazz = self.env[0].GetObjectClass(self.env, object)
     local fieldID = self.env[0].GetFieldID(self.env, clazz, field, signature)
+    self.env[0].DeleteLocalRef(self.env, clazz)
     return self.env[0].GetObjectField(self.env, object, fieldID)
 end
 
@@ -1022,6 +1036,7 @@ function JNI:setObjectField(object, field, signature, value)
     local clazz = self.env[0].GetObjectClass(self.env, object)
     local fieldID = self.env[0].GetFieldID(self.env, clazz, field, signature)
     self.env[0].SetObjectField(self.env, object, fieldID, value)
+    self.env[0].DeleteLocalRef(self.env, clazz)
     return object
 end
 
@@ -1029,6 +1044,7 @@ function JNI:setFloatField(object, field, signature, value)
     local clazz = self.env[0].GetObjectClass(self.env, object)
     local fieldID = self.env[0].GetFieldID(self.env, clazz, field, signature)
     self.env[0].SetFloatField(self.env, object, fieldID, value)
+    self.env[0].DeleteLocalRef(self.env, clazz)
     return object
 end
 
@@ -1234,6 +1250,45 @@ local function run(android_app_state)
             end
             --]]
             return res
+        end)
+    end
+    io.popen = function(prog, mode)
+        mode = mode or "r"
+        if mode ~= "r" then
+            android.LOGI("io.popen currently only supports read mode")
+            return
+        end
+        android.LOGI("run program "..prog)
+        return JNI:context(android.app.activity.vm, function(JNI)
+            local program = JNI.env[0].NewStringUTF(JNI.env, prog)
+            local stdout = JNI:callObjectMethod(
+                JNI:callObjectMethod(
+                    JNI:callStaticObjectMethod(
+                        "java/lang/Runtime",
+                        "getRuntime",
+                        "()Ljava/lang/Runtime;"
+                    ),
+                    "exec",
+                    "(Ljava/lang/String;)Ljava/lang/Process;",
+                    program
+                ),
+                "getInputStream",
+                "()Ljava/io/InputStream;"
+            )
+            local tmp_file = android.dir .. "/io.popen.tmp"
+            local tmp = io.open(tmp_file, "w")
+            while true do
+                local char = JNI:callIntMethod(stdout, "read", "()I")
+                if char >= 0 then
+                    tmp:write(string.char(char))
+                else
+                    tmp:close()
+                    break
+                end
+            end
+            JNI.env[0].DeleteLocalRef(JNI.env, program)
+            JNI.env[0].DeleteLocalRef(JNI.env, stdout)
+            return io.open(tmp_file, "r")
         end)
     end
     android.LOGI("Application data directory "..android.dir)
