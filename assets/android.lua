@@ -1252,43 +1252,61 @@ local function run(android_app_state)
             return res
         end)
     end
-    io.popen = function(prog, mode)
-        mode = mode or "r"
-        if mode ~= "r" then
-            android.LOGI("io.popen currently only supports read mode")
-            return
+    local function subprocess(JNI, argv)
+        local args_array = JNI.env[0].NewObjectArray(JNI.env, #argv,
+            JNI.env[0].FindClass(JNI.env, "java/lang/String"), nil)
+        local args_list = {}
+        for i = 1, #argv do
+            local arg = JNI.env[0].NewStringUTF(JNI.env, argv[i])
+            table.insert(args_list, arg)
+            JNI.env[0].SetObjectArrayElement(JNI.env, args_array, i-1, arg)
         end
-        android.LOGI("run program "..prog)
+        local process = JNI:callObjectMethod(
+            JNI:callStaticObjectMethod(
+                "java/lang/Runtime",
+                "getRuntime",
+                "()Ljava/lang/Runtime;"
+            ),
+            "exec",
+            "([Ljava/lang/String;)Ljava/lang/Process;",
+            args_array
+        )
+        for _, arg in ipairs(args_list) do
+            JNI.env[0].DeleteLocalRef(JNI.env, arg)
+        end
+        return process
+    end
+    android.execute = function(...)
+        local argv = {...}
+        android.LOGI("run command " .. table.concat(argv, " "))
         return JNI:context(android.app.activity.vm, function(JNI)
-            local program = JNI.env[0].NewStringUTF(JNI.env, prog)
+            local process = subprocess(JNI, argv)
+            JNI.env[0].DeleteLocalRef(JNI.env, process)
+            return 0 -- TODO: check if process is an exception
+        end)
+    end
+    android.stdout = function(...)
+        local argv = {...}
+        android.LOGI("run command " .. table.concat(argv, " "))
+        return JNI:context(android.app.activity.vm, function(JNI)
+            local process = subprocess(JNI, argv)
             local stdout = JNI:callObjectMethod(
-                JNI:callObjectMethod(
-                    JNI:callStaticObjectMethod(
-                        "java/lang/Runtime",
-                        "getRuntime",
-                        "()Ljava/lang/Runtime;"
-                    ),
-                    "exec",
-                    "(Ljava/lang/String;)Ljava/lang/Process;",
-                    program
-                ),
+                process,
                 "getInputStream",
                 "()Ljava/io/InputStream;"
             )
-            local tmp_file = android.dir .. "/io.popen.tmp"
-            local tmp = io.open(tmp_file, "w")
+            local out = ""
             while true do
                 local char = JNI:callIntMethod(stdout, "read", "()I")
                 if char >= 0 then
-                    tmp:write(string.char(char))
+                    out = out .. string.char(char)
                 else
-                    tmp:close()
                     break
                 end
             end
-            JNI.env[0].DeleteLocalRef(JNI.env, program)
+            JNI.env[0].DeleteLocalRef(JNI.env, process)
             JNI.env[0].DeleteLocalRef(JNI.env, stdout)
-            return io.open(tmp_file, "r")
+            return out
         end)
     end
     android.LOGI("Application data directory "..android.dir)
