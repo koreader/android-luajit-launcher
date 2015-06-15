@@ -1005,8 +1005,9 @@ end
 function JNI:callStaticIntMethod(class, method, signature, ...)
     local clazz = self.env[0].FindClass(self.env, class)
     local methodID = self.env[0].GetStaticMethodID(self.env, clazz, method, signature)
+    local res = self.env[0].CallStaticIntMethod(self.env, clazz, methodID, ...)
     self.env[0].DeleteLocalRef(self.env, clazz)
-    return self.env[0].CallStaticIntMethod(self.env, clazz, methodID, ...)
+    return res
 end
 
 function JNI:callStaticBooleanMethod(class, method, signature, ...)
