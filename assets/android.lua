@@ -1,4 +1,25 @@
 local ffi = require("ffi")
+
+ffi.cdef[[
+    void *mmap(void *addr, size_t length, int prot, int flags, int fd, size_t offset);
+    int munmap(void *addr, size_t length);
+]]
+
+-- reservation enough mmap slots for mcode allocation
+local reserved_slots = {}
+for i = 1, 32 do
+  local len = 0x80000 + i*0x2000
+  local p = ffi.C.mmap(nil, len, 0x3, 0x22, -1, 0)
+  table.insert(reserved_slots, {p = p, len = len})
+end
+-- free the reservation immediately
+for _, slot in ipairs(reserved_slots) do
+  local res = ffi.C.munmap(slot.p, slot.len)
+end
+-- and allocate a large mcode segment, hopefully it will success.
+require("jit.opt").start("sizemcode=512","maxmcode=512")
+for i=1,100 do end  -- Force allocation of one large segment
+
 ffi.cdef[[
 // logging:
 int __android_log_print(int prio, const char *tag,  const char *fmt, ...);
