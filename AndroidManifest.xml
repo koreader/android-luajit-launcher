@@ -28,19 +28,46 @@
                 <data android:host="*" />
                 <data android:scheme="file" />
                 <data android:mimeType="*/*" />
+                <!-- the second and third lines for each respective extension are a workaround for file patterns with dots in them, like /my.folder/test.pdf or  "Joe W. Writer-Love in Somewhere.pdf" -->
                 <data android:pathPattern=".*\\.pdf" />
+                <data android:pathPattern=".*\\..*\\.pdf" />
+                <data android:pathPattern=".*\\..*\\..*\\.pdf" />
                 <data android:pathPattern=".*\\.djvu" />
+                <data android:pathPattern=".*\\..*\\.djvu" />
+                <data android:pathPattern=".*\\..*\\..*\\.djvu" />
                 <data android:pathPattern=".*\\.epub" />
+                <data android:pathPattern=".*\\..*\\.epub" />
+                <data android:pathPattern=".*\\..*\\..*\\.epub" />
                 <data android:pathPattern=".*\\.cbz" />
+                <data android:pathPattern=".*\\..*\\.cbz" />
+                <data android:pathPattern=".*\\..*\\..*\\.cbz" />
                 <data android:pathPattern=".*\\.zip" />
+                <data android:pathPattern=".*\\..*\\.zip" />
+                <data android:pathPattern=".*\\..*\\..*\\.zip" />
                 <data android:pathPattern=".*\\.xps" />
+                <data android:pathPattern=".*\\..*\\.xps" />
+                <data android:pathPattern=".*\\..*\\..*\\.xps" />
                 <data android:pathPattern=".*\\.fb2" />
+                <data android:pathPattern=".*\\..*\\.fb2" />
+                <data android:pathPattern=".*\\..*\\..*\\.fb2" />
                 <data android:pathPattern=".*\\.mobi" />
+                <data android:pathPattern=".*\\..*\\.mobi" />
+                <data android:pathPattern=".*\\..*\\..*\\.mobi" />
                 <data android:pathPattern=".*\\.chm" />
+                <data android:pathPattern=".*\\..*\\.chm" />
+                <data android:pathPattern=".*\\..*\\..*\\.chm" />
                 <data android:pathPattern=".*\\.pdb" />
+                <data android:pathPattern=".*\\..*\\.pdb" />
+                <data android:pathPattern=".*\\..*\\..*\\.pdb" />
                 <data android:pathPattern=".*\\.doc" />
+                <data android:pathPattern=".*\\..*\\.doc" />
+                <data android:pathPattern=".*\\..*\\..*\\.doc" />
                 <data android:pathPattern=".*\\.tcr" />
+                <data android:pathPattern=".*\\..*\\.tcr" />
+                <data android:pathPattern=".*\\..*\\..*\\.tcr" />
                 <data android:pathPattern=".*\\.rtf" />
+                <data android:pathPattern=".*\\..*\\.rtf" />
+                <data android:pathPattern=".*\\..*\\..*\\.rtf" />
             </intent-filter>
         </activity>
     </application>
