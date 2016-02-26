@@ -33,9 +33,9 @@ local dl = {
 local function sys_dlopen(library)
     local p = ffi.C.dlopen(library, ffi.C.RTLD_LOCAL)
     if p == nil then
-        local error = ffi.C.dlerror()
-        if error ~= nil then
-            error("error opening "..library..": "..ffi.string(error))
+        local err_msg = ffi.C.dlerror()
+        if err_msg ~= nil then
+            error("error opening "..library..": "..ffi.string(err_msg))
         end
     end
     return p
