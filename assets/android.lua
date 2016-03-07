@@ -1303,8 +1303,42 @@ local function run(android_app_state)
         android.LOGI("run command " .. table.concat(argv, " "))
         return JNI:context(android.app.activity.vm, function(JNI)
             local process = subprocess(JNI, argv)
+            local stdout = JNI:callObjectMethod(
+                process,
+                "getInputStream",
+                "()Ljava/io/InputStream;"
+            )
+            local stderr = JNI:callObjectMethod(
+                process,
+                "getErrorStream",
+                "()Ljava/io/InputStream;"
+            )
+            local out = ""
+            local err = ""
+            while true do
+                local char = JNI:callIntMethod(stdout, "read", "()I")
+                if char >= 0 then
+                    out = out .. string.char(char)
+                else
+                    break
+                end
+            end
+            while true do
+                local char = JNI:callIntMethod(stderr, "read", "()I")
+                if char >= 0 then
+                    err = err .. string.char(char)
+                else
+                    break
+                end
+            end
+            local res = JNI:callIntMethod(process, "waitFor", "()I")
+            android.LOGI("command stdout:" .. out)
+            android.LOGI("command stderr:" .. err)
+            android.LOGI("command res:" .. res)
             JNI.env[0].DeleteLocalRef(JNI.env, process)
-            return 0 -- TODO: check if process is an exception
+            JNI.env[0].DeleteLocalRef(JNI.env, stdout)
+            JNI.env[0].DeleteLocalRef(JNI.env, stderr)
+            return res
         end)
     end
     android.stdout = function(...)
@@ -1326,10 +1360,17 @@ local function run(android_app_state)
                     break
                 end
             end
+            android.LOGI("command output:" .. out)
             JNI.env[0].DeleteLocalRef(JNI.env, process)
             JNI.env[0].DeleteLocalRef(JNI.env, stdout)
             return out
         end)
+    end
+    os.execute = function(command)
+        if command == nil then return -1 end
+        local argv = {}
+        command:gsub("([^ ]+)", function(arg) table.insert(argv, arg) end)
+        return android.execute(unpack(argv))
     end
     android.LOGI("Application data directory "..android.dir)
     android.LOGI("Application library directory "..android.nativeLibraryDir)
