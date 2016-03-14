@@ -32,6 +32,25 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR,"luajit-launcher",__VA_ARGS__)
 #define  LOADER_ASSET "android.lua"
 
+
+static int window_ready = 0;
+static int gained_focus = 0;
+
+
+static void handle_cmd(struct android_app* app, int32_t cmd) {
+    switch (cmd) {
+        case APP_CMD_INIT_WINDOW:
+            // The window is being shown, get it ready.
+            window_ready = 1;
+            LOGI("App window ready.");
+            break;
+        case APP_CMD_GAINED_FOCUS:
+            gained_focus = 1;
+            LOGI("App gained focus.");
+            break;
+    }
+}
+
 void android_main(struct android_app* state) {
     lua_State *L;
     AAsset* luaCode;
@@ -39,9 +58,31 @@ void android_main(struct android_app* state) {
     off_t bufsize;
     int status;
 
-    // Make sure glue isn't stripped.
+    // Suppress link-time optimization that removes unreferenced code
+    // to make sure glue isn't stripped.
     app_dummy();
 
+    // wait until everything is initialized before launching LuaJIT assets
+    state->onAppCmd = handle_cmd;
+    LOGI("Waiting for app ready...");
+    int events;
+    struct android_poll_source* source;
+    // we block forever waiting for events.
+    while (ALooper_pollAll(-1, NULL, &events, (void**)&source) >= 0) {
+        // Process this event.
+        if (source != NULL) {
+            source->process(state, source);
+        }
+        if (window_ready && gained_focus) {
+            break;
+        }
+        // Check if we are exiting.
+        if (state->destroyRequested != 0) {
+            return;
+        }
+    }
+
+    LOGI("Launching LuaJIT assets...");
     luaCode = AAssetManager_open(state->activity->assetManager, LOADER_ASSET, AASSET_MODE_BUFFER);
     if (luaCode == NULL) {
         LOGE("error loading loader asset");
