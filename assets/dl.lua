@@ -71,7 +71,12 @@ function dl.dlopen(library, load_func)
             -- we do _not_ pass the load_func to the cascaded
             -- calls, so those will always use sys_dlopen()
             for _, needed in pairs(lib:dlneeds()) do
-                dl.dlopen(needed)
+                -- for android >= 6.0, you can't load system library anymore
+                -- and since we also have our own dl implementation, it's safe
+                -- to skip the stock libdl.
+                if needed ~= "libdl.so" then
+                    dl.dlopen(needed)
+                end
             end
             return load_func(lname)
         end
