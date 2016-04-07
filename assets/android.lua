@@ -8,7 +8,7 @@ ffi.cdef[[
 -- reservation enough mmap slots for mcode allocation
 local reserved_slots = {}
 for i = 1, 32 do
-  local len = 0x80000 + i*0x2000
+  local len = 0x10000 + i*0x1000
   local p = ffi.C.mmap(nil, len, 0x3, 0x22, -1, 0)
   table.insert(reserved_slots, {p = p, len = len})
 end
@@ -16,9 +16,10 @@ end
 for _, slot in ipairs(reserved_slots) do
   local res = ffi.C.munmap(slot.p, slot.len)
 end
--- and allocate a large mcode segment, hopefully it will success.
-require("jit.opt").start("sizemcode=512","maxmcode=512")
-for i=1,100 do end  -- Force allocation of one large segment
+-- and allocate a large mcode segment, hopefully it will succeed.
+-- 64KB ought to be enough for everyone with 10000 loop threshold
+require("jit.opt").start("sizemcode=64","maxmcode=64", "hotloop=10000")
+for i=1,20000 do end  -- Force allocation of one large segment
 
 ffi.cdef[[
 // logging:
