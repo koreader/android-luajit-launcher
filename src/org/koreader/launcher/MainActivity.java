@@ -3,6 +3,9 @@ package org.koreader.launcher;
 import android.app.NativeActivity;
 import android.provider.Settings;
 import android.view.WindowManager;
+import android.os.BatteryManager;
+import android.content.IntentFilter;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.util.Log;
@@ -47,14 +50,32 @@ public class MainActivity extends NativeActivity {
                             Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
 
                     //refreshes the screen
+                    Settings.System.putInt(getContentResolver(),
+                            Settings.System.SCREEN_BRIGHTNESS, brightness);
                     WindowManager.LayoutParams lp = getWindow().getAttributes();
-                    lp.screenBrightness = (float) brightness / 25;
+                    lp.screenBrightness = brightness / 255.0f;
                     getWindow().setAttributes(lp);
                 } catch (Exception e) {
                     Log.v(TAG, e.toString());
                 }
             }
         });
+    }
+
+    public int getBatteryLevel() {
+        Intent intent  = this.registerReceiver(null,
+                new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+        int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
+        int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, 100);
+        return (level*100)/scale;
+    }
+
+    public int isCharging() {
+        Intent intent = this.registerReceiver(null,
+                new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+        int plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
+        return plugged == BatteryManager.BATTERY_PLUGGED_AC
+            || plugged == BatteryManager.BATTERY_PLUGGED_USB ? 1 : 0;
     }
 
     public void showProgress(final String title, final String message) {
