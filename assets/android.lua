@@ -1014,6 +1014,13 @@ function JNI:context(jvm, runnable)
     return unpack(result)
 end
 
+function JNI:callVoidMethod(object, method, signature, ...)
+    local clazz = self.env[0].GetObjectClass(self.env, object)
+    local methodID = self.env[0].GetMethodID(self.env, clazz, method, signature)
+    self.env[0].DeleteLocalRef(self.env, clazz)
+    self.env[0].CallVoidMethod(self.env, object, methodID, ...)
+end
+
 function JNI:callObjectMethod(object, method, signature, ...)
     local clazz = self.env[0].GetObjectClass(self.env, object)
     local methodID = self.env[0].GetMethodID(self.env, clazz, method, signature)
@@ -1243,40 +1250,38 @@ local function run(android_app_state)
     android.set_screen_brightness = function(brightness)
         android.LOGI("set screen brightness "..brightness)
         return JNI:context(android.app.activity.vm, function(JNI)
-            local str_brightness = JNI.env[0].NewStringUTF(JNI.env, "screen_brightness")
-            local res = JNI:callStaticBooleanMethod(
-                "android/provider/Settings$System",
-                "putInt",
-                "(Landroid/content/ContentResolver;Ljava/lang/String;I)Z",
-                JNI:callObjectMethod(
-                    android.app.activity.clazz,
-                    "getContentResolver",
-                    "()Landroid/content/ContentResolver;"
-                ),
-                str_brightness,
+            JNI:callVoidMethod(
+                android.app.activity.clazz,
+                "setScreenBrightness",
+                "(I)V",
                 brightness
-                )
-            JNI.env[0].DeleteLocalRef(JNI.env, str_brightness)
-            --[[
-            if res then
-                local window = JNI:callObjectMethod(
-                    android.app.activity.clazz,
-                    "getWindow",
-                    "()Landroid/view/Window;"
-                )
-                JNI:callObjectMethod(
-                    window,
-                    "setAttributes",
-                    "(Landroid/view/WindowManager$LayoutParams;)V",
-                    JNI:setFloatField(JNI:callObjectMethod(
-                        window,
-                        "getAttributes",
-                        "()Landroid/view/WindowManager$LayoutParams;"
-                    ), "screenBrightness", "F", brightness/255)
-                )
-            end
-            --]]
-            return res
+            )
+        end)
+    end
+    android.showProgress = function(title, message)
+        android.LOGI("show progress dialog")
+        JNI:context(android.app.activity.vm, function(JNI)
+            local title = JNI.env[0].NewStringUTF(JNI.env, title)
+            local message = JNI.env[0].NewStringUTF(JNI.env, message)
+            JNI:callVoidMethod(
+                android.app.activity.clazz,
+                "showProgress",
+                "(Ljava/lang/String;Ljava/lang/String;)V",
+                title, message
+            )
+            JNI.env[0].DeleteLocalRef(JNI.env, title)
+            JNI.env[0].DeleteLocalRef(JNI.env, message)
+        end)
+    end
+    android.dismissProgress = function()
+        android.LOGI("dismiss progress dialog")
+        JNI:context(android.app.activity.vm, function(JNI)
+            JNI:callVoidMethod(
+                android.app.activity.clazz,
+                "dismissProgress",
+                "()V",
+                title, message
+            )
         end)
     end
     local function subprocess(JNI, argv)
@@ -1411,7 +1416,9 @@ local function run(android_app_state)
     -- install native libraries into libs
     local install = android.asset_loader("install")
     if type(install) == "function" then
+        android.showProgress()
         install()
+        android.dismissProgress()
     else
         error("error loading install.lua")
     end
