@@ -1014,11 +1014,18 @@ function JNI:context(jvm, runnable)
     return unpack(result)
 end
 
-function JNI:callObjectMethod(object, method, signature, ...)
+function JNI:callVoidMethod(object, method, signature, ...)
     local clazz = self.env[0].GetObjectClass(self.env, object)
     local methodID = self.env[0].GetMethodID(self.env, clazz, method, signature)
+    self.env[0].CallVoidMethod(self.env, object, methodID, ...)
     self.env[0].DeleteLocalRef(self.env, clazz)
-    return self.env[0].CallObjectMethod(self.env, object, methodID, ...)
+end
+
+function JNI:callStaticVoidMethod(class, method, signature, ...)
+    local clazz = self.env[0].FindClass(self.env, class)
+    local methodID = self.env[0].GetStaticMethodID(self.env, clazz, method, signature)
+    self.env[0].callStaticVoidMethod(self.env, clazz, methodID, ...)
+    self.env[0].DeleteLocalRef(self.env, clazz)
 end
 
 function JNI:callIntMethod(object, method, signature, ...)
@@ -1036,12 +1043,26 @@ function JNI:callStaticIntMethod(class, method, signature, ...)
     return res
 end
 
+function JNI:callBooleanMethod(object, method, signature, ...)
+    local clazz = self.env[0].GetObjectClass(self.env, object)
+    local methodID = self.env[0].GetMethodID(self.env, clazz, method, signature)
+    self.env[0].DeleteLocalRef(self.env, clazz)
+    return self.env[0].callBooleanMethod(self.env, object, methodID, ...)
+end
+
 function JNI:callStaticBooleanMethod(class, method, signature, ...)
     local clazz = self.env[0].FindClass(self.env, class)
     local methodID = self.env[0].GetStaticMethodID(self.env, clazz, method, signature)
     local res = self.env[0].CallStaticBooleanMethod(self.env, clazz, methodID, ...)
     self.env[0].DeleteLocalRef(self.env, clazz)
     return res
+end
+
+function JNI:callObjectMethod(object, method, signature, ...)
+    local clazz = self.env[0].GetObjectClass(self.env, object)
+    local methodID = self.env[0].GetMethodID(self.env, clazz, method, signature)
+    self.env[0].DeleteLocalRef(self.env, clazz)
+    return self.env[0].CallObjectMethod(self.env, object, methodID, ...)
 end
 
 function JNI:callStaticObjectMethod(class, method, signature, ...)
@@ -1222,7 +1243,7 @@ local function run(android_app_state)
                 JNI:callIntMethod(display, "getWidth", "()I"),
                 JNI:callIntMethod(display, "getHeight", "()I")
         end)
-    android.get_screen_brightness = function()
+    android.getScreenBrightness = function()
         return JNI:context(android.app.activity.vm, function(JNI)
             local str_brightness = JNI.env[0].NewStringUTF(JNI.env, "screen_brightness")
             local res = JNI:callStaticIntMethod(
@@ -1240,43 +1261,66 @@ local function run(android_app_state)
             return res
         end)
     end
-    android.set_screen_brightness = function(brightness)
+    android.setScreenBrightness = function(brightness)
         android.LOGI("set screen brightness "..brightness)
+        JNI:context(android.app.activity.vm, function(JNI)
+            JNI:callVoidMethod(
+                android.app.activity.clazz,
+                "setScreenBrightness",
+                "(I)V",
+                ffi.new('int32_t', brightness)
+                -- Note that JNI won't covert lua number to int, we need to convert
+                -- it explictly.
+            )
+        end)
+    end
+    android.getBatteryLevel = function()
         return JNI:context(android.app.activity.vm, function(JNI)
-            local str_brightness = JNI.env[0].NewStringUTF(JNI.env, "screen_brightness")
-            local res = JNI:callStaticBooleanMethod(
-                "android/provider/Settings$System",
-                "putInt",
-                "(Landroid/content/ContentResolver;Ljava/lang/String;I)Z",
-                JNI:callObjectMethod(
-                    android.app.activity.clazz,
-                    "getContentResolver",
-                    "()Landroid/content/ContentResolver;"
-                ),
-                str_brightness,
-                brightness
-                )
-            JNI.env[0].DeleteLocalRef(JNI.env, str_brightness)
-            --[[
-            if res then
-                local window = JNI:callObjectMethod(
-                    android.app.activity.clazz,
-                    "getWindow",
-                    "()Landroid/view/Window;"
-                )
-                JNI:callObjectMethod(
-                    window,
-                    "setAttributes",
-                    "(Landroid/view/WindowManager$LayoutParams;)V",
-                    JNI:setFloatField(JNI:callObjectMethod(
-                        window,
-                        "getAttributes",
-                        "()Landroid/view/WindowManager$LayoutParams;"
-                    ), "screenBrightness", "F", brightness/255)
-                )
-            end
-            --]]
-            return res
+            local level = JNI:callIntMethod(
+                android.app.activity.clazz,
+                "getBatteryLevel",
+                "()I"
+            )
+            android.LOGI("get battery level " .. level)
+            return level
+        end)
+    end
+    android.isCharging = function()
+        return JNI:context(android.app.activity.vm, function(JNI)
+            android.LOGI("is charging?")
+            local is_charging = JNI:callIntMethod(
+                android.app.activity.clazz,
+                "isCharging",
+                "()I"
+            )
+            android.LOGI("is charging " .. is_charging)
+            return is_charging == 1
+        end)
+    end
+    android.showProgress = function(title, message)
+        android.LOGI("show progress dialog")
+        JNI:context(android.app.activity.vm, function(JNI)
+            local title = JNI.env[0].NewStringUTF(JNI.env, title)
+            local message = JNI.env[0].NewStringUTF(JNI.env, message)
+            JNI:callVoidMethod(
+                android.app.activity.clazz,
+                "showProgress",
+                "(Ljava/lang/String;Ljava/lang/String;)V",
+                title, message
+            )
+            JNI.env[0].DeleteLocalRef(JNI.env, title)
+            JNI.env[0].DeleteLocalRef(JNI.env, message)
+        end)
+    end
+    android.dismissProgress = function()
+        android.LOGI("dismiss progress dialog")
+        JNI:context(android.app.activity.vm, function(JNI)
+            JNI:callVoidMethod(
+                android.app.activity.clazz,
+                "dismissProgress",
+                "()V",
+                title, message
+            )
         end)
     end
     local function subprocess(JNI, argv)
@@ -1380,7 +1424,7 @@ local function run(android_app_state)
     android.LOGI("Application data directory "..android.dir)
     android.LOGI("Application library directory "..android.nativeLibraryDir)
     android.LOGI("Screen size "..android.screen.width.."x"..android.screen.height)
-    android.LOGI("Screen brightness "..android.get_screen_brightness())
+    android.LOGI("Screen brightness "..android.getScreenBrightness())
 
     -- register the "android" module (ourself)
     package.loaded.android = android
@@ -1411,7 +1455,9 @@ local function run(android_app_state)
     -- install native libraries into libs
     local install = android.asset_loader("install")
     if type(install) == "function" then
+        android.showProgress()
         install()
+        android.dismissProgress()
     else
         error("error loading install.lua")
     end
