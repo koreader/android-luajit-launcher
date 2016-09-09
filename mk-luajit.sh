@@ -19,7 +19,11 @@ clean)
 armeabi)
 	# Android/ARM, armeabi (ARMv5TE soft-float), Android 2.2+ (Froyo)
 	NDKABI=8
-	NDKVER=$NDK/toolchains/arm-linux-androideabi-4.6
+	NDKVER=$NDK/toolchains/arm-linux-androideabi-4.9
+	if [ ! -d "$NDKVER" ]; then
+	    echo 'NDK not of the right version, please update to NDK version 11 or higher.'
+	    exit 1
+	fi
 	NDKP=$NDKVER/prebuilt/$BUILD_ARCH/bin/arm-linux-androideabi-
 	NDKF="--sysroot $NDK/platforms/android-$NDKABI/arch-arm"
 	rm -rf "$DEST"
@@ -28,7 +32,11 @@ armeabi)
 armeabi-v7a)
 	# Android/ARM, armeabi-v7a (ARMv7 VFP), Android 4.0+ (ICS)
 	NDKABI=14
-	NDKVER=$NDK/toolchains/arm-linux-androideabi-4.6
+	NDKVER=$NDK/toolchains/arm-linux-androideabi-4.9
+	if [ ! -d "$NDKVER" ]; then
+	    echo 'NDK not of the right version, please update to NDK version 11 or higher.'
+	    exit 1
+	fi
 	NDKP=$NDKVER/prebuilt/$BUILD_ARCH/bin/arm-linux-androideabi-
 	NDKF="--sysroot $NDK/platforms/android-$NDKABI/arch-arm"
 	NDKARCH="-march=armv7-a -mfloat-abi=softfp -Wl,--fix-cortex-a8"
@@ -37,7 +45,11 @@ armeabi-v7a)
 mips)
 	# Android/MIPS, mips (MIPS32R1 hard-float), Android 4.0+ (ICS)
 	NDKABI=14
-	NDKVER=$NDK/toolchains/mipsel-linux-android-4.6
+	NDKVER=$NDK/toolchains/mipsel-linux-android-4.9
+	if [ ! -d "$NDKVER" ]; then
+	    echo 'NDK not of the right version, please update to NDK version 11 or higher.'
+	    exit 1
+	fi
 	NDKP=$NDKVER/prebuilt/$BUILD_ARCH/bin/mipsel-linux-android-
 	NDKF="--sysroot $NDK/platforms/android-$NDKABI/arch-mips"
 	make -C luajit-2.0 install HOST_CC="gcc -m32" CROSS=$NDKP TARGET_FLAGS="$NDKF" DESTDIR="$DEST" PREFIX=
@@ -45,7 +57,11 @@ mips)
 x86)
 	# Android/x86, x86 (i686 SSE3), Android 4.0+ (ICS)
 	NDKABI=14
-	NDKVER=$NDK/toolchains/x86-4.6
+	NDKVER=$NDK/toolchains/x86-4.9
+	if [ ! -d "$NDKVER" ]; then
+	    echo 'NDK not of the right version, please update to NDK version 11 or higher.'
+	    exit 1
+	fi
 	NDKP=$NDKVER/prebuilt/$BUILD_ARCH/bin/i686-linux-android-
 	NDKF="--sysroot $NDK/platforms/android-$NDKABI/arch-x86"
 	make -C luajit-2.0 install HOST_CC="gcc -m32" CROSS=$NDKP TARGET_FLAGS="$NDKF" DESTDIR="$DEST" PREFIX=
