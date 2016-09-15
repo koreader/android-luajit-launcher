@@ -1,7 +1,7 @@
 # see http://luajit.org/install.html for details
 # there, a call like one of the following is recommended
 
-if [ "x$NDK" == "x" ]; then
+if [ "x$NDK" = "x" ]; then
 	NDK=/opt/android-ndk
 fi
 if [ ! -d "$NDK" ]; then
