@@ -1297,6 +1297,22 @@ local function run(android_app_state)
             return is_charging == 1
         end)
     end
+    android.externalStorage = function()
+        return JNI:context(android.app.activity.vm, function(JNI)
+            local dir = JNI:callObjectMethod(
+                JNI:callStaticObjectMethod(
+                    "android/os/Environment",
+                    "getExternalStorageDirectory",
+                    "()Ljava/io/File;"
+                ),
+                "getAbsolutePath",
+                "()Ljava/lang/String;"
+            )
+            dir = JNI:to_string(dir)
+            android.LOGI("external storage " .. dir)
+            return dir
+        end)
+    end
     android.showProgress = function(title, message)
         android.LOGI("show progress dialog")
         JNI:context(android.app.activity.vm, function(JNI)
