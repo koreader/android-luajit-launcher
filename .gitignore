@@ -4,7 +4,6 @@ libs/
 gen/
 *.swp
 jni/luajit-build
-jni/compress-deflate7
 assets/module
 local.properties
 proguard-project.txt

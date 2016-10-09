@@ -1,6 +1,6 @@
 NDK_VER=$(shell grep -E 'NDKABI=[0-9]+' ./mk-luajit.sh | cut -d= -f2)
 
-apk: local.properties
+apk: local.properties project.properties
 	git submodule init
 	git submodule sync
 	git submodule update
@@ -8,7 +8,7 @@ apk: local.properties
 	ndk-build
 	ant debug
 
-local.properties:
+local.properties project.properties:
 	android update project --path . -t android-19
 
 clean:
