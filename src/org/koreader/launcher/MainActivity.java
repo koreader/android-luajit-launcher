@@ -32,9 +32,9 @@ public class MainActivity extends NativeActivity {
         super.onResume();
         //Hide toolbar
         int SDK_INT = android.os.Build.VERSION.SDK_INT;
-        if(SDK_INT >= 11 && SDK_INT < 14) {
+        if(SDK_INT >= 11 && SDK_INT < 16) {
             getWindow().getDecorView().setSystemUiVisibility(View.STATUS_BAR_HIDDEN);
-        } else if (SDK_INT >= 14) {
+        } else if (SDK_INT >= 16) {
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LOW_PROFILE);
         }
     }
