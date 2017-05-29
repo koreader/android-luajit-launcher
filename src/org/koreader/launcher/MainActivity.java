@@ -98,4 +98,23 @@ public class MainActivity extends NativeActivity {
             }
         });
     }
+
+    public void setFullscreen(final boolean fullscreen) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    WindowManager.LayoutParams attrs = getWindow().getAttributes();
+                    if (fullscreen){
+                        attrs.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
+                    } else {
+                        attrs.flags &= ~WindowManager.LayoutParams.FLAG_FULLSCREEN;
+                    }
+                    getWindow().setAttributes(attrs);
+                } catch (Exception e) {
+                    Log.v(TAG, e.toString());
+                }
+            }
+        });
+
 }
