@@ -1339,6 +1339,17 @@ local function run(android_app_state)
             )
         end)
     end
+    android.setFullscreen = function(fullscreen)
+        android.LOGI("set fullscreen "..fullscreen)
+        JNI:context(android.app.activity.vm, function(JNI)
+            JNI:callVoidMethod(
+                android.app.activity.clazz,
+                "setFullscreen",
+                "(I)V",
+                ffi.new('bool', fullscreen)
+            )
+        end)
+    end
     local function subprocess(JNI, argv)
         local args_array = JNI.env[0].NewObjectArray(JNI.env, #argv,
             JNI.env[0].FindClass(JNI.env, "java/lang/String"), nil)
