@@ -1339,13 +1339,24 @@ local function run(android_app_state)
             )
         end)
     end
+    android.isFullscreen = function()
+        return JNI:context(android.app.activity.vm, function(JNI)
+            local fullscreen = JNI:callIntMethod(
+                android.app.activity.clazz,
+                "isFullscreen",
+                "()Z"
+            )
+            android.LOGI("is fullscreen " .. fullscreen)
+            return fullscreen
+        end)
+    end
     android.setFullscreen = function(fullscreen)
         android.LOGI("set fullscreen "..fullscreen)
         JNI:context(android.app.activity.vm, function(JNI)
             JNI:callVoidMethod(
                 android.app.activity.clazz,
                 "setFullscreen",
-                "(I)V",
+                "(Z)V",
                 ffi.new('bool', fullscreen)
             )
         end)
