@@ -66,6 +66,10 @@ function dl.dlopen(library, load_func)
         end
 
         local ok, lib = pcall(Elf.open, lname)
+        if not ok and lname:find("%.so%.%d+$") then
+            lname = lname:gsub("%.so%.%d+$", "%.so")
+            ok, lib = pcall(Elf.open, lname)
+        end
         if ok then
             -- we found a library, now load its requirements
             -- we do _not_ pass the load_func to the cascaded
