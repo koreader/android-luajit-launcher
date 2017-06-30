@@ -1346,12 +1346,12 @@ local function run(android_app_state)
                 "isFullscreen",
                 "()Z"
             )
-            android.LOGI("is fullscreen " .. fullscreen)
+            android.LOGI("is fullscreen =", fullscreen)
             return fullscreen
         end)
     end
     android.setFullscreen = function(fullscreen)
-        android.LOGI("set fullscreen "..fullscreen)
+        android.LOGI("setting fullscreen ", fullscreen)
         JNI:context(android.app.activity.vm, function(JNI)
             JNI:callVoidMethod(
                 android.app.activity.clazz,
