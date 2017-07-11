@@ -38,11 +38,11 @@ public class MainActivity extends NativeActivity {
         super.onResume();
         //Hide toolbar
         int SDK_INT = android.os.Build.VERSION.SDK_INT;
-        if(SDK_INT >= 11 && SDK_INT < 14) {
+        if(SDK_INT >= 11 && SDK_INT < 16) {
             getWindow().getDecorView().setSystemUiVisibility(View.STATUS_BAR_HIDDEN);
-        } else if (SDK_INT >= 14) {
+        } else if (SDK_INT >= 16) {
             getWindow().getDecorView().setSystemUiVisibility(
-                  View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LOW_PROFILE);
+                    View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LOW_PROFILE);
         }
     }
 
@@ -131,6 +131,29 @@ public class MainActivity extends NativeActivity {
             public void run() {
                 if(dialog!= null && dialog.isShowing()){
                     dialog.dismiss();
+                }
+            }
+        });
+    }
+
+    public boolean isFullscreen() {
+    	return (getWindow().getAttributes().flags & WindowManager.LayoutParams.FLAG_FULLSCREEN) != 0;
+    }
+
+    public void setFullscreen(final boolean fullscreen) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    WindowManager.LayoutParams attrs = getWindow().getAttributes();
+                    if (fullscreen){
+                        attrs.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
+                    } else {
+                        attrs.flags &= ~WindowManager.LayoutParams.FLAG_FULLSCREEN;
+                    }
+                    getWindow().setAttributes(attrs);
+                } catch (Exception e) {
+                    Log.v(TAG, e.toString());
                 }
             }
         });
