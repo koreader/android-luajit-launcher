@@ -10,7 +10,13 @@ import android.os.Bundle;
 import android.view.View;
 import android.util.Log;
 
+import java.util.concurrent.CountDownLatch;
+
 public class MainActivity extends NativeActivity {
+    private class Box<T> {
+        public T value;
+    }
+
     static {
         System.loadLibrary("luajit-launcher");
     }
@@ -35,7 +41,8 @@ public class MainActivity extends NativeActivity {
         if(SDK_INT >= 11 && SDK_INT < 16) {
             getWindow().getDecorView().setSystemUiVisibility(View.STATUS_BAR_HIDDEN);
         } else if (SDK_INT >= 16) {
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LOW_PROFILE);
+            getWindow().getDecorView().setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LOW_PROFILE);
         }
     }
 
@@ -60,6 +67,36 @@ public class MainActivity extends NativeActivity {
                 }
             }
         });
+    }
+
+    public int getScreenBrightness() {
+        final Box<Integer> result = new Box<Integer>();
+        final CountDownLatch cd = new CountDownLatch(1);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    result.value = new Integer(Settings.System.getInt(
+                                                       getContentResolver(),
+                                                       Settings.System.SCREEN_BRIGHTNESS));
+                } catch (Exception e) {
+                    Log.v(TAG, e.toString());
+                    result.value = new Integer(0);
+                }
+                cd.countDown();
+            }
+        });
+        try {
+            cd.await();
+        } catch (InterruptedException ex) {
+            return 0;
+        }
+
+        if (result.value == null) {
+            return 0;
+        }
+
+        return result.value.intValue();
     }
 
     public int getBatteryLevel() {
