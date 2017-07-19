@@ -9,6 +9,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.util.Log;
+import android.graphics.Point;
+import android.view.Display;
+import android.graphics.Rect;
+import android.view.Window;
 
 import java.util.concurrent.CountDownLatch;
 
@@ -158,4 +162,29 @@ public class MainActivity extends NativeActivity {
             }
         });
     }
+    
+    public int getStatusBarHeight() {
+	    Rect rectangle = new Rect();
+		Window window = getWindow();
+		window.getDecorView().getWindowVisibleDisplayFrame(rectangle);
+		int statusBarHeight = rectangle.top;
+		return statusBarHeight;
+	}
+	
+	private Point getSceenSize() {
+		Display display = getWindowManager().getDefaultDisplay();
+		Point size = new Point();
+		display.getSize(size);
+		return size;
+	}
+	
+	public int getScreenWidth() {
+		int width = getSceenSize().x;
+		return width;
+	}
+	
+	public int getScreenHeight(){
+		int height = getSceenSize().y;
+		return height;
+	}
 }

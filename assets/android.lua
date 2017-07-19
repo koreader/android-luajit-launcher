@@ -1361,6 +1361,39 @@ local function run(android_app_state)
             )
         end)
     end
+    android.getStatusBarHeight = function()
+        return JNI:context(android.app.activity.vm, function(JNI)
+            local statusBarHeight = JNI:callIntMethod(
+                android.app.activity.clazz,
+                "getStatusBarHeight",
+                "()I"
+            )
+            android.LOGI("get status bar height  " .. statusBarHeight)
+            return statusBarHeight
+        end)
+    end
+    android.getScreenWidth = function()
+        return JNI:context(android.app.activity.vm, function(JNI)
+            local width = JNI:callIntMethod(
+                android.app.activity.clazz,
+                "getScreenWidth",
+                "()I"
+            )
+            android.LOGI("get screen width  " .. width)
+            return width
+        end)
+    end
+    android.getScreenHeight = function()
+        return JNI:context(android.app.activity.vm, function(JNI)
+            local height = JNI:callIntMethod(
+                android.app.activity.clazz,
+                "getScreenHeight",
+                "()I"
+            )
+            android.LOGI("get screen height  " .. height)
+            return height
+        end)
+    end
     local function subprocess(JNI, argv)
         local args_array = JNI.env[0].NewObjectArray(JNI.env, #argv,
             JNI.env[0].FindClass(JNI.env, "java/lang/String"), nil)
