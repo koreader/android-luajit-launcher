@@ -121,4 +121,12 @@ public class MainActivity extends NativeActivity {
             }
         });
     }
+    
+    public int getStatusBarHeight() {
+	    Rect rectangle = new Rect();
+		Window window = getWindow();
+		window.getDecorView().getWindowVisibleDisplayFrame(rectangle);
+		int statusBarHeight = rectangle.top;
+		return statusBarHeight;
+	}
 }
