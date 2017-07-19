@@ -9,6 +9,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.util.Log;
+import android.graphics.Point;
+import android.view.Display;
+import android.graphics.Rect;
+import android.view.Window;
 
 public class MainActivity extends NativeActivity {
     static {
@@ -130,7 +134,7 @@ public class MainActivity extends NativeActivity {
 		return statusBarHeight;
 	}
 	
-	private static Point getSceenSize() {
+	private Point getSceenSize() {
 		Display display = getWindowManager().getDefaultDisplay();
 		Point size = new Point();
 		display.getSize(size);
