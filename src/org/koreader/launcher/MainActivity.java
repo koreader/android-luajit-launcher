@@ -129,4 +129,21 @@ public class MainActivity extends NativeActivity {
 		int statusBarHeight = rectangle.top;
 		return statusBarHeight;
 	}
+	
+	private static Point getSceenSize() {
+		Display display = getWindowManager().getDefaultDisplay();
+		Point size = new Point();
+		display.getSize(size);
+		return size;
+	}
+	
+	public int getScreenWidth() {
+		int width = getSceenSize().x;
+		return width;
+	}
+	
+	public int getScreenHeight(){
+		int height = getSceenSize().y;
+		return height;
+	}
 }
