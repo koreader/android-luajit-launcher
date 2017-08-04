@@ -1,0 +1,15 @@
+language: c
+
+sudo: false
+
+cache:
+  apt: true
+
+addons:
+  apt:
+    packages:
+      # provides xmllint
+      - libxml2-utils
+
+# check for XML syntax errors
+script: find . -type f -iname '*.xml' -exec xmllint {} + >/dev/null
