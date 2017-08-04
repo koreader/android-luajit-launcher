@@ -28,7 +28,7 @@
                 <data android:mimeType="application/pdf" />
                 <data android:mimeType="image/djvu" />
                 <data android:mimeType="image/vnd.djvu" />
-                <data android:mimeType="image/x-djvu". />
+                <data android:mimeType="image/x-djvu" />
                 <data android:mimeType="application/x-cbz" />
                 <data android:mimeType="application/epub+zip" />
                 <data android:mimeType="application/x-fb2" />
