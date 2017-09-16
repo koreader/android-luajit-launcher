@@ -10,7 +10,7 @@ fi
 
 # NDKABI=21  # Android 5.0+
 # NDKABI=19  # Android 4.4+
-NDKABI=9 # Android 4.0+
+NDKABI=${NDKABI:-14} # Android 4.0+
 BUILD_ARCH=linux-$(uname -m)
 DEST=$(cd "$(dirname "$0")" && pwd)/jni/luajit-build/$1
 
