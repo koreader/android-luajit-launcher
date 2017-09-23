@@ -1105,10 +1105,14 @@ end
 
 -- Android specific
 
+-- Some Android roms won't load libandroid.so to the global namespace thus
+-- we load it by ourselves.
+local android_lib_ok, android_lib = pcall(ffi.load, "libandroid.so")
 local android = {
     app = nil,
     jni = JNI,
     log_name = "luajit-launcher",
+    lib = android_lib_ok and android_lib or ffi.C,
 }
 
 function android.LOG(level, message)
@@ -1135,21 +1139,21 @@ function android.asset_loader(modulename)
     -- Find source
     local modulepath = string.gsub(modulename, "%.", "/")
     local filename = string.gsub("?.lua", "%?", modulepath)
-    local asset = ffi.C.AAssetManager_open(
+    local asset = android.lib.AAssetManager_open(
         android.app.activity.assetManager,
         filename, ffi.C.AASSET_MODE_BUFFER)
     --android.LOGI(string.format("trying to open asset %s: %s", filename, tostring(asset)))
     if asset ~= nil then
         -- read asset:
-        local assetdata = ffi.C.AAsset_getBuffer(asset)
-        local assetsize = ffi.C.AAsset_getLength(asset)
+        local assetdata = android.lib.AAsset_getBuffer(asset)
+        local assetsize = android.lib.AAsset_getLength(asset)
         if assetdata ~= nil then
             -- Compile and return the module
             local compiled = assert(loadstring(ffi.string(assetdata, assetsize), filename))
-            ffi.C.AAsset_close(asset)
+            android.lib.AAsset_close(asset)
             return compiled
         else
-            ffi.C.AAsset_close(asset)
+            android.lib.AAsset_close(asset)
             errmsg = errmsg.."\n\tunaccessible file '"..filename.."' (tried with asset loader)"
         end
     else
@@ -1264,6 +1268,11 @@ local function run(android_app_state)
     android.setScreenBrightness = function(brightness)
         android.LOGI("set screen brightness "..brightness)
         JNI:context(android.app.activity.vm, function(JNI)
+            if brightness > 255 then
+                brightness = 255
+            elseif brightness < 0 then
+                brightness = 0
+            end
             JNI:callVoidMethod(
                 android.app.activity.clazz,
                 "setScreenBrightness",

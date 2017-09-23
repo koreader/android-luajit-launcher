@@ -21,9 +21,9 @@ local function install()
     local module = "module"
     local package_name = "koreader%-(.*)%.7z"
     local mgr = A.app.activity.assetManager
-    local asset_dir = ffi.C.AAssetManager_openDir(mgr, module)
+    local asset_dir = A.lib.AAssetManager_openDir(mgr, module)
     assert(asset_dir ~= nil, "could not open module directory in assets")
-    local filename = ffi.C.AAssetDir_getNextFileName(asset_dir)
+    local filename = A.lib.AAssetDir_getNextFileName(asset_dir)
     while filename ~= nil do
         filename = ffi.string(filename)
         A.LOGI(string.format("Check file in asset %s: %s", module, filename))
@@ -38,22 +38,22 @@ local function install()
             local package = A.dir.."/"..filename
             local buffer_size = 4096
             local buf = ffi.new("char[?]", buffer_size)
-            local asset = ffi.C.AAssetManager_open(mgr,
+            local asset = A.lib.AAssetManager_open(mgr,
                             ffi.cast("char*", module.."/"..filename),
                             ffi.C.AASSET_MODE_STREAMING);
             if asset ~= nil then
                 local output = ffi.C.fopen(ffi.cast("char*", package),
                                 ffi.cast("char*", "wb"))
-                local nb_read = ffi.C.AAsset_read(asset, buf,
+                local nb_read = A.lib.AAsset_read(asset, buf,
                                 ffi.new("int", buffer_size))
                 while nb_read > 0 do
                     ffi.C.fwrite(buf, ffi.new("int", nb_read),
                                 ffi.new("int", 1), output)
-                    nb_read = ffi.C.AAsset_read(asset, buf,
+                    nb_read = A.lib.AAsset_read(asset, buf,
                                 ffi.new("int", buffer_size))
                 end
                 ffi.C.fclose(output)
-                ffi.C.AAsset_close(asset)
+                A.lib.AAsset_close(asset)
                 -- unpack to data directory
                 local args = {"7z", "x", package, A.dir}
                 local argv = ffi.new("char*[?]", #args+1)
@@ -67,9 +67,9 @@ local function install()
                 break
             end
         end
-        filename = ffi.string(ffi.C.AAssetDir_getNextFileName(asset_dir))
+        filename = ffi.string(A.lib.AAssetDir_getNextFileName(asset_dir))
     end
-    ffi.C.AAssetDir_close(asset_dir)
+    A.lib.AAssetDir_close(asset_dir)
 end
 
 install()
