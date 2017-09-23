@@ -22,7 +22,7 @@ public class MainActivity extends NativeActivity {
     }
 
     static {
-        System.loadLibrary("luajit-launcher");
+        System.loadLibrary("luajit");
     }
 
     private static String TAG = "luajit-launcher";
@@ -162,7 +162,7 @@ public class MainActivity extends NativeActivity {
             }
         });
     }
-    
+
     public int getStatusBarHeight() {
 	    Rect rectangle = new Rect();
 		Window window = getWindow();
@@ -170,19 +170,19 @@ public class MainActivity extends NativeActivity {
 		int statusBarHeight = rectangle.top;
 		return statusBarHeight;
 	}
-	
+
 	private Point getSceenSize() {
 		Display display = getWindowManager().getDefaultDisplay();
 		Point size = new Point();
 		display.getSize(size);
 		return size;
 	}
-	
+
 	public int getScreenWidth() {
 		int width = getSceenSize().x;
 		return width;
 	}
-	
+
 	public int getScreenHeight(){
 		int height = getSceenSize().y;
 		return height;

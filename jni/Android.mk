@@ -41,7 +41,7 @@ include $(BUILD_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
 
-LOCAL_MODULE    := luajit-launcher
+LOCAL_MODULE    := luajit
 LOCAL_SRC_FILES := android-main.c
 # remember to add libraries here that you plan to use via FFI:
 LOCAL_LDLIBS    := -lm -llog -landroid
