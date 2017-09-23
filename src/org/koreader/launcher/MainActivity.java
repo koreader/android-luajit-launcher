@@ -13,6 +13,7 @@ import android.graphics.Point;
 import android.view.Display;
 import android.graphics.Rect;
 import android.view.Window;
+import android.util.DisplayMetrics;
 
 import java.util.concurrent.CountDownLatch;
 
@@ -38,16 +39,27 @@ public class MainActivity extends NativeActivity {
         super.onCreate(savedInstanceState);
     }
 
-    protected void onResume() {
-        super.onResume();
-        //Hide toolbar
+    private void setFullscreenLayout() {
         int SDK_INT = android.os.Build.VERSION.SDK_INT;
         if(SDK_INT >= 11 && SDK_INT < 16) {
             getWindow().getDecorView().setSystemUiVisibility(View.STATUS_BAR_HIDDEN);
-        } else if (SDK_INT >= 16) {
+        } else if (SDK_INT >= 16 && SDK_INT < 19) {
             getWindow().getDecorView().setSystemUiVisibility(
                     View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LOW_PROFILE);
+        } else if (SDK_INT >= 19) {
+            getWindow().getDecorView().setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
+                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
+                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
+                    View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
+                    View.SYSTEM_UI_FLAG_FULLSCREEN |
+                    View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
         }
+    }
+
+    protected void onResume() {
+        super.onResume();
+        setFullscreenLayout();
     }
 
     public void setScreenBrightness(final int brightness) {
@@ -145,6 +157,7 @@ public class MainActivity extends NativeActivity {
     }
 
     public void setFullscreen(final boolean fullscreen) {
+        final CountDownLatch cd = new CountDownLatch(1);
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -159,32 +172,49 @@ public class MainActivity extends NativeActivity {
                 } catch (Exception e) {
                     Log.v(TAG, e.toString());
                 }
+                cd.countDown();
             }
         });
+        try {
+            cd.await();
+        } catch (InterruptedException ex) {
+        }
     }
 
     public int getStatusBarHeight() {
-	    Rect rectangle = new Rect();
-		Window window = getWindow();
-		window.getDecorView().getWindowVisibleDisplayFrame(rectangle);
-		int statusBarHeight = rectangle.top;
-		return statusBarHeight;
+        Rect rectangle = new Rect();
+        Window window = getWindow();
+        window.getDecorView().getWindowVisibleDisplayFrame(rectangle);
+        int statusBarHeight = rectangle.top;
+        return statusBarHeight;
 	}
 
 	private Point getSceenSize() {
-		Display display = getWindowManager().getDefaultDisplay();
-		Point size = new Point();
-		display.getSize(size);
-		return size;
+        Point size = new Point();
+        Display display = getWindowManager().getDefaultDisplay();
+
+        try {
+            // For JellyBean 4.2 (API 17) and onward
+            if (android.os.Build.VERSION.SDK_INT >= 17) {
+                DisplayMetrics metrics = new DisplayMetrics();
+                display.getRealMetrics(metrics);
+                size.set(metrics.widthPixels, metrics.heightPixels);
+            } else {
+                display.getSize(size);
+            }
+        } catch (Exception e) {
+            Log.v(TAG, e.toString());
+        }
+        return size;
 	}
 
 	public int getScreenWidth() {
-		int width = getSceenSize().x;
-		return width;
+        int width = getSceenSize().x;
+        return width;
 	}
 
 	public int getScreenHeight(){
-		int height = getSceenSize().y;
-		return height;
+        int height = getSceenSize().y;
+        return height;
 	}
 }
