@@ -1231,22 +1231,32 @@ local function run(android_app_state)
                 JNI:to_string(files_dir),
                 JNI:to_string(JNI:getObjectField(app_info, "nativeLibraryDir", "Ljava/lang/String;"))
         end)
-    android.screen = {}
-    android.screen.width, android.screen.height =
-        JNI:context(android.app.activity.vm, function(JNI)
-            local display = JNI:callObjectMethod(
-                JNI:callObjectMethod(
-                    android.app.activity.clazz,
-                    "getWindowManager",
-                    "()Landroid/view/WindowManager;"
-                ),
-                "getDefaultDisplay",
-                "()Landroid/view/Display;"
+
+    android.getScreenWidth = function()
+        return JNI:context(android.app.activity.vm, function(JNI)
+            local width = JNI:callIntMethod(
+                android.app.activity.clazz,
+                "getScreenWidth",
+                "()I"
             )
-            return
-                JNI:callIntMethod(display, "getWidth", "()I"),
-                JNI:callIntMethod(display, "getHeight", "()I")
+            android.LOGI("get screen width  " .. width)
+            return width
         end)
+    end
+    android.getScreenHeight = function()
+        return JNI:context(android.app.activity.vm, function(JNI)
+            local height = JNI:callIntMethod(
+                android.app.activity.clazz,
+                "getScreenHeight",
+                "()I"
+            )
+            android.LOGI("get screen height  " .. height)
+            return height
+        end)
+    end
+    android.screen = {}
+    android.screen.width = android.getScreenWidth()
+    android.screen.height = android.getScreenHeight()
     android.getScreenBrightness = function()
         return JNI:context(android.app.activity.vm, function(JNI)
             local str_brightness = JNI.env[0].NewStringUTF(JNI.env, "screen_brightness")
@@ -1381,28 +1391,7 @@ local function run(android_app_state)
             return statusBarHeight
         end)
     end
-    android.getScreenWidth = function()
-        return JNI:context(android.app.activity.vm, function(JNI)
-            local width = JNI:callIntMethod(
-                android.app.activity.clazz,
-                "getScreenWidth",
-                "()I"
-            )
-            android.LOGI("get screen width  " .. width)
-            return width
-        end)
-    end
-    android.getScreenHeight = function()
-        return JNI:context(android.app.activity.vm, function(JNI)
-            local height = JNI:callIntMethod(
-                android.app.activity.clazz,
-                "getScreenHeight",
-                "()I"
-            )
-            android.LOGI("get screen height  " .. height)
-            return height
-        end)
-    end
+
     local function subprocess(JNI, argv)
         local args_array = JNI.env[0].NewObjectArray(JNI.env, #argv,
             JNI.env[0].FindClass(JNI.env, "java/lang/String"), nil)
