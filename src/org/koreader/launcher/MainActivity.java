@@ -72,12 +72,8 @@ public class MainActivity extends NativeActivity {
                             Settings.System.SCREEN_BRIGHTNESS_MODE,
                             Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
 
-                    //refreshes the screen
                     Settings.System.putInt(getContentResolver(),
                             Settings.System.SCREEN_BRIGHTNESS, brightness);
-                    WindowManager.LayoutParams lp = getWindow().getAttributes();
-                    lp.screenBrightness = brightness / 255.0f;
-                    getWindow().setAttributes(lp);
                 } catch (Exception e) {
                     Log.v(TAG, e.toString());
                 }
