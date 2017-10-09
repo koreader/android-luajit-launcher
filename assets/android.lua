@@ -1380,6 +1380,31 @@ local function run(android_app_state)
             )
         end)
     end
+
+    android.isWifiEnabled = function()
+        return JNI:context(android.app.activity.vm, function(JNI)
+            local isWifiEnabled = JNI:callIntMethod(
+                android.app.activity.clazz,
+                "isWifiEnabled",
+                "()Z"
+            )
+            android.LOGI("is WifiEnabled =", isWifiEnabled)
+            return isWifiEnabled
+        end)
+    end
+
+    android.setWifiEnabled = function(wifiEnabled)
+        android.LOGI("setting wifi to: ", wifiEnabled)
+        JNI:context(android.app.activity.vm, function(JNI)
+            JNI:callVoidMethod(
+                android.app.activity.clazz,
+                "setWifiEnabled",
+                "(Z)V",
+                ffi.new('bool', wifiEnabled)
+            )
+        end)
+    end
+
     android.getStatusBarHeight = function()
         return JNI:context(android.app.activity.vm, function(JNI)
             local statusBarHeight = JNI:callIntMethod(
