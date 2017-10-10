@@ -6,6 +6,7 @@ import android.view.WindowManager;
 import android.os.BatteryManager;
 import android.content.IntentFilter;
 import android.content.Intent;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 import android.util.Log;
@@ -15,7 +16,6 @@ import android.graphics.Rect;
 import android.view.Window;
 import android.util.DisplayMetrics;
 import android.net.wifi.WifiManager;
-import android.content.Context;
 
 import java.util.concurrent.CountDownLatch;
 
