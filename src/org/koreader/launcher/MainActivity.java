@@ -6,6 +6,7 @@ import android.view.WindowManager;
 import android.os.BatteryManager;
 import android.content.IntentFilter;
 import android.content.Intent;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 import android.util.Log;
@@ -14,6 +15,7 @@ import android.view.Display;
 import android.graphics.Rect;
 import android.view.Window;
 import android.util.DisplayMetrics;
+import android.net.wifi.WifiManager;
 
 import java.util.concurrent.CountDownLatch;
 
@@ -150,6 +152,19 @@ public class MainActivity extends NativeActivity {
 
     public boolean isFullscreen() {
     	return (getWindow().getAttributes().flags & WindowManager.LayoutParams.FLAG_FULLSCREEN) != 0;
+    }
+
+
+    public void setWifiEnabled(final boolean enabled) {
+        this.getWifiManager().setWifiEnabled(enabled);
+    }
+
+    public boolean isWifiEnabled() {
+        return this.getWifiManager().isWifiEnabled();
+    }
+
+    private WifiManager getWifiManager() {
+        return (WifiManager) this.getSystemService(Context.WIFI_SERVICE); 
     }
 
     public void setFullscreen(final boolean fullscreen) {
