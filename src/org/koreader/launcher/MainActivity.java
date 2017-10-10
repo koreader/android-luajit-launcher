@@ -164,7 +164,7 @@ public class MainActivity extends NativeActivity {
     }
 
     private WifiManager getWifiManager() {
-	return (WifiManager) this.getSystemService(Context.WIFI_SERVICE); 
+        return (WifiManager) this.getSystemService(Context.WIFI_SERVICE); 
     }
 
     public void setFullscreen(final boolean fullscreen) {
