@@ -57,7 +57,7 @@ local function install()
                 -- unpack to data directory
                 local args = {"7z", "x", package, A.dir}
                 local argv = ffi.new("char*[?]", #args+1)
-                for i, arg in ipairs(args) do
+                for i, arg in ipairs(args) do -- luacheck: ignore 213
                     argv[i-1] = ffi.cast("char*", args[i])
                 end
                 A.LOGI("Installing new koreader package to "..args[4])
