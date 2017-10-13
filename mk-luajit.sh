@@ -17,7 +17,7 @@ DEST=$(cd "$(dirname "$0")" && pwd)/jni/luajit-build/$1
 
 echo "Using NDKABI ${NDKABI}."
 
-NDKVER=$(grep -oP 'r\K([0-9]+)(?=[a-z])' ${NDK}/CHANGELOG.md)
+NDKVER=$(grep -oP 'r\K([0-9]+)(?=[a-z])' ${NDK}/CHANGELOG.md | head -1)
 echo "Detected NDK version ${NDKVER}..."
 if [ "$NDKVER" -lt 11 ]; then
     echo 'NDK not of the right version, please update to NDK version 11 or higher.'
