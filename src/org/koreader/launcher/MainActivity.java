@@ -167,6 +167,30 @@ public class MainActivity extends NativeActivity {
         return (WifiManager) this.getSystemService(Context.WIFI_SERVICE); 
     }
 
+    public void setKeepScreenOn(final boolean keepOn) {
+        final CountDownLatch cd = new CountDownLatch(1);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                   if (keepOn) {
+                        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                    } else {
+                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                    }
+                } catch (Exception e) {
+                    Log.v(TAG, e.toString());
+                }
+                cd.countDown();
+            }
+        });
+        try {
+            cd.await();
+        } catch (InterruptedException ex) {
+        }
+    }
+
+
     public void setFullscreen(final boolean fullscreen) {
         final CountDownLatch cd = new CountDownLatch(1);
         runOnUiThread(new Runnable() {
