@@ -7,7 +7,7 @@ char *getcwd(char *buf, size_t size);
 char *strerror(int errnum);
 ]]
 
-function chdir(path)
+local function chdir(path)
     if ffi.C.chdir(path) == 0 then
         return true
     else
@@ -17,7 +17,7 @@ function chdir(path)
 end
 
 local max_path = 4096
-function currentdir()
+local function currentdir()
     return ffi.string(
         ffi.C.getcwd(ffi.new('char[?]', max_path), max_path))
 end

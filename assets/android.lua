@@ -14,12 +14,12 @@ for i = 1, 32 do
 end
 -- free the reservation immediately
 for _, slot in ipairs(reserved_slots) do
-  local res = ffi.C.munmap(slot.p, slot.len)
+  ffi.C.munmap(slot.p, slot.len)
 end
 -- and allocate a large mcode segment, hopefully it will succeed.
 -- 64KB ought to be enough for everyone with 10000 loop threshold
 require("jit.opt").start("sizemcode=64","maxmcode=64", "hotloop=10000")
-for i=1,20000 do end  -- Force allocation of one large segment
+for _=1,20000 do end  -- Force allocation of one large segment
 
 ffi.cdef[[
 // logging:
@@ -1509,7 +1509,7 @@ local function run(android_app_state)
             return out
         end)
     end
-    os.execute = function(command)
+    os.execute = function(command) -- luacheck: ignore 122
         if command == nil then return -1 end
         local argv = {}
         command:gsub("([^ ]+)", function(arg) table.insert(argv, arg) end)
@@ -1541,7 +1541,7 @@ local function run(android_app_state)
 
     -- ffi.load wrapper
     local ffi_load = ffi.load
-    ffi.load = function(library, ...)
+    ffi.load = function(library, ...) -- luacheck: ignore 212
         android.LOGI("ffi.load "..library)
         return android.dl.dlopen(library, ffi_load)
     end
