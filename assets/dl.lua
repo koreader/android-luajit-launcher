@@ -78,10 +78,12 @@ function dl.dlopen(library, load_func)
                 if needed == "libluajit.so" then
                     -- load the luajit-launcher libluajit with sys_dlopen
                     load_func("libluajit.so")
-                elseif needed ~= "libdl.so" then
-                    -- for android >= 6.0, you can't load system library anymore
-                    -- and since we also have our own dl implementation, it's safe
-                    -- to skip the stock libdl.
+                elseif needed ~= "libdl.so" and pspec ~= "/system/lib" then
+                    -- For Android >= 6.0, you the list of safe system libraries is:
+                    -- libandroid, libc, libcamera2ndk, libdl, libGLES, libjnigraphics,
+                    -- liblog, libm, libmediandk, libOpenMAXAL, libOpenSLES, libstdc++,
+                    -- libvulkan, and libz
+                    -- However, we have our own dl implementation and don't need the rest.
                     dl.dlopen(needed)
                 end
             end
