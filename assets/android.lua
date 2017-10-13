@@ -1381,6 +1381,18 @@ local function run(android_app_state)
         end)
     end
 
+    android.setKeepScreenOn = function(keepOn)
+        android.LOGI("setting KeepScreenOn to ", keepOn)
+        JNI:context(android.app.activity.vm, function(JNI)
+            JNI:callVoidMethod(
+                android.app.activity.clazz,
+                "setKeepScreenOn",
+                "(Z)V",
+                ffi.new('bool', keepOn)
+            )
+        end)
+    end
+
     android.isWifiEnabled = function()
         return JNI:context(android.app.activity.vm, function(JNI)
             local isWifiEnabled = JNI:callIntMethod(
