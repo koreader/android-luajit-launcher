@@ -29,7 +29,7 @@ DEFLATE7_DIR := $(LOCAL_PATH)/compress-deflate7
 PATCH_OUTPUT := $(shell cd $(DEFLATE7_DIR) && patch -N -p1 < ../7zMain.patch)
 lzma_SOURCES := \
         7zStream.c 7zFile.c Ppmd7Dec.c Ppmd7.c Bcj2.c \
-        Bra86.c Bra.c Lzma2Dec.c LzmaDec.c 7zIn.c 7zDec.c \
+        Bra86.c Bra.c CpuArch.c Lzma2Dec.c LzmaDec.c 7zIn.c 7zDec.c \
         7zCrcOpt.c 7zCrc.c 7zBuf2.c 7zBuf.c 7zAlloc.c \
         Util/7z/7zMain.c
 
