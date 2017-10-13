@@ -167,7 +167,6 @@ public class MainActivity extends NativeActivity {
         return (WifiManager) this.getSystemService(Context.WIFI_SERVICE); 
     }
 
-
     public void setKeepScreenOn(final boolean keepOn) {
         final CountDownLatch cd = new CountDownLatch(1);
         runOnUiThread(new Runnable() {
