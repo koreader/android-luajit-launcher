@@ -8,6 +8,7 @@ import android.content.IntentFilter;
 import android.content.Intent;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.util.Log;
 import android.graphics.Point;
@@ -61,7 +62,14 @@ public class MainActivity extends NativeActivity {
 
     protected void onResume() {
         super.onResume();
-        setFullscreenLayout();
+
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                setFullscreenLayout();
+            }
+        }, 500);
     }
 
     public void setScreenBrightness(final int brightness) {

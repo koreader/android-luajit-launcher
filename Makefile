@@ -30,6 +30,7 @@ local.properties project.properties:
 
 clean:
 	-ndk-build clean
+	./mk-luajit.sh clean
 	rm -rf bin obj libs gen jni/luajit-build local.properties assets/module
 
 dev: apk
