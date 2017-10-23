@@ -1360,7 +1360,7 @@ local function run(android_app_state)
     end
     android.isFullscreen = function()
         return JNI:context(android.app.activity.vm, function(JNI)
-            local fullscreen = JNI:callIntMethod(
+            local fullscreen = JNI:callBooleanMethod(
                 android.app.activity.clazz,
                 "isFullscreen",
                 "()Z"
@@ -1395,7 +1395,7 @@ local function run(android_app_state)
 
     android.isWifiEnabled = function()
         return JNI:context(android.app.activity.vm, function(JNI)
-            local isWifiEnabled = JNI:callIntMethod(
+            local isWifiEnabled = JNI:callBooleanMethod(
                 android.app.activity.clazz,
                 "isWifiEnabled",
                 "()Z"
