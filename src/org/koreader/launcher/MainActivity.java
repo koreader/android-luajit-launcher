@@ -6,13 +6,27 @@ import android.view.WindowManager;
 import android.os.BatteryManager;
 import android.content.IntentFilter;
 import android.content.Intent;
+import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.util.Log;
+import android.graphics.Point;
+import android.view.Display;
+import android.graphics.Rect;
+import android.view.Window;
+import android.util.DisplayMetrics;
+import android.net.wifi.WifiManager;
+
+import java.util.concurrent.CountDownLatch;
 
 public class MainActivity extends NativeActivity {
+    private class Box<T> {
+        public T value;
+    }
+
     static {
-        System.loadLibrary("luajit-launcher");
+        System.loadLibrary("luajit");
     }
 
     private static String TAG = "luajit-launcher";
@@ -28,15 +42,34 @@ public class MainActivity extends NativeActivity {
         super.onCreate(savedInstanceState);
     }
 
-    protected void onResume() {
-        super.onResume();
-        //Hide toolbar
+    private void setFullscreenLayout() {
         int SDK_INT = android.os.Build.VERSION.SDK_INT;
         if(SDK_INT >= 11 && SDK_INT < 16) {
             getWindow().getDecorView().setSystemUiVisibility(View.STATUS_BAR_HIDDEN);
-        } else if (SDK_INT >= 16) {
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LOW_PROFILE);
+        } else if (SDK_INT >= 16 && SDK_INT < 19) {
+            getWindow().getDecorView().setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LOW_PROFILE);
+        } else if (SDK_INT >= 19) {
+            getWindow().getDecorView().setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
+                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
+                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
+                    View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
+                    View.SYSTEM_UI_FLAG_FULLSCREEN |
+                    View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
         }
+    }
+
+    protected void onResume() {
+        super.onResume();
+
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                setFullscreenLayout();
+            }
+        }, 500);
     }
 
     public void setScreenBrightness(final int brightness) {
@@ -49,17 +82,43 @@ public class MainActivity extends NativeActivity {
                             Settings.System.SCREEN_BRIGHTNESS_MODE,
                             Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
 
-                    //refreshes the screen
                     Settings.System.putInt(getContentResolver(),
                             Settings.System.SCREEN_BRIGHTNESS, brightness);
-                    WindowManager.LayoutParams lp = getWindow().getAttributes();
-                    lp.screenBrightness = brightness / 255.0f;
-                    getWindow().setAttributes(lp);
                 } catch (Exception e) {
                     Log.v(TAG, e.toString());
                 }
             }
         });
+    }
+
+    public int getScreenBrightness() {
+        final Box<Integer> result = new Box<Integer>();
+        final CountDownLatch cd = new CountDownLatch(1);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    result.value = new Integer(Settings.System.getInt(
+                                                       getContentResolver(),
+                                                       Settings.System.SCREEN_BRIGHTNESS));
+                } catch (Exception e) {
+                    Log.v(TAG, e.toString());
+                    result.value = new Integer(0);
+                }
+                cd.countDown();
+            }
+        });
+        try {
+            cd.await();
+        } catch (InterruptedException ex) {
+            return 0;
+        }
+
+        if (result.value == null) {
+            return 0;
+        }
+
+        return result.value.intValue();
     }
 
     public int getBatteryLevel() {
@@ -98,4 +157,107 @@ public class MainActivity extends NativeActivity {
             }
         });
     }
+
+    public boolean isFullscreen() {
+    	return (getWindow().getAttributes().flags & WindowManager.LayoutParams.FLAG_FULLSCREEN) != 0;
+    }
+
+
+    public void setWifiEnabled(final boolean enabled) {
+        this.getWifiManager().setWifiEnabled(enabled);
+    }
+
+    public boolean isWifiEnabled() {
+        return this.getWifiManager().isWifiEnabled();
+    }
+
+    private WifiManager getWifiManager() {
+        return (WifiManager) this.getSystemService(Context.WIFI_SERVICE); 
+    }
+
+    public void setKeepScreenOn(final boolean keepOn) {
+        final CountDownLatch cd = new CountDownLatch(1);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                   if (keepOn) {
+                        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                    } else {
+                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                    }
+                } catch (Exception e) {
+                    Log.v(TAG, e.toString());
+                }
+                cd.countDown();
+            }
+        });
+        try {
+            cd.await();
+        } catch (InterruptedException ex) {
+        }
+    }
+
+
+    public void setFullscreen(final boolean fullscreen) {
+        final CountDownLatch cd = new CountDownLatch(1);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    WindowManager.LayoutParams attrs = getWindow().getAttributes();
+                    if (fullscreen){
+                        attrs.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
+                    } else {
+                        attrs.flags &= ~WindowManager.LayoutParams.FLAG_FULLSCREEN;
+                    }
+                    getWindow().setAttributes(attrs);
+                } catch (Exception e) {
+                    Log.v(TAG, e.toString());
+                }
+                cd.countDown();
+            }
+        });
+        try {
+            cd.await();
+        } catch (InterruptedException ex) {
+        }
+    }
+
+    public int getStatusBarHeight() {
+        Rect rectangle = new Rect();
+        Window window = getWindow();
+        window.getDecorView().getWindowVisibleDisplayFrame(rectangle);
+        int statusBarHeight = rectangle.top;
+        return statusBarHeight;
+	}
+
+	private Point getSceenSize() {
+        Point size = new Point();
+        Display display = getWindowManager().getDefaultDisplay();
+
+        try {
+            // For JellyBean 4.2 (API 17) and onward
+            if (android.os.Build.VERSION.SDK_INT >= 17) {
+                DisplayMetrics metrics = new DisplayMetrics();
+                display.getRealMetrics(metrics);
+                size.set(metrics.widthPixels, metrics.heightPixels);
+            } else {
+                display.getSize(size);
+            }
+        } catch (Exception e) {
+            Log.v(TAG, e.toString());
+        }
+        return size;
+	}
+
+	public int getScreenWidth() {
+        int width = getSceenSize().x;
+        return width;
+	}
+
+	public int getScreenHeight(){
+        int height = getSceenSize().y;
+        return height;
+	}
 }

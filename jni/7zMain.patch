@@ -1,36 +1,27 @@
-diff --git a/7zip/C/Util/7z/7zMain.c b/7zip/C/Util/7z/7zMain.c
-index f217340..3194e39 100755
---- a/7zip/C/Util/7z/7zMain.c
-+++ b/7zip/C/Util/7z/7zMain.c
-@@ -275,13 +275,13 @@ static void GetAttribString(UInt32 wa, Bool isDir, char *s)
-   s[5] = '\0';
- }
- #else
--static void GetAttribString(UInt32, Bool, char *s)
-+static void GetAttribString(UInt32 wa, Bool isDir, char *s)
- {
-   s[0] = '\0';
- }
- #endif
+--- 7z/C/Util/7z/7zMain.c
++++ 7z/C/Util/7z/7zMain.c
+@@ -372,7 +372,7 @@
+ 
+ // #define NUM_PARENTS_MAX 128
  
 -int MY_CDECL main(int numargs, char *args[])
 +int MY_CDECL lzma_main(int numargs, char *args[])
  {
-   CFileInStream archiveStream;
-   CLookToRead lookStream;
-@@ -296,7 +296,7 @@ int MY_CDECL main(int numargs, char *args[])
+   ISzAlloc allocImp;
+   ISzAlloc allocTempImp;
+@@ -390,7 +390,7 @@
    if (numargs == 1)
    {
-     printf(
+     Print(
 -      "Usage: 7zDec <command> <archive_name>\n\n"
 +      "Usage: 7zDec <command> <archive_name> <location>\n\n"
        "<Commands>\n"
        "  e: Extract files from archive (without using directory names)\n"
        "  l: List contents of archive\n"
-@@ -304,11 +304,12 @@ int MY_CDECL main(int numargs, char *args[])
-       "  x: eXtract files with full paths\n");
+@@ -399,11 +399,12 @@
      return 0;
    }
+ 
 -  if (numargs < 3)
 +  if (numargs < 4)
    {
@@ -39,5 +30,5 @@ index f217340..3194e39 100755
    }
 +  chdir(args[3]);
  
-   allocImp.Alloc = SzAlloc;
-   allocImp.Free = SzFree;
+   #if defined(_WIN32) && !defined(USE_WINDOWS_FILE) && !defined(UNDER_CE)
+   g_FileCodePage = AreFileApisANSI() ? CP_ACP : CP_OEMCP;

@@ -14,12 +14,12 @@ for i = 1, 32 do
 end
 -- free the reservation immediately
 for _, slot in ipairs(reserved_slots) do
-  local res = ffi.C.munmap(slot.p, slot.len)
+  ffi.C.munmap(slot.p, slot.len)
 end
 -- and allocate a large mcode segment, hopefully it will succeed.
 -- 64KB ought to be enough for everyone with 10000 loop threshold
 require("jit.opt").start("sizemcode=64","maxmcode=64", "hotloop=10000")
-for i=1,20000 do end  -- Force allocation of one large segment
+for _=1,20000 do end  -- Force allocation of one large segment
 
 ffi.cdef[[
 // logging:
@@ -1105,10 +1105,14 @@ end
 
 -- Android specific
 
+-- Some Android roms won't load libandroid.so to the global namespace thus
+-- we load it by ourselves.
+local android_lib_ok, android_lib = pcall(ffi.load, "libandroid.so")
 local android = {
     app = nil,
     jni = JNI,
     log_name = "luajit-launcher",
+    lib = android_lib_ok and android_lib or ffi.C,
 }
 
 function android.LOG(level, message)
@@ -1135,21 +1139,21 @@ function android.asset_loader(modulename)
     -- Find source
     local modulepath = string.gsub(modulename, "%.", "/")
     local filename = string.gsub("?.lua", "%?", modulepath)
-    local asset = ffi.C.AAssetManager_open(
+    local asset = android.lib.AAssetManager_open(
         android.app.activity.assetManager,
         filename, ffi.C.AASSET_MODE_BUFFER)
     --android.LOGI(string.format("trying to open asset %s: %s", filename, tostring(asset)))
     if asset ~= nil then
         -- read asset:
-        local assetdata = ffi.C.AAsset_getBuffer(asset)
-        local assetsize = ffi.C.AAsset_getLength(asset)
+        local assetdata = android.lib.AAsset_getBuffer(asset)
+        local assetsize = android.lib.AAsset_getLength(asset)
         if assetdata ~= nil then
             -- Compile and return the module
             local compiled = assert(loadstring(ffi.string(assetdata, assetsize), filename))
-            ffi.C.AAsset_close(asset)
+            android.lib.AAsset_close(asset)
             return compiled
         else
-            ffi.C.AAsset_close(asset)
+            android.lib.AAsset_close(asset)
             errmsg = errmsg.."\n\tunaccessible file '"..filename.."' (tried with asset loader)"
         end
     else
@@ -1227,22 +1231,32 @@ local function run(android_app_state)
                 JNI:to_string(files_dir),
                 JNI:to_string(JNI:getObjectField(app_info, "nativeLibraryDir", "Ljava/lang/String;"))
         end)
-    android.screen = {}
-    android.screen.width, android.screen.height =
-        JNI:context(android.app.activity.vm, function(JNI)
-            local display = JNI:callObjectMethod(
-                JNI:callObjectMethod(
-                    android.app.activity.clazz,
-                    "getWindowManager",
-                    "()Landroid/view/WindowManager;"
-                ),
-                "getDefaultDisplay",
-                "()Landroid/view/Display;"
+
+    android.getScreenWidth = function()
+        return JNI:context(android.app.activity.vm, function(JNI)
+            local width = JNI:callIntMethod(
+                android.app.activity.clazz,
+                "getScreenWidth",
+                "()I"
             )
-            return
-                JNI:callIntMethod(display, "getWidth", "()I"),
-                JNI:callIntMethod(display, "getHeight", "()I")
+            android.LOGI("get screen width  " .. width)
+            return width
         end)
+    end
+    android.getScreenHeight = function()
+        return JNI:context(android.app.activity.vm, function(JNI)
+            local height = JNI:callIntMethod(
+                android.app.activity.clazz,
+                "getScreenHeight",
+                "()I"
+            )
+            android.LOGI("get screen height  " .. height)
+            return height
+        end)
+    end
+    android.screen = {}
+    android.screen.width = android.getScreenWidth()
+    android.screen.height = android.getScreenHeight()
     android.getScreenBrightness = function()
         return JNI:context(android.app.activity.vm, function(JNI)
             local str_brightness = JNI.env[0].NewStringUTF(JNI.env, "screen_brightness")
@@ -1264,6 +1278,11 @@ local function run(android_app_state)
     android.setScreenBrightness = function(brightness)
         android.LOGI("set screen brightness "..brightness)
         JNI:context(android.app.activity.vm, function(JNI)
+            if brightness > 255 then
+                brightness = 255
+            elseif brightness < 0 then
+                brightness = 0
+            end
             JNI:callVoidMethod(
                 android.app.activity.clazz,
                 "setScreenBrightness",
@@ -1339,6 +1358,77 @@ local function run(android_app_state)
             )
         end)
     end
+    android.isFullscreen = function()
+        return JNI:context(android.app.activity.vm, function(JNI)
+            local fullscreen = JNI:callIntMethod(
+                android.app.activity.clazz,
+                "isFullscreen",
+                "()Z"
+            )
+            android.LOGI("is fullscreen =", fullscreen)
+            return fullscreen
+        end)
+    end
+    android.setFullscreen = function(fullscreen)
+        android.LOGI("setting fullscreen ", fullscreen)
+        JNI:context(android.app.activity.vm, function(JNI)
+            JNI:callVoidMethod(
+                android.app.activity.clazz,
+                "setFullscreen",
+                "(Z)V",
+                ffi.new('bool', fullscreen)
+            )
+        end)
+    end
+
+    android.setKeepScreenOn = function(keepOn)
+        android.LOGI("setting KeepScreenOn to ", keepOn)
+        JNI:context(android.app.activity.vm, function(JNI)
+            JNI:callVoidMethod(
+                android.app.activity.clazz,
+                "setKeepScreenOn",
+                "(Z)V",
+                ffi.new('bool', keepOn)
+            )
+        end)
+    end
+
+    android.isWifiEnabled = function()
+        return JNI:context(android.app.activity.vm, function(JNI)
+            local isWifiEnabled = JNI:callIntMethod(
+                android.app.activity.clazz,
+                "isWifiEnabled",
+                "()Z"
+            )
+            android.LOGI("is WifiEnabled =", isWifiEnabled)
+            return isWifiEnabled
+        end)
+    end
+
+    android.setWifiEnabled = function(wifiEnabled)
+        android.LOGI("setting wifi to: ", wifiEnabled)
+        JNI:context(android.app.activity.vm, function(JNI)
+            JNI:callVoidMethod(
+                android.app.activity.clazz,
+                "setWifiEnabled",
+                "(Z)V",
+                ffi.new('bool', wifiEnabled)
+            )
+        end)
+    end
+
+    android.getStatusBarHeight = function()
+        return JNI:context(android.app.activity.vm, function(JNI)
+            local statusBarHeight = JNI:callIntMethod(
+                android.app.activity.clazz,
+                "getStatusBarHeight",
+                "()I"
+            )
+            android.LOGI("get status bar height  " .. statusBarHeight)
+            return statusBarHeight
+        end)
+    end
+
     local function subprocess(JNI, argv)
         local args_array = JNI.env[0].NewObjectArray(JNI.env, #argv,
             JNI.env[0].FindClass(JNI.env, "java/lang/String"), nil)
@@ -1431,7 +1521,7 @@ local function run(android_app_state)
             return out
         end)
     end
-    os.execute = function(command)
+    os.execute = function(command) -- luacheck: ignore 122
         if command == nil then return -1 end
         local argv = {}
         command:gsub("([^ ]+)", function(arg) table.insert(argv, arg) end)
@@ -1463,7 +1553,7 @@ local function run(android_app_state)
 
     -- ffi.load wrapper
     local ffi_load = ffi.load
-    ffi.load = function(library, ...)
+    ffi.load = function(library, ...) -- luacheck: ignore 212
         android.LOGI("ffi.load "..library)
         return android.dl.dlopen(library, ffi_load)
     end
