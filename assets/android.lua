@@ -1047,7 +1047,7 @@ function JNI:callBooleanMethod(object, method, signature, ...)
     local clazz = self.env[0].GetObjectClass(self.env, object)
     local methodID = self.env[0].GetMethodID(self.env, clazz, method, signature)
     self.env[0].DeleteLocalRef(self.env, clazz)
-    return self.env[0].callBooleanMethod(self.env, object, methodID, ...)
+    return self.env[0].CallBooleanMethod(self.env, object, methodID, ...)
 end
 
 function JNI:callStaticBooleanMethod(class, method, signature, ...)
@@ -1363,7 +1363,7 @@ local function run(android_app_state)
             local fullscreen = JNI:callBooleanMethod(
                 android.app.activity.clazz,
                 "isFullscreen",
-                "()C"
+                "()Z"
             )
             android.LOGI("is fullscreen =", fullscreen)
             return fullscreen
@@ -1398,7 +1398,7 @@ local function run(android_app_state)
             local isWifiEnabled = JNI:callBooleanMethod(
                 android.app.activity.clazz,
                 "isWifiEnabled",
-                "()C"
+                "()Z"
             )
             android.LOGI("is WifiEnabled =", isWifiEnabled)
             return isWifiEnabled
