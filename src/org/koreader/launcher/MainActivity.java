@@ -158,8 +158,8 @@ public class MainActivity extends NativeActivity {
         });
     }
 
-    public boolean isFullscreen() {
-    	return (getWindow().getAttributes().flags & WindowManager.LayoutParams.FLAG_FULLSCREEN) != 0;
+    public int isFullscreen() {
+    	return ((getWindow().getAttributes().flags & WindowManager.LayoutParams.FLAG_FULLSCREEN) != 0) ? 1: 0;
     }
 
 
@@ -167,8 +167,8 @@ public class MainActivity extends NativeActivity {
         this.getWifiManager().setWifiEnabled(enabled);
     }
 
-    public boolean isWifiEnabled() {
-        return this.getWifiManager().isWifiEnabled();
+    public int isWifiEnabled() {
+        return this.getWifiManager().isWifiEnabled() ? 1 : 0;
     }
 
     private WifiManager getWifiManager() {
