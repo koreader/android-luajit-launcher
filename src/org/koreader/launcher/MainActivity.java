@@ -1,6 +1,9 @@
 package org.koreader.launcher;
 
 import android.app.NativeActivity;
+import android.content.ClipData;
+import android.content.ClipDescription;
+import android.content.ClipboardManager;
 import android.provider.Settings;
 import android.view.WindowManager;
 import android.os.BatteryManager;
@@ -21,6 +24,9 @@ import android.net.wifi.WifiManager;
 import java.util.concurrent.CountDownLatch;
 
 public class MainActivity extends NativeActivity {
+
+    private final static int SDK_INT = android.os.Build.VERSION.SDK_INT;
+
     private class Box<T> {
         public T value;
     }
@@ -43,7 +49,6 @@ public class MainActivity extends NativeActivity {
     }
 
     private void setFullscreenLayout() {
-        int SDK_INT = android.os.Build.VERSION.SDK_INT;
         if(SDK_INT >= 11 && SDK_INT < 16) {
             getWindow().getDecorView().setSystemUiVisibility(View.STATUS_BAR_HIDDEN);
         } else if (SDK_INT >= 16 && SDK_INT < 19) {
@@ -52,11 +57,11 @@ public class MainActivity extends NativeActivity {
         } else if (SDK_INT >= 19) {
             getWindow().getDecorView().setSystemUiVisibility(
                     View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
-                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
-                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
-                    View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
-                    View.SYSTEM_UI_FLAG_FULLSCREEN |
-                    View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+                            View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
+                            View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
+                            View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
+                            View.SYSTEM_UI_FLAG_FULLSCREEN |
+                            View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
         }
     }
 
@@ -99,8 +104,8 @@ public class MainActivity extends NativeActivity {
             public void run() {
                 try {
                     result.value = new Integer(Settings.System.getInt(
-                                                       getContentResolver(),
-                                                       Settings.System.SCREEN_BRIGHTNESS));
+                            getContentResolver(),
+                            Settings.System.SCREEN_BRIGHTNESS));
                 } catch (Exception e) {
                     Log.v(TAG, e.toString());
                     result.value = new Integer(0);
@@ -134,7 +139,7 @@ public class MainActivity extends NativeActivity {
                 new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
         int plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
         return plugged == BatteryManager.BATTERY_PLUGGED_AC
-            || plugged == BatteryManager.BATTERY_PLUGGED_USB ? 1 : 0;
+                || plugged == BatteryManager.BATTERY_PLUGGED_USB ? 1 : 0;
     }
 
     public void showProgress(final String title, final String message) {
@@ -159,7 +164,7 @@ public class MainActivity extends NativeActivity {
     }
 
     public int isFullscreen() {
-    	return ((getWindow().getAttributes().flags & WindowManager.LayoutParams.FLAG_FULLSCREEN) != 0) ? 1: 0;
+        return ((getWindow().getAttributes().flags & WindowManager.LayoutParams.FLAG_FULLSCREEN) != 0) ? 1: 0;
     }
 
 
@@ -172,7 +177,7 @@ public class MainActivity extends NativeActivity {
     }
 
     private WifiManager getWifiManager() {
-        return (WifiManager) this.getSystemService(Context.WIFI_SERVICE); 
+        return (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
     }
 
     public void setKeepScreenOn(final boolean keepOn) {
@@ -181,7 +186,7 @@ public class MainActivity extends NativeActivity {
             @Override
             public void run() {
                 try {
-                   if (keepOn) {
+                    if (keepOn) {
                         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                     } else {
                         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -224,21 +229,56 @@ public class MainActivity extends NativeActivity {
         }
     }
 
+    public void setClipboardText(String text) {
+        if (SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
+            android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            clipboard.setText(text);
+        } else {
+            ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            ClipData clip = ClipData.newPlainText("Koreader_clipboard",text);
+            clipboard.setPrimaryClip(clip);
+        }
+    }
+
+    public String getClipboardText() {
+        if (hasClipboardText()) {
+            if (SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
+                android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                return clipboard.getText().toString();
+            } else {
+                ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                ClipData.Item item = clipboard.getPrimaryClip().getItemAt(0);
+                return item.getText().toString();
+            }
+        }
+        return "";
+    }
+
+    public boolean hasClipboardText() {
+        if (SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
+            android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+            return clipboard.hasText();
+        }else{
+            ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+            return clipboard.hasPrimaryClip() && clipboard.getPrimaryClipDescription().hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN);
+        }
+    }
+
     public int getStatusBarHeight() {
         Rect rectangle = new Rect();
         Window window = getWindow();
         window.getDecorView().getWindowVisibleDisplayFrame(rectangle);
         int statusBarHeight = rectangle.top;
         return statusBarHeight;
-	}
+    }
 
-	private Point getSceenSize() {
+    private Point getSceenSize() {
         Point size = new Point();
         Display display = getWindowManager().getDefaultDisplay();
 
         try {
             // For JellyBean 4.2 (API 17) and onward
-            if (android.os.Build.VERSION.SDK_INT >= 17) {
+            if (SDK_INT >= 17) {
                 DisplayMetrics metrics = new DisplayMetrics();
                 display.getRealMetrics(metrics);
                 size.set(metrics.widthPixels, metrics.heightPixels);
@@ -249,15 +289,15 @@ public class MainActivity extends NativeActivity {
             Log.v(TAG, e.toString());
         }
         return size;
-	}
+    }
 
-	public int getScreenWidth() {
+    public int getScreenWidth() {
         int width = getSceenSize().x;
         return width;
-	}
+    }
 
-	public int getScreenHeight(){
+    public int getScreenHeight(){
         int height = getSceenSize().y;
         return height;
-	}
+    }
 }
