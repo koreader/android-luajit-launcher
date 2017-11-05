@@ -260,6 +260,10 @@ public class MainActivity extends NativeActivity {
         }
     }
 
+    public int hasClipboardTextIntResultWrapper() {
+        return hasClipboardText() ? 1 :0 ;
+    }
+
     public int getStatusBarHeight() {
         Rect rectangle = new Rect();
         Window window = getWindow();
