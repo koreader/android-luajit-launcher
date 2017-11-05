@@ -1381,6 +1381,40 @@ local function run(android_app_state)
         end)
     end
 
+    android.getClipboardText = function()
+        return JNI:context(android.app.activity.vm, function(JNI)
+            JNI:callObjectMethod(
+                android.app.activity.clazz,
+                "getClipboardText",
+                "()Ljava/lang/String;"
+            )
+        end)
+    end
+
+    android.hasClipboardText = function()
+        return JNI:context(android.app.activity.vm, function(JNI)
+            JNI:callIntMethod(
+                android.app.activity.clazz,
+                "hasClipboardTextIntResultWrapper",
+                "()I"
+            )
+        end)
+    end
+
+    android.setClipboardText = function(text)
+        android.LOGI("setting clipboard text to: ", text)
+        local clipboard_text = JNI.env[0].NewStringUTF(JNI.env, text)
+        JNI:context(android.app.activity.vm, function(JNI)
+            JNI:callVoidMethod(
+                android.app.activity.clazz,
+                "setClipboardText",
+                "(Ljava/lang/String;)V",
+                clipboard_text
+            )
+            JNI.env[0].DeleteLocalRef(JNI.env, clipboard_text)
+        end)
+    end
+
     android.setKeepScreenOn = function(keepOn)
         android.LOGI("setting KeepScreenOn to ", keepOn)
         JNI:context(android.app.activity.vm, function(JNI)
