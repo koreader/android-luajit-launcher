@@ -26,21 +26,16 @@ import java.util.concurrent.CountDownLatch;
 public class MainActivity extends NativeActivity {
 
     private final static int SDK_INT = android.os.Build.VERSION.SDK_INT;
-
-    private class Box<T> {
-        public T value;
-    }
+    private final static String LOGGER_NAME = "luajit-launcher";
+    private FramelessProgressDialog dialog;
 
     static {
         System.loadLibrary("luajit");
     }
 
-    private static String TAG = "luajit-launcher";
-    private FramelessProgressDialog dialog;
-
     public MainActivity() {
         super();
-        Log.v(TAG, "Creating luajit launcher main activity");
+        Log.v(LOGGER_NAME, "Creating luajit launcher main activity");
     }
 
     @Override
@@ -48,23 +43,7 @@ public class MainActivity extends NativeActivity {
         super.onCreate(savedInstanceState);
     }
 
-    private void setFullscreenLayout() {
-        if(SDK_INT >= 11 && SDK_INT < 16) {
-            getWindow().getDecorView().setSystemUiVisibility(View.STATUS_BAR_HIDDEN);
-        } else if (SDK_INT >= 16 && SDK_INT < 19) {
-            getWindow().getDecorView().setSystemUiVisibility(
-                    View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LOW_PROFILE);
-        } else if (SDK_INT >= 19) {
-            getWindow().getDecorView().setSystemUiVisibility(
-                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
-                            View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
-                            View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
-                            View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
-                            View.SYSTEM_UI_FLAG_FULLSCREEN |
-                            View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-        }
-    }
-
+    @Override
     protected void onResume() {
         super.onResume();
 
@@ -77,6 +56,23 @@ public class MainActivity extends NativeActivity {
         }, 500);
     }
 
+    private void setFullscreenLayout() {
+        if(SDK_INT >= 11 && SDK_INT < 16) {
+            getWindow().getDecorView().setSystemUiVisibility(View.STATUS_BAR_HIDDEN);
+        } else if (SDK_INT >= 16 && SDK_INT < 19) {
+            getWindow().getDecorView().setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LOW_PROFILE);
+        } else if (SDK_INT >= 19) {
+            getWindow().getDecorView().setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
+                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
+                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
+                    View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
+                    View.SYSTEM_UI_FLAG_FULLSCREEN |
+                    View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+        }
+    }
+
     public void setScreenBrightness(final int brightness) {
         runOnUiThread(new Runnable() {
             @Override
@@ -84,13 +80,13 @@ public class MainActivity extends NativeActivity {
                 try {
                     //this will set the manual mode (set the automatic mode off)
                     Settings.System.putInt(getContentResolver(),
-                            Settings.System.SCREEN_BRIGHTNESS_MODE,
-                            Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
+                        Settings.System.SCREEN_BRIGHTNESS_MODE,
+                        Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
 
                     Settings.System.putInt(getContentResolver(),
-                            Settings.System.SCREEN_BRIGHTNESS, brightness);
+                        Settings.System.SCREEN_BRIGHTNESS, brightness);
                 } catch (Exception e) {
-                    Log.v(TAG, e.toString());
+                    Log.v(LOGGER_NAME, e.toString());
                 }
             }
         });
@@ -104,10 +100,10 @@ public class MainActivity extends NativeActivity {
             public void run() {
                 try {
                     result.value = new Integer(Settings.System.getInt(
-                            getContentResolver(),
-                            Settings.System.SCREEN_BRIGHTNESS));
+                        getContentResolver(),
+                        Settings.System.SCREEN_BRIGHTNESS));
                 } catch (Exception e) {
-                    Log.v(TAG, e.toString());
+                    Log.v(LOGGER_NAME, e.toString());
                     result.value = new Integer(0);
                 }
                 cd.countDown();
@@ -128,7 +124,7 @@ public class MainActivity extends NativeActivity {
 
     public int getBatteryLevel() {
         Intent intent  = this.registerReceiver(null,
-                new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+            new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
         int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
         int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, 100);
         return (level*100)/scale;
@@ -136,10 +132,10 @@ public class MainActivity extends NativeActivity {
 
     public int isCharging() {
         Intent intent = this.registerReceiver(null,
-                new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+            new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
         int plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
         return plugged == BatteryManager.BATTERY_PLUGGED_AC
-                || plugged == BatteryManager.BATTERY_PLUGGED_USB ? 1 : 0;
+            || plugged == BatteryManager.BATTERY_PLUGGED_USB ? 1 : 0;
     }
 
     public void showProgress(final String title, final String message) {
@@ -147,7 +143,7 @@ public class MainActivity extends NativeActivity {
             @Override
             public void run() {
                 dialog = FramelessProgressDialog.show(MainActivity.this,
-                        title, message, true, false);
+                    title, message, true, false);
             }
         });
     }
@@ -192,7 +188,7 @@ public class MainActivity extends NativeActivity {
                         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                     }
                 } catch (Exception e) {
-                    Log.v(TAG, e.toString());
+                    Log.v(LOGGER_NAME, e.toString());
                 }
                 cd.countDown();
             }
@@ -218,7 +214,7 @@ public class MainActivity extends NativeActivity {
                     }
                     getWindow().setAttributes(attrs);
                 } catch (Exception e) {
-                    Log.v(TAG, e.toString());
+                    Log.v(LOGGER_NAME, e.toString());
                 }
                 cd.countDown();
             }
@@ -272,6 +268,16 @@ public class MainActivity extends NativeActivity {
         return statusBarHeight;
     }
 
+    public int getScreenWidth() {
+        int width = getSceenSize().x;
+        return width;
+    }
+
+    public int getScreenHeight(){
+        int height = getSceenSize().y;
+        return height;
+    }
+
     private Point getSceenSize() {
         Point size = new Point();
         Display display = getWindowManager().getDefaultDisplay();
@@ -286,18 +292,12 @@ public class MainActivity extends NativeActivity {
                 display.getSize(size);
             }
         } catch (Exception e) {
-            Log.v(TAG, e.toString());
+            Log.v(LOGGER_NAME, e.toString());
         }
         return size;
     }
 
-    public int getScreenWidth() {
-        int width = getSceenSize().x;
-        return width;
-    }
-
-    public int getScreenHeight(){
-        int height = getSceenSize().y;
-        return height;
+    private class Box<T> {
+        public T value;
     }
 }
