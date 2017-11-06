@@ -232,20 +232,44 @@ public class MainActivity extends NativeActivity {
     }
 
     public String getClipboardText() {
-        if (hasClipboardText()) {
-            if (SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
-                android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-                return clipboard.getText().toString();
-            } else {
-                ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                ClipData.Item item = clipboard.getPrimaryClip().getItemAt(0);
-                return item.getText().toString();
-            }
-        }
-        return "";
+      final Box<String> result = new Box<String>();
+      final CountDownLatch cd = new CountDownLatch(1);
+      runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+              try {
+                  if (hasClipboardText()) {
+                      if (SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
+                          android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                          result.value = clipboard.getText().toString();
+                      } else {
+                          ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                          ClipData.Item item = clipboard.getPrimaryClip().getItemAt(0);
+                          result.value = item.getText().toString();
+                      }
+                  }
+                  result.value = "";
+              } catch (Exception e) {
+                  Log.v(LOGGER_NAME, e.toString());
+                  result.value = "";
+              }
+              cd.countDown();
+          }
+      });
+      try {
+          cd.await();
+      } catch (InterruptedException ex) {
+          return "";
+      }
+
+      if (result.value == null) {
+          return "";
+      }
+
+      return result.value;
     }
 
-    public void setClipboardText(String text) {
+    public void setClipboardText(final String text) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -276,7 +300,31 @@ public class MainActivity extends NativeActivity {
     }
 
     public int hasClipboardTextIntResultWrapper() {
-        return hasClipboardText() ? 1 : 0;
+      final Box<Integer> result = new Box<Integer>();
+      final CountDownLatch cd = new CountDownLatch(1);
+      runOnUiThread(new Runnable() {
+          @Override
+          public void run() {
+              try {
+                  result.value = hasClipboardText() ? 1 : 0;
+              } catch (Exception e) {
+                  Log.v(LOGGER_NAME, e.toString());
+                  result.value = new Integer(0);
+              }
+              cd.countDown();
+          }
+      });
+      try {
+          cd.await();
+      } catch (InterruptedException ex) {
+          return 0;
+      }
+
+      if (result.value == null) {
+          return 0;
+      }
+
+      return result.value.intValue();
     }
 
     public int getStatusBarHeight() {
