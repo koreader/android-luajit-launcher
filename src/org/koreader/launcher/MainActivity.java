@@ -4,22 +4,22 @@ import android.app.NativeActivity;
 import android.content.ClipData;
 import android.content.ClipDescription;
 import android.content.ClipboardManager;
-import android.provider.Settings;
-import android.view.WindowManager;
-import android.os.BatteryManager;
-import android.content.IntentFilter;
-import android.content.Intent;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.graphics.Point;
+import android.graphics.Rect;
+import android.net.wifi.WifiManager;
+import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.View;
-import android.util.Log;
-import android.graphics.Point;
-import android.view.Display;
-import android.graphics.Rect;
-import android.view.Window;
+import android.provider.Settings;
 import android.util.DisplayMetrics;
-import android.net.wifi.WifiManager;
+import android.util.Log;
+import android.view.Display;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 
 import java.util.concurrent.CountDownLatch;
 
@@ -27,11 +27,12 @@ public class MainActivity extends NativeActivity {
 
     private final static int SDK_INT = android.os.Build.VERSION.SDK_INT;
     private final static String LOGGER_NAME = "luajit-launcher";
-    private FramelessProgressDialog dialog;
 
     static {
         System.loadLibrary("luajit");
     }
+
+    private FramelessProgressDialog dialog;
 
     public MainActivity() {
         super();
@@ -57,7 +58,7 @@ public class MainActivity extends NativeActivity {
     }
 
     private void setFullscreenLayout() {
-        if(SDK_INT >= 11 && SDK_INT < 16) {
+        if (SDK_INT >= 11 && SDK_INT < 16) {
             getWindow().getDecorView().setSystemUiVisibility(View.STATUS_BAR_HIDDEN);
         } else if (SDK_INT >= 16 && SDK_INT < 19) {
             getWindow().getDecorView().setSystemUiVisibility(
@@ -71,25 +72,6 @@ public class MainActivity extends NativeActivity {
                     View.SYSTEM_UI_FLAG_FULLSCREEN |
                     View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
         }
-    }
-
-    public void setScreenBrightness(final int brightness) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    //this will set the manual mode (set the automatic mode off)
-                    Settings.System.putInt(getContentResolver(),
-                        Settings.System.SCREEN_BRIGHTNESS_MODE,
-                        Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
-
-                    Settings.System.putInt(getContentResolver(),
-                        Settings.System.SCREEN_BRIGHTNESS, brightness);
-                } catch (Exception e) {
-                    Log.v(LOGGER_NAME, e.toString());
-                }
-            }
-        });
     }
 
     public int getScreenBrightness() {
@@ -122,12 +104,31 @@ public class MainActivity extends NativeActivity {
         return result.value.intValue();
     }
 
+    public void setScreenBrightness(final int brightness) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    //this will set the manual mode (set the automatic mode off)
+                    Settings.System.putInt(getContentResolver(),
+                        Settings.System.SCREEN_BRIGHTNESS_MODE,
+                        Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
+
+                    Settings.System.putInt(getContentResolver(),
+                        Settings.System.SCREEN_BRIGHTNESS, brightness);
+                } catch (Exception e) {
+                    Log.v(LOGGER_NAME, e.toString());
+                }
+            }
+        });
+    }
+
     public int getBatteryLevel() {
-        Intent intent  = this.registerReceiver(null,
+        Intent intent = this.registerReceiver(null,
             new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
         int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
         int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, 100);
-        return (level*100)/scale;
+        return (level * 100) / scale;
     }
 
     public int isCharging() {
@@ -152,7 +153,7 @@ public class MainActivity extends NativeActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if(dialog!= null && dialog.isShowing()){
+                if (dialog != null && dialog.isShowing()) {
                     dialog.dismiss();
                 }
             }
@@ -160,16 +161,21 @@ public class MainActivity extends NativeActivity {
     }
 
     public int isFullscreen() {
-        return ((getWindow().getAttributes().flags & WindowManager.LayoutParams.FLAG_FULLSCREEN) != 0) ? 1: 0;
+        return ((getWindow().getAttributes().flags & WindowManager.LayoutParams.FLAG_FULLSCREEN) != 0) ? 1 : 0;
     }
 
 
     public void setWifiEnabled(final boolean enabled) {
-        this.getWifiManager().setWifiEnabled(enabled);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                getWifiManager().setWifiEnabled(enabled);
+            }
+        });
     }
 
     public int isWifiEnabled() {
-        return this.getWifiManager().isWifiEnabled() ? 1 : 0;
+        return getWifiManager().isWifiEnabled() ? 1 : 0;
     }
 
     private WifiManager getWifiManager() {
@@ -207,7 +213,7 @@ public class MainActivity extends NativeActivity {
             public void run() {
                 try {
                     WindowManager.LayoutParams attrs = getWindow().getAttributes();
-                    if (fullscreen){
+                    if (fullscreen) {
                         attrs.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
                     } else {
                         attrs.flags &= ~WindowManager.LayoutParams.FLAG_FULLSCREEN;
@@ -225,17 +231,6 @@ public class MainActivity extends NativeActivity {
         }
     }
 
-    public void setClipboardText(String text) {
-        if (SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
-            android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-            clipboard.setText(text);
-        } else {
-            ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-            ClipData clip = ClipData.newPlainText("Koreader_clipboard",text);
-            clipboard.setPrimaryClip(clip);
-        }
-    }
-
     public String getClipboardText() {
         if (hasClipboardText()) {
             if (SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
@@ -250,18 +245,38 @@ public class MainActivity extends NativeActivity {
         return "";
     }
 
+    public void setClipboardText(String text) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    if (SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
+                        android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                        clipboard.setText(text);
+                    } else {
+                        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                        ClipData clip = ClipData.newPlainText("KOReader_clipboard", text);
+                        clipboard.setPrimaryClip(clip);
+                    }
+                } catch (Exception e) {
+                    Log.v(LOGGER_NAME, e.toString());
+                }
+            }
+        });
+    }
+
     public boolean hasClipboardText() {
         if (SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
             android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
             return clipboard.hasText();
-        }else{
+        } else {
             ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
             return clipboard.hasPrimaryClip() && clipboard.getPrimaryClipDescription().hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN);
         }
     }
 
     public int hasClipboardTextIntResultWrapper() {
-        return hasClipboardText() ? 1 :0 ;
+        return hasClipboardText() ? 1 : 0;
     }
 
     public int getStatusBarHeight() {
@@ -277,7 +292,7 @@ public class MainActivity extends NativeActivity {
         return width;
     }
 
-    public int getScreenHeight(){
+    public int getScreenHeight() {
         int height = getSceenSize().y;
         return height;
     }
