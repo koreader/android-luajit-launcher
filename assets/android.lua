@@ -1403,8 +1403,8 @@ local function run(android_app_state)
 
     android.setClipboardText = function(text)
         android.LOGI("setting clipboard text to: ", text)
-        local clipboard_text = JNI.env[0].NewStringUTF(JNI.env, text)
         JNI:context(android.app.activity.vm, function(JNI)
+            local clipboard_text = JNI.env[0].NewStringUTF(JNI.env, text)
             JNI:callVoidMethod(
                 android.app.activity.clazz,
                 "setClipboardText",
