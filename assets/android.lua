@@ -1376,7 +1376,7 @@ local function run(android_app_state)
                 android.app.activity.clazz,
                 "setFullscreen",
                 "(Z)V",
-                ffi.new('bool', fullscreen)
+                ffi.new("bool", fullscreen)
             )
         end)
     end
@@ -1422,7 +1422,7 @@ local function run(android_app_state)
                 android.app.activity.clazz,
                 "setKeepScreenOn",
                 "(Z)V",
-                ffi.new('bool', keepOn)
+                ffi.new("bool", keepOn)
             )
         end)
     end
@@ -1446,7 +1446,7 @@ local function run(android_app_state)
                 android.app.activity.clazz,
                 "setWifiEnabled",
                 "(Z)V",
-                ffi.new('bool', wifiEnabled)
+                ffi.new("bool", wifiEnabled)
             )
         end)
     end
