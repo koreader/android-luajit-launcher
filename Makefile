@@ -23,7 +23,8 @@ apk: local.properties project.properties
 	git submodule update
 	./mk-luajit.sh $(ANDROID_FULL_ARCH)
 	ndk-build ANDROID_FULL_ARCH=$(ANDROID_FULL_ARCH)
-	ant debug
+#	ant debug
+	./gradlew build
 
 local.properties project.properties:
 	android update project --path . -t android-$(NDKABI_MIN_16)
@@ -31,7 +32,8 @@ local.properties project.properties:
 clean:
 	-ndk-build clean
 	./mk-luajit.sh clean
-	rm -rf bin obj libs gen jni/luajit-build local.properties assets/module
+	rm -rf bin obj libs gen app/src/main/jni/luajit-build local.properties /app/src/main/assets/module
 
 dev: apk
-	ant dev
+#	ant dev
+	./gradlew build

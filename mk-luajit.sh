@@ -7,7 +7,8 @@
 #NDKABI=${NDKABI:-14} # Android 4.0+
 NDKABI=${NDKABI:-9} # Android 2.3+
 BUILD_ARCH=linux-$(uname -m)
-DEST=$(cd "$(dirname "$0")" && pwd)/jni/luajit-build/$1
+#DEST=$(cd "$(dirname "$0")" && pwd)/jni/luajit-build/$1
+DEST=$(cd "$(dirname "$0")" && pwd)/app/src/main/jni/luajit-build/$1
 
 function check_NDK() {
     [[ -v NDK ]] || export NDK=/opt/android-ndk

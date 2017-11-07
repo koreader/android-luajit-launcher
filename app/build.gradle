@@ -15,6 +15,7 @@ android {
         targetSdkVersion 9
 
         ndk {
+            abiFilters 'x86', 'armeabi', 'armeabi-v7a'
             moduleName "libluajit-prebuilt"
         }
     }
@@ -27,7 +28,10 @@ android {
     }
     externalNativeBuild {
         ndkBuild {
+
             path 'src/main/jni/Android.mk'
         }
     }
+
+
 }
