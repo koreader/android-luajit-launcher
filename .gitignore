@@ -2,6 +2,8 @@ obj/
 bin/
 libs/
 gen/
+app/build/
+build/
 *.swp
 jni/luajit-build
 assets/module
