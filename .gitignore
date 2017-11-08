@@ -5,6 +5,8 @@ gen/
 app/build/
 build/
 *.swp
+.gradle
+.idea
 jni/luajit-build
 assets/module
 local.properties
