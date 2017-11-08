@@ -10,6 +10,8 @@ BUILD_ARCH=linux-$(uname -m)
 #DEST=$(cd "$(dirname "$0")" && pwd)/jni/luajit-build/$1
 DEST=$(cd "$(dirname "$0")" && pwd)/app/src/main/jni/luajit-build/$1
 
+export NDK_PROJECT_PATH=app/src/main
+
 function check_NDK() {
     [[ -v NDK ]] || export NDK=/opt/android-ndk
     if [ ! -d "$NDK" ]; then
@@ -18,6 +20,9 @@ function check_NDK() {
     fi
 
     echo "Using NDKABI ${NDKABI}."
+    #TODO move to better place
+    export PATH=$PATH:$NDK
+
 
     NDKVER=$(grep -oP 'r\K([0-9]+)(?=[a-z])' ${NDK}/CHANGELOG.md | head -1)
     echo "Detected NDK version ${NDKVER}..."
@@ -26,6 +31,7 @@ function check_NDK() {
         exit 1
     fi
 }
+cd $NDK_PROJECT_PATH
 
 case "$1" in
     clean)
@@ -70,3 +76,5 @@ case "$1" in
         exit 1
         ;;
 esac
+
+cd -
