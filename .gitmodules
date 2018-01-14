@@ -3,4 +3,4 @@
 	url = https://github.com/LuaJIT/LuaJIT
 [submodule "jni/7z"]
 	path = jni/7z
-	url = https://github.com/pornel/7z.git
+	url = https://github.com/kornelski/7z.git
