@@ -248,7 +248,6 @@ public class MainActivity extends NativeActivity {
                           result.value = item.getText().toString();
                       }
                   }
-                  result.value = "";
               } catch (Exception e) {
                   Log.v(LOGGER_NAME, e.toString());
                   result.value = "";
