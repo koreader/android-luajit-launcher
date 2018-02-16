@@ -1376,8 +1376,47 @@ local function run(android_app_state)
                 android.app.activity.clazz,
                 "setFullscreen",
                 "(Z)V",
-                ffi.new('bool', fullscreen)
+                ffi.new("bool", fullscreen)
             )
+        end)
+    end
+
+    android.getClipboardText = function()
+        return JNI:context(android.app.activity.vm, function(JNI)
+            local text = JNI:callObjectMethod(
+                android.app.activity.clazz,
+                "getClipboardText",
+                "()Ljava/lang/String;"
+            )
+            text = JNI:to_string(text)
+            android.LOGI("clipboard text copied: " .. text)
+            return text
+        end)
+    end
+
+    android.hasClipboardText = function()
+        return JNI:context(android.app.activity.vm, function(JNI)
+            local hasClipboardText = JNI:callIntMethod(
+                android.app.activity.clazz,
+                "hasClipboardTextIntResultWrapper",
+                "()I"
+            )
+            android.LOGI("Has text in clipboard: ", hasClipboardText)
+            return hasClipboardText == 1
+        end)
+    end
+
+    android.setClipboardText = function(text)
+        android.LOGI("setting clipboard text to: " .. text)
+        JNI:context(android.app.activity.vm, function(JNI)
+            local clipboard_text = JNI.env[0].NewStringUTF(JNI.env, text)
+            JNI:callVoidMethod(
+                android.app.activity.clazz,
+                "setClipboardText",
+                "(Ljava/lang/String;)V",
+                clipboard_text
+            )
+            JNI.env[0].DeleteLocalRef(JNI.env, clipboard_text)
         end)
     end
 
@@ -1388,7 +1427,7 @@ local function run(android_app_state)
                 android.app.activity.clazz,
                 "setKeepScreenOn",
                 "(Z)V",
-                ffi.new('bool', keepOn)
+                ffi.new("bool", keepOn)
             )
         end)
     end
@@ -1412,7 +1451,7 @@ local function run(android_app_state)
                 android.app.activity.clazz,
                 "setWifiEnabled",
                 "(Z)V",
-                ffi.new('bool', wifiEnabled)
+                ffi.new("bool", wifiEnabled)
             )
         end)
     end
