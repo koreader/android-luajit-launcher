@@ -47,7 +47,10 @@ public class MainActivity extends NativeActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        // set fullscreen immediately on general principle
+        setFullscreenLayout();
 
+        // set fullscreen delayed because presumably some devices don't work right otherwise
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
