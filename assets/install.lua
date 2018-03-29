@@ -15,7 +15,7 @@ local function install()
     local function check_installed_rev()
         local git_rev = io.open(A.dir .. "/git-rev")
         local rev = git_rev and git_rev:read() or ""
-        return rev:match(".*%-(.*)")
+        return rev
     end
     -- 7z compressed package are stored in module directory in asset
     local module = "module"
