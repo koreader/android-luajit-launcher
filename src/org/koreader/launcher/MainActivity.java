@@ -357,8 +357,11 @@ public class MainActivity extends NativeActivity {
                 DisplayMetrics metrics = new DisplayMetrics();
                 display.getRealMetrics(metrics);
                 size.set(metrics.widthPixels, metrics.heightPixels);
-            } else {
+            // Android 3.0 (API 11) and higher
+            } else if (SDK_INT >= 11) {
                 display.getSize(size);
+            } else {
+                size.set(display.getWidth(), display.getHeight());
             }
         } catch (Exception e) {
             Log.v(LOGGER_NAME, e.toString());
