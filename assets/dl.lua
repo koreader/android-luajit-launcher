@@ -32,7 +32,7 @@ local dl = {
 }
 
 local function sys_dlopen(library)
-    A.LOGI(string.format("dl.lua - sys_dlopen - loading library %s", library))
+    A.LOGV(string.format("dl.lua - sys_dlopen - loading library %s", library))
     local p = ffi.C.dlopen(library, ffi.C.RTLD_LOCAL)
     if p == nil then
         local err_msg = ffi.C.dlerror()
@@ -73,7 +73,7 @@ function dl.dlopen(library, load_func)
             ok, lib = pcall(Elf.open, lname)
         end
         if ok then
-            A.LOGI(string.format("dl.lua - dl.dlopen - library lname detected %s", lname))
+            A.LOGV(string.format("dl.lua - dl.dlopen - library lname detected %s", lname))
             -- we found a library, now load its requirements
             -- we do _not_ pass the load_func to the cascaded
             -- calls, so those will always use sys_dlopen()
@@ -87,7 +87,7 @@ function dl.dlopen(library, load_func)
                     -- liblog, libm, libmediandk, libOpenMAXAL, libOpenSLES, libstdc++,
                     -- libvulkan, and libz
                     -- However, we have our own dl implementation and don't need the rest.
-                    A.LOGI(string.format("         dl.dlopen - opening needed %s for %s", needed, lname))
+                    A.LOGV(string.format("         dl.dlopen - opening needed %s for %s", needed, lname))
                     dl.dlopen(needed)
                 end
             end
