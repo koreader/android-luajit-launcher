@@ -1232,6 +1232,28 @@ local function run(android_app_state)
                 JNI:to_string(JNI:getObjectField(app_info, "nativeLibraryDir", "Ljava/lang/String;"))
         end)
 
+    android.getIntent = function()
+        return JNI:context(android.app.activity.vm, function(JNI)
+            local uri = JNI:callObjectMethod(
+                JNI:callObjectMethod(
+                    android.app.activity.clazz,
+                    "getIntent",
+                    "()Landroid/content/Intent;"
+                ),
+                "getData",
+                "()Landroid/net/Uri;"
+            )
+            if uri ~= nil then
+                local path = JNI:callObjectMethod(
+                    uri,
+                    "getPath",
+                    "()Ljava/lang/String;"
+                )
+                return JNI:to_string(path)
+            end
+        end)
+    end
+
     android.getScreenWidth = function()
         return JNI:context(android.app.activity.vm, function(JNI)
             local width = JNI:callIntMethod(
