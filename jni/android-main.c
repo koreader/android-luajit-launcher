@@ -26,6 +26,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <android/asset_manager.h>
 
 #include "luajit-2.1/lua.h"
+#include "luajit-2.1/lualib.h"
 #include "luajit-2.1/lauxlib.h"
 
 #define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO,"luajit-launcher",__VA_ARGS__)
