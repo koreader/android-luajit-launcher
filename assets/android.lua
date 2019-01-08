@@ -1391,7 +1391,7 @@ local function run(android_app_state)
         end)
     end
     android.setFullscreen = function(fullscreen)
-        android.LOGV("setting fullscreen to ", tostring(fullscreen))
+        android.LOGV("setting fullscreen to " .. tostring(fullscreen))
         JNI:context(android.app.activity.vm, function(JNI)
             JNI:callVoidMethod(
                 android.app.activity.clazz,
@@ -1442,7 +1442,7 @@ local function run(android_app_state)
     end
 
     android.setKeepScreenOn = function(keepOn)
-        android.LOGV("setting KeepScreenOn to ", tostring(keepOn))
+        android.LOGV("setting KeepScreenOn to " .. tostring(keepOn))
         JNI:context(android.app.activity.vm, function(JNI)
             JNI:callVoidMethod(
                 android.app.activity.clazz,
@@ -1466,7 +1466,7 @@ local function run(android_app_state)
     end
 
     android.setWifiEnabled = function(wifiEnabled)
-        android.LOGV("setting wifi to: ", tostring(wifiEnabled))
+        android.LOGV("setting wifi to: " .. tostring(wifiEnabled))
         JNI:context(android.app.activity.vm, function(JNI)
             JNI:callVoidMethod(
                 android.app.activity.clazz,
