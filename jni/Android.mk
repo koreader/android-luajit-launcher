@@ -46,7 +46,10 @@ include $(CLEAR_VARS)
 LOCAL_MODULE    := luajit
 LOCAL_SRC_FILES := android-main.c
 # remember to add libraries here that you plan to use via FFI:
-LOCAL_LDLIBS    := -lm -llog -landroid
+LOCAL_EXPORT_LDLIBS := -lm -llog -landroid
+# The linker will strip this as "unused" since this is a static library, but we
+# need to keep it around since it's the interface for JNI.
+LOCAL_EXPORT_LDFLAGS := -u ANativeActivity_onCreate
 LOCAL_STATIC_LIBRARIES := android_native_app_glue
 LOCAL_WHOLE_STATIC_LIBRARIES += libluajit-prebuilt
 

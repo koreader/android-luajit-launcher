@@ -59,10 +59,6 @@ void android_main(struct android_app* state) {
     off_t bufsize;
     int status;
 
-    // Suppress link-time optimization that removes unreferenced code
-    // to make sure glue isn't stripped.
-    app_dummy();
-
     // wait until everything is initialized before launching LuaJIT assets
     state->onAppCmd = handle_cmd;
     LOGI("Waiting for app ready...");
