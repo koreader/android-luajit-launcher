@@ -1,6 +1,14 @@
 --- 7z/C/Util/7z/7zMain.c
 +++ 7z/C/Util/7z/7zMain.c
-@@ -372,7 +372,7 @@
+@@ -5,6 +5,7 @@
+
+ #include <stdio.h>
+ #include <string.h>
++#include <unistd.h>
+
+ #include "../../CpuArch.h"
+
+@@ -372,7 +373,7 @@
  
  // #define NUM_PARENTS_MAX 128
  
@@ -9,7 +17,7 @@
  {
    ISzAlloc allocImp;
    ISzAlloc allocTempImp;
-@@ -390,7 +390,7 @@
+@@ -390,7 +391,7 @@
    if (numargs == 1)
    {
      Print(
@@ -18,7 +26,7 @@
        "<Commands>\n"
        "  e: Extract files from archive (without using directory names)\n"
        "  l: List contents of archive\n"
-@@ -399,11 +399,12 @@
+@@ -399,11 +400,12 @@
      return 0;
    }
  
