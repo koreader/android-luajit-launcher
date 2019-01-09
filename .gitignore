@@ -2,6 +2,7 @@ obj/
 bin/
 libs/
 gen/
+.gradle/
 *.swp
 jni/luajit-build
 assets/module

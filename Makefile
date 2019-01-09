@@ -24,6 +24,7 @@ apk: local.properties project.properties
 	./mk-luajit.sh $(ANDROID_FULL_ARCH)
 	ndk-build ANDROID_FULL_ARCH=$(ANDROID_FULL_ARCH)
 	ant debug
+        #gradle debug
 
 local.properties project.properties:
 	android update project --path . -t android-$(NDKABI_MIN_16)
@@ -35,3 +36,4 @@ clean:
 
 dev: apk
 	ant dev
+	#gradle dev
