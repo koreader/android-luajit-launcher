@@ -1402,6 +1402,18 @@ local function run(android_app_state)
         end)
     end
 
+    android.setWakeLock = function(enabled)
+        android.LOGV("Switching wakelock to " .. tostring(enabled))
+        JNI:context(android.app.activity.vm, function(JNI)
+            JNI:callVoidMethod(
+                android.app.activity.clazz,
+                "setWakeLock",
+                "(Z)V",
+                ffi.new("bool", enabled)
+            )
+        end)
+    end
+
     android.getClipboardText = function()
         return JNI:context(android.app.activity.vm, function(JNI)
             local text = JNI:callObjectMethod(
@@ -1438,18 +1450,6 @@ local function run(android_app_state)
                 clipboard_text
             )
             JNI.env[0].DeleteLocalRef(JNI.env, clipboard_text)
-        end)
-    end
-
-    android.setKeepScreenOn = function(keepOn)
-        android.LOGV("setting KeepScreenOn to " .. tostring(keepOn))
-        JNI:context(android.app.activity.vm, function(JNI)
-            JNI:callVoidMethod(
-                android.app.activity.clazz,
-                "setKeepScreenOn",
-                "(Z)V",
-                ffi.new("bool", keepOn)
-            )
         end)
     end
 
