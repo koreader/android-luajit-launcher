@@ -153,20 +153,28 @@ public class MainActivity extends NativeActivity {
         });
     }
 
-    public int getBatteryLevel() {
+    private int getBatteryState(boolean isPercent) {
         Intent intent = this.registerReceiver(null,
             new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
         int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
         int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, 100);
-        return (level * 100) / scale;
+        int plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
+        int percent = (level * 100) / scale;
+
+        if (isPercent) return percent;
+
+        if (plugged == BatteryManager.BATTERY_PLUGGED_AC || plugged == BatteryManager.BATTERY_PLUGGED_USB)
+            return (percent != 100) ? 1 : 0;
+        else
+            return 0;
+    }
+
+    public int getBatteryLevel() {
+        return getBatteryState(true);
     }
 
     public int isCharging() {
-        Intent intent = this.registerReceiver(null,
-            new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-        int plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
-        return plugged == BatteryManager.BATTERY_PLUGGED_AC
-            || plugged == BatteryManager.BATTERY_PLUGGED_USB ? 1 : 0;
+        return getBatteryState(false);
     }
 
     public void showProgress(final String title, final String message) {
