@@ -47,6 +47,8 @@ public class MainActivity extends NativeActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        setFullWakeLock();
+
         // set fullscreen immediately on general principle
         setFullscreenLayout();
 
@@ -61,9 +63,28 @@ public class MainActivity extends NativeActivity {
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        removeFullWakeLock();
+    }
+
+    @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
+    }
+
+    private void setFullWakeLock() {
+        WakeLockHelper.acquire(MainActivity.this);
+    }
+
+    private void removeFullWakeLock() {
+        WakeLockHelper.release();
+    }
+
+    public void setWakeLock(final boolean enabled) {
+        WakeLockHelper.set(enabled);
+        if (enabled) setFullWakeLock();
     }
 
     private void setFullscreenLayout() {
@@ -190,30 +211,6 @@ public class MainActivity extends NativeActivity {
     private WifiManager getWifiManager() {
         return (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
     }
-
-    public void setKeepScreenOn(final boolean keepOn) {
-        final CountDownLatch cd = new CountDownLatch(1);
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    if (keepOn) {
-                        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-                    } else {
-                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-                    }
-                } catch (Exception e) {
-                    Log.v(LOGGER_NAME, e.toString());
-                }
-                cd.countDown();
-            }
-        });
-        try {
-            cd.await();
-        } catch (InterruptedException ex) {
-        }
-    }
-
 
     public void setFullscreen(final boolean fullscreen) {
         final CountDownLatch cd = new CountDownLatch(1);
