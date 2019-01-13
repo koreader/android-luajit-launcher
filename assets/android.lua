@@ -1265,6 +1265,18 @@ local function run(android_app_state)
         end)
     end
 
+    android.getVersion =  function()
+        return JNI:context(android.app.activity.vm, function(JNI)
+            local version = JNI:callObjectMethod(
+                android.app.activity.clazz,
+                "getVersion",
+                "()Ljava/lang/String;"
+            )
+            return JNI:to_string(version) or ""
+        end)
+    end
+
+
     android.getScreenWidth = function()
         return JNI:context(android.app.activity.vm, function(JNI)
             return JNI:callIntMethod(
