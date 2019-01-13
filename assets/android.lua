@@ -1254,31 +1254,41 @@ local function run(android_app_state)
         end)
     end
 
+    android.getProduct = function()
+        return JNI:context(android.app.activity.vm, function(JNI)
+            local product = JNI:callObjectMethod(
+                android.app.activity.clazz,
+                "getProduct",
+                "()Ljava/lang/String;"
+            )
+            return JNI:to_string(product) or "unknown"
+        end)
+    end
+
     android.getScreenWidth = function()
         return JNI:context(android.app.activity.vm, function(JNI)
-            local width = JNI:callIntMethod(
+            return JNI:callIntMethod(
                 android.app.activity.clazz,
                 "getScreenWidth",
                 "()I"
             )
-            android.LOGV("get screen width  " .. width)
-            return width
         end)
     end
+
     android.getScreenHeight = function()
         return JNI:context(android.app.activity.vm, function(JNI)
-            local height = JNI:callIntMethod(
+            return JNI:callIntMethod(
                 android.app.activity.clazz,
                 "getScreenHeight",
                 "()I"
             )
-            android.LOGV("get screen height  " .. height)
-            return height
         end)
     end
+
     android.screen = {}
     android.screen.width = android.getScreenWidth()
     android.screen.height = android.getScreenHeight()
+
     android.getScreenBrightness = function()
         return JNI:context(android.app.activity.vm, function(JNI)
             local str_brightness = JNI.env[0].NewStringUTF(JNI.env, "screen_brightness")
@@ -1297,6 +1307,7 @@ local function run(android_app_state)
             return res
         end)
     end
+
     android.setScreenBrightness = function(brightness)
         android.LOGV("set screen brightness "..brightness)
         JNI:context(android.app.activity.vm, function(JNI)
@@ -1315,28 +1326,27 @@ local function run(android_app_state)
             )
         end)
     end
+
     android.getBatteryLevel = function()
         return JNI:context(android.app.activity.vm, function(JNI)
-            local level = JNI:callIntMethod(
+            return JNI:callIntMethod(
                 android.app.activity.clazz,
                 "getBatteryLevel",
                 "()I"
             )
-            android.LOGV("get battery level " .. level)
-            return level
         end)
     end
+
     android.isCharging = function()
         return JNI:context(android.app.activity.vm, function(JNI)
-            local is_charging = JNI:callIntMethod(
+            return JNI:callIntMethod(
                 android.app.activity.clazz,
                 "isCharging",
                 "()I"
-            )
-            android.LOGV("is charging " .. is_charging)
-            return is_charging == 1
+            ) == 1
         end)
     end
+
     android.externalStorage = function()
         return JNI:context(android.app.activity.vm, function(JNI)
             local dir = JNI:callObjectMethod(
@@ -1353,6 +1363,7 @@ local function run(android_app_state)
             return dir
         end)
     end
+
     android.showProgress = function(title, message)
         android.LOGV("show progress dialog")
         JNI:context(android.app.activity.vm, function(JNI)
@@ -1368,6 +1379,7 @@ local function run(android_app_state)
             JNI.env[0].DeleteLocalRef(JNI.env, message)
         end)
     end
+
     android.dismissProgress = function()
         android.LOGV("dismiss progress dialog")
         JNI:context(android.app.activity.vm, function(JNI)
@@ -1379,17 +1391,17 @@ local function run(android_app_state)
             )
         end)
     end
+
     android.isFullscreen = function()
         return JNI:context(android.app.activity.vm, function(JNI)
-            local fullscreen = JNI:callIntMethod(
+            return JNI:callIntMethod(
                 android.app.activity.clazz,
                 "isFullscreen",
                 "()I"
-            )
-            android.LOGI("is fullscreen = ", fullscreen)
-            return fullscreen == 1
+            ) == 1
         end)
     end
+
     android.setFullscreen = function(fullscreen)
         android.LOGV("setting fullscreen to " .. tostring(fullscreen))
         JNI:context(android.app.activity.vm, function(JNI)
@@ -1421,21 +1433,17 @@ local function run(android_app_state)
                 "getClipboardText",
                 "()Ljava/lang/String;"
             )
-            text = JNI:to_string(text)
-            android.LOGV("clipboard text copied: " .. text)
-            return text
+            return JNI:to_string(text)
         end)
     end
 
     android.hasClipboardText = function()
         return JNI:context(android.app.activity.vm, function(JNI)
-            local hasClipboardText = JNI:callIntMethod(
+            return JNI:callIntMethod(
                 android.app.activity.clazz,
                 "hasClipboardTextIntResultWrapper",
                 "()I"
-            )
-            android.LOGV("Has text in clipboard: ", hasClipboardText)
-            return hasClipboardText == 1
+            ) == 1
         end)
     end
 
@@ -1455,13 +1463,11 @@ local function run(android_app_state)
 
     android.isWifiEnabled = function()
         return JNI:context(android.app.activity.vm, function(JNI)
-            local isWifiEnabled = JNI:callIntMethod(
+            return JNI:callIntMethod(
                 android.app.activity.clazz,
                 "isWifiEnabled",
                 "()I"
-            )
-            android.LOGV("is WifiEnabled =", isWifiEnabled)
-            return isWifiEnabled == 1
+            ) == 1
         end)
     end
 
@@ -1479,13 +1485,11 @@ local function run(android_app_state)
 
     android.getStatusBarHeight = function()
         return JNI:context(android.app.activity.vm, function(JNI)
-            local statusBarHeight = JNI:callIntMethod(
+            return JNI:callIntMethod(
                 android.app.activity.clazz,
                 "getStatusBarHeight",
                 "()I"
             )
-            android.LOGV("get status bar height  " .. statusBarHeight)
-            return statusBarHeight
         end)
     end
 
@@ -1513,9 +1517,9 @@ local function run(android_app_state)
         end
         return process
     end
+
     android.execute = function(...)
         local argv = {...}
-        android.LOGI("run command " .. table.concat(argv, " "))
         return JNI:context(android.app.activity.vm, function(JNI)
             local process = subprocess(JNI, argv)
             local stdout = JNI:callObjectMethod(
@@ -1547,18 +1551,22 @@ local function run(android_app_state)
                 end
             end
             local res = JNI:callIntMethod(process, "waitFor", "()I")
-            android.LOGV("command stdout:" .. out)
-            android.LOGV("command stderr:" .. err)
-            android.LOGI("command res:" .. res)
+
+            if res > 0 then
+                android.LOGW(string.format("command %s returned %d", table.concat(argv, " "), res))
+            else
+                android.LOGI(string.format("command %s returned %d", table.concat(argv, " "), res))
+            end
+            android.LOGV(string.format(" stdout: %s\n stderr: %s", out, err))
             JNI.env[0].DeleteLocalRef(JNI.env, process)
             JNI.env[0].DeleteLocalRef(JNI.env, stdout)
             JNI.env[0].DeleteLocalRef(JNI.env, stderr)
             return res
         end)
     end
+
     android.stdout = function(...)
         local argv = {...}
-        android.LOGI("run command " .. table.concat(argv, " "))
         return JNI:context(android.app.activity.vm, function(JNI)
             local process = subprocess(JNI, argv)
             local stdout = JNI:callObjectMethod(
@@ -1575,22 +1583,21 @@ local function run(android_app_state)
                     break
                 end
             end
-            android.LOGI("command output:" .. out)
             JNI.env[0].DeleteLocalRef(JNI.env, process)
             JNI.env[0].DeleteLocalRef(JNI.env, stdout)
             return out
         end)
     end
+
     os.execute = function(command) -- luacheck: ignore 122
         if command == nil then return -1 end
         local argv = {}
         command:gsub("([^ ]+)", function(arg) table.insert(argv, arg) end)
         return android.execute(unpack(argv))
     end
+
     android.LOGI("Application data directory "..android.dir)
     android.LOGI("Application library directory "..android.nativeLibraryDir)
-    android.LOGI("Screen size "..android.screen.width.."x"..android.screen.height)
-    android.LOGI("Screen brightness "..android.getScreenBrightness())
 
     -- register the "android" module (ourself)
     package.loaded.android = android

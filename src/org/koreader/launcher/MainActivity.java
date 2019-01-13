@@ -26,6 +26,7 @@ import java.util.concurrent.CountDownLatch;
 public class MainActivity extends NativeActivity {
 
     private final static int SDK_INT = android.os.Build.VERSION.SDK_INT;
+    private final static String PRODUCT_ID = android.os.Build.PRODUCT;
     private final static String LOGGER_NAME = "luajit-launcher";
 
     static {
@@ -47,6 +48,7 @@ public class MainActivity extends NativeActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        logActivity("resumed");
         setFullWakeLock();
 
         // set fullscreen immediately on general principle
@@ -65,12 +67,20 @@ public class MainActivity extends NativeActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        logActivity("paused");
         removeFullWakeLock();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        logActivity("stopped");
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
+        logActivity("new intent");
         setIntent(intent);
     }
 
@@ -87,8 +97,12 @@ public class MainActivity extends NativeActivity {
         if (enabled) setFullWakeLock();
     }
 
+    private void logActivity(final String state) {
+        Log.v(LOGGER_NAME, String.format("== %S", state));
+    }
+
     private void setFullscreenLayout() {
-        if (SDK_INT >= 11 && SDK_INT < 16) {
+        if (SDK_INT < 16) {
             getWindow().getDecorView().setSystemUiVisibility(View.STATUS_BAR_HIDDEN);
         } else if (SDK_INT >= 16 && SDK_INT < 19) {
             getWindow().getDecorView().setSystemUiVisibility(
@@ -226,13 +240,12 @@ public class MainActivity extends NativeActivity {
             @Override
             public void run() {
                 try {
-                    WindowManager.LayoutParams attrs = getWindow().getAttributes();
+                    final Window window = getWindow();
                     if (fullscreen) {
-                        attrs.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
+                        window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
                     } else {
-                        attrs.flags &= ~WindowManager.LayoutParams.FLAG_FULLSCREEN;
+                        window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
                     }
-                    getWindow().setAttributes(attrs);
                 } catch (Exception e) {
                     Log.v(LOGGER_NAME, e.toString());
                 }
@@ -253,14 +266,9 @@ public class MainActivity extends NativeActivity {
           public void run() {
               try {
                   if (hasClipboardText()) {
-                      if (SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
-                          android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-                          result.value = clipboard.getText().toString();
-                      } else {
-                          ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                          ClipData.Item item = clipboard.getPrimaryClip().getItemAt(0);
-                          result.value = item.getText().toString();
-                      }
+                      ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                      ClipData.Item item = clipboard.getPrimaryClip().getItemAt(0);
+                      result.value = item.getText().toString();
                   }
               } catch (Exception e) {
                   Log.v(LOGGER_NAME, e.toString());
@@ -287,14 +295,9 @@ public class MainActivity extends NativeActivity {
             @Override
             public void run() {
                 try {
-                    if (SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
-                        android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                        clipboard.setText(text);
-                    } else {
-                        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                        ClipData clip = ClipData.newPlainText("KOReader_clipboard", text);
-                        clipboard.setPrimaryClip(clip);
-                    }
+                    ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                    ClipData clip = ClipData.newPlainText("KOReader_clipboard", text);
+                    clipboard.setPrimaryClip(clip);
                 } catch (Exception e) {
                     Log.v(LOGGER_NAME, e.toString());
                 }
@@ -303,13 +306,8 @@ public class MainActivity extends NativeActivity {
     }
 
     public boolean hasClipboardText() {
-        if (SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
-            android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-            return clipboard.hasText();
-        } else {
-            ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-            return clipboard.hasPrimaryClip() && clipboard.getPrimaryClipDescription().hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN);
-        }
+        ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+        return clipboard.hasPrimaryClip() && clipboard.getPrimaryClipDescription().hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN);
     }
 
     public int hasClipboardTextIntResultWrapper() {
@@ -349,35 +347,32 @@ public class MainActivity extends NativeActivity {
     }
 
     public int getScreenWidth() {
-        int width = getSceenSize().x;
+        int width = getScreenSize().x;
         return width;
     }
 
     public int getScreenHeight() {
-        int height = getSceenSize().y;
+        int height = getScreenSize().y;
         return height;
     }
 
-    private Point getSceenSize() {
+    private Point getScreenSize() {
         Point size = new Point();
         Display display = getWindowManager().getDefaultDisplay();
-
         try {
-            // For JellyBean 4.2 (API 17) and onward
-            if (SDK_INT >= 17) {
-                DisplayMetrics metrics = new DisplayMetrics();
-                display.getRealMetrics(metrics);
-                size.set(metrics.widthPixels, metrics.heightPixels);
-            // Android 3.0 (API 11) and higher
-            } else if (SDK_INT >= 11) {
-                display.getSize(size);
-            } else {
-                size.set(display.getWidth(), display.getHeight());
-            }
-        } catch (Exception e) {
-            Log.v(LOGGER_NAME, e.toString());
+            // JellyBean 4.2 (API 17) and higher
+            DisplayMetrics metrics = new DisplayMetrics();
+            display.getRealMetrics(metrics);
+            size.set(metrics.widthPixels, metrics.heightPixels);
+        } catch (NoSuchMethodError e) {
+            // Honeycomb 3.0 (API 11) adn higher
+            display.getSize(size);
         }
         return size;
+    }
+
+    public String getProduct() {
+        return PRODUCT_ID;
     }
 
     private class Box<T> {
