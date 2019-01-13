@@ -26,6 +26,7 @@ import java.util.concurrent.CountDownLatch;
 public class MainActivity extends NativeActivity {
 
     private final static int SDK_INT = android.os.Build.VERSION.SDK_INT;
+    private final static String VERSION = android.os.Build.VERSION.RELEASE;
     private final static String PRODUCT_ID = android.os.Build.PRODUCT;
     private final static String LOGGER_NAME = "luajit-launcher";
 
@@ -373,6 +374,10 @@ public class MainActivity extends NativeActivity {
 
     public String getProduct() {
         return PRODUCT_ID;
+    }
+
+    public String getVersion() {
+        return VERSION;
     }
 
     private class Box<T> {
