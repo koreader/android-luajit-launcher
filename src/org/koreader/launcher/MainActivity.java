@@ -38,7 +38,7 @@ public class MainActivity extends NativeActivity {
 
     public MainActivity() {
         super();
-        Log.v(LOGGER_NAME, "Creating luajit launcher main activity");
+        Log.i(LOGGER_NAME, "Creating luajit launcher main activity");
     }
 
     @Override

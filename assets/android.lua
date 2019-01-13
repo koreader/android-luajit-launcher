@@ -1300,6 +1300,7 @@ local function run(android_app_state)
     android.screen = {}
     android.screen.width = android.getScreenWidth()
     android.screen.height = android.getScreenHeight()
+    android.LOGV("Screen size "..android.screen.width.."x"..android.screen.height)
 
     android.getScreenBrightness = function()
         return JNI:context(android.app.activity.vm, function(JNI)
