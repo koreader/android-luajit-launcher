@@ -24,7 +24,7 @@ apk: local.properties project.properties
         #gradle debug
 
 local.properties project.properties:
-	android update project --path . -t android-$(SDKAPI_MIN}
+	android update project --path . -t android-$(SDKAPI_MIN)
 
 clean:
 	-ndk-build clean
