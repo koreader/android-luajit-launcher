@@ -1,8 +1,5 @@
-NDK_VER=$(shell grep -E 'NDKABI=[0-9]+' ./mk-luajit.sh | cut -d= -f2)
+# Supported Android ABIs: armeabi-v7a, x86 and x86_64
 
-# Android is kind of bizarre. Sometimes you need specific stuff.
-# Other times you need just `arm` or else…
-# For `x86` and `x86_64` it's all good.
 ifdef ANDROID_ARCH
 	ifeq ($(ANDROID_ARCH), arm)
 		ANDROID_FULL_ARCH?=armeabi-v7a
@@ -10,12 +7,12 @@ ifdef ANDROID_ARCH
 		ANDROID_FULL_ARCH?=$(ANDROID_ARCH)
 	endif
 endif
+
+# Default is build for arm
 ANDROID_FULL_ARCH?=armeabi-v7a
 
-# at least 16 is required to create a build with View.SYSTEM_UI_FLAG_FULLSCREEN
-# and View.SYSTEM_UI_FLAG_LOW_PROFILE
-# however, default to 19 because that's what the nightly build server uses
-NDKABI_MIN_16=$(shell [ ${NDKABI} -ge 16 ] && echo -n ${NDKABI} || echo -n 19)
+# Minimum SDK API is 19, required to use View.VERSION_CODES.KITKAT
+SDKAPI_MIN=$(shell [ ${NDKABI} -ge 19 ] && echo -n ${NDKABI} || echo -n 19)
 
 apk: local.properties project.properties
 	git submodule init
@@ -27,7 +24,7 @@ apk: local.properties project.properties
         #gradle debug
 
 local.properties project.properties:
-	android update project --path . -t android-$(NDKABI_MIN_16)
+	android update project --path . -t android-$(SDKAPI_MIN}
 
 clean:
 	-ndk-build clean
