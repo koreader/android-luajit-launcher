@@ -4,8 +4,8 @@
 
 # NDKABI=21  # Android 5.0+
 # NDKABI=19  # Android 4.4+
-#NDKABI=${NDKABI:-14} # Android 4.0+
-NDKABI=${NDKABI:-9} # Android 2.3+
+NDKABI=${NDKABI:-14} # Android 4.0+
+#NDKABI=${NDKABI:-9} # Android 2.3+
 DEST=$(cd "$(dirname "$0")" && pwd)/jni/luajit-build/$1
 # might be linux-x86_64 or darwin-x86-64
 HOST_ARCH="*"
@@ -21,8 +21,8 @@ function check_NDK() {
 
     NDKVER=$(grep -oP 'r\K([0-9]+)(?=[a-z])' ${NDK}/CHANGELOG.md | head -1)
     echo "Detected NDK version ${NDKVER}..."
-    if [ "$NDKVER" -lt 11 ]; then
-        echo 'NDK not of the right version, please update to NDK version 11 or higher.'
+    if [ "$NDKVER" -lt 15 ]; then
+        echo 'NDK not of the right version, please update to NDK version 15 or higher.'
         exit 1
     fi
 }
