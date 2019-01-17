@@ -80,7 +80,6 @@ public class MainActivity extends NativeActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        logActivity("new intent");
         setIntent(intent);
     }
 
@@ -98,7 +97,7 @@ public class MainActivity extends NativeActivity {
     }
 
     private void logActivity(final String state) {
-        Log.v(LOGGER_NAME, String.format("== %S", state));
+        Log.v(LOGGER_NAME, String.format("App %s", state));
     }
 
     private void setFullscreenLayout() {
