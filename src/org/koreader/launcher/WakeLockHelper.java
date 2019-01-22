@@ -13,8 +13,8 @@ public abstract class WakeLockHelper {
     private static PowerManager.WakeLock wakelock;
     private static final String LOGGER_NAME = "luajit-launcher";
 
-    // allow wakelocks by default.
-    private static boolean isWakeLockAllowed = true;
+    // disable wakelocks by default.
+    private static boolean isWakeLockAllowed = false;
 
     public static void acquire(Context context) {
         if (isWakeLockAllowed) {
