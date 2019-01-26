@@ -1427,6 +1427,27 @@ local function run(android_app_state)
         end)
     end
 
+    android.isEink = function()
+        return JNI:context(android.app.activity.vm, function(JNI)
+            return JNI:callIntMethod(
+                android.app.activity.clazz,
+                "isEink",
+                "()I"
+            ) == 1
+        end)
+    end
+
+    android.einkUpdate = function(mode)
+        JNI:context(android.app.activity.vm, function(JNI)
+            JNI:callVoidMethod(
+                android.app.activity.clazz,
+                "einkUpdate",
+                "(I)V",
+                ffi.new("int32_t", mode)
+            )
+        end)
+    end
+
     android.setWakeLock = function(enabled)
         android.LOGV("Switching wakelock to " .. tostring(enabled))
         JNI:context(android.app.activity.vm, function(JNI)
