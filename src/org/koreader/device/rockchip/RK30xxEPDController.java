@@ -1,4 +1,9 @@
-package com.unw.device.epdcontrol.rockchip;
+/**
+ * This file was created by unw on 15. 3. 25 as part of
+ * https://github.com/unwmun/refreshU
+ */
+
+package org.koreader.device.rockchip;
 
 import android.util.Log;
 import android.view.View;
@@ -7,9 +12,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-/**
- * Created by unw on 15. 3. 25..
- */
+@SuppressWarnings("unchecked")
 public abstract class RK30xxEPDController
 {
     enum EINK_MODE
@@ -32,6 +35,8 @@ public abstract class RK30xxEPDController
         EPD_STANDBY,
         EPD_POWEROFF
     }
+
+    public static final String LOGGER_NAME = "luajit-launcher";
 
     public static final String EPD_NULL = "EPD_NULL";
 
@@ -59,24 +64,20 @@ public abstract class RK30xxEPDController
 
     protected static Field isInA2;
 
-
     static {
         try {
             eInkEnum = (Class<Enum>) Class.forName("android.view.View$EINK_MODE");
-
             requestEpdModeMethod1 = View.class.getMethod("requestEpdMode", eInkEnum);
-
             requestEpdModeMethod2 = View.class.getMethod("requestEpdMode", eInkEnum, boolean.class);
-
             isInA2 = View.class.getDeclaredField("mIsInA2");
             isInA2.setAccessible(true);
 
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            Log.e(LOGGER_NAME, e.toString());
         } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+            Log.e(LOGGER_NAME, e.toString());
         } catch (NoSuchFieldException e) {
-            e.printStackTrace();
+            Log.e(LOGGER_NAME, e.toString());
         }
     }
 
@@ -84,11 +85,12 @@ public abstract class RK30xxEPDController
     {
         try {
             boolean value = (Boolean)isInA2.get(view);
-            Log.d("TAGGG", "isInA2 : " + value);
+            Log.d(LOGGER_NAME, "isInA2 : " + value);
+            return value;
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            Log.e(LOGGER_NAME, e.toString());
+            return false;
         }
-        return true;
     }
 
     public static boolean requestEpdMode(View view, String mode) {
@@ -97,10 +99,10 @@ public abstract class RK30xxEPDController
             requestEpdModeMethod1.invoke(view, stringToEnum(mode));
             return true;
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            Log.e(LOGGER_NAME, e.toString());
             return false;
         } catch (InvocationTargetException e) {
-            e.printStackTrace();
+            Log.e(LOGGER_NAME, e.toString());
             return false;
         }
     }
@@ -110,10 +112,10 @@ public abstract class RK30xxEPDController
             requestEpdModeMethod2.invoke(view, stringToEnum(mode), flag);
             return true;
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            Log.e(LOGGER_NAME, e.toString());
             return false;
         } catch (InvocationTargetException e) {
-            e.printStackTrace();
+            Log.e(LOGGER_NAME, e.toString());
             return false;
         }
     }
@@ -122,5 +124,4 @@ public abstract class RK30xxEPDController
     {
         return Enum.valueOf(eInkEnum, str);
     }
-
 }

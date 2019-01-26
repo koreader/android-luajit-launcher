@@ -1,12 +1,15 @@
-package com.unw.device.epdcontrol.rockchip;
+/**
+ * This file was created by unw on 15. 3. 25 as part of
+ * https://github.com/unwmun/refreshU
+ */
+
+package org.koreader.device.rockchip;
 
 import android.view.View;
 
-import com.unw.device.epdcontrol.EPDController;
+import org.koreader.device.EPDController;
 
-/**
- * Created by unw on 15. 3. 26..
- */
+
 public class C67EPDController extends RK30xxEPDController implements EPDController
 {
     @Override
