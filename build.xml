@@ -6,6 +6,9 @@
          Version Control Systems. -->
     <property file="local.properties" />
 
+    <property name="java.target" value="1.6" />
+    <property name="java.source" value="1.6" />
+
     <!-- The ant.properties file can be created by you. It is only edited by the
          'android' tool to add properties to it.
          This is the place to change some Ant specific build properties.
