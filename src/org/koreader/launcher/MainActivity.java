@@ -24,6 +24,10 @@ import android.view.WindowManager;
 
 import java.util.concurrent.CountDownLatch;
 
+import org.koreader.device.DeviceInfo;
+import org.koreader.device.EPDController;
+import org.koreader.device.EPDFactory;
+
 public class MainActivity extends NativeActivity {
 
     private final static int SDK_INT = Build.VERSION.SDK_INT;
@@ -34,6 +38,8 @@ public class MainActivity extends NativeActivity {
     }
 
     private FramelessProgressDialog dialog;
+    private DeviceInfo device;
+    private EPDController epd = EPDFactory.getEPDController();
 
     public MainActivity() {
         super();
@@ -49,6 +55,7 @@ public class MainActivity extends NativeActivity {
     protected void onResume() {
         super.onResume();
         logActivity("resumed");
+
         setFullWakeLock();
 
         // set fullscreen immediately on general principle
@@ -371,11 +378,35 @@ public class MainActivity extends NativeActivity {
     }
 
     public String getProduct() {
-        return Build.PRODUCT;
+        return device.PRODUCT;
     }
 
     public String getVersion() {
         return Build.VERSION.RELEASE;
+    }
+
+    public int isEink() {
+        return (device.IS_EINK_SUPPORTED) ? 1 : 0;
+    }
+
+    public void einkUpdate(int mode) {
+        String mode_name = "invalid mode";
+        final View root_view = getWindow().getDecorView().findViewById(android.R.id.content);
+
+        if (mode == 0) {
+            mode_name = "EPD_FULL";
+        } else if (mode == 1) {
+            mode_name = "EPD_PART";
+        } else if (mode == 2) {
+            mode_name = "EPD_A2";
+        } else if (mode == 3) {
+            mode_name = "EPD_AUTO";
+        } else {
+            Log.e(LOGGER_NAME, String.format("%s: %d", mode_name, mode));
+            return;
+        }
+        Log.v(LOGGER_NAME, String.format("requesting eink refresh, type: %s", mode_name));
+        epd.setEpdMode(root_view, mode_name);
     }
 
     private class Box<T> {
