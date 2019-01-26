@@ -8,6 +8,8 @@
 
     <property name="java.target" value="1.6" />
     <property name="java.source" value="1.6" />
+    <property name="java.compilerargs" value="-Xlint:deprecation" />
+
 
     <!-- The ant.properties file can be created by you. It is only edited by the
          'android' tool to add properties to it.
