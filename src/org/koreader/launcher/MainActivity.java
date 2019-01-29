@@ -393,13 +393,13 @@ public class MainActivity extends NativeActivity {
         String mode_name = "invalid mode";
         final View root_view = getWindow().getDecorView().findViewById(android.R.id.content);
 
-        if (mode == 0) {
+        if (mode == device.EPD_FULL) {
             mode_name = "EPD_FULL";
-        } else if (mode == 1) {
+        } else if (mode == device.EPD_PART) {
             mode_name = "EPD_PART";
-        } else if (mode == 2) {
+        } else if (mode == device.EPD_A2) {
             mode_name = "EPD_A2";
-        } else if (mode == 3) {
+        } else if (mode == device.EPD_AUTO) {
             mode_name = "EPD_AUTO";
         } else {
             Log.e(LOGGER_NAME, String.format("%s: %d", mode_name, mode));

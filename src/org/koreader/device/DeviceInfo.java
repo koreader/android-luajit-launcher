@@ -27,6 +27,11 @@ public class DeviceInfo {
         EINK_ENERGY,
     }
 
+    public final static int EPD_FULL = 1;
+    public final static int EPD_PART = 2;
+    public final static int EPD_A2 = 3;
+    public final static int EPD_AUTO = 4;
+
     public final static String MANUFACTURER;
     public final static String BRAND;
     public final static String MODEL;
