@@ -7,10 +7,8 @@ package org.koreader.device;
 
 import android.view.View;
 
-import org.koreader.device.rockchip.C67EPDController;
-import org.koreader.device.rockchip.T61EPDController;
-import org.koreader.device.rockchip.T62EPDController;
-import org.koreader.device.rockchip.EnergyEPDController;
+import org.koreader.device.rockchip.RK3026EPDController;
+import org.koreader.device.rockchip.RK3066EPDController;
 
 
 public class EPDFactory {
@@ -18,19 +16,21 @@ public class EPDFactory {
     public static EPDController getEPDController() {
         EPDController epdController = null;
         switch (DeviceInfo.CURRENT_DEVICE) {
-            case EINK_BOYUE_T61 :
-                epdController = new T61EPDController();
+
+            /** Supported rk3026 devices */
+            case EINK_BOYUE_T61:
+            case EINK_ONYX_C67:
+            case EINK_ENERGY:
+                epdController = new RK3026EPDController();
                 break;
-            case EINK_BOYUE_T62 :
-                epdController = new T62EPDController();
+
+            /** supported rk3066 devices */
+            case EINK_BOYUE_T62:
+                epdController = new RK3066EPDController();
                 break;
-            case EINK_ONYX_C67 :
-                epdController = new C67EPDController();
-                break;
-            case EINK_ENERGY :
-                epdController = new EnergyEPDController();
-                break;
-            case UNKNOWN :
+
+            /** unsupported devices */
+            case UNKNOWN:
                 epdController = new FakeEPDController();
                 break;
 
