@@ -52,7 +52,7 @@ public class MainActivity extends android.app.Activity {
 
         fakeDesc.setText("This button does nothing! It's just an example of an empty action. ");
         fakeDesc.append("If you don't see any difference between fake and real tests, your device ");
-        fakeDesc.append("is not supported by any implemented epd controller");
+        fakeDesc.append("is not supported by any implemented epd controller.");
 
         rockchipDesc.setText("These buttons should invoke a full refresh of rockchip rk30xx devices. ");
         rockchipDesc.append("Both normal and forced modes should work.");
