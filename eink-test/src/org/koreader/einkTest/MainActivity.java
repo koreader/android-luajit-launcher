@@ -50,7 +50,7 @@ public class MainActivity extends android.app.Activity {
         overview.append("\n Product: " + PRODUCT);
         overview.append("\n Hardware: " + HARDWARE);
 
-        fakeDesc.setText("This button does nothing! is it just an example of an empty action. ");
+        fakeDesc.setText("This button does nothing! It's just an example of an empty action. ");
         fakeDesc.append("If you don't see any difference between fake and real tests, your device ");
         fakeDesc.append("is not supported by any implemented epd controller");
 
