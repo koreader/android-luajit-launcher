@@ -4,6 +4,7 @@ libs/
 gen/
 .gradle/
 *.swp
+*.apk
 jni/luajit-build
 assets/module
 local.properties
