@@ -107,6 +107,7 @@ public class MainActivity extends NativeActivity {
         Log.v(LOGGER_NAME, String.format("App %s", state));
     }
 
+    @SuppressWarnings("deprecation")
     private void setFullscreenLayout() {
         if (SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
             getWindow().getDecorView().setSystemUiVisibility(View.STATUS_BAR_HIDDEN);
