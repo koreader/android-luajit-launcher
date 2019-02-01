@@ -9,6 +9,7 @@ import android.util.Log;
  * Used to keep CPU, display and touchscreen
  * idle for a long time without sleep. */
 
+@SuppressWarnings("deprecation")
 public abstract class WakeLockHelper {
     private static PowerManager.WakeLock wakelock;
     private static final String LOGGER_NAME = "luajit-launcher";
