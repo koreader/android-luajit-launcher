@@ -31,12 +31,12 @@ build-native:
 
 debug: update build-native
 	ant debug
-	cp -pv bin/NativeActivity-debug.apk NativeActivity.apk
+	cp -pv bin/NativeActivity-debug.apk bin/NativeActivity.apk
 	@echo "application was built, type: debug (signed)"
 
 release: update build-native
 	ant release
-	cp -pv bin/NativeActivity-release-unsigned.apk NativeActivity.apk
+	cp -pv bin/NativeActivity-release-unsigned.apk bin/NativeActivity.apk
 	@echo "application was built, type: release (unsigned)"
 	@echo "You'll need to sign this application to be able to install it"
 
