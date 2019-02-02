@@ -5,13 +5,7 @@
          It contains the path to the SDK. It should *NOT* be checked into Version Control Systems. -->
     <property file="local.properties" />
 
-    <!-- These are properties for the java compiler -->
-    <property name="java.target" value="1.6" />
-    <property name="java.source" value="1.6" />
-    <property name="java.compilerargs" value="-Xlint:deprecation" />
-
-    <!-- The ant.properties file can be created by you. It's
-         the place to change some Ant specific build properties. -->
+    <!-- ant build properties. Keep this file in git -->
     <property file="ant.properties" />
 
     <!-- if sdk.dir was not set from one of the property file, then get it from the ANDROID_SDK_ROOT env var.
@@ -22,7 +16,7 @@
     </condition>
 
     <!-- The project.properties file is created and updated by the 'android' tool.
-         This contains project specific properties such as project target, and library dependencies. -->
+         It contains the project target. It should *NOT* be checked into Version Control Systems. -->
     <loadproperties srcFile="project.properties" />
 
     <target name="-crunch">

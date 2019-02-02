@@ -13,6 +13,7 @@ eink-test/proguard-project.txt
 eink-test/src/org/koreader/einkTest/*EPDController.java
 eink-test/*.apk
 local.properties
+project.properties
 proguard-project.txt
 .gradle/
 *.apk
