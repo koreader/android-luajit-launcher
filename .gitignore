@@ -15,4 +15,5 @@ eink-test/*.apk
 local.properties
 proguard-project.txt
 .gradle/
+*.apk
 *.swp
