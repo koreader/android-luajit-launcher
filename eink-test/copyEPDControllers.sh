@@ -7,9 +7,9 @@ TARGET_PATH="src/org/koreader/einkTest"
 ROCKCHIP_PATH="${BASE_PATH}/rockchip"
 ROCKCHIP_EPD="RK30xxEPDController"
 
-for EPD in "${ROCKCHIP_EPD}"; do
+for EPD in ${ROCKCHIP_EPD}; do
     src="${ROCKCHIP_PATH}/${EPD}.java"
     dest="${TARGET_PATH}/${EPD}.java"
     echo "copying ${EPD} controller from ${src} to ${dest}"
-    sed 's/package org.koreader.device.rockchip/package org.koreader.einkTest/' "${src}" > "${dest}"
+    sed 's/package org.koreader.device.rockchip/package org.koreader.einkTest/' "${src}" >"${dest}"
 done

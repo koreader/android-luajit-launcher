@@ -12,4 +12,6 @@ addons:
       - libxml2-utils
 
 # check for XML syntax errors
-script: find . -type f -iname '*.xml' -exec xmllint {} + >/dev/null
+script:
+  - find . -type f -iname '*.xml' -exec xmllint {} + >/dev/null
+  - bash -c 'shopt -s globstar; shellcheck **/*.sh'
