@@ -117,7 +117,7 @@ void android_main(struct android_app* state) {
     lua_close(L);
 
 quit:
-    LOGE("Destroying Native Activity due to previous errors");
+    LOGE("Destroying NativeActivity due to previous errors");
     ANativeActivity_finish(state->activity);
     exit(1);
 }
