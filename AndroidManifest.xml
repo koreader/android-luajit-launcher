@@ -2,7 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="org.koreader.launcher"
       android:versionCode="4"
-      android:versionName="1.4">
+      android:versionName="1.4"
+    >
     <uses-sdk android:minSdkVersion="14" />
     <uses-sdk android:targetSdkVersion="19" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
