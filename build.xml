@@ -25,6 +25,19 @@
          This contains project specific properties such as project target, and library dependencies. -->
     <loadproperties srcFile="project.properties" />
 
+    <!-- Override android:versionName and android:versionCode with commandline arguments -->
+    <target name="set-version-using-commandline-args">
+        <replaceregexp
+            file="AndroidManifest.xml"
+            match="android:versionCode(.*)"
+            replace='android:versionCode="${code}"'/>
+        <replaceregexp
+            file="AndroidManifest.xml"
+            match="android:versionName(.*)"
+            replace='android:versionName="${name}"'/>
+    </target>
+
+    <!-- Disable png crunching, because it's incompatible with reproducible builds -->
     <target name="-crunch">
         <echo message="Skipping png optimization"/>
     </target>
