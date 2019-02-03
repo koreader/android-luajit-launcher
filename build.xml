@@ -19,6 +19,30 @@
          It contains the project target. It should *NOT* be checked into Version Control Systems. -->
     <loadproperties srcFile="project.properties" />
 
+    <!-- Override android:versionName and android:versionCode with commandline arguments -->
+    <target name="-pre-build">
+        <echo message="Creating a backup of AndroidManifest.xml"/>
+        <copy file="AndroidManifest.xml" tofile="AndroidManifest.backup" preservelastmodified="false" />
+        <echo message="Overriding version code from AndroidManifest.xml"/>
+        <replaceregexp
+            file="AndroidManifest.xml"
+            match="android:versionCode(.*)"
+            replace='android:versionCode="${code}"'/>
+        <echo message="Overriding version name from AndroidManifest.xml"/>
+        <replaceregexp
+            file="AndroidManifest.xml"
+            match="android:versionName(.*)"
+            replace='android:versionName="${name}"'/>
+    </target>
+
+    <!-- Restore AndroidManifest.xml to its original state -->
+    <target name="-post-build">
+        <echo message="Restoring the AndroidManifest.xml backup"/>
+        <copy file="AndroidManifest.backup" tofile="AndroidManifest.xml" preservelastmodified="false" />
+        <delete file="AndroidManifest.backup" />
+    </target>
+
+    <!-- Disable png crunching, because it's incompatible with reproducible builds -->
     <target name="-crunch">
         <echo message="Skipping png optimization"/>
     </target>

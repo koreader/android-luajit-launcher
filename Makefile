@@ -1,5 +1,4 @@
 # Supported Android ABIs: armeabi-v7a, x86 and x86_64
-
 ifdef ANDROID_ARCH
 	ifeq ($(ANDROID_ARCH), arm)
 		ANDROID_FULL_ARCH?=armeabi-v7a
@@ -11,13 +10,35 @@ endif
 # Default is build for arm
 ANDROID_FULL_ARCH?=armeabi-v7a
 
-# Minimum SDK API is 19, required to use View.VERSION_CODES.KITKAT
-SDKAPI_MIN=$(shell [ ${NDKABI} -ge 19 ] && echo -n ${NDKABI} || echo -n 19)
+# API19 is used by the docker build image.
+# It's also required to use View.VERSION_CODES.KITKAT.
+TARGET_API=19
+
+ifdef NDKABI
+	# Update target API if is higher than current target
+	SDKAPI=$(shell [ ${NDKABI} -gt ${TARGET_API} ] && echo -n ${NDKABI} || echo -n ${TARGET_API})
+endif
+
+SDKAPI?=$(TARGET_API)
+
+# override android:versionName="string"
+ifdef ANDROID_NAME
+	NAME?=$(ANDROID_NAME)
+endif
+
+# override android:versionCode="integer"
+ifdef ANDROID_VERSION
+	VERSION?=$(ANDROID_VERSION)
+endif
+
+# Defaults
+NAME?=1.5
+VERSION?=5
 
 update:
 	# update local.properties and project.properties with sdk/ndk paths for current user
 	# this works with sdk tools <= 25.3.0
-	android update project --path . -t android-$(SDKAPI_MIN)
+	android update project --path . -t android-$(SDKAPI)
 
 	# update sources
 	git submodule init
@@ -30,16 +51,20 @@ build-native:
 	ndk-build ANDROID_FULL_ARCH=$(ANDROID_FULL_ARCH)
 
 debug: update build-native
-	ant debug
+	# build signed debug apk, with version code and version name
+	ant -Dname=$(NAME) -Dcode=$(VERSION) debug
 	cp -pv bin/NativeActivity-debug.apk bin/NativeActivity.apk
 	@echo "application was built, type: debug (signed)"
 
 release: update build-native
-	ant release
+        # build unsigned release apk, with version code and version name
+	@echo "Building release APK, Version $(NAME), release $(VERSION)"
+	ant -Dname=$(NAME) -Dcode=$(VERSION) release
 	cp -pv bin/NativeActivity-release-unsigned.apk bin/NativeActivity.apk
-	@echo "application was built, type: release (unsigned)"
-	@echo "You'll need to sign this application to be able to install it"
+	@echo "application was built, type: release (unsigned), version: $(NAME), release $(VERSION), api $(SDKAPI)"
+	@echo "WARNING: You'll need to sign this application to be able to install it"
 
 clean:
+	ndk-build ANDROID_FULL_ARCH=$(ANDROID_FULL_ARCH) clean
 	./mk-luajit.sh clean
 	rm -rf bin obj libs gen jni/luajit-build local.properties assets/module
