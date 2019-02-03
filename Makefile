@@ -32,8 +32,8 @@ ifdef ANDROID_VERSION
 endif
 
 # Defaults
-NAME?=1.4
-VERSION?=4
+NAME?=1.5
+VERSION?=5
 
 update:
 	# update local.properties and project.properties with sdk/ndk paths for current user
@@ -51,8 +51,8 @@ build-native:
 	ndk-build ANDROID_FULL_ARCH=$(ANDROID_FULL_ARCH)
 
 debug: update build-native
-	# build signed debug apk.
-	ant debug
+	# build signed debug apk, with version code and version name
+	ant -Dname=$(NAME) -Dcode=$(VERSION) debug
 	cp -pv bin/NativeActivity-debug.apk bin/NativeActivity.apk
 	@echo "application was built, type: debug (signed)"
 
