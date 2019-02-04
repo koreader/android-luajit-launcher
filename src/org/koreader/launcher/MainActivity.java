@@ -13,7 +13,6 @@ import android.net.wifi.WifiManager;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -46,44 +45,44 @@ public class MainActivity extends NativeActivity {
         Log.i(LOGGER_NAME, "Creating luajit launcher main activity");
     }
 
+    /** Called when the activity is first created. */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
 
+    /** Called when the activity has become visible. */
     @Override
     protected void onResume() {
-        super.onResume();
-        logActivity("resumed");
-
+        Log.v(LOGGER_NAME, "App resumed");
         setFullWakeLock();
-
-        // set fullscreen immediately on general principle
         setFullscreenLayout();
-
-        // set fullscreen delayed because presumably some devices don't work right otherwise
-        final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                setFullscreenLayout();
-            }
-        }, 500);
+        super.onResume();
     }
 
+    /** Called when another activity is taking focus. */
     @Override
     protected void onPause() {
-        super.onPause();
-        logActivity("paused");
+        Log.v(LOGGER_NAME, "App paused");
         removeFullWakeLock();
+        super.onPause();
     }
 
+    /** Called when the activity is no longer visible. */
     @Override
     protected void onStop() {
+        Log.v(LOGGER_NAME, "App stopped");
         super.onStop();
-        logActivity("stopped");
     }
 
+    /** Called just before the activity is destroyed. */
+    @Override
+    protected void onDestroy() {
+        Log.v(LOGGER_NAME, "App destroyed");
+        super.onDestroy();
+    }
+
+    /** Called just before the activity is resumed by an Intent */
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
@@ -101,10 +100,6 @@ public class MainActivity extends NativeActivity {
     public void setWakeLock(final boolean enabled) {
         WakeLockHelper.set(enabled);
         if (enabled) setFullWakeLock();
-    }
-
-    private void logActivity(final String state) {
-        Log.v(LOGGER_NAME, String.format("App %s", state));
     }
 
     @SuppressWarnings("deprecation")
