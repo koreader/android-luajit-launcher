@@ -84,6 +84,7 @@ public class MainActivity extends android.app.NativeActivity {
      *  If you add a new function here remember to write the companion
      *  lua function in that file */
 
+
     /** clipboard */
     public String getClipboardText() {
         return clipboard.getClipboardText();
@@ -97,82 +98,7 @@ public class MainActivity extends android.app.NativeActivity {
         clipboard.setClipboardText(text);
     }
 
-    /** power */
-    public int isCharging() {
-        return power.batteryCharging();
-    }
-
-    public int getBatteryLevel() {
-        return power.batteryPercent();
-    }
-
-    public void setWakeLock(final boolean enabled) {
-        power.setWakelockState(enabled);
-    }
-
-    public void showProgress(final String title, final String message) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                dialog = FramelessProgressDialog.show(MainActivity.this,
-                    title, message, true, false);
-            }
-        });
-    }
-
-    public void dismissProgress() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (dialog != null && dialog.isShowing()) {
-                    dialog.dismiss();
-                }
-            }
-        });
-    }
-
-    /** screen */
-    public int getScreenBrightness() {
-        return screen.getScreenBrightness();
-    }
-
-    public int getScreenHeight() {
-        return screen.getScreenHeight();
-    }
-
-    public int getScreenWidth() {
-        return screen.getScreenWidth();
-    }
-
-    public int isFullscreen() {
-        return screen.isFullscreen();
-    }
-
-    public void setFullscreen(final boolean enabled) {
-        screen.setFullscreen(enabled);
-    }
-
-    public void setScreenBrightness(final int brightness) {
-        screen.setScreenBrightness(brightness);
-    }
-
-    public void setWifiEnabled(final boolean enabled) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                getWifiManager().setWifiEnabled(enabled);
-            }
-        });
-    }
-
-    public int isWifiEnabled() {
-        return getWifiManager().isWifiEnabled() ? 1 : 0;
-    }
-
-    private WifiManager getWifiManager() {
-        return (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
-    }
-
+    /** device */
     public String getProduct() {
         return device.PRODUCT;
     }
@@ -205,7 +131,81 @@ public class MainActivity extends android.app.NativeActivity {
         epd.setEpdMode(root_view, mode_name);
     }
 
-    private class Box<T> {
-        public T value;
+    /** dialogs */
+    public void showProgress(final String title, final String message) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                dialog = FramelessProgressDialog.show(MainActivity.this,
+                    title, message, true, false);
+            }
+        });
+    }
+
+    public void dismissProgress() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (dialog != null && dialog.isShowing()) {
+                    dialog.dismiss();
+                }
+            }
+        });
+    }
+
+    /** power */
+    public int isCharging() {
+        return power.batteryCharging();
+    }
+
+    public int getBatteryLevel() {
+        return power.batteryPercent();
+    }
+
+    public void setWakeLock(final boolean enabled) {
+        power.setWakelockState(enabled);
+    }
+
+    /** screen */
+    public int getScreenBrightness() {
+        return screen.getScreenBrightness();
+    }
+
+    public int getScreenHeight() {
+        return screen.getScreenHeight();
+    }
+
+    public int getScreenWidth() {
+        return screen.getScreenWidth();
+    }
+
+    public int isFullscreen() {
+        return screen.isFullscreen();
+    }
+
+    public void setFullscreen(final boolean enabled) {
+        screen.setFullscreen(enabled);
+    }
+
+    public void setScreenBrightness(final int brightness) {
+        screen.setScreenBrightness(brightness);
+    }
+
+    /** wifi */
+    public void setWifiEnabled(final boolean enabled) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                getWifiManager().setWifiEnabled(enabled);
+            }
+        });
+    }
+
+    public int isWifiEnabled() {
+        return getWifiManager().isWifiEnabled() ? 1 : 0;
+    }
+
+    private WifiManager getWifiManager() {
+        return (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
     }
 }
