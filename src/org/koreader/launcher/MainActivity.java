@@ -1,9 +1,6 @@
 package org.koreader.launcher;
 
 import android.app.NativeActivity;
-import android.content.ClipData;
-import android.content.ClipDescription;
-import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Point;
@@ -37,6 +34,7 @@ public class MainActivity extends NativeActivity {
     private FramelessProgressDialog dialog;
     private DeviceInfo device;
     private EPDController epd = EPDFactory.getEPDController();
+    private Clipboard clipboard;
     private PowerHelper power;
 
     public MainActivity() {
@@ -48,6 +46,7 @@ public class MainActivity extends NativeActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        clipboard = new Clipboard(this, LOGGER_NAME);
         power = new PowerHelper(this, LOGGER_NAME);
     }
 
@@ -79,6 +78,7 @@ public class MainActivity extends NativeActivity {
     @Override
     protected void onDestroy() {
         Log.v(LOGGER_NAME, "App destroyed");
+        clipboard = null;
         power = null;
         super.onDestroy();
     }
@@ -93,6 +93,19 @@ public class MainActivity extends NativeActivity {
     /** These functions are exposed to lua in assets/android.lua
      *  If you add a new function here remember to write the companion
      *  lua function in that file */
+
+    /** clipboard */
+    public String getClipboardText() {
+        return clipboard.getClipboardText();
+    }
+
+    public int hasClipboardTextIntResultWrapper() {
+        return clipboard.hasClipboardText();
+    }
+
+    public void setClipboardText(final String text) {
+        clipboard.setClipboardText(text);
+    }
 
     /** power */
     public int isCharging() {
@@ -239,86 +252,6 @@ public class MainActivity extends NativeActivity {
             cd.await();
         } catch (InterruptedException ex) {
         }
-    }
-
-    public String getClipboardText() {
-      final Box<String> result = new Box<String>();
-      final CountDownLatch cd = new CountDownLatch(1);
-      runOnUiThread(new Runnable() {
-          @Override
-          public void run() {
-              try {
-                  if (hasClipboardText()) {
-                      ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                      ClipData.Item item = clipboard.getPrimaryClip().getItemAt(0);
-                      result.value = item.getText().toString();
-                  }
-              } catch (Exception e) {
-                  Log.v(LOGGER_NAME, e.toString());
-                  result.value = "";
-              }
-              cd.countDown();
-          }
-      });
-      try {
-          cd.await();
-      } catch (InterruptedException ex) {
-          return "";
-      }
-
-      if (result.value == null) {
-          return "";
-      }
-
-      return result.value;
-    }
-
-    public void setClipboardText(final String text) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                    ClipData clip = ClipData.newPlainText("KOReader_clipboard", text);
-                    clipboard.setPrimaryClip(clip);
-                } catch (Exception e) {
-                    Log.v(LOGGER_NAME, e.toString());
-                }
-            }
-        });
-    }
-
-    public boolean hasClipboardText() {
-        ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-        return clipboard.hasPrimaryClip() && clipboard.getPrimaryClipDescription().hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN);
-    }
-
-    public int hasClipboardTextIntResultWrapper() {
-      final Box<Integer> result = new Box<Integer>();
-      final CountDownLatch cd = new CountDownLatch(1);
-      runOnUiThread(new Runnable() {
-          @Override
-          public void run() {
-              try {
-                  result.value = hasClipboardText() ? 1 : 0;
-              } catch (Exception e) {
-                  Log.v(LOGGER_NAME, e.toString());
-                  result.value = new Integer(0);
-              }
-              cd.countDown();
-          }
-      });
-      try {
-          cd.await();
-      } catch (InterruptedException ex) {
-          return 0;
-      }
-
-      if (result.value == null) {
-          return 0;
-      }
-
-      return result.value.intValue();
     }
 
     public int getStatusBarHeight() {
