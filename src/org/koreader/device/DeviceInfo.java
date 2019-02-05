@@ -25,6 +25,7 @@ public class DeviceInfo {
         EINK_BOYUE_T62,
         EINK_ONYX_C67,
         EINK_ENERGY,
+        EINK_INKBOOK,
     }
 
     public final static int EPD_FULL = 1;
@@ -42,6 +43,7 @@ public class DeviceInfo {
     public static final boolean EINK_BOYUE_T62;
     public static final boolean EINK_ONYX_C67;
     public static final boolean EINK_ENERGY;
+    public static final boolean EINK_INKBOOK;
 
     public static final boolean IS_EINK_SUPPORTED;
     public static Device CURRENT_DEVICE = Device.UNKNOWN;
@@ -78,11 +80,17 @@ public class DeviceInfo {
                 && MODEL.toLowerCase().startsWith("ereader");
         deviceMap.put(Device.EINK_ENERGY, EINK_ENERGY);
 
+        // Artatech Inkbook Prime HD.
+        EINK_INKBOOK = MANUFACTURER.toLowerCase().contentEquals("artatech")
+                && BRAND.toLowerCase().contentEquals("inkbook")
+                && MODEL.toLowerCase().contentEquals("prime hd");
+        deviceMap.put(Device.EINK_INKBOOK, EINK_INKBOOK);
+
         // add your eink device here...
 
 
         // true if we found a supported device
-        IS_EINK_SUPPORTED = (EINK_BOYUE_T62 || EINK_BOYUE_T61 || EINK_ONYX_C67 || EINK_ENERGY);
+        IS_EINK_SUPPORTED = (EINK_BOYUE_T62 || EINK_BOYUE_T61 || EINK_ONYX_C67 || EINK_ENERGY || EINK_INKBOOK);
 
         // find current device.
         Iterator<Device> iter = deviceMap.keySet().iterator();

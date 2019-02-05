@@ -21,6 +21,7 @@ public class EPDFactory {
             case EINK_BOYUE_T61:
             case EINK_ONYX_C67:
             case EINK_ENERGY:
+            case EINK_INKBOOK:
                 epdController = new RK3026EPDController();
                 break;
 
