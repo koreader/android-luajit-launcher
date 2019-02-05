@@ -1,30 +1,17 @@
 package org.koreader.launcher;
 
-import android.app.NativeActivity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Point;
-import android.graphics.Rect;
 import android.net.wifi.WifiManager;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
-import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Display;
-import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
-
-import java.util.concurrent.CountDownLatch;
 
 import org.koreader.device.DeviceInfo;
 import org.koreader.device.EPDController;
 import org.koreader.device.EPDFactory;
 
-public class MainActivity extends NativeActivity {
+public class MainActivity extends android.app.NativeActivity {
 
-    private final static int SDK_INT = Build.VERSION.SDK_INT;
     private final static String LOGGER_NAME = "luajit-launcher";
 
     static {
@@ -36,6 +23,7 @@ public class MainActivity extends NativeActivity {
     private EPDController epd = EPDFactory.getEPDController();
     private Clipboard clipboard;
     private PowerHelper power;
+    private ScreenHelper screen;
 
     public MainActivity() {
         super();
@@ -48,6 +36,7 @@ public class MainActivity extends NativeActivity {
         super.onCreate(savedInstanceState);
         clipboard = new Clipboard(this, LOGGER_NAME);
         power = new PowerHelper(this, LOGGER_NAME);
+        screen = new ScreenHelper(this, LOGGER_NAME);
     }
 
     /** Called when the activity has become visible. */
@@ -55,7 +44,7 @@ public class MainActivity extends NativeActivity {
     protected void onResume() {
         Log.v(LOGGER_NAME, "App resumed");
         power.setWakelock(true);
-        setFullscreenLayout();
+        screen.setFullscreenLayout();
         super.onResume();
     }
 
@@ -80,10 +69,11 @@ public class MainActivity extends NativeActivity {
         Log.v(LOGGER_NAME, "App destroyed");
         clipboard = null;
         power = null;
+	screen = null;
         super.onDestroy();
     }
 
-    /** Called just before the activity is resumed by an Intent */
+    /** Called just before the activity is resumed by an intent */
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
@@ -120,73 +110,6 @@ public class MainActivity extends NativeActivity {
         power.setWakelockState(enabled);
     }
 
-    @SuppressWarnings("deprecation")
-    private void setFullscreenLayout() {
-        if (SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-            getWindow().getDecorView().setSystemUiVisibility(View.STATUS_BAR_HIDDEN);
-        } else if (SDK_INT < Build.VERSION_CODES.KITKAT) {
-            getWindow().getDecorView().setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LOW_PROFILE);
-        } else {
-            getWindow().getDecorView().setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
-                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
-                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
-                    View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
-                    View.SYSTEM_UI_FLAG_FULLSCREEN |
-                    View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-        }
-    }
-
-    public int getScreenBrightness() {
-        final Box<Integer> result = new Box<Integer>();
-        final CountDownLatch cd = new CountDownLatch(1);
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    result.value = new Integer(Settings.System.getInt(
-                        getContentResolver(),
-                        Settings.System.SCREEN_BRIGHTNESS));
-                } catch (Exception e) {
-                    Log.v(LOGGER_NAME, e.toString());
-                    result.value = new Integer(0);
-                }
-                cd.countDown();
-            }
-        });
-        try {
-            cd.await();
-        } catch (InterruptedException ex) {
-            return 0;
-        }
-
-        if (result.value == null) {
-            return 0;
-        }
-
-        return result.value.intValue();
-    }
-
-    public void setScreenBrightness(final int brightness) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    //this will set the manual mode (set the automatic mode off)
-                    Settings.System.putInt(getContentResolver(),
-                        Settings.System.SCREEN_BRIGHTNESS_MODE,
-                        Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
-
-                    Settings.System.putInt(getContentResolver(),
-                        Settings.System.SCREEN_BRIGHTNESS, brightness);
-                } catch (Exception e) {
-                    Log.v(LOGGER_NAME, e.toString());
-                }
-            }
-        });
-    }
-
     public void showProgress(final String title, final String message) {
         runOnUiThread(new Runnable() {
             @Override
@@ -208,10 +131,30 @@ public class MainActivity extends NativeActivity {
         });
     }
 
-    public int isFullscreen() {
-        return ((getWindow().getAttributes().flags & WindowManager.LayoutParams.FLAG_FULLSCREEN) != 0) ? 1 : 0;
+    /** screen */
+    public int getScreenBrightness() {
+        return screen.getScreenBrightness();
     }
 
+    public int getScreenHeight() {
+        return screen.getScreenHeight();
+    }
+
+    public int getScreenWidth() {
+        return screen.getScreenWidth();
+    }
+
+    public int isFullscreen() {
+        return screen.isFullscreen();
+    }
+
+    public void setFullscreen(final boolean enabled) {
+        screen.setFullscreen(enabled);
+    }
+
+    public void setScreenBrightness(final int brightness) {
+        screen.setScreenBrightness(brightness);
+    }
 
     public void setWifiEnabled(final boolean enabled) {
         runOnUiThread(new Runnable() {
@@ -230,69 +173,12 @@ public class MainActivity extends NativeActivity {
         return (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
     }
 
-    public void setFullscreen(final boolean fullscreen) {
-        final CountDownLatch cd = new CountDownLatch(1);
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    final Window window = getWindow();
-                    if (fullscreen) {
-                        window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-                    } else {
-                        window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-                    }
-                } catch (Exception e) {
-                    Log.v(LOGGER_NAME, e.toString());
-                }
-                cd.countDown();
-            }
-        });
-        try {
-            cd.await();
-        } catch (InterruptedException ex) {
-        }
-    }
-
-    public int getStatusBarHeight() {
-        Rect rectangle = new Rect();
-        Window window = getWindow();
-        window.getDecorView().getWindowVisibleDisplayFrame(rectangle);
-        int statusBarHeight = rectangle.top;
-        return statusBarHeight;
-    }
-
-    public int getScreenWidth() {
-        int width = getScreenSize().x;
-        return width;
-    }
-
-    public int getScreenHeight() {
-        int height = getScreenSize().y;
-        return height;
-    }
-
-    private Point getScreenSize() {
-        Point size = new Point();
-        Display display = getWindowManager().getDefaultDisplay();
-        try {
-            // JellyBean 4.2 (API 17) and higher
-            DisplayMetrics metrics = new DisplayMetrics();
-            display.getRealMetrics(metrics);
-            size.set(metrics.widthPixels, metrics.heightPixels);
-        } catch (NoSuchMethodError e) {
-            // Honeycomb 3.0 (API 11) adn higher
-            display.getSize(size);
-        }
-        return size;
-    }
-
     public String getProduct() {
         return device.PRODUCT;
     }
 
     public String getVersion() {
-        return Build.VERSION.RELEASE;
+        return android.os.Build.VERSION.RELEASE;
     }
 
     public int isEink() {
@@ -301,7 +187,7 @@ public class MainActivity extends NativeActivity {
 
     public void einkUpdate(int mode) {
         String mode_name = "invalid mode";
-        final View root_view = getWindow().getDecorView().findViewById(android.R.id.content);
+        final android.view.View root_view = getWindow().getDecorView().findViewById(android.R.id.content);
 
         if (mode == device.EPD_FULL) {
             mode_name = "EPD_FULL";
