@@ -6,11 +6,9 @@ import android.content.ClipDescription;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.net.wifi.WifiManager;
-import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -39,6 +37,7 @@ public class MainActivity extends NativeActivity {
     private FramelessProgressDialog dialog;
     private DeviceInfo device;
     private EPDController epd = EPDFactory.getEPDController();
+    private PowerHelper power;
 
     public MainActivity() {
         super();
@@ -49,13 +48,14 @@ public class MainActivity extends NativeActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        power = new PowerHelper(this, LOGGER_NAME);
     }
 
     /** Called when the activity has become visible. */
     @Override
     protected void onResume() {
         Log.v(LOGGER_NAME, "App resumed");
-        setFullWakeLock();
+        power.setWakelock(true);
         setFullscreenLayout();
         super.onResume();
     }
@@ -64,7 +64,7 @@ public class MainActivity extends NativeActivity {
     @Override
     protected void onPause() {
         Log.v(LOGGER_NAME, "App paused");
-        removeFullWakeLock();
+        power.setWakelock(false);
         super.onPause();
     }
 
@@ -79,6 +79,7 @@ public class MainActivity extends NativeActivity {
     @Override
     protected void onDestroy() {
         Log.v(LOGGER_NAME, "App destroyed");
+        power = null;
         super.onDestroy();
     }
 
@@ -89,17 +90,21 @@ public class MainActivity extends NativeActivity {
         setIntent(intent);
     }
 
-    private void setFullWakeLock() {
-        WakeLockHelper.acquire(MainActivity.this);
+    /** These functions are exposed to lua in assets/android.lua
+     *  If you add a new function here remember to write the companion
+     *  lua function in that file */
+
+    /** power */
+    public int isCharging() {
+        return power.batteryCharging();
     }
 
-    private void removeFullWakeLock() {
-        WakeLockHelper.release();
+    public int getBatteryLevel() {
+        return power.batteryPercent();
     }
 
     public void setWakeLock(final boolean enabled) {
-        WakeLockHelper.set(enabled);
-        if (enabled) setFullWakeLock();
+        power.setWakelockState(enabled);
     }
 
     @SuppressWarnings("deprecation")
@@ -167,30 +172,6 @@ public class MainActivity extends NativeActivity {
                 }
             }
         });
-    }
-
-    private int getBatteryState(boolean isPercent) {
-        Intent intent = this.registerReceiver(null,
-            new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-        int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
-        int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, 100);
-        int plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
-        int percent = (level * 100) / scale;
-
-        if (isPercent) return percent;
-
-        if (plugged == BatteryManager.BATTERY_PLUGGED_AC || plugged == BatteryManager.BATTERY_PLUGGED_USB)
-            return (percent != 100) ? 1 : 0;
-        else
-            return 0;
-    }
-
-    public int getBatteryLevel() {
-        return getBatteryState(true);
-    }
-
-    public int isCharging() {
-        return getBatteryState(false);
     }
 
     public void showProgress(final String title, final String message) {
