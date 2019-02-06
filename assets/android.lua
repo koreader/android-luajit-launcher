@@ -1495,6 +1495,17 @@ local function run(android_app_state)
         end)
     end
 
+    android.getNetworkInfo = function()
+        return JNI:context(android.app.activity.vm, function(JNI)
+            local network_info = JNI:callObjectMethod(
+                android.app.activity.clazz,
+                "getNetworkInfo",
+                "()Ljava/lang/String;"
+            )
+            return string.match(JNI:to_string(network_info), "(.*);(.*);(.*)")
+        end)
+    end
+
     android.isWifiEnabled = function()
         return JNI:context(android.app.activity.vm, function(JNI)
             return JNI:callIntMethod(
