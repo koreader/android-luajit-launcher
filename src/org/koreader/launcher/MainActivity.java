@@ -2,7 +2,10 @@ package org.koreader.launcher;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.DhcpInfo;
+import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.text.format.Formatter;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -203,6 +206,30 @@ public class MainActivity extends android.app.NativeActivity {
 
     public int isWifiEnabled() {
         return getWifiManager().isWifiEnabled() ? 1 : 0;
+    }
+
+    public String getNetworkInfo() {
+        final WifiInfo wi = getWifiManager().getConnectionInfo();
+        final DhcpInfo dhcp = getWifiManager().getDhcpInfo();
+
+        int ip = wi.getIpAddress();
+        int gw = dhcp.gateway;
+        String ip_address;
+        String gw_address;
+
+        if (ip > 0) {
+            ip_address = Formatter.formatIpAddress(ip);
+        } else {
+            ip_address = String.valueOf(ip);
+        }
+
+        if (gw > 0) {
+            gw_address = Formatter.formatIpAddress(gw);
+        } else {
+            gw_address = String.valueOf(gw);
+        }
+
+        return String.format("%s;%s;%s", wi.getSSID(), ip_address, gw_address);
     }
 
     private WifiManager getWifiManager() {
