@@ -80,10 +80,10 @@ public class DeviceInfo {
                 && MODEL.toLowerCase().startsWith("ereader");
         deviceMap.put(Device.EINK_ENERGY, EINK_ENERGY);
 
-        // Artatech Inkbook Prime HD.
+        // Artatech Inkbook Prime/Prime HD.
         EINK_INKBOOK = MANUFACTURER.toLowerCase().contentEquals("artatech")
                 && BRAND.toLowerCase().contentEquals("inkbook")
-                && MODEL.toLowerCase().contentEquals("prime hd");
+                && MODEL.toLowerCase().startsWith("prime");
         deviceMap.put(Device.EINK_INKBOOK, EINK_INKBOOK);
 
         // add your eink device here...
