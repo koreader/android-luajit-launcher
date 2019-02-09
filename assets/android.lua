@@ -1674,8 +1674,14 @@ local function run(android_app_state)
     local install = android.asset_loader("install")
     if type(install) == "function" then
         android.showProgress()
+        local start_time = os.time()
         install()
+        local end_time = os.time()
         android.dismissProgress()
+        local elapsed_time = os.difftime(end_time, start_time)
+        if elapsed_time > 0 then
+            android.LOGV(string.format("update installed in %d seconds", elapsed_time))
+        end
     else
         error("error loading install.lua")
     end
