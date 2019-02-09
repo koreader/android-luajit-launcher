@@ -22,7 +22,7 @@
     <!-- Override android:versionName and android:versionCode with commandline arguments -->
     <target name="-pre-build">
         <echo message="Creating a backup of AndroidManifest.xml"/>
-        <copy file="AndroidManifest.xml" tofile="AndroidManifest.backup" preservelastmodified="false" />
+        <copy file="AndroidManifest.xml" tofile="AndroidManifest.backup"/>
         <echo message="Overriding version code from AndroidManifest.xml"/>
         <replaceregexp
             file="AndroidManifest.xml"
@@ -38,7 +38,7 @@
     <!-- Restore AndroidManifest.xml to its original state -->
     <target name="-post-build">
         <echo message="Restoring the AndroidManifest.xml backup"/>
-        <copy file="AndroidManifest.backup" tofile="AndroidManifest.xml" preservelastmodified="false" />
+        <copy file="AndroidManifest.backup" tofile="AndroidManifest.xml" overwrite="true"/>
         <delete file="AndroidManifest.backup" />
     </target>
 
