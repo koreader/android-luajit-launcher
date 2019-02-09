@@ -19,6 +19,7 @@ public class EPDFactory {
 
             /** Supported rk3026 devices */
             case EINK_BOYUE_T61:
+            case EINK_BOYUE_T80S:
             case EINK_ONYX_C67:
             case EINK_ENERGY:
             case EINK_INKBOOK:
