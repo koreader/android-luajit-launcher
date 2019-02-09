@@ -23,6 +23,7 @@ public class DeviceInfo {
         UNKNOWN,
         EINK_BOYUE_T61,
         EINK_BOYUE_T62,
+        EINK_BOYUE_T80S,
         EINK_ONYX_C67,
         EINK_ENERGY,
         EINK_INKBOOK,
@@ -41,6 +42,7 @@ public class DeviceInfo {
 
     public static final boolean EINK_BOYUE_T61;
     public static final boolean EINK_BOYUE_T62;
+    public static final boolean EINK_BOYUE_T80S;
     public static final boolean EINK_ONYX_C67;
     public static final boolean EINK_ENERGY;
     public static final boolean EINK_INKBOOK;
@@ -69,6 +71,11 @@ public class DeviceInfo {
                 && DEVICE.toLowerCase().startsWith("t61");
         deviceMap.put(Device.EINK_BOYUE_T61, EINK_BOYUE_T61);
 
+        // Boyue Likebook Plus
+        EINK_BOYUE_T80S = (MANUFACTURER.toLowerCase().contentEquals("boeye") || MANUFACTURER.toLowerCase().contentEquals("boyue"))
+                && PRODUCT.toLowerCase().contentEquals("t80s");
+        deviceMap.put(Device.EINK_BOYUE_T80S, EINK_BOYUE_T80S);
+
         // Onyx C67
         EINK_ONYX_C67 = MANUFACTURER.toLowerCase().contentEquals("onyx")
                 && ( PRODUCT.toLowerCase().startsWith("c67") || MODEL.contentEquals("rk30sdk") )
@@ -90,7 +97,7 @@ public class DeviceInfo {
 
 
         // true if we found a supported device
-        IS_EINK_SUPPORTED = (EINK_BOYUE_T62 || EINK_BOYUE_T61 || EINK_ONYX_C67 || EINK_ENERGY || EINK_INKBOOK);
+        IS_EINK_SUPPORTED = (EINK_BOYUE_T62 || EINK_BOYUE_T61 || EINK_BOYUE_T80S || EINK_ONYX_C67 || EINK_ENERGY || EINK_INKBOOK);
 
         // find current device.
         Iterator<Device> iter = deviceMap.keySet().iterator();
