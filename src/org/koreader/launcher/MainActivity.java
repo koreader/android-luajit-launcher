@@ -6,8 +6,11 @@ import android.net.DhcpInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.text.format.Formatter;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
+import android.view.View;
 
 import org.koreader.device.DeviceInfo;
 import org.koreader.device.EPDController;
@@ -15,6 +18,7 @@ import org.koreader.device.EPDFactory;
 
 public class MainActivity extends android.app.NativeActivity {
 
+    private final static int SDK_INT = Build.VERSION.SDK_INT;
     private final static String LOGGER_NAME = "luajit-launcher";
 
     static {
@@ -40,6 +44,18 @@ public class MainActivity extends android.app.NativeActivity {
         clipboard = new Clipboard(this, LOGGER_NAME);
         power = new PowerHelper(this, LOGGER_NAME);
         screen = new ScreenHelper(this, LOGGER_NAME);
+
+        /** Listen to visibility changes */
+        if (SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            setFullscreenLayout();
+            View decorView = getWindow().getDecorView();
+            decorView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
+                @Override
+                public void onSystemUiVisibilityChange(int visibility) {
+                    setFullscreenLayout();
+                }
+            });
+        }
     }
 
     /** Called when the activity has become visible. */
@@ -47,8 +63,17 @@ public class MainActivity extends android.app.NativeActivity {
     protected void onResume() {
         Log.v(LOGGER_NAME, "App resumed");
         power.setWakelock(true);
-        screen.setFullscreenLayout();
         super.onResume();
+        /** switch to fullscreen for older devices */
+        if (SDK_INT < Build.VERSION_CODES.KITKAT) {
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    setFullscreenLayout();
+                }
+            }, 500);
+        }
     }
 
     /** Called when another activity is taking focus. */
@@ -116,7 +141,7 @@ public class MainActivity extends android.app.NativeActivity {
 
     public void einkUpdate(int mode) {
         String mode_name = "invalid mode";
-        final android.view.View root_view = getWindow().getDecorView().findViewById(android.R.id.content);
+        final View root_view = getWindow().getDecorView().findViewById(android.R.id.content);
 
         if (mode == device.EPD_FULL) {
             mode_name = "EPD_FULL";
@@ -232,7 +257,25 @@ public class MainActivity extends android.app.NativeActivity {
         return String.format("%s;%s;%s", wi.getSSID(), ip_address, gw_address);
     }
 
+    // ----------------------------------
     private WifiManager getWifiManager() {
         return (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
+    }
+
+    private void setFullscreenLayout() {
+        View decorView = getWindow().getDecorView();
+        if (SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            decorView.setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_FULLSCREEN |
+                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
+                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY |
+                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
+                View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+        } else {
+            decorView.setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_FULLSCREEN |
+                View.SYSTEM_UI_FLAG_LOW_PROFILE);
+        }
     }
 }

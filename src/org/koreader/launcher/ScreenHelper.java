@@ -121,24 +121,6 @@ public class ScreenHelper {
         }
     }
 
-    @SuppressWarnings("deprecation")
-    public void setFullscreenLayout() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-            ((Activity)context).getWindow().getDecorView().setSystemUiVisibility(View.STATUS_BAR_HIDDEN);
-        } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
-            ((Activity)context).getWindow().getDecorView().setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LOW_PROFILE);
-        } else {
-            ((Activity)context).getWindow().getDecorView().setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
-                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
-                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
-                    View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
-                    View.SYSTEM_UI_FLAG_FULLSCREEN |
-                    View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-        }
-    }
-
     private Point getScreenSize() {
         Point size = new Point();
         Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
