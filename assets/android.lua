@@ -1637,7 +1637,12 @@ local function run(android_app_state)
     os.execute = function(command) -- luacheck: ignore 122
         if command == nil then return -1 end
         local argv = {}
-        command:gsub("([^ ]+)", function(arg) table.insert(argv, arg) end)
+        command:gsub("([^ ]+)", function(arg)
+            -- strip quotes around argument, since they are not necessary here
+            arg = arg:gsub('"(.*)"', "%1") -- strip double quotes
+            arg = arg:gsub("'(.*)'", "%1") -- strip single quotes
+            table.insert(argv, arg)
+        end)
         return android.execute(unpack(argv))
     end
 
