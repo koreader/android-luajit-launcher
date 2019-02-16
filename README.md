@@ -1,5 +1,4 @@
-android-luajit-launcher
-=======================
+# android-luajit-launcher
 
 Android NativeActivity based launcher for LuaJIT, implementing the main loop within Lua land via FFI.
 
@@ -17,9 +16,9 @@ Have a look at KOReader's [llapp_main.lua](https://github.com/koreader/koreader/
 
 The real starting point, called from JNI/C, is the run() function in android.lua. It sets up a few things, namely FFI definitions for the Android native API (since it uses that itself for a few things) and some wrapper functions for logging. Also, it registers the "android" module in package.loaded, so you can access it in your own code via require("android"). It also registers a new package loader which can load Lua code from the activity's asset store, so you can use require() for Lua code stored there.
 
-# Starting
+## Starting
 
-## Init and update the submodules
+### Init and update the submodules
 
 ```sh
 git submodule init
@@ -27,7 +26,7 @@ git submodule sync
 git submodule update
 ```
 
-## Update the project for your Android SDK/NDK
+### Update the project for your Android SDK/NDK
 
 This requires the `android` tool in your `$PATH`.
 
@@ -35,7 +34,7 @@ This requires the `android` tool in your `$PATH`.
 android update project --path .
 ```
 
-## Compile LuaJIT for your target architecture(s)
+### Compile LuaJIT for your target architecture(s)
 
 ```sh
 ./mk-luajit.sh armeabi-v7a
@@ -43,19 +42,19 @@ android update project --path .
 ./mk-luajit.sh armeabi
 ```
 
-## Compile NDK/native code
+### Compile NDK/native code
 
 ```sh
 ndk-build
 ```
 
-## Compile and package APK (debug variant)
+### Compile and package APK (debug variant)
 
 ```sh
 ant debug
 ```
 
-# To-do
+## To-do
 
 * a concept to deal with native Lua modules.
 * a loader for native modules that have been put into the activity's library directory?
