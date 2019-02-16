@@ -83,7 +83,7 @@ public class DeviceInfo {
         deviceMap.put(Device.EINK_ONYX_C67, EINK_ONYX_C67);
 
         // Energy Sistem eReaders. Tested on Energy Ereader Pro 4
-        EINK_ENERGY = BRAND.toLowerCase().contentEquals("energysistem")
+        EINK_ENERGY = (BRAND.toLowerCase().contentEquals("energysistem") || BRAND.toLowerCase().contentEquals("energy_sistem"))
                 && MODEL.toLowerCase().startsWith("ereader");
         deviceMap.put(Device.EINK_ENERGY, EINK_ENERGY);
 
