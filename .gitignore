@@ -10,7 +10,7 @@ eink-test/libs
 eink-test/local.properties
 eink-test/project.properties
 eink-test/proguard-project.txt
-eink-test/src/org/koreader/einkTest/*EPDController.java
+eink-test/src/org/koreader/test/eink/*EPDController.java
 eink-test/*.apk
 local.properties
 project.properties

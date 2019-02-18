@@ -1,10 +1,10 @@
-package org.koreader.einkTest;
+package org.koreader.test.eink;
 
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.view.View.OnClickListener;
+
 
 public class MainActivity extends android.app.Activity {
     private static final String TAG = "eink-test";
@@ -13,47 +13,45 @@ public class MainActivity extends android.app.Activity {
     private static final int RK30xxFORCED = 2;
     private static final int FAKE = 999;
 
-    /** current device overview */
-    private TextView overview;
-
     private static final String MANUFACTURER = android.os.Build.MANUFACTURER;
     private static final String BRAND = android.os.Build.BRAND;
     private static final String MODEL = android.os.Build.MODEL;
     private static final String PRODUCT = android.os.Build.PRODUCT;
     private static final String HARDWARE = android.os.Build.HARDWARE;
 
-    /** fake eink */
-    private TextView fakeDesc;
-    private Button fake_button;
-
-    /** rockchip */
-    private TextView rockchipDesc;
-    private Button rk30xx_normal_button;
-    private Button rk30xx_forced_button;
-
     @Override
     public void onCreate(android.os.Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
-        overview = (TextView) findViewById(R.id.overview);
-        fakeDesc = (TextView) findViewById(R.id.fakeText);
-        rockchipDesc = (TextView) findViewById(R.id.rockchipText);
+        TextView overview = (TextView) findViewById(R.id.overview);
+        TextView fakeDesc = (TextView) findViewById(R.id.fakeText);
+        TextView rockchipDesc = (TextView) findViewById(R.id.rockchipText);
 
-        fake_button = (Button) findViewById(R.id.fakeButton);
-        rk30xx_normal_button = (Button) findViewById(R.id.rockchipNormalButton);
-        rk30xx_forced_button = (Button) findViewById(R.id.rockchipForcedButton);
+        Button fake_button = (Button) findViewById(R.id.fakeButton);
+        Button rk30xx_normal_button = (Button) findViewById(R.id.rockchipNormalButton);
+        Button rk30xx_forced_button = (Button) findViewById(R.id.rockchipForcedButton);
 
+        /** current device overview */
         overview.setText("Manufacturer: " + MANUFACTURER);
         overview.append("\n Brand: " + BRAND);
         overview.append("\n Model: " + MODEL);
         overview.append("\n Product: " + PRODUCT);
         overview.append("\n Hardware: " + HARDWARE);
 
+        /** fake eink */
         fakeDesc.setText("This button does nothing! It's just an example of an empty action. ");
         fakeDesc.append("If you don't see any difference between fake and real tests, your device ");
         fakeDesc.append("is not supported by any implemented epd controller.");
 
+        fake_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                runEinkTest(FAKE);
+            }
+        });
+
+        /** rockchip */
         rockchipDesc.setText("These buttons should invoke a full refresh of rockchip rk30xx devices. ");
         rockchipDesc.append("Both normal and forced modes should work.");
 
@@ -67,12 +65,6 @@ public class MainActivity extends android.app.Activity {
             @Override
             public void onClick(View view) {
                 runEinkTest(RK30xxFORCED);
-            }
-        });
-        fake_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                runEinkTest(FAKE);
             }
         });
     }
