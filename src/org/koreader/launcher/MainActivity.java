@@ -207,6 +207,10 @@ public class MainActivity extends android.app.NativeActivity {
         return screen.getScreenWidth();
     }
 
+    public int getStatusBarHeight() {
+        return screen.getStatusBarHeight();
+    }
+
     public int isFullscreen() {
         return screen.isFullscreen();
     }
