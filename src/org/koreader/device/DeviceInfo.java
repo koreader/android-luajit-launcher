@@ -8,11 +8,6 @@ package org.koreader.device;
 import android.os.Build;
 import android.util.Log;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.util.HashMap;
 import java.util.Iterator;
 
