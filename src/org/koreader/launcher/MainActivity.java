@@ -41,9 +41,9 @@ public class MainActivity extends android.app.NativeActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        clipboard = new Clipboard(this, LOGGER_NAME);
-        power = new PowerHelper(this, LOGGER_NAME);
-        screen = new ScreenHelper(this, LOGGER_NAME);
+        clipboard = new Clipboard(this);
+        power = new PowerHelper(this);
+        screen = new ScreenHelper(this);
 
         /** Listen to visibility changes */
         if (SDK_INT >= Build.VERSION_CODES.KITKAT) {
