@@ -14,12 +14,10 @@ import android.view.WindowManager;
 import java.util.concurrent.CountDownLatch;
 
 public class ScreenHelper {
-    private static String TAG;
-    private static Context context;
+    private Context context;
 
-    public ScreenHelper(Context context, String logger_name) {
+    public ScreenHelper(Context context) {
         this.context = context;
-        this.TAG = logger_name;
     }
 
     /** Screen size */
@@ -51,7 +49,7 @@ public class ScreenHelper {
                         context.getContentResolver(),
                         Settings.System.SCREEN_BRIGHTNESS));
                 } catch (Exception e) {
-                    Log.v(TAG, e.toString());
+                    Log.e("luajit-launcher", "getBrightness error: " + e.toString());
                     result.value = new Integer(0);
                 }
                 cd.countDown();
@@ -84,7 +82,7 @@ public class ScreenHelper {
                     Settings.System.putInt(context.getContentResolver(),
                         Settings.System.SCREEN_BRIGHTNESS, brightness);
                 } catch (Exception e) {
-                    Log.v(TAG, e.toString());
+                    Log.e("luajit-launcher", "setBrightness error: " + e.toString());
                 }
             }
         });
@@ -108,7 +106,7 @@ public class ScreenHelper {
                         window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
                     }
                 } catch (Exception e) {
-                    Log.v(TAG, e.toString());
+                    Log.e("luajit-launcher", "setFullscreen error: " + e.toString());
                 }
                 cd.countDown();
             }

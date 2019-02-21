@@ -9,16 +9,16 @@ import android.util.Log;
 
 
 public class PowerHelper {
-    private static String TAG;
-    private static Context context;
-    private static Intent intent;
-    private static IntentFilter filter;
-    private static PowerManager.WakeLock wakelock;
-    private static boolean isWakeLockAllowed = false;
+    private static final String WAKELOCK_ID = "ko-wakelock";
 
-    public PowerHelper(Context context, String logger_name) {
-        this.context = context;
-        this.TAG = logger_name;
+    private Context context;
+    private IntentFilter filter;
+    private PowerManager.WakeLock wakelock;
+    private boolean isWakeLockAllowed = false;
+
+    public PowerHelper(Context context) {
+        /* use application context */
+        this.context = context.getApplicationContext();
         this.filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
     }
 
@@ -30,7 +30,7 @@ public class PowerHelper {
         return getBatteryState(false);
     }
 
-    public static void setWakelock(final boolean enable) {
+    public void setWakelock(final boolean enable) {
         if (enable) {
             wakelockAcquire();
         } else {
@@ -38,7 +38,7 @@ public class PowerHelper {
         }
     }
 
-    public static void setWakelockState(final boolean enabled) {
+    public void setWakelockState(final boolean enabled) {
         /** release wakelock first, if present and wakelocks are allowed */
         if (isWakeLockAllowed && wakelock != null) wakelockRelease();
         /** update wakelock settings */
@@ -48,7 +48,7 @@ public class PowerHelper {
     }
 
     private int getBatteryState(boolean isPercent) {
-        intent = context.registerReceiver(null, filter);
+        Intent intent = context.registerReceiver(null, filter);
         int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
         int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, 100);
         int plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
@@ -63,19 +63,19 @@ public class PowerHelper {
     }
 
     @SuppressWarnings("deprecation")
-    private static void wakelockAcquire() {
+    private void wakelockAcquire() {
         if (isWakeLockAllowed) {
             wakelockRelease();
             PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-            wakelock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "ko-wakelock");
-            Log.v(TAG, "Acquiring wakelock");
+            wakelock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, WAKELOCK_ID);
+            Log.v("luajit-launcher", "wakelock: acquiring " + WAKELOCK_ID);
             wakelock.acquire();
         }
     }
 
-    private static void wakelockRelease() {
+    private void wakelockRelease() {
         if (isWakeLockAllowed && wakelock != null) {
-            Log.v(TAG, "Releasing wakelock");
+            Log.v("luajit-launcher", "wakelock: releasing " + WAKELOCK_ID);
             wakelock.release();
             wakelock = null;
         }

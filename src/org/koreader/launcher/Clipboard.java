@@ -10,14 +10,11 @@ import android.util.Log;
 import java.util.concurrent.CountDownLatch;
 
 public class Clipboard {
+    private Context context;
+    private ClipboardManager clipboard;
 
-    private static String TAG;
-    private static Context context;
-    private static ClipboardManager clipboard;
-
-    public Clipboard(Context context, String logger_name) {
+    public Clipboard(Context context) {
         this.context = context;
-        this.TAG = logger_name;
         this.clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
     }
 
@@ -33,7 +30,7 @@ public class Clipboard {
                         result.value = item.getText().toString();
                     }
                 } catch (Exception e) {
-                    Log.v(TAG, e.toString());
+                    Log.e("luajit-launcher", "clipboard error: " + e.toString());
                     result.value = "";
                 }
                 cd.countDown();
@@ -59,7 +56,7 @@ public class Clipboard {
                     ClipData clip = ClipData.newPlainText("KOReader_clipboard", text);
                     clipboard.setPrimaryClip(clip);
                 } catch (Exception e) {
-                    Log.v(TAG, e.toString());
+                    Log.e("luajit-launcher", "clipboard error: " + e.toString());
                 }
             }
         });
