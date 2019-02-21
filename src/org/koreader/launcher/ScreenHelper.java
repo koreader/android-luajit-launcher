@@ -49,7 +49,7 @@ public class ScreenHelper {
                         context.getContentResolver(),
                         Settings.System.SCREEN_BRIGHTNESS));
                 } catch (Exception e) {
-                    Log.e("luajit-launcher","getBrightness error: " + e.toString());
+                    Log.e("luajit-launcher", "getBrightness error: " + e.toString());
                     result.value = new Integer(0);
                 }
                 cd.countDown();
