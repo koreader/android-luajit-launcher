@@ -1528,6 +1528,35 @@ local function run(android_app_state)
         end)
     end
 
+    android.download = function(url, name)
+        android.LOGV("downloading " .. name .. " from " .. url)
+        return JNI:context(android.app.activity.vm, function(JNI)
+            local uri_string = JNI.env[0].NewStringUTF(JNI.env, url)
+            local download_name = JNI.env[0].NewStringUTF(JNI.env, name)
+            JNI:callVoidMethod(
+                android.app.activity.clazz,
+                "download",
+                "(Ljava/lang/String;Ljava/lang/String;)V",
+                uri_string, download_name
+            )
+            JNI.env[0].DeleteLocalRef(JNI.env, uri_string)
+            JNI.env[0].DeleteLocalRef(JNI.env, download_name)
+        end)
+    end
+
+    android.notification = function(message)
+        return JNI:context(android.app.activity.vm, function(JNI)
+            local text = JNI.env[0].NewStringUTF(JNI.env, message)
+            JNI:callVoidMethod(
+                android.app.activity.clazz,
+                "showToast",
+                "(Ljava/lang/String;)V",
+                text
+            )
+            JNI.env[0].DeleteLocalRef(JNI.env, text)
+        end)
+    end
+
     android.getStatusBarHeight = function()
         return JNI:context(android.app.activity.vm, function(JNI)
             return JNI:callIntMethod(

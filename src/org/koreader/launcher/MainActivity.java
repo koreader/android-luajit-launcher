@@ -1,16 +1,20 @@
 package org.koreader.launcher;
 
+import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.text.format.Formatter;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import org.koreader.device.DeviceInfo;
 import org.koreader.device.EPDController;
@@ -159,7 +163,17 @@ public class MainActivity extends android.app.NativeActivity {
         epd.setEpdMode(root_view, mode_name);
     }
 
-    /** dialogs */
+    /** native dialogs and widgets run on UI Thread */
+    public void showToast(final String message) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                final Toast toast = Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT);
+                toast.show();
+            }
+        });
+    }
+
     public void showProgress(final String title, final String message) {
         runOnUiThread(new Runnable() {
             @Override
@@ -259,6 +273,15 @@ public class MainActivity extends android.app.NativeActivity {
         }
 
         return String.format("%s;%s;%s", wi.getSSID(), ip_address, gw_address);
+    }
+
+    public void download(final String url, final String name) {
+        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+        request.allowScanningByMediaScanner();
+        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, name);
+        DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+        manager.enqueue(request);
     }
 
     // ----------------------------------
