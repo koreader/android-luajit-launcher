@@ -16,6 +16,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import java.io.File;
+
 import org.koreader.device.DeviceInfo;
 import org.koreader.device.EPDController;
 import org.koreader.device.EPDFactory;
@@ -275,13 +277,20 @@ public class MainActivity extends android.app.NativeActivity {
         return String.format("%s;%s;%s", wi.getSSID(), ip_address, gw_address);
     }
 
-    public void download(final String url, final String name) {
+    public int download(final String url, final String name) {
+        File file = new File(Environment.getExternalStoragePublicDirectory(
+            Environment.DIRECTORY_DOWNLOADS) + "/" + name);
+
+        Log.v(LOGGER_NAME, file.getAbsolutePath());
+        if (file.exists()) return 1;
+
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
         request.allowScanningByMediaScanner();
         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
         request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, name);
         DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
         manager.enqueue(request);
+        return 0;
     }
 
     // ----------------------------------
