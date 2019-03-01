@@ -9,6 +9,7 @@ import android.view.View;
 
 import org.koreader.device.rockchip.RK3026EPDController;
 import org.koreader.device.rockchip.RK3066EPDController;
+import org.koreader.device.rockchip.RK3368EPDController;
 
 
 public class EPDFactory {
@@ -29,6 +30,11 @@ public class EPDFactory {
             /** supported rk3066 devices */
             case EINK_BOYUE_T62:
                 epdController = new RK3066EPDController();
+                break;
+
+            /** supported rk3368 devices */
+            case EINK_BOYUE_T103D:
+                epdController = new RK3368EPDController();
                 break;
 
             /** unsupported devices */

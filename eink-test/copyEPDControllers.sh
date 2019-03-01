@@ -5,7 +5,7 @@ TARGET_PATH="src/org/koreader/test/eink"
 
 # Rockchip EPD Controllers
 ROCKCHIP_PATH="${BASE_PATH}/rockchip"
-ROCKCHIP_EPD="RK30xxEPDController"
+ROCKCHIP_EPD="RK30xxEPDController RK33xxEPDController"
 
 for EPD in ${ROCKCHIP_EPD}; do
     src="${ROCKCHIP_PATH}/${EPD}.java"

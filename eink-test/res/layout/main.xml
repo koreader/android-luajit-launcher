@@ -45,25 +45,42 @@
             android:layout_height="12dp" />
 
         <TextView
-            android:id="@+id/rockchipText"
+            android:id="@+id/rk30xxText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:textSize="22sp" />
     
         <Button
-            android:id="@+id/rockchipNormalButton"
+            android:id="@+id/rk30xxNormalButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="rk30xx normal update"
             android:textSize="28sp" />
     
         <Button
-            android:id="@+id/rockchipForcedButton"
+            android:id="@+id/rk30xxForcedButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="rk30xx forced update" 
             android:textSize="28sp" />
-    
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="12dp" />
+
+        <TextView
+            android:id="@+id/rk33xxText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:textSize="22sp" />
+
+        <Button
+            android:id="@+id/rk33xxNormalButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="rk33xx normal update"
+            android:textSize="28sp" />
     </LinearLayout>
 </ScrollView>
