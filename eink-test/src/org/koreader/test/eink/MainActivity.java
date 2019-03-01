@@ -11,6 +11,7 @@ public class MainActivity extends android.app.Activity {
 
     private static final int RK30xxNORMAL = 1;
     private static final int RK30xxFORCED = 2;
+    private static final int RK33xxNORMAL = 3;
     private static final int FAKE = 999;
 
     private static final String MANUFACTURER = android.os.Build.MANUFACTURER;
@@ -26,11 +27,13 @@ public class MainActivity extends android.app.Activity {
 
         TextView overview = (TextView) findViewById(R.id.overview);
         TextView fakeDesc = (TextView) findViewById(R.id.fakeText);
-        TextView rockchipDesc = (TextView) findViewById(R.id.rockchipText);
+        TextView rk30xx_description = (TextView) findViewById(R.id.rk30xxText);
+        TextView rk33xx_description = (TextView) findViewById(R.id.rk33xxText);
 
         Button fake_button = (Button) findViewById(R.id.fakeButton);
-        Button rk30xx_normal_button = (Button) findViewById(R.id.rockchipNormalButton);
-        Button rk30xx_forced_button = (Button) findViewById(R.id.rockchipForcedButton);
+        Button rk30xx_normal_button = (Button) findViewById(R.id.rk30xxNormalButton);
+        Button rk30xx_forced_button = (Button) findViewById(R.id.rk30xxForcedButton);
+        Button rk33xx_normal_button = (Button) findViewById(R.id.rk33xxNormalButton);
 
         /** current device overview */
         overview.setText("Manufacturer: " + MANUFACTURER);
@@ -38,6 +41,7 @@ public class MainActivity extends android.app.Activity {
         overview.append("\n Model: " + MODEL);
         overview.append("\n Product: " + PRODUCT);
         overview.append("\n Hardware: " + HARDWARE);
+        overview.append("\n Platform: " + getBuildProperty("ro.board.platform"));
 
         /** fake eink */
         fakeDesc.setText("This button does nothing! It's just an example of an empty action. ");
@@ -51,9 +55,9 @@ public class MainActivity extends android.app.Activity {
             }
         });
 
-        /** rockchip */
-        rockchipDesc.setText("These buttons should invoke a full refresh of rockchip rk30xx devices. ");
-        rockchipDesc.append("Both normal and forced modes should work.");
+        /** rockchip rk30xx */
+        rk30xx_description.setText("These buttons should invoke a full refresh of rockchip rk30xx devices. ");
+        rk30xx_description.append("Both normal and forced modes should work.");
 
         rk30xx_normal_button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -67,6 +71,18 @@ public class MainActivity extends android.app.Activity {
                 runEinkTest(RK30xxFORCED);
             }
         });
+
+        /** rockchip rk33xx */
+        rk33xx_description.setText("This button should work on boyue rk3368 clones.");
+
+        rk33xx_normal_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                runEinkTest(RK33xxNORMAL);
+            }
+        });
+
+
     }
 
     private void runEinkTest(int test) {
@@ -78,6 +94,9 @@ public class MainActivity extends android.app.Activity {
             } else if (test == RK30xxFORCED) {
 	        Log.i(TAG, "rockchip forced update");
 	        RK30xxEPDController.requestEpdMode(v, "EPD_FULL", true);
+            } else if (test == RK33xxNORMAL) {
+                Log.i(TAG, "rockchip 33xx normal update");
+                RK33xxEPDController.requestEpdMode();
             } else if (test == FAKE) {
                 Log.i(TAG, "fake update");
             } else {
@@ -86,6 +105,18 @@ public class MainActivity extends android.app.Activity {
         } catch (Exception e) {
             Log.e(TAG, e.toString());
         }
+    }
+
+    private String getBuildProperty(String key) {
+        String value;
+        try {
+            value = (String) Class.forName("android.os.SystemProperties").getMethod(
+                "get", String.class).invoke(null, key);
+        } catch (Exception e) {
+            Log.e(TAG, e.toString());
+            value = "unknown";
+        }
+        return value;
     }
 }
 
