@@ -141,6 +141,10 @@ public class MainActivity extends android.app.NativeActivity {
         return android.os.Build.VERSION.RELEASE;
     }
 
+    public String getFlavor() {
+        return getResources().getString(R.string.app_flavor);
+    }
+
     public int isEink() {
         return (device.IS_EINK_SUPPORTED) ? 1 : 0;
     }

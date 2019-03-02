@@ -1276,6 +1276,16 @@ local function run(android_app_state)
         end)
     end
 
+    android.getFlavor = function()
+        return JNI:context(android.app.activity.vm, function(JNI)
+            local flavor = JNI:callObjectMethod(
+                android.app.activity.clazz,
+                "getFlavor",
+                "()Ljava/lang/String;"
+            )
+            return JNI:to_string(flavor)
+        end)
+    end
 
     android.getScreenWidth = function()
         return JNI:context(android.app.activity.vm, function(JNI)
