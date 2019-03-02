@@ -21,25 +21,38 @@
 
     <!-- Override android:versionName and android:versionCode with commandline arguments -->
     <target name="-pre-build">
-        <echo message="Creating a backup of AndroidManifest.xml"/>
-        <copy file="AndroidManifest.xml" tofile="AndroidManifest.backup"/>
+        <echo message="saving xml backup"/>
+        <copy file="AndroidManifest.xml" tofile="AndroidManifest.backup" verbose="true"/>
+        <copy file="res/values/strings.xml" toFile="strings.xml.backup" verbose="true"/>
+
         <echo message="Overriding version code from AndroidManifest.xml"/>
         <replaceregexp
             file="AndroidManifest.xml"
             match="android:versionCode(.*)"
             replace='android:versionCode="${code}"'/>
+
         <echo message="Overriding version name from AndroidManifest.xml"/>
         <replaceregexp
             file="AndroidManifest.xml"
             match="android:versionName(.*)"
             replace='android:versionName="${name}"'/>
+
+        <!-- Override android flavor too -->
+        <echo message="Overriding android flavor"/>
+        <replaceregexp
+            file="res/values/strings.xml"
+            match='name="app_flavor"(.*)'
+            replace='name="app_flavor"&gt;${flavor}&lt;\/string&gt;'/>
     </target>
+
 
     <!-- Restore AndroidManifest.xml to its original state -->
     <target name="-post-build">
-        <echo message="Restoring the AndroidManifest.xml backup"/>
-        <copy file="AndroidManifest.backup" tofile="AndroidManifest.xml" overwrite="true"/>
+        <echo message="restoring xml backup"/>
+        <copy file="AndroidManifest.backup" tofile="AndroidManifest.xml" overwrite="true" verbose="true"/>
         <delete file="AndroidManifest.backup" />
+        <copy file="strings.xml.backup" tofile="res/values/strings.xml" overwrite="true" verbose="true"/>
+        <delete file="strings.xml.backup" />
     </target>
 
     <!-- Disable png crunching, because it's incompatible with reproducible builds -->
