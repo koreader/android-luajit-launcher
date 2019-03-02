@@ -58,7 +58,7 @@ build-native:
 
 debug: update build-native
 	# build signed debug apk, with version code and version name
-	ant -Dname=$(NAME) -Dcode=$(VERSION) -Dflavor=debug debug
+	ant -Dname=$(NAME) -Dcode=$(VERSION) -Dflavor=$(FLAVOR) debug
 	cp -pv bin/NativeActivity-debug.apk bin/NativeActivity.apk
 	@echo "application was built, type: debug (signed)"
 
