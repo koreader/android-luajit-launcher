@@ -19,6 +19,8 @@ public class DeviceInfo {
         EINK_BOYUE_T61,
         EINK_BOYUE_T62,
         EINK_BOYUE_T80S,
+        EINK_BOYUE_T80D,
+        EINK_BOYUE_T78D,
         EINK_BOYUE_T103D,
         EINK_ONYX_C67,
         EINK_ENERGY,
@@ -39,6 +41,8 @@ public class DeviceInfo {
     public static final boolean EINK_BOYUE_T61;
     public static final boolean EINK_BOYUE_T62;
     public static final boolean EINK_BOYUE_T80S;
+    public static final boolean EINK_BOYUE_T80D;
+    public static final boolean EINK_BOYUE_T78D;
     public static final boolean EINK_BOYUE_T103D;
     public static final boolean EINK_ONYX_C67;
     public static final boolean EINK_ENERGY;
@@ -72,6 +76,16 @@ public class DeviceInfo {
         EINK_BOYUE_T80S = (MANUFACTURER.toLowerCase().contentEquals("boeye") || MANUFACTURER.toLowerCase().contentEquals("boyue"))
                 && PRODUCT.toLowerCase().contentEquals("t80s");
         deviceMap.put(Device.EINK_BOYUE_T80S, EINK_BOYUE_T80S);
+
+        // Boyue Likebook Mars
+        EINK_BOYUE_T103D = (MANUFACTURER.toLowerCase().contentEquals("boeye") || MANUFACTURER.toLowerCase().contentEquals("boyue"))
+                && PRODUCT.toLowerCase().contentEquals("t80d");
+        deviceMap.put(Device.EINK_BOYUE_T80D, EINK_BOYUE_T80D);
+
+        // Boyue Likebook Muses
+        EINK_BOYUE_T103D = (MANUFACTURER.toLowerCase().contentEquals("boeye") || MANUFACTURER.toLowerCase().contentEquals("boyue"))
+                && PRODUCT.toLowerCase().contentEquals("t78d");
+        deviceMap.put(Device.EINK_BOYUE_T78D, EINK_BOYUE_T78D);
 
         // Boyue Likebook Mimas
         EINK_BOYUE_T103D = (MANUFACTURER.toLowerCase().contentEquals("boeye") || MANUFACTURER.toLowerCase().contentEquals("boyue"))

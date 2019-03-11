@@ -33,6 +33,8 @@ public class EPDFactory {
                 break;
 
             /** supported rk3368 devices */
+            case EINK_BOYUE_T80D:
+            case EINK_BOYUE_T78D:
             case EINK_BOYUE_T103D:
                 epdController = new RK3368EPDController();
                 break;
