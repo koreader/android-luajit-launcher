@@ -78,12 +78,12 @@ public class DeviceInfo {
         deviceMap.put(Device.EINK_BOYUE_T80S, EINK_BOYUE_T80S);
 
         // Boyue Likebook Mars
-        EINK_BOYUE_T103D = (MANUFACTURER.toLowerCase().contentEquals("boeye") || MANUFACTURER.toLowerCase().contentEquals("boyue"))
+        EINK_BOYUE_T80D = (MANUFACTURER.toLowerCase().contentEquals("boeye") || MANUFACTURER.toLowerCase().contentEquals("boyue"))
                 && PRODUCT.toLowerCase().contentEquals("t80d");
         deviceMap.put(Device.EINK_BOYUE_T80D, EINK_BOYUE_T80D);
 
         // Boyue Likebook Muses
-        EINK_BOYUE_T103D = (MANUFACTURER.toLowerCase().contentEquals("boeye") || MANUFACTURER.toLowerCase().contentEquals("boyue"))
+        EINK_BOYUE_T78D = (MANUFACTURER.toLowerCase().contentEquals("boeye") || MANUFACTURER.toLowerCase().contentEquals("boyue"))
                 && PRODUCT.toLowerCase().contentEquals("t78d");
         deviceMap.put(Device.EINK_BOYUE_T78D, EINK_BOYUE_T78D);
 
