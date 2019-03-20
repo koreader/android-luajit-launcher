@@ -1554,6 +1554,20 @@ local function run(android_app_state)
         end)
     end
 
+    android.openLink = function(link)
+        return JNI:context(android.app.activity.vm, function(JNI)
+            local uri_string = JNI.env[0].NewStringUTF(JNI.env, link)
+            local result = JNI:callIntMethod(
+                android.app.activity.clazz,
+                "openLink",
+                "(Ljava/lang/String;)I",
+                uri_string
+            )
+            JNI.env[0].DeleteLocalRef(JNI.env, uri_string)
+            return result
+        end)
+    end
+
     android.notification = function(message)
         return JNI:context(android.app.activity.vm, function(JNI)
             local text = JNI.env[0].NewStringUTF(JNI.env, message)

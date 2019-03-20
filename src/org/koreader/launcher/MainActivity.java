@@ -297,6 +297,10 @@ public class MainActivity extends android.app.NativeActivity {
         return 0;
     }
 
+    public int openLink(String url) {
+        return openWebPage(url) ? 0 : 1;
+    }
+
     // ----------------------------------
     private WifiManager getWifiManager() {
         return (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
@@ -316,6 +320,18 @@ public class MainActivity extends android.app.NativeActivity {
             decorView.setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_FULLSCREEN |
                 View.SYSTEM_UI_FLAG_LOW_PROFILE);
+        }
+    }
+
+    private boolean openWebPage(String url) {
+        Uri webpage = Uri.parse(url);
+        Intent intent = new Intent(Intent.ACTION_VIEW, webpage);
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+            return true;
+        } else {
+            // cannot find a package able to open the page
+            return false;
         }
     }
 }
