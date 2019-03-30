@@ -5,12 +5,12 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.BatteryManager;
 import android.os.PowerManager;
-import android.util.Log;
 
 
 public class PowerHelper {
     private static final String WAKELOCK_ID = "ko-wakelock";
 
+    private String TAG;
     private Context context;
     private IntentFilter filter;
     private PowerManager.WakeLock wakelock;
@@ -20,6 +20,7 @@ public class PowerHelper {
         /* use application context */
         this.context = context.getApplicationContext();
         this.filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+        this.TAG = context.getResources().getString(R.string.app_name);
     }
 
     public int batteryPercent() {
@@ -68,14 +69,14 @@ public class PowerHelper {
             wakelockRelease();
             PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
             wakelock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, WAKELOCK_ID);
-            Log.v("luajit-launcher", "wakelock: acquiring " + WAKELOCK_ID);
+            Logger.v(TAG, "wakelock: acquiring " + WAKELOCK_ID);
             wakelock.acquire();
         }
     }
 
     private void wakelockRelease() {
         if (isWakeLockAllowed && wakelock != null) {
-            Log.v("luajit-launcher", "wakelock: releasing " + WAKELOCK_ID);
+            Logger.v(TAG, "wakelock: releasing " + WAKELOCK_ID);
             wakelock.release();
             wakelock = null;
         }

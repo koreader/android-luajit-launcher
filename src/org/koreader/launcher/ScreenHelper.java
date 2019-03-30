@@ -6,7 +6,6 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.provider.Settings;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Display;
 import android.view.Window;
 import android.view.WindowManager;
@@ -14,10 +13,12 @@ import android.view.WindowManager;
 import java.util.concurrent.CountDownLatch;
 
 public class ScreenHelper {
+    private String TAG;
     private Context context;
 
     public ScreenHelper(Context context) {
         this.context = context;
+        this.TAG = context.getResources().getString(R.string.app_name);
     }
 
     /** Screen size */
@@ -49,7 +50,7 @@ public class ScreenHelper {
                         context.getContentResolver(),
                         Settings.System.SCREEN_BRIGHTNESS));
                 } catch (Exception e) {
-                    Log.e("luajit-launcher", "getBrightness error: " + e.toString());
+                    Logger.e(TAG, "getBrightness error: " + e.toString());
                     result.value = new Integer(0);
                 }
                 cd.countDown();
@@ -82,7 +83,7 @@ public class ScreenHelper {
                     Settings.System.putInt(context.getContentResolver(),
                         Settings.System.SCREEN_BRIGHTNESS, brightness);
                 } catch (Exception e) {
-                    Log.e("luajit-launcher", "setBrightness error: " + e.toString());
+                    Logger.e(TAG, "setBrightness error: " + e.toString());
                 }
             }
         });
@@ -106,7 +107,7 @@ public class ScreenHelper {
                         window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
                     }
                 } catch (Exception e) {
-                    Log.e("luajit-launcher", "setFullscreen error: " + e.toString());
+                    Logger.e(TAG, "setFullscreen error: " + e.toString());
                 }
                 cd.countDown();
             }

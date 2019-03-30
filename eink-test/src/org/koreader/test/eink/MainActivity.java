@@ -96,7 +96,7 @@ public class MainActivity extends android.app.Activity {
 	        RK30xxEPDController.requestEpdMode(v, "EPD_FULL", true);
             } else if (test == RK33xxNORMAL) {
                 Log.i(TAG, "rockchip 33xx normal update");
-                RK33xxEPDController.requestEpdMode();
+                RK33xxEPDController.requestEpdMode("EPD_FULL");
             } else if (test == FAKE) {
                 Log.i(TAG, "fake update");
             } else {

@@ -31,6 +31,11 @@ ifdef ANDROID_VERSION
 	VERSION?=$(ANDROID_VERSION)
 endif
 
+# support different app names
+ifdef ANDROID_APPNAME
+	APPNAME?=$(ANDROID_APPNAME)
+endif
+
 # support different flavors
 ifdef ANDROID_FLAVOR
 	FLAVOR?=$(ANDROID_FLAVOR)
@@ -39,6 +44,7 @@ endif
 # Defaults
 NAME?=1.5
 VERSION?=5
+APPNAME?="luajit-launcher"
 FLAVOR?="rocks"
 
 update:
@@ -54,20 +60,21 @@ update:
 build-native:
 	# build luajit, lzma and native activity for desired arch (armeabi-v7a, x86, x86_64)
 	./mk-luajit.sh $(ANDROID_FULL_ARCH)
+	@echo "#define LOGGER_NAME \"$(APPNAME)\"" > jni/logger.h
 	ndk-build ANDROID_FULL_ARCH=$(ANDROID_FULL_ARCH)
 
 debug: update build-native
 	# build signed debug apk, with version code and version name
-	ant -Dname=$(NAME) -Dcode=$(VERSION) -Dflavor=$(FLAVOR) debug
+	ant -Dname=$(NAME) -Dcode=$(VERSION) -DappName=$(APPNAME) -Dflavor=$(FLAVOR) debug
 	cp -pv bin/NativeActivity-debug.apk bin/NativeActivity.apk
 	@echo "application was built, type: debug (signed)"
 
 release: update build-native
         # build unsigned release apk, with version code and version name
 	@echo "Building release APK, Version $(NAME), release $(VERSION)"
-	ant -Dname=$(NAME) -Dcode=$(VERSION) -Dflavor=$(FLAVOR) release
+	ant -Dname=$(NAME) -Dcode=$(VERSION) -DappName=$(APPNAME) -Dflavor=$(FLAVOR) release
 	cp -pv bin/NativeActivity-release-unsigned.apk bin/NativeActivity.apk
-	@echo "application was built, type: release (unsigned), flavor: $(FLAVOR), version: $(NAME), release $(VERSION), api $(SDKAPI)"
+	@echo "application $(APPNAME) was built, type: release (unsigned), flavor: $(FLAVOR), version: $(NAME), release $(VERSION), api $(SDKAPI)"
 	@echo "WARNING: You'll need to sign this application to be able to install it"
 
 clean:

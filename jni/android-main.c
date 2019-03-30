@@ -31,8 +31,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "luajit-2.1/lualib.h"
 #include "luajit-2.1/lauxlib.h"
 
-#define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR,"luajit-launcher",__VA_ARGS__)
-#define  LOGV(...)  __android_log_print(ANDROID_LOG_VERBOSE,"luajit-launcher",__VA_ARGS__)
+#include "logger.h"
+
+#define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR,LOGGER_NAME,__VA_ARGS__)
+#define  LOGV(...)  __android_log_print(ANDROID_LOG_VERBOSE,LOGGER_NAME,__VA_ARGS__)
 #define  LOADER_ASSET "android.lua"
 
 
@@ -119,7 +121,7 @@ void android_main(struct android_app* state) {
     lua_close(L);
 
 quit:
-    LOGE("Destroying NativeActivity due to previous errors");
+    LOGE("Destroying activity due to previous errors");
     ANativeActivity_finish(state->activity);
     exit(1);
 }

@@ -37,7 +37,13 @@
             match="android:versionName(.*)"
             replace='android:versionName="${name}"'/>
 
-        <!-- Override android flavor too -->
+        <!-- Override android appname & flavor too -->
+        <echo message="Overriding android app name"/>
+        <replaceregexp
+            file="res/values/strings.xml"
+            match='name="app_name"(.*)'
+            replace='name="app_name"&gt;${appName}&lt;\/string&gt;'/>
+
         <echo message="Overriding android flavor"/>
         <replaceregexp
             file="res/values/strings.xml"

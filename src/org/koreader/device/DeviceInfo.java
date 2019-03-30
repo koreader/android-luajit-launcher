@@ -6,8 +6,6 @@
 package org.koreader.device;
 
 import android.os.Build;
-import android.util.Log;
-
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -113,7 +111,16 @@ public class DeviceInfo {
 
 
         // true if we found a supported device
-        IS_EINK_SUPPORTED = (EINK_BOYUE_T62 || EINK_BOYUE_T61 || EINK_BOYUE_T80S || EINK_BOYUE_T103D || EINK_ONYX_C67 || EINK_ENERGY || EINK_INKBOOK);
+        IS_EINK_SUPPORTED = (
+            EINK_BOYUE_T61 ||
+            EINK_BOYUE_T62 ||
+            EINK_BOYUE_T78D ||
+            EINK_BOYUE_T80D ||
+            EINK_BOYUE_T103D ||
+            EINK_ENERGY ||
+            EINK_INKBOOK ||
+            EINK_ONYX_C67
+        );
 
         // find current device.
         Iterator<Device> iter = deviceMap.keySet().iterator();
@@ -132,7 +139,6 @@ public class DeviceInfo {
         try {
             return (String)Build.class.getField(fieldName).get(null);
         } catch (Exception e) {
-            Log.w("luajit-launcher", "Exception while trying to check Build." + fieldName);
             return "";
         }
     }
