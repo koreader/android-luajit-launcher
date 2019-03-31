@@ -12,7 +12,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -23,30 +22,38 @@ import org.koreader.device.EPDController;
 import org.koreader.device.EPDFactory;
 
 public class MainActivity extends android.app.NativeActivity {
-
     private final static int SDK_INT = Build.VERSION.SDK_INT;
-    private final static String LOGGER_NAME = "luajit-launcher";
 
     static {
         System.loadLibrary("luajit");
     }
 
+    private String TAG;
+
     private FramelessProgressDialog dialog;
-    private DeviceInfo device;
-    private EPDController epd = EPDFactory.getEPDController();
     private Clipboard clipboard;
+    private DeviceInfo device;
+    private EPDController epd;
     private PowerHelper power;
     private ScreenHelper screen;
 
     public MainActivity() {
         super();
-        Log.i(LOGGER_NAME, "Creating luajit launcher main activity");
     }
 
     /** Called when the activity is first created. */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // set a tag for logging
+        TAG = getName();
+        Logger.i(TAG, "Creating main activity");
+
+        // set a epd controller for eink devices
+        epd = EPDFactory.getEPDController(TAG);
+
+        // helper classes
         clipboard = new Clipboard(this);
         power = new PowerHelper(this);
         screen = new ScreenHelper(this);
@@ -67,7 +74,7 @@ public class MainActivity extends android.app.NativeActivity {
     /** Called when the activity has become visible. */
     @Override
     protected void onResume() {
-        Log.v(LOGGER_NAME, "App resumed");
+        Logger.v(TAG, "App resumed");
         power.setWakelock(true);
         super.onResume();
         /** switch to fullscreen for older devices */
@@ -85,7 +92,7 @@ public class MainActivity extends android.app.NativeActivity {
     /** Called when another activity is taking focus. */
     @Override
     protected void onPause() {
-        Log.v(LOGGER_NAME, "App paused");
+        Logger.v(TAG, "App paused");
         power.setWakelock(false);
         super.onPause();
     }
@@ -93,17 +100,18 @@ public class MainActivity extends android.app.NativeActivity {
     /** Called when the activity is no longer visible. */
     @Override
     protected void onStop() {
-        Log.v(LOGGER_NAME, "App stopped");
+        Logger.v(TAG, "App stopped");
         super.onStop();
     }
 
     /** Called just before the activity is destroyed. */
     @Override
     protected void onDestroy() {
-        Log.v(LOGGER_NAME, "App destroyed");
+        Logger.v(TAG, "App destroyed");
         clipboard = null;
         power = null;
 	screen = null;
+        epd = null;
         super.onDestroy();
     }
 
@@ -145,6 +153,10 @@ public class MainActivity extends android.app.NativeActivity {
         return getResources().getString(R.string.app_flavor);
     }
 
+    public String getName() {
+        return getResources().getString(R.string.app_name);
+    }
+
     public int isEink() {
         return (device.IS_EINK_SUPPORTED) ? 1 : 0;
     }
@@ -162,10 +174,10 @@ public class MainActivity extends android.app.NativeActivity {
         } else if (mode == device.EPD_AUTO) {
             mode_name = "EPD_AUTO";
         } else {
-            Log.e(LOGGER_NAME, String.format("%s: %d", mode_name, mode));
+            Logger.e(TAG, String.format("%s: %d", mode_name, mode));
             return;
         }
-        Log.v(LOGGER_NAME, String.format("requesting eink refresh, type: %s", mode_name));
+        Logger.v(TAG, String.format("requesting eink refresh, type: %s", mode_name));
         epd.setEpdMode(root_view, mode_name);
     }
 
@@ -285,7 +297,7 @@ public class MainActivity extends android.app.NativeActivity {
         File file = new File(Environment.getExternalStoragePublicDirectory(
             Environment.DIRECTORY_DOWNLOADS) + "/" + name);
 
-        Log.v(LOGGER_NAME, file.getAbsolutePath());
+        Logger.v(TAG, file.getAbsolutePath());
         if (file.exists()) return 1;
 
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));

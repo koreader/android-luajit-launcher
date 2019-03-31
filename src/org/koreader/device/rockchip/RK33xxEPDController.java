@@ -11,7 +11,7 @@ import android.util.Log;
 
 @SuppressWarnings("unchecked")
 public abstract class RK33xxEPDController {
-    private static final String TAG = "luajit-launcher";
+    private static final String TAG = "epd";
     public static final int EPD_FULL = 1;
     public static final int EPD_A2 = 2;
     public static final int EPD_PART = 3;

@@ -3,6 +3,7 @@ gen/
 libs/
 obj/
 assets/module
+jni/logger.h
 jni/luajit-build
 eink-test/bin
 eink-test/gen

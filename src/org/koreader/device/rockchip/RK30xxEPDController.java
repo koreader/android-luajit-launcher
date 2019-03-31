@@ -36,7 +36,7 @@ public abstract class RK30xxEPDController
         EPD_POWEROFF
     }
 
-    public static final String LOGGER_NAME = "luajit-launcher";
+    public static final String TAG = "epd";
 
     public static final String EPD_NULL = "EPD_NULL";
 
@@ -73,11 +73,11 @@ public abstract class RK30xxEPDController
             isInA2.setAccessible(true);
 
         } catch (ClassNotFoundException e) {
-            Log.e(LOGGER_NAME, e.toString());
+            Log.e(TAG, e.toString());
         } catch (NoSuchMethodException e) {
-            Log.e(LOGGER_NAME, e.toString());
+            Log.e(TAG, e.toString());
         } catch (NoSuchFieldException e) {
-            Log.e(LOGGER_NAME, e.toString());
+            Log.e(TAG, e.toString());
         }
     }
 
@@ -85,10 +85,10 @@ public abstract class RK30xxEPDController
     {
         try {
             boolean value = (Boolean)isInA2.get(view);
-            Log.d(LOGGER_NAME, "isInA2 : " + value);
+            Log.d(TAG, "isInA2 : " + value);
             return value;
         } catch (IllegalAccessException e) {
-            Log.e(LOGGER_NAME, e.toString());
+            Log.e(TAG, e.toString());
             return false;
         }
     }
@@ -99,10 +99,10 @@ public abstract class RK30xxEPDController
             requestEpdModeMethod1.invoke(view, stringToEnum(mode));
             return true;
         } catch (IllegalAccessException e) {
-            Log.e(LOGGER_NAME, e.toString());
+            Log.e(TAG, e.toString());
             return false;
         } catch (InvocationTargetException e) {
-            Log.e(LOGGER_NAME, e.toString());
+            Log.e(TAG, e.toString());
             return false;
         }
     }
@@ -112,10 +112,10 @@ public abstract class RK30xxEPDController
             requestEpdModeMethod2.invoke(view, stringToEnum(mode), flag);
             return true;
         } catch (IllegalAccessException e) {
-            Log.e(LOGGER_NAME, e.toString());
+            Log.e(TAG, e.toString());
             return false;
         } catch (InvocationTargetException e) {
-            Log.e(LOGGER_NAME, e.toString());
+            Log.e(TAG, e.toString());
             return false;
         }
     }

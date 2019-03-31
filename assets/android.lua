@@ -1287,6 +1287,20 @@ local function run(android_app_state)
         end)
     end
 
+    android.getName = function()
+        return JNI:context(android.app.activity.vm, function(JNI)
+            local name = JNI:callObjectMethod(
+                android.app.activity.clazz,
+                "getName",
+                "()Ljava/lang/String;"
+            )
+            return JNI:to_string(name)
+        end)
+    end
+
+    -- update logger name
+    android.log_name = android.getName()
+
     android.getScreenWidth = function()
         return JNI:context(android.app.activity.vm, function(JNI)
             return JNI:callIntMethod(

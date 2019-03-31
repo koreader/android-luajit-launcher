@@ -5,17 +5,19 @@ import android.content.Context;
 import android.content.ClipData;
 import android.content.ClipDescription;
 import android.content.ClipboardManager;
-import android.util.Log;
 
 import java.util.concurrent.CountDownLatch;
+
 
 public class Clipboard {
     private Context context;
     private ClipboardManager clipboard;
+    private String TAG;
 
     public Clipboard(Context context) {
         this.context = context;
         this.clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+        this.TAG = context.getResources().getString(R.string.app_name);
     }
 
     public String getClipboardText() {
@@ -30,7 +32,7 @@ public class Clipboard {
                         result.value = item.getText().toString();
                     }
                 } catch (Exception e) {
-                    Log.e("luajit-launcher", "clipboard error: " + e.toString());
+                    Logger.e(TAG, "clipboard error: " + e.toString());
                     result.value = "";
                 }
                 cd.countDown();
@@ -56,7 +58,7 @@ public class Clipboard {
                     ClipData clip = ClipData.newPlainText("KOReader_clipboard", text);
                     clipboard.setPrimaryClip(clip);
                 } catch (Exception e) {
-                    Log.e("luajit-launcher", "clipboard error: " + e.toString());
+                    Logger.e(TAG, "clipboard error: " + e.toString());
                 }
             }
         });
