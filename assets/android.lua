@@ -1121,6 +1121,9 @@ end
 function android.LOGV(message)
     android.LOG(ffi.C.ANDROID_LOG_VERBOSE, message)
 end
+function android.LOGD(message)
+    android.LOG(ffi.C.ANDROID_LOG_DEBUG, message)
+end
 function android.LOGI(message)
     android.LOG(ffi.C.ANDROID_LOG_INFO, message)
 end
@@ -1178,7 +1181,7 @@ function android.deplib_loader(modulename)
         local module = string.gsub(path, "%?", modulepath)
         -- try to load dependencies of this module with our dlopen implementation
         if readable(module) then
-            android.LOGV("try to load module "..module)
+            android.DEBUG("try to load module "..module)
             local ok, err = pcall(android.dl.dlopen, module)
             if ok then return end
             if err then
@@ -1301,6 +1304,28 @@ local function run(android_app_state)
     -- update logger name
     android.log_name = android.getName()
 
+    android.isDebuggable = function()
+        return JNI:context(android.app.activity.vm, function(JNI)
+            return JNI:callIntMethod(
+                android.app.activity.clazz,
+                "isDebuggable",
+                "()I"
+            ) == 1
+        end)
+    end
+
+    -- some apk properties
+    android.prop = {}
+    android.prop.appName = android.getName()
+    android.prop.appFlavor = android.getFlavor()
+    android.prop.isDebuggable = android.isDebuggable()
+
+    android.DEBUG = function(message)
+        if android.prop.isDebuggable then
+            android.LOGD(message)
+        end
+    end
+
     android.getScreenWidth = function()
         return JNI:context(android.app.activity.vm, function(JNI)
             return JNI:callIntMethod(
@@ -1346,7 +1371,7 @@ local function run(android_app_state)
     end
 
     android.setScreenBrightness = function(brightness)
-        android.LOGV("set screen brightness "..brightness)
+        android.DEBUG("set screen brightness "..brightness)
         JNI:context(android.app.activity.vm, function(JNI)
             if brightness > 255 then
                 brightness = 255
@@ -1402,7 +1427,7 @@ local function run(android_app_state)
     end
 
     android.showProgress = function(title, message)
-        android.LOGV("show progress dialog")
+        android.DEBUG("show progress dialog")
         JNI:context(android.app.activity.vm, function(JNI)
             local title = JNI.env[0].NewStringUTF(JNI.env, title)
             local message = JNI.env[0].NewStringUTF(JNI.env, message)
@@ -1418,7 +1443,7 @@ local function run(android_app_state)
     end
 
     android.dismissProgress = function()
-        android.LOGV("dismiss progress dialog")
+        android.DEBUG("dismiss progress dialog")
         JNI:context(android.app.activity.vm, function(JNI)
             JNI:callVoidMethod(
                 android.app.activity.clazz,
@@ -1440,7 +1465,7 @@ local function run(android_app_state)
     end
 
     android.setFullscreen = function(fullscreen)
-        android.LOGV("setting fullscreen to " .. tostring(fullscreen))
+        android.DEBUG("setting fullscreen to " .. tostring(fullscreen))
         JNI:context(android.app.activity.vm, function(JNI)
             JNI:callVoidMethod(
                 android.app.activity.clazz,
@@ -1473,7 +1498,7 @@ local function run(android_app_state)
     end
 
     android.setWakeLock = function(enabled)
-        android.LOGV("Switching wakelock to " .. tostring(enabled))
+        android.DEBUG("Switching wakelock to " .. tostring(enabled))
         JNI:context(android.app.activity.vm, function(JNI)
             JNI:callVoidMethod(
                 android.app.activity.clazz,
@@ -1506,7 +1531,7 @@ local function run(android_app_state)
     end
 
     android.setClipboardText = function(text)
-        android.LOGV("setting clipboard text to: " .. text)
+        android.DEBUG("setting clipboard text to: " .. text)
         JNI:context(android.app.activity.vm, function(JNI)
             local clipboard_text = JNI.env[0].NewStringUTF(JNI.env, text)
             JNI:callVoidMethod(
@@ -1541,7 +1566,7 @@ local function run(android_app_state)
     end
 
     android.setWifiEnabled = function(wifiEnabled)
-        android.LOGV("setting wifi to: " .. tostring(wifiEnabled))
+        android.DEBUG("setting wifi to: " .. tostring(wifiEnabled))
         JNI:context(android.app.activity.vm, function(JNI)
             JNI:callVoidMethod(
                 android.app.activity.clazz,
@@ -1738,7 +1763,7 @@ local function run(android_app_state)
     -- ffi.load wrapper
     local ffi_load = ffi.load
     ffi.load = function(library, ...) -- luacheck: ignore 212
-        android.LOGV("ffi.load "..library)
+        android.DEBUG("ffi.load "..library)
         return android.dl.dlopen(library, ffi_load)
     end
 

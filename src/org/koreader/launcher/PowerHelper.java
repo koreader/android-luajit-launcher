@@ -69,14 +69,14 @@ public class PowerHelper {
             wakelockRelease();
             PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
             wakelock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, WAKELOCK_ID);
-            Logger.v(TAG, "wakelock: acquiring " + WAKELOCK_ID);
+            Logger.d(TAG, "wakelock: acquiring " + WAKELOCK_ID);
             wakelock.acquire();
         }
     }
 
     private void wakelockRelease() {
         if (isWakeLockAllowed && wakelock != null) {
-            Logger.v(TAG, "wakelock: releasing " + WAKELOCK_ID);
+            Logger.d(TAG, "wakelock: releasing " + WAKELOCK_ID);
             wakelock.release();
             wakelock = null;
         }

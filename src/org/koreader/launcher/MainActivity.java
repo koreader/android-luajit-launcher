@@ -37,10 +37,6 @@ public class MainActivity extends android.app.NativeActivity {
     private PowerHelper power;
     private ScreenHelper screen;
 
-    public MainActivity() {
-        super();
-    }
-
     /** Called when the activity is first created. */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +44,7 @@ public class MainActivity extends android.app.NativeActivity {
 
         // set a tag for logging
         TAG = getName();
-        Logger.i(TAG, "Creating main activity");
+        Logger.d(TAG, "App created");
 
         // set a epd controller for eink devices
         epd = EPDFactory.getEPDController(TAG);
@@ -74,7 +70,7 @@ public class MainActivity extends android.app.NativeActivity {
     /** Called when the activity has become visible. */
     @Override
     protected void onResume() {
-        Logger.v(TAG, "App resumed");
+        Logger.d(TAG, "App resumed");
         power.setWakelock(true);
         super.onResume();
         /** switch to fullscreen for older devices */
@@ -92,7 +88,7 @@ public class MainActivity extends android.app.NativeActivity {
     /** Called when another activity is taking focus. */
     @Override
     protected void onPause() {
-        Logger.v(TAG, "App paused");
+        Logger.d(TAG, "App paused");
         power.setWakelock(false);
         super.onPause();
     }
@@ -100,14 +96,14 @@ public class MainActivity extends android.app.NativeActivity {
     /** Called when the activity is no longer visible. */
     @Override
     protected void onStop() {
-        Logger.v(TAG, "App stopped");
+        Logger.d(TAG, "App stopped");
         super.onStop();
     }
 
     /** Called just before the activity is destroyed. */
     @Override
     protected void onDestroy() {
-        Logger.v(TAG, "App destroyed");
+        Logger.d(TAG, "App destroyed");
         clipboard = null;
         power = null;
 	screen = null;
@@ -126,6 +122,19 @@ public class MainActivity extends android.app.NativeActivity {
      *  If you add a new function here remember to write the companion
      *  lua function in that file */
 
+
+    /** build */
+    public int isDebuggable() {
+        return (BuildConfig.DEBUG) ? 1 : 0;
+    }
+
+    public String getFlavor() {
+        return getResources().getString(R.string.app_flavor);
+    }
+
+    public String getName() {
+        return getResources().getString(R.string.app_name);
+    }
 
     /** clipboard */
     public String getClipboardText() {
@@ -147,14 +156,6 @@ public class MainActivity extends android.app.NativeActivity {
 
     public String getVersion() {
         return android.os.Build.VERSION.RELEASE;
-    }
-
-    public String getFlavor() {
-        return getResources().getString(R.string.app_flavor);
-    }
-
-    public String getName() {
-        return getResources().getString(R.string.app_name);
     }
 
     public int isEink() {
@@ -297,7 +298,7 @@ public class MainActivity extends android.app.NativeActivity {
         File file = new File(Environment.getExternalStoragePublicDirectory(
             Environment.DIRECTORY_DOWNLOADS) + "/" + name);
 
-        Logger.v(TAG, file.getAbsolutePath());
+        Logger.d(TAG, file.getAbsolutePath());
         if (file.exists()) return 1;
 
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
