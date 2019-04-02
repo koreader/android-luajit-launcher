@@ -4,7 +4,9 @@ import android.util.Log;
 
 public class Logger {
     public static void d(final String TAG, final String message) {
-        Log.d(TAG, message);
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, message);
+        }
     }
     public static void v(final String TAG, final String message) {
         Log.v(TAG, message);

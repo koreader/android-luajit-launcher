@@ -54,8 +54,6 @@ public class EPDFactory {
 
         if (controllerName != null) {
             Log.i(TAG, String.format("Using %s EPD Controller", controllerName));
-        } else {
-            Log.w(TAG, "Device does not have an eink screen or driver is unsupported");
         }
 
         return epdController;
