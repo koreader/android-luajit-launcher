@@ -33,8 +33,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include "logger.h"
 
+#define  TAG "[main thread]"
+
 #define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR,LOGGER_NAME,__VA_ARGS__)
+#define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO,LOGGER_NAME,__VA_ARGS__)
 #define  LOGV(...)  __android_log_print(ANDROID_LOG_VERBOSE,LOGGER_NAME,__VA_ARGS__)
+
 #define  LOADER_ASSET "android.lua"
 
 
@@ -47,11 +51,11 @@ static void handle_cmd(struct android_app* app, int32_t cmd) {
         case APP_CMD_INIT_WINDOW:
             // The window is being shown, get it ready.
             window_ready = 1;
-            LOGV("App window ready.");
+            LOGV("%s: App window ready.", TAG);
             break;
         case APP_CMD_GAINED_FOCUS:
             gained_focus = 1;
-            LOGV("App gained focus.");
+            LOGV("%s: App gained focus.", TAG);
             break;
     }
 }
@@ -63,9 +67,11 @@ void android_main(struct android_app* state) {
     off_t bufsize;
     int status;
 
+    LOGI("%s: starting %s", TAG, LOGGER_NAME);
+
     // wait until everything is initialized before launching LuaJIT assets
     state->onAppCmd = handle_cmd;
-    LOGV("Waiting for app ready...");
+    LOGV("%s: waiting for app ready...", TAG);
     int events;
     struct android_poll_source* source;
     // we block forever waiting for events.
@@ -83,17 +89,17 @@ void android_main(struct android_app* state) {
         }
     }
 
-    LOGV("Launching LuaJIT assets...");
+    LOGV("%s: launching LuaJIT assets...", TAG);
     luaCode = AAssetManager_open(state->activity->assetManager, LOADER_ASSET, AASSET_MODE_BUFFER);
     if (luaCode == NULL) {
-        LOGE("error loading loader asset");
+        LOGE("%s: error loading loader asset", TAG);
         goto quit;
     }
 
     bufsize = AAsset_getLength(luaCode);
     buf = AAsset_getBuffer(luaCode);
     if (buf == NULL) {
-        LOGE("error getting loader asset buffer");
+        LOGE("%s: error getting loader asset buffer", TAG);
         goto quit;
     }
 
@@ -105,7 +111,7 @@ void android_main(struct android_app* state) {
     status = luaL_loadbuffer(L, (const char*) buf, (size_t) bufsize, LOADER_ASSET);
     AAsset_close(luaCode);
     if (status) {
-        LOGE("error loading file: %s", lua_tostring(L, -1));
+        LOGE("%s: error loading file: %s", TAG, lua_tostring(L, -1));
         goto quit;
     }
 
@@ -114,14 +120,14 @@ void android_main(struct android_app* state) {
 
     status = lua_pcall(L, 1, LUA_MULTRET, 0);
     if (status) {
-        LOGE("Failed to run script: %s", lua_tostring(L, -1));
+        LOGE("%s: failed to run script: %s", TAG, lua_tostring(L, -1));
         goto quit;
     }
 
     lua_close(L);
 
 quit:
-    LOGE("Destroying activity due to previous errors");
+    LOGE("%s: Stopping %s due to previous errors", TAG, LOGGER_NAME);
     ANativeActivity_finish(state->activity);
     exit(1);
 }
