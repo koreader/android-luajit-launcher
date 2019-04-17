@@ -27,7 +27,15 @@ end
 -- the default current directory is root so we should first of all
 -- change current directory to application's data directory
 if chdir(A.dir) then
-    A.LOGI("Change directory to "..currentdir())
+    local msg = "Change directory to assets dir"
+    local cwd = currentdir()
+    if A.dir ~= cwd then
+        -- multi user environment
+        A.LOGI(string.format("%s: %s -> %s", msg, A.dir, cwd))
+    else
+        -- single user environment
+        A.LOGI(string.format("%s: %s", msg, cwd))
+    end
 else
     A.LOGE("Cannot change directory to "..A.dir)
 end
