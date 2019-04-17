@@ -1257,6 +1257,7 @@ local function run(android_app_state)
         end)
     end
 
+    -- device identification
     android.getProduct = function()
         return JNI:context(android.app.activity.vm, function(JNI)
             local product = JNI:callObjectMethod(
@@ -1279,6 +1280,7 @@ local function run(android_app_state)
         end)
     end
 
+    -- build identification
     android.getFlavor = function()
         return JNI:context(android.app.activity.vm, function(JNI)
             local flavor = JNI:callObjectMethod(
@@ -1301,9 +1303,6 @@ local function run(android_app_state)
         end)
     end
 
-    -- update logger name
-    android.log_name = android.getName()
-
     android.isDebuggable = function()
         return JNI:context(android.app.activity.vm, function(JNI)
             return JNI:callIntMethod(
@@ -1314,12 +1313,22 @@ local function run(android_app_state)
         end)
     end
 
-    -- some apk properties
+    -- properties that don't change during the execution of the program.
     android.prop = {}
-    android.prop.appName = android.getName()
-    android.prop.appFlavor = android.getFlavor()
+
+    -- build properties
+    android.prop.name = android.getName()
+    android.prop.flavor = android.getFlavor()
     android.prop.isDebuggable = android.isDebuggable()
 
+    -- device properties
+    android.prop.product = android.getProduct()
+    android.prop.version = android.getVersion()
+
+    -- update logger name
+    android.log_name = android.prop.name
+
+    -- debug logs only if the build is debuggable
     android.DEBUG = function(message)
         if android.prop.isDebuggable then
             android.LOGD(message)
@@ -1349,7 +1358,6 @@ local function run(android_app_state)
     android.screen = {}
     android.screen.width = android.getScreenWidth()
     android.screen.height = android.getScreenHeight()
-    android.LOGV("Screen size "..android.screen.width.."x"..android.screen.height)
 
     android.getScreenBrightness = function()
         return JNI:context(android.app.activity.vm, function(JNI)
@@ -1420,9 +1428,7 @@ local function run(android_app_state)
                 "getAbsolutePath",
                 "()Ljava/lang/String;"
             )
-            dir = JNI:to_string(dir)
-            android.LOGV("external storage " .. dir)
-            return dir
+            return JNI:to_string(dir)
         end)
     end
 
@@ -1738,8 +1744,9 @@ local function run(android_app_state)
         return android.execute(unpack(argv))
     end
 
-    android.LOGI("Application data directory "..android.dir)
-    android.LOGI("Application library directory "..android.nativeLibraryDir)
+    android.LOGI(string.format(
+        "Loading %s using paths {\n  assets:	%s\n  library:	%s\n  storage:	%s\n}\nScreen size: %dx%d",
+        android.prop.name, android.dir, android.nativeLibraryDir, android.externalStorage(), android.screen.width, android.screen.height))
 
     -- register the "android" module (ourself)
     package.loaded.android = android
