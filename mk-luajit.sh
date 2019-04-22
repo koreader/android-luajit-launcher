@@ -10,6 +10,19 @@ DEST=$(cd "$(dirname "$0")" && pwd)/jni/luajit-build/$1
 # might be linux-x86_64 or darwin-x86-64
 HOST_ARCH="*"
 
+# Patch luajit like in koreader-base
+# Script pilfered from patch-wrapper in koreader-base
+PATCH_FILE=koreader-luajit-makefile-tweaks.patch
+
+# Reverse patch will succeed if the patch is already applied.
+# In case of failure, it means we should try to apply the patch.
+if ! patch -R -p1 -N --dry-run <"${PATCH_FILE}" >/dev/null 2>&1; then
+    # Now patch for real.
+    if ! patch -p1 -N <"${PATCH_FILE}"; then
+        exit $?
+    fi
+fi
+
 function check_NDK() {
     [[ -n $NDK ]] || export NDK=/opt/android-ndk
     if [ ! -d "$NDK" ]; then
