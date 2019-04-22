@@ -48,35 +48,35 @@ case "$1" in
         # Android/ARM, armeabi (ARMv5TE soft-float)
         check_NDK
         TCVER=("${NDK}"/toolchains/arm-linux-androideabi-4.*)
-        NDKP=${TCVER[0]}/prebuilt/$HOST_ARCH/bin/arm-linux-androideabi-
-        NDKF="--sysroot $NDK/platforms/android-$NDKABI/arch-arm"
+        NDKP=${TCVER[0]}/prebuilt/${HOST_ARCH}/bin/arm-linux-androideabi-
+        NDKF="--sysroot ${NDK}/platforms/android-${NDKABI}/arch-arm"
         rm -rf "$DEST"
-        make -C luajit-2.0 install HOST_CC="gcc -m32" CROSS="$NDKP" TARGET_FLAGS="$NDKF" TARGET_SYS=Linux DESTDIR="$DEST" PREFIX=
+        make -C luajit-2.0 install HOST_CC="gcc -m32" CFLAGS="-O2 -pipe" HOST_CFLAGS="-O2 -pipe -mtune=generic" LDFLAGS="" HOST_LDFLAGS="" TARGET_CFLAGS="${CFLAGS}" TARGET_LDFLAGS="${LDFLAGS}" CROSS="$NDKP" TARGET_FLAGS="$NDKF" TARGET_SYS=Linux DESTDIR="$DEST" PREFIX=
         ;;
     armeabi-v7a)
         # Android/ARM, armeabi-v7a (ARMv7 VFP)
         check_NDK
         TCVER=("${NDK}"/toolchains/arm-linux-androideabi-4.*)
-        NDKP=${TCVER[0]}/prebuilt/$HOST_ARCH/bin/arm-linux-androideabi-
-        NDKF="--sysroot $NDK/platforms/android-$NDKABI/arch-arm"
+        NDKP=${TCVER[0]}/prebuilt/${HOST_ARCH}/bin/arm-linux-androideabi-
+        NDKF="--sysroot ${NDK}/platforms/android-${NDKABI}/arch-arm"
         NDKARCH="-march=armv7-a -mfloat-abi=softfp -Wl,--fix-cortex-a8"
-        make -C luajit-2.0 install HOST_CC="gcc -m32" CROSS="$NDKP" TARGET_FLAGS="$NDKF $NDKARCH" TARGET_SYS=Linux DESTDIR="$DEST" PREFIX=
+        make -C luajit-2.0 install HOST_CC="gcc -m32" CFLAGS="-O2 -pipe" HOST_CFLAGS="-O2 -pipe -mtune=generic" LDFLAGS="" HOST_LDFLAGS="" TARGET_CFLAGS="${CFLAGS}" TARGET_LDFLAGS="${LDFLAGS}" CROSS="$NDKP" TARGET_FLAGS="${NDKF} ${NDKARCH}" TARGET_SYS=Linux DESTDIR="$DEST" PREFIX=
         ;;
     mips)
         # Android/MIPS, mips (MIPS32R1 hard-float)
         check_NDK
         TCVER=("${NDK}"/toolchains/mipsel-linux-android-4.*)
-        NDKP=${TCVER[0]}/prebuilt/$HOST_ARCH/bin/mipsel-linux-android-
-        NDKF="--sysroot $NDK/platforms/android-$NDKABI/arch-mips"
-        make -C luajit-2.0 install HOST_CC="gcc -m32" CROSS="$NDKP" TARGET_FLAGS="$NDKF" TARGET_SYS=Linux DESTDIR="$DEST" PREFIX=
+        NDKP=${TCVER[0]}/prebuilt/${HOST_ARCH}/bin/mipsel-linux-android-
+        NDKF="--sysroot ${NDK}/platforms/android-${NDKABI}/arch-mips"
+        make -C luajit-2.0 install HOST_CC="gcc -m32" CFLAGS="-O2 -pipe" HOST_CFLAGS="-O2 -pipe -mtune=generic" LDFLAGS="" HOST_LDFLAGS="" TARGET_CFLAGS="${CFLAGS}" TARGET_LDFLAGS="${LDFLAGS}" CROSS="${NDKP}" TARGET_FLAGS="$NDKF" TARGET_SYS=Linux DESTDIR="$DEST" PREFIX=
         ;;
     x86)
         # Android/x86, x86 (i686 SSE3)
         check_NDK
         TCVER=("${NDK}"/toolchains/x86-4.*)
-        NDKP=${TCVER[0]}/prebuilt/$HOST_ARCH/bin/i686-linux-android-
-        NDKF="--sysroot $NDK/platforms/android-$NDKABI/arch-x86"
-        make -C luajit-2.0 install HOST_CC="gcc -m32" CROSS="$NDKP" TARGET_FLAGS="$NDKF" TARGET_SYS=Linux DESTDIR="$DEST" PREFIX=
+        NDKP=${TCVER[0]}/prebuilt/${HOST_ARCH}/bin/i686-linux-android-
+        NDKF="--sysroot ${NDK}/platforms/android-${NDKABI}/arch-x86"
+        make -C luajit-2.0 install HOST_CC="gcc -m32" CFLAGS="-O2 -pipe" HOST_CFLAGS="-O2 -pipe -mtune=generic" LDFLAGS="" HOST_LDFLAGS="" TARGET_CFLAGS="${CFLAGS}" TARGET_LDFLAGS="${LDFLAGS}" CROSS="$NDKP" TARGET_FLAGS="$NDKF" TARGET_SYS=Linux DESTDIR="$DEST" PREFIX=
         ;;
     *)
         echo 'specify one of "armeabi", "armeabi-v7a", "mips", "x86" or "clean" as first argument'
