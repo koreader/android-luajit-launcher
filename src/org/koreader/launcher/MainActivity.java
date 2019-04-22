@@ -12,6 +12,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Toast;
 
@@ -21,7 +23,7 @@ import org.koreader.device.DeviceInfo;
 import org.koreader.device.EPDController;
 import org.koreader.device.EPDFactory;
 
-public class MainActivity extends android.app.NativeActivity {
+public class MainActivity extends android.app.NativeActivity implements SurfaceHolder.Callback2 {
     private final static int SDK_INT = Build.VERSION.SDK_INT;
 
     static {
@@ -36,6 +38,7 @@ public class MainActivity extends android.app.NativeActivity {
     private EPDController epd;
     private PowerHelper power;
     private ScreenHelper screen;
+    private SurfaceView surface;
 
     /** Called when the activity is first created. */
     @Override
@@ -45,6 +48,14 @@ public class MainActivity extends android.app.NativeActivity {
         // set a tag for logging
         TAG = getName();
         Logger.d(TAG, "App created");
+
+        // set the native window as an android surface. Useful in *some* eink devices,
+        // where the epd driver is hooked in the View class framework.
+        getWindow().takeSurface(null);
+        surface = new SurfaceView(this);
+        SurfaceHolder holder = surface.getHolder();
+        holder.addCallback(this);
+        setContentView(surface);
 
         // set a epd controller for eink devices
         epd = EPDFactory.getEPDController(TAG);
@@ -116,6 +127,31 @@ public class MainActivity extends android.app.NativeActivity {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
+    }
+
+    /** Called when a new surface is created */
+    @Override
+    public void surfaceCreated(SurfaceHolder holder) {
+        Logger.d(TAG, "Surface created");
+        super.surfaceCreated(holder);
+        surface.setWillNotDraw(false);
+    }
+
+    /** Called after a surface change */
+    @Override
+    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+        Logger.d(TAG, String.format(
+            "Surface changed {\n  format:	%d\n  width:	%d\n  height:	%d\n}",
+            format, width, height));
+
+        super.surfaceChanged(holder,format,width,height);
+    }
+
+    /** Called when the surface is destroyed */
+    @Override
+    public void surfaceDestroyed(SurfaceHolder holder) {
+        Logger.d(TAG, "Surface destroyed");
+        super.surfaceDestroyed(holder);
     }
 
     /** These functions are exposed to lua in assets/android.lua
