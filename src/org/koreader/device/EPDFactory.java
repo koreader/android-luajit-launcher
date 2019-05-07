@@ -9,6 +9,7 @@ import android.view.View;
 import android.util.Log;
 
 import org.koreader.device.DeviceInfo;
+import org.koreader.device.generic.GenericEPDController;
 import org.koreader.device.rockchip.RK3026EPDController;
 import org.koreader.device.rockchip.RK3066EPDController;
 import org.koreader.device.rockchip.RK3368EPDController;
@@ -19,30 +20,36 @@ public class EPDFactory {
         EPDController epdController = null;
         String controllerName = null;
 
-        switch (DeviceInfo.CURRENT_DEVICE) {
+        switch (DeviceInfo.EPD) {
 
             /** Supported rk3026 devices */
-            case EINK_BOYUE_T61:
-            case EINK_BOYUE_T80S:
-            case EINK_ONYX_C67:
-            case EINK_ENERGY:
-            case EINK_INKBOOK:
+            case BOYUE_T61:
+            case BOYUE_T80S:
+            case ONYX_C67:
+            case ENERGY:
+            case INKBOOK:
                 controllerName = "Rockchip RK3026";
                 epdController = new RK3026EPDController();
                 break;
 
             /** supported rk3066 devices */
-            case EINK_BOYUE_T62:
+            case BOYUE_T62:
                 controllerName = "Rockchip RK3066";
                 epdController = new RK3066EPDController();
                 break;
 
             /** supported rk3368 devices */
-            case EINK_BOYUE_T80D:
-            case EINK_BOYUE_T78D:
-            case EINK_BOYUE_T103D:
+            case BOYUE_T80D:
+            case BOYUE_T78D:
+            case BOYUE_T103D:
                 controllerName = "Rockchip RK3368";
                 epdController = new RK3368EPDController();
+                break;
+
+            /** fallback method: invalidating the view */
+            case GENERIC:
+                controllerName = "Generic Android surface";
+                epdController = new GenericEPDController();
                 break;
 
             /** unsupported devices */

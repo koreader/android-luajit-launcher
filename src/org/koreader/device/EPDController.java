@@ -9,5 +9,5 @@ import android.view.View;
 
 
 public interface EPDController {
-    void setEpdMode(View targetView, String epdMode);
+    void setEpdMode(View targetView, String epdMode, long delay, int x, int y, int width, int height, int mode);
 }
