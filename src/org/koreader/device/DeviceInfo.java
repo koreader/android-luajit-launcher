@@ -13,7 +13,9 @@ import java.util.Iterator;
 public class DeviceInfo {
 
     public enum Device {
+        // unkown devices
         UNKNOWN,
+        // devices with supported driver
         EINK_BOYUE_T61,
         EINK_BOYUE_T62,
         EINK_BOYUE_T80S,
@@ -23,6 +25,10 @@ public class DeviceInfo {
         EINK_ONYX_C67,
         EINK_ENERGY,
         EINK_INKBOOK,
+        // devices using a generic workaround
+        EINK_SONY_RP1,
+        EINK_NOOK_V520,
+        EINK_EMULATOR_X86,
     }
 
     public final static int EPD_FULL = 1;
@@ -45,6 +51,10 @@ public class DeviceInfo {
     public static final boolean EINK_ONYX_C67;
     public static final boolean EINK_ENERGY;
     public static final boolean EINK_INKBOOK;
+    public static final boolean EINK_SONY_RP1;
+    public static final boolean EINK_NOOK_V520;
+    public static final boolean EINK_EMULATOR_X86;
+    public static final boolean EINK_GENERIC;
 
     public static final boolean IS_EINK_SUPPORTED;
     public static Device CURRENT_DEVICE = Device.UNKNOWN;
@@ -107,8 +117,29 @@ public class DeviceInfo {
                 && MODEL.toLowerCase().startsWith("prime");
         deviceMap.put(Device.EINK_INKBOOK, EINK_INKBOOK);
 
+        // Sony DPT-RP1
+        EINK_SONY_RP1 = MANUFACTURER.toLowerCase().contentEquals("sony")
+                && MODEL.toLowerCase().contentEquals("dpt-rp1");
+        deviceMap.put(Device.EINK_SONY_RP1, EINK_SONY_RP1);
+
+        // Nook Glowlight 3
+        EINK_NOOK_V520 = MANUFACTURER.toLowerCase().contentEquals("barnes and noble")
+                && MODEL.toLowerCase().contentEquals("bnrv520");
+        deviceMap.put(Device.EINK_NOOK_V520, EINK_NOOK_V520);
+
+        // Android Emulator for x86
+        EINK_EMULATOR_X86 = MODEL.contentEquals("Android SDK built for x86");
+        deviceMap.put(Device.EINK_EMULATOR_X86, EINK_EMULATOR_X86);
+
         // add your eink device here...
 
+
+        // true if we use a generic workaround
+        EINK_GENERIC = (
+            EINK_SONY_RP1 ||
+            EINK_NOOK_V520 ||
+            EINK_EMULATOR_X86
+        );
 
         // true if we found a supported device
         IS_EINK_SUPPORTED = (
@@ -119,7 +150,8 @@ public class DeviceInfo {
             EINK_BOYUE_T103D ||
             EINK_ENERGY ||
             EINK_INKBOOK ||
-            EINK_ONYX_C67
+            EINK_ONYX_C67 ||
+            EINK_GENERIC
         );
 
         // find current device.
