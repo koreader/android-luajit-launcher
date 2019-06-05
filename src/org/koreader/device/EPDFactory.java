@@ -6,7 +6,6 @@
 package org.koreader.device;
 
 import android.view.View;
-import android.view.SurfaceView;
 import android.util.Log;
 
 import org.koreader.device.rockchip.RK3026EPDController;
