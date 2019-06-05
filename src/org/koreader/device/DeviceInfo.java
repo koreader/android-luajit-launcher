@@ -123,7 +123,7 @@ public class DeviceInfo {
         deviceMap.put(Device.EINK_SONY_RP1, EINK_SONY_RP1);
 
         // Nook Glowlight 3
-        EINK_NOOK_V520 = MANUFACTURER.toLowerCase().contentEquals("barnes and noble")
+        EINK_NOOK_V520 = MANUFACTURER.toLowerCase().contentEquals("barnesandnoble")
                 && MODEL.toLowerCase().contentEquals("bnrv520");
         deviceMap.put(Device.EINK_NOOK_V520, EINK_NOOK_V520);
 
