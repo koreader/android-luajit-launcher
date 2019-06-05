@@ -6,6 +6,7 @@
 package org.koreader.device;
 
 import android.view.View;
+import android.view.SurfaceView;
 import android.util.Log;
 
 import org.koreader.device.rockchip.RK3026EPDController;
@@ -74,7 +75,7 @@ public class EPDFactory {
         public void setEpdMode(View targetView, String epdMode) {
             /** just invalidate current view */
             try {
-                Class.forName("android.view.View").getMethod("postInvalidate",
+                Class.forName("android.view.SurfaceView").getMethod("postInvalidate",
                     new Class[]{}).invoke(targetView, new Object[]{});
                 Log.i("epd", "root view invalidated");
             } catch (Exception e) {

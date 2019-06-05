@@ -200,7 +200,7 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
 
     public void einkUpdate(int mode) {
         String mode_name = "invalid mode";
-        final View root_view = getWindow().getDecorView().findViewById(android.R.id.content);
+        //final View root_view = getWindow().getDecorView().findViewById(android.R.id.content);
 
         if (mode == device.EPD_FULL) {
             mode_name = "EPD_FULL";
@@ -215,7 +215,7 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
             return;
         }
         Logger.v(TAG, String.format("requesting eink refresh, type: %s", mode_name));
-        epd.setEpdMode(root_view, mode_name);
+        epd.setEpdMode(surface, mode_name);
     }
 
     /** native dialogs and widgets run on UI Thread */
