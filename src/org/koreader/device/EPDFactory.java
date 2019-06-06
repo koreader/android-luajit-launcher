@@ -23,33 +23,33 @@ public class EPDFactory {
         switch (DeviceInfo.CURRENT_DEVICE) {
 
             /** Supported rk3026 devices */
-            case EINK_BOYUE_T61:
-            case EINK_BOYUE_T80S:
-            case EINK_ONYX_C67:
-            case EINK_ENERGY:
-            case EINK_INKBOOK:
+            case BOYUE_T61:
+            case BOYUE_T80S:
+            case ONYX_C67:
+            case ENERGY:
+            case INKBOOK:
                 controllerName = "Rockchip RK3026";
                 epdController = new RK3026EPDController();
                 break;
 
             /** supported rk3066 devices */
-            case EINK_BOYUE_T62:
+            case BOYUE_T62:
                 controllerName = "Rockchip RK3066";
                 epdController = new RK3066EPDController();
                 break;
 
             /** supported rk3368 devices */
-            case EINK_BOYUE_T80D:
-            case EINK_BOYUE_T78D:
-            case EINK_BOYUE_T103D:
+            case BOYUE_T80D:
+            case BOYUE_T78D:
+            case BOYUE_T103D:
                 controllerName = "Rockchip RK3368";
                 epdController = new RK3368EPDController();
                 break;
 
             /** devices using generic view methods */
-            case EINK_SONY_RP1:
-            case EINK_NOOK_V520:
-            case EINK_EMULATOR_X86:
+            case SONY_RP1:
+            case NOOK_V520:
+            case EMULATOR_X86:
                 controllerName = "generic android surface";
                 epdController = new GenericEPDController();
                 break;
