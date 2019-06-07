@@ -1,6 +1,6 @@
 /**
- * This file was created by unw on 15. 3. 31 as part of
- * https://github.com/unwmun/refreshU
+ * generic EPD Controller for Android devices,
+ * based on https://github.com/unwmun/refreshU
  */
 
 package org.koreader.device;
@@ -25,6 +25,7 @@ public class DeviceInfo {
         ONYX_C67,
         ENERGY,
         INKBOOK,
+        TOLINO,
         // devices using a generic workaround
         SONY_RP1,
         NOOK_V520,
@@ -51,12 +52,14 @@ public class DeviceInfo {
     public static final boolean EINK_ONYX_C67;
     public static final boolean EINK_ENERGY;
     public static final boolean EINK_INKBOOK;
+    public static final boolean EINK_TOLINO;
     public static final boolean EINK_SONY_RP1;
     public static final boolean EINK_NOOK_V520;
     public static final boolean EINK_EMULATOR_X86;
     public static final boolean EINK_GENERIC;
 
-    public static final boolean IS_EINK_SUPPORTED;
+    public static final boolean EINK_SUPPORT;
+    public static final boolean EINK_FULL_SUPPORT;
     public static Device CURRENT_DEVICE = Device.UNKNOWN;
 
     static {
@@ -117,6 +120,12 @@ public class DeviceInfo {
                 && MODEL.toLowerCase().startsWith("prime");
         deviceMap.put(Device.INKBOOK, EINK_INKBOOK);
 
+        // Tolino Vision 2 and maybe others?
+        EINK_TOLINO = (BRAND.toLowerCase().contentEquals("tolino") && (MODEL.toLowerCase().contentEquals("imx50_rdp")))
+                || (MODEL.toLowerCase().contentEquals("tolino")
+                && (DEVICE.toLowerCase().contentEquals("tolino_vision2") || DEVICE.toLowerCase().contentEquals("ntx_6sl")));
+        deviceMap.put(Device.TOLINO, EINK_TOLINO);
+
         // Sony DPT-RP1
         EINK_SONY_RP1 = MANUFACTURER.toLowerCase().contentEquals("sony")
                 && MODEL.toLowerCase().contentEquals("dpt-rp1");
@@ -142,7 +151,7 @@ public class DeviceInfo {
         );
 
         // true if we found a supported device
-        IS_EINK_SUPPORTED = (
+        EINK_SUPPORT = (
             EINK_BOYUE_T61 ||
             EINK_BOYUE_T62 ||
             EINK_BOYUE_T78D ||
@@ -151,7 +160,13 @@ public class DeviceInfo {
             EINK_ENERGY ||
             EINK_INKBOOK ||
             EINK_ONYX_C67 ||
+            EINK_TOLINO ||
             EINK_GENERIC
+        );
+
+        // true if we have full eink control over android
+        EINK_FULL_SUPPORT = (
+            EINK_TOLINO
         );
 
         // find current device.

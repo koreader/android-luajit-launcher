@@ -1,16 +1,16 @@
 /**
- * This file was created by unw on 15. 3. 31 as part of
- * https://github.com/unwmun/refreshU
+ * generic EPD Controller for Android devices,
+ * based on https://github.com/unwmun/refreshU
  */
 
 package org.koreader.device;
 
-import android.view.View;
-import android.util.Log;
-
 import org.koreader.device.rockchip.RK3026EPDController;
 import org.koreader.device.rockchip.RK3066EPDController;
 import org.koreader.device.rockchip.RK3368EPDController;
+import org.koreader.device.freescale.TolinoNewEPDController;
+
+import android.util.Log;
 
 
 @SuppressWarnings("unused")
@@ -46,6 +46,12 @@ public class EPDFactory {
                 epdController = new RK3368EPDController();
                 break;
 
+            /** devices using imx/ntx platform */
+            case TOLINO:
+                controllerName = "Tolino/ntx6sl";
+                epdController = new TolinoNewEPDController();
+                break;
+
             /** devices using generic view methods */
             case SONY_RP1:
             case NOOK_V520:
@@ -71,10 +77,10 @@ public class EPDFactory {
 
     private static class GenericEPDController implements EPDController {
         @Override
-        public void setEpdMode(View targetView, String epdMode) {
+        public void setEpdMode(android.view.View targetView, int mode, long delay, int x, int y, int width, int height, String epdMode) {
             /** just invalidate current view */
             try {
-                Class.forName("android.view.SurfaceView").getMethod("postInvalidate",
+                Class.forName("android.view.View").getMethod("postInvalidate",
                     new Class[]{}).invoke(targetView, new Object[]{});
                 Log.i("epd", "root view invalidated");
             } catch (Exception e) {
@@ -85,7 +91,7 @@ public class EPDFactory {
 
     private static class FakeEPDController implements EPDController {
         @Override
-        public void setEpdMode(View targetView, String epdMode) {
+        public void setEpdMode(android.view.View targetView, int mode, long delay, int x, int y, int width, int height, String epdMode) {
             /** do nothing */
         }
     }
