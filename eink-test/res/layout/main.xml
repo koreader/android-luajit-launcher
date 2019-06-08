@@ -82,5 +82,23 @@
             android:layout_height="wrap_content"
             android:text="rk33xx normal update"
             android:textSize="28sp" />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="12dp" />
+
+        <TextView
+            android:id="@+id/ntxTolinoText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:textSize="22sp" />
+
+        <Button
+            android:id="@+id/ntxTolinoButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="ntx/tolino update"
+            android:textSize="28sp" />
     </LinearLayout>
 </ScrollView>
