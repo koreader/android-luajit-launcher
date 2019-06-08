@@ -1,18 +1,19 @@
 package org.koreader.test.eink;
 
+import android.content.Intent;
+import android.graphics.Point;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 
 public class MainActivity extends android.app.Activity {
-    private static final String TAG = "eink-test";
 
-    private static final int RK30xxNORMAL = 1;
-    private static final int RK30xxFORCED = 2;
-    private static final int RK33xxNORMAL = 3;
-    private static final int FAKE = 999;
+    private static final int RK30xx = 1;
+    private static final int RK33xx = 2;
+    private static final int NTX_NEW= 3;
 
     private static final String MANUFACTURER = android.os.Build.MANUFACTURER;
     private static final String BRAND = android.os.Build.BRAND;
@@ -20,91 +21,113 @@ public class MainActivity extends android.app.Activity {
     private static final String PRODUCT = android.os.Build.PRODUCT;
     private static final String HARDWARE = android.os.Build.HARDWARE;
 
+    private StringBuilder info;
+
     @Override
     public void onCreate(android.os.Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
-        TextView overview = (TextView) findViewById(R.id.overview);
-        TextView fakeDesc = (TextView) findViewById(R.id.fakeText);
+        info = new StringBuilder();
+
+        TextView readmeReport = (TextView) findViewById(R.id.readmeReport);
         TextView rk30xx_description = (TextView) findViewById(R.id.rk30xxText);
         TextView rk33xx_description = (TextView) findViewById(R.id.rk33xxText);
+        TextView ntx_new_description = (TextView) findViewById(R.id.ntxNewText);
 
-        Button fake_button = (Button) findViewById(R.id.fakeButton);
-        Button rk30xx_normal_button = (Button) findViewById(R.id.rk30xxNormalButton);
-        Button rk30xx_forced_button = (Button) findViewById(R.id.rk30xxForcedButton);
-        Button rk33xx_normal_button = (Button) findViewById(R.id.rk33xxNormalButton);
+        Button rk30xx_button = (Button) findViewById(R.id.rk30xxButton);
+        Button rk33xx_button = (Button) findViewById(R.id.rk33xxButton);
+        Button ntx_new_button = (Button) findViewById(R.id.ntxNewButton);
+        Button share_button = (Button) findViewById(R.id.shareButton);
 
-        /** current device overview */
-        overview.setText("Manufacturer: " + MANUFACTURER);
-        overview.append("\n Brand: " + BRAND);
-        overview.append("\n Model: " + MODEL);
-        overview.append("\n Product: " + PRODUCT);
-        overview.append("\n Hardware: " + HARDWARE);
-        overview.append("\n Platform: " + getBuildProperty("ro.board.platform"));
+        /** current device info */
+        info.append("Manufacturer: " + MANUFACTURER + "\n");
+        info.append("Brand: " + BRAND + "\n");
+        info.append("Model: " + MODEL + "\n");
+        info.append("Product: " + PRODUCT + "\n");
+        info.append("Hardware: " + HARDWARE + "\n");
 
-        /** fake eink */
-        fakeDesc.setText("This button does nothing! It's just an example of an empty action. ");
-        fakeDesc.append("If you don't see any difference between fake and real tests, your device ");
-        fakeDesc.append("is not supported by any implemented epd controller.");
+        /** add platform if available */
+        String platform = getBuildProperty("ro.board.platform");
+        if (!("".equals(platform) && (platform == null))) {
+            info.append("Platform: " + platform + "\n");
+        }
 
-        fake_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                runEinkTest(FAKE);
-            }
-        });
+        readmeReport.setText("Did they work? Cool");
+        readmeReport.append("\n Go to github.com/koreader/koreader/issues/4551");
+        readmeReport.append(" and share your device information with us and which button did work for you");
 
         /** rockchip rk30xx */
-        rk30xx_description.setText("These buttons should invoke a full refresh of rockchip rk30xx devices. ");
-        rk30xx_description.append("Both normal and forced modes should work.");
+        rk30xx_description.setText("This button should invoke a full refresh of Boyue T61/T62 clones.");
 
-        rk30xx_normal_button.setOnClickListener(new View.OnClickListener() {
+        rk30xx_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                runEinkTest(RK30xxNORMAL);
-            }
-        });
-        rk30xx_forced_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                runEinkTest(RK30xxFORCED);
+                runEinkTest(RK30xx);
             }
         });
 
         /** rockchip rk33xx */
         rk33xx_description.setText("This button should work on boyue rk3368 clones.");
 
-        rk33xx_normal_button.setOnClickListener(new View.OnClickListener() {
+        rk33xx_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                runEinkTest(RK33xxNORMAL);
+                runEinkTest(RK33xx);
             }
         });
 
+        /** freescale/ntx - Newer Tolino/Nook devices */
+        ntx_new_description.setText("This button should work on modern Tolinos/Nooks and other ntx boards");
 
+        ntx_new_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                runEinkTest(NTX_NEW);
+            }
+        });
+
+        /** share button */
+        share_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                shareText(info.toString());
+            }
+        });
     }
 
     private void runEinkTest(int test) {
+        info.append(String.format("run test #%d -> ", test));
         try {
             View v = getWindow().getDecorView().findViewById(android.R.id.content);
-	    if (test == RK30xxNORMAL) {
-	        Log.i(TAG, "rockchip normal update");
-	        RK30xxEPDController.requestEpdMode(v, "EPD_FULL");
-            } else if (test == RK30xxFORCED) {
-	        Log.i(TAG, "rockchip forced update");
+	    if (test == RK30xx) {
+	        info.append("rk30xx\n");
+                // force a flashing black->white update
 	        RK30xxEPDController.requestEpdMode(v, "EPD_FULL", true);
-            } else if (test == RK33xxNORMAL) {
-                Log.i(TAG, "rockchip 33xx normal update");
+            } else if (test == RK33xx) {
+                info.append("rk33xx\n");
                 RK33xxEPDController.requestEpdMode("EPD_FULL");
-            } else if (test == FAKE) {
-                Log.i(TAG, "fake update");
+            } else if (test == NTX_NEW) {
+                // get screen width and height
+                Display display = getWindowManager().getDefaultDisplay();
+                Point size = new Point();
+                display.getSize(size);
+                int width = size.x;
+                int height = size.y;
+                info.append("tolino\n");
+                NTXEPDController.requestEpdMode(v, 34, 50, 0, 0, width, height);
             } else {
-                Log.e(TAG, "invalid test");
+                info.append("error: invalid test\n");
             }
         } catch (Exception e) {
-            Log.e(TAG, e.toString());
         }
+    }
+
+    private void shareText(String text) {
+        Intent i = new Intent(Intent.ACTION_SEND);
+        i.putExtra(Intent.EXTRA_TEXT, text);
+        i.setType("text/plain");
+        startActivity(Intent.createChooser(i, "einkTest results"));
     }
 
     private String getBuildProperty(String key) {
@@ -112,8 +135,8 @@ public class MainActivity extends android.app.Activity {
         try {
             value = (String) Class.forName("android.os.SystemProperties").getMethod(
                 "get", String.class).invoke(null, key);
+            if (value.length() < 2) value = "unknown";
         } catch (Exception e) {
-            Log.e(TAG, e.toString());
             value = "unknown";
         }
         return value;
