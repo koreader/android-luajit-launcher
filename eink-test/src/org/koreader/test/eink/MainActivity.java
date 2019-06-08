@@ -116,7 +116,7 @@ public class MainActivity extends android.app.Activity {
                 display.getSize(size);
                 int width = size.x;
                 int height = size.y;
-                Log.i(TAG, "freescale (EGL) full screen update");
+                Log.i(TAG, String.format("freescale (EGL) update_full [0,0,%d,%d]", width, height));
                 NTXEPDController.requestEpdMode(v, 34, 50, 0, 0, width, height);
             } else if (test == FAKE) {
                 Log.i(TAG, "fake update");
