@@ -119,6 +119,7 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         power = null;
 	screen = null;
         epd = null;
+        surface = null;
         super.onDestroy();
     }
 
@@ -195,12 +196,17 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
     }
 
     public int isEink() {
-        return (device.IS_EINK_SUPPORTED) ? 1 : 0;
+        return (device.EINK_SUPPORT) ? 1 : 0;
     }
 
+    public int isEinkFull() {
+        return (device.EINK_FULL_SUPPORT) ? 1 : 0;
+    }
+
+
+    /** Used on Rockchip devices */
     public void einkUpdate(int mode) {
         String mode_name = "invalid mode";
-        final View root_view = getWindow().getDecorView().findViewById(android.R.id.content);
 
         if (mode == device.EPD_FULL) {
             mode_name = "EPD_FULL";
@@ -214,8 +220,15 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
             Logger.e(TAG, String.format("%s: %d", mode_name, mode));
             return;
         }
-        Logger.v(TAG, String.format("requesting eink refresh, type: %s", mode_name));
-        epd.setEpdMode(root_view, mode_name);
+        Logger.v(TAG, String.format("requesting epd update, type: %s", mode_name));
+        epd.setEpdMode(surface, 0, 0, 0, 0, 0, 0, mode_name);
+    }
+
+    /** Used on Freescale imx devices */
+    public void einkUpdate(int mode, long delay, int x, int y, int width, int height) {
+        Logger.v(TAG, String.format("requesting epd update, mode:%d, delay:%d, [x:%d, y:%d, w:%d, h:%d]",
+            mode, delay, x, y, width, height));
+        epd.setEpdMode(surface, mode, delay, x, y, width, height, null);
     }
 
     /** native dialogs and widgets run on UI Thread */

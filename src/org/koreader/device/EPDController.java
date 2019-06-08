@@ -1,13 +1,10 @@
 /**
- * This file was created by unw on 15. 3. 31 as part of
- * https://github.com/unwmun/refreshU
+ * generic EPD Controller for Android devices,
+ * based on https://github.com/unwmun/refreshU
  */
 
 package org.koreader.device;
 
-import android.view.View;
-
-
 public interface EPDController {
-    void setEpdMode(View targetView, String epdMode);
+    void setEpdMode(android.view.View targetView, int mode, long delay, int x, int y, int width, int height, String epdMode);
 }

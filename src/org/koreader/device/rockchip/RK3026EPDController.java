@@ -1,14 +1,15 @@
+/**
+ * generic EPD Controller for Android devices,
+ * based on https://github.com/unwmun/refreshU
+ */
+
 package org.koreader.device.rockchip;
 
-import android.view.View;
 
-import org.koreader.device.EPDController;
-
-
-public class RK3026EPDController extends RK30xxEPDController implements EPDController
-{
+@SuppressWarnings("unused")
+public class RK3026EPDController extends RK30xxEPDController implements org.koreader.device.EPDController {
     @Override
-    public void setEpdMode(View targetView, String epdMode) {
+    public void setEpdMode(android.view.View targetView, int mode, long delay, int x, int y, int width, int height, String epdMode) {
         requestEpdMode(targetView, epdMode, true);
     }
 }

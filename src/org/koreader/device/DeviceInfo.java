@@ -1,6 +1,6 @@
 /**
- * This file was created by unw on 15. 3. 31 as part of
- * https://github.com/unwmun/refreshU
+ * generic EPD Controller for Android devices,
+ * based on https://github.com/unwmun/refreshU
  */
 
 package org.koreader.device;
@@ -14,15 +14,17 @@ public class DeviceInfo {
 
     public enum Device {
         UNKNOWN,
-        EINK_BOYUE_T61,
-        EINK_BOYUE_T62,
-        EINK_BOYUE_T80S,
-        EINK_BOYUE_T80D,
-        EINK_BOYUE_T78D,
-        EINK_BOYUE_T103D,
-        EINK_ONYX_C67,
-        EINK_ENERGY,
-        EINK_INKBOOK,
+        BOYUE_T61,
+        BOYUE_T62,
+        BOYUE_T80S,
+        BOYUE_T80D,
+        BOYUE_T78D,
+        BOYUE_T103D,
+        ONYX_C67,
+        ENERGY,
+        INKBOOK,
+        TOLINO,
+        NOOK_V520,
     }
 
     public final static int EPD_FULL = 1;
@@ -45,8 +47,11 @@ public class DeviceInfo {
     public static final boolean EINK_ONYX_C67;
     public static final boolean EINK_ENERGY;
     public static final boolean EINK_INKBOOK;
+    public static final boolean EINK_TOLINO;
+    public static final boolean EINK_NOOK_V520;
 
-    public static final boolean IS_EINK_SUPPORTED;
+    public static final boolean EINK_SUPPORT;
+    public static final boolean EINK_FULL_SUPPORT;
     public static Device CURRENT_DEVICE = Device.UNKNOWN;
 
     static {
@@ -62,56 +67,66 @@ public class DeviceInfo {
         EINK_BOYUE_T62 = ( MANUFACTURER.toLowerCase().contentEquals("boeye") || MANUFACTURER.toLowerCase().contentEquals("boyue") )
                 && (PRODUCT.toLowerCase().startsWith("t62") || MODEL.contentEquals("rk30sdk"))
                 && DEVICE.toLowerCase().startsWith("t62");
-        deviceMap.put(Device.EINK_BOYUE_T62, EINK_BOYUE_T62);
+        deviceMap.put(Device.BOYUE_T62, EINK_BOYUE_T62);
 
         // Boyue T61, uses RK3066 chipset
         EINK_BOYUE_T61 = ( MANUFACTURER.toLowerCase().contentEquals("boeye") || MANUFACTURER.toLowerCase().contentEquals("boyue") )
                 && ( PRODUCT.toLowerCase().startsWith("t61") || MODEL.contentEquals("rk30sdk") )
                 && DEVICE.toLowerCase().startsWith("t61");
-        deviceMap.put(Device.EINK_BOYUE_T61, EINK_BOYUE_T61);
+        deviceMap.put(Device.BOYUE_T61, EINK_BOYUE_T61);
 
         // Boyue Likebook Plus
         EINK_BOYUE_T80S = (MANUFACTURER.toLowerCase().contentEquals("boeye") || MANUFACTURER.toLowerCase().contentEquals("boyue"))
                 && PRODUCT.toLowerCase().contentEquals("t80s");
-        deviceMap.put(Device.EINK_BOYUE_T80S, EINK_BOYUE_T80S);
+        deviceMap.put(Device.BOYUE_T80S, EINK_BOYUE_T80S);
 
         // Boyue Likebook Mars
         EINK_BOYUE_T80D = (MANUFACTURER.toLowerCase().contentEquals("boeye") || MANUFACTURER.toLowerCase().contentEquals("boyue"))
                 && PRODUCT.toLowerCase().contentEquals("t80d");
-        deviceMap.put(Device.EINK_BOYUE_T80D, EINK_BOYUE_T80D);
+        deviceMap.put(Device.BOYUE_T80D, EINK_BOYUE_T80D);
 
         // Boyue Likebook Muses
         EINK_BOYUE_T78D = (MANUFACTURER.toLowerCase().contentEquals("boeye") || MANUFACTURER.toLowerCase().contentEquals("boyue"))
                 && PRODUCT.toLowerCase().contentEquals("t78d");
-        deviceMap.put(Device.EINK_BOYUE_T78D, EINK_BOYUE_T78D);
+        deviceMap.put(Device.BOYUE_T78D, EINK_BOYUE_T78D);
 
         // Boyue Likebook Mimas
         EINK_BOYUE_T103D = (MANUFACTURER.toLowerCase().contentEquals("boeye") || MANUFACTURER.toLowerCase().contentEquals("boyue"))
                 && PRODUCT.toLowerCase().contentEquals("t103d");
-        deviceMap.put(Device.EINK_BOYUE_T103D, EINK_BOYUE_T103D);
+        deviceMap.put(Device.BOYUE_T103D, EINK_BOYUE_T103D);
 
         // Onyx C67
         EINK_ONYX_C67 = MANUFACTURER.toLowerCase().contentEquals("onyx")
                 && ( PRODUCT.toLowerCase().startsWith("c67") || MODEL.contentEquals("rk30sdk") )
                 && DEVICE.toLowerCase().startsWith("c67");
-        deviceMap.put(Device.EINK_ONYX_C67, EINK_ONYX_C67);
+        deviceMap.put(Device.ONYX_C67, EINK_ONYX_C67);
 
         // Energy Sistem eReaders. Tested on Energy Ereader Pro 4
         EINK_ENERGY = (BRAND.toLowerCase().contentEquals("energysistem") || BRAND.toLowerCase().contentEquals("energy_sistem"))
                 && MODEL.toLowerCase().startsWith("ereader");
-        deviceMap.put(Device.EINK_ENERGY, EINK_ENERGY);
+        deviceMap.put(Device.ENERGY, EINK_ENERGY);
 
         // Artatech Inkbook Prime/Prime HD.
         EINK_INKBOOK = MANUFACTURER.toLowerCase().contentEquals("artatech")
                 && BRAND.toLowerCase().contentEquals("inkbook")
                 && MODEL.toLowerCase().startsWith("prime");
-        deviceMap.put(Device.EINK_INKBOOK, EINK_INKBOOK);
+        deviceMap.put(Device.INKBOOK, EINK_INKBOOK);
+
+        // Tolino
+        EINK_TOLINO = (BRAND.toLowerCase().contentEquals("tolino") && (MODEL.toLowerCase().contentEquals("imx50_rdp")))
+                || (MODEL.toLowerCase().contentEquals("tolino")
+                && (DEVICE.toLowerCase().contentEquals("tolino_vision2") || DEVICE.toLowerCase().contentEquals("ntx_6sl")));
+        deviceMap.put(Device.TOLINO, EINK_TOLINO);
+
+        // Nook Glowlight 3
+        EINK_NOOK_V520 = MANUFACTURER.toLowerCase().contentEquals("barnesandnoble")
+                && MODEL.toLowerCase().contentEquals("bnrv520");
+        deviceMap.put(Device.NOOK_V520, EINK_NOOK_V520);
 
         // add your eink device here...
 
-
         // true if we found a supported device
-        IS_EINK_SUPPORTED = (
+        EINK_SUPPORT = (
             EINK_BOYUE_T61 ||
             EINK_BOYUE_T62 ||
             EINK_BOYUE_T78D ||
@@ -119,7 +134,15 @@ public class DeviceInfo {
             EINK_BOYUE_T103D ||
             EINK_ENERGY ||
             EINK_INKBOOK ||
-            EINK_ONYX_C67
+            EINK_ONYX_C67 ||
+            EINK_TOLINO ||
+            EINK_NOOK_V520
+        );
+
+        // true if we have full eink control over android
+        EINK_FULL_SUPPORT = (
+            EINK_TOLINO ||
+            EINK_NOOK_V520
         );
 
         // find current device.

@@ -1492,6 +1492,16 @@ local function run(android_app_state)
         end)
     end
 
+    android.isEinkFull = function()
+        return JNI:context(android.app.activity.vm, function(JNI)
+            return JNI:callIntMethod(
+                android.app.activity.clazz,
+                "isEinkFull",
+                "()I"
+            ) == 1
+        end)
+    end
+
     android.einkUpdate = function(mode)
         JNI:context(android.app.activity.vm, function(JNI)
             JNI:callVoidMethod(
@@ -1501,6 +1511,35 @@ local function run(android_app_state)
                 ffi.new("int32_t", mode)
             )
         end)
+    end
+
+    android.einkUpdate = function(mode, delay, x, y, w, h)
+        if not (delay and x and y and w and h) then
+            -- basic support, only fullscreen refreshes
+            JNI:context(android.app.activity.vm, function(JNI)
+                JNI:callVoidMethod(
+                    android.app.activity.clazz,
+                    "einkUpdate",
+                    "(I)V",
+                    ffi.new("int32_t", mode)
+                )
+            end)
+        else
+            -- full support
+            JNI:context(android.app.activity.vm, function(JNI)
+                JNI:callVoidMethod(
+                    android.app.activity.clazz,
+                    "einkUpdate",
+                    "(IJIIII)V",
+                    ffi.new("int32_t", mode),
+                    ffi.new("int64_t", delay),
+                    ffi.new("int32_t", x),
+                    ffi.new("int32_t", y),
+                    ffi.new("int32_t", w),
+                    ffi.new("int32_t", h)
+                )
+            end)
+        end
     end
 
     android.setWakeLock = function(enabled)
