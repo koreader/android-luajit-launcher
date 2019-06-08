@@ -1,7 +1,8 @@
 /**
- * minimal rk33xx interface for boyue mimas and maybe others,
- * based on https://github.com/koreader/koreader/issues/4595
+ * generic EPD Controller for Android devices
  *
+ * interface for boyue mimas and maybe others,
+ * based on https://github.com/koreader/koreader/issues/4595
  */
 
 package org.koreader.device.rockchip;
