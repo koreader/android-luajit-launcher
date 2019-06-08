@@ -21,16 +21,16 @@ public class MainActivity extends android.app.Activity {
     private static final String PRODUCT = android.os.Build.PRODUCT;
     private static final String HARDWARE = android.os.Build.HARDWARE;
 
-    private StringBuilder info;
+    private TextView info;
 
     @Override
     public void onCreate(android.os.Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
-        info = new StringBuilder();
-
+        info = (TextView) findViewById(R.id.info);
         TextView readmeReport = (TextView) findViewById(R.id.readmeReport);
+
         TextView rk30xx_description = (TextView) findViewById(R.id.rk30xxText);
         TextView rk33xx_description = (TextView) findViewById(R.id.rk33xxText);
         TextView ntx_new_description = (TextView) findViewById(R.id.ntxNewText);
@@ -53,9 +53,9 @@ public class MainActivity extends android.app.Activity {
             info.append("Platform: " + platform + "\n");
         }
 
-        readmeReport.setText("Did they work? Cool");
-        readmeReport.append("\n Go to github.com/koreader/koreader/issues/4551");
-        readmeReport.append(" and share your device information with us and which button did work for you");
+        readmeReport.setText("Did you see a flashing black to white eink update? Cool\n\n");
+        readmeReport.append("Go to github.com/koreader/koreader/issues/4551 ");
+        readmeReport.append("and share the following information with us");
 
         /** rockchip rk30xx */
         rk30xx_description.setText("This button should invoke a full refresh of Boyue T61/T62 clones.");
@@ -91,22 +91,27 @@ public class MainActivity extends android.app.Activity {
         share_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                shareText(info.toString());
+                shareText(info.getText().toString());
             }
         });
     }
 
     private void runEinkTest(int test) {
+        boolean success = false;
         info.append(String.format("run test #%d -> ", test));
         try {
             View v = getWindow().getDecorView().findViewById(android.R.id.content);
 	    if (test == RK30xx) {
-	        info.append("rk30xx\n");
+	        info.append("rk30xx: ");
                 // force a flashing black->white update
-	        RK30xxEPDController.requestEpdMode(v, "EPD_FULL", true);
+	        if (RK30xxEPDController.requestEpdMode(v, "EPD_FULL", true))
+                    success = true;
+
             } else if (test == RK33xx) {
-                info.append("rk33xx\n");
-                RK33xxEPDController.requestEpdMode("EPD_FULL");
+                info.append("rk33xx: ");
+                if (RK33xxEPDController.requestEpdMode("EPD_FULL"))
+                    success = true;
+
             } else if (test == NTX_NEW) {
                 // get screen width and height
                 Display display = getWindowManager().getDefaultDisplay();
@@ -114,13 +119,17 @@ public class MainActivity extends android.app.Activity {
                 display.getSize(size);
                 int width = size.x;
                 int height = size.y;
-                info.append("tolino\n");
-                NTXEPDController.requestEpdMode(v, 34, 50, 0, 0, width, height);
-            } else {
-                info.append("error: invalid test\n");
+                info.append("tolino: ");
+                if (NTXEPDController.requestEpdMode(v, 34, 50, 0, 0, width, height))
+                    success = true;
             }
         } catch (Exception e) {
         }
+
+        if (success)
+            info.append("pass\n");
+        else
+            info.append("fail\n");
     }
 
     private void shareText(String text) {
