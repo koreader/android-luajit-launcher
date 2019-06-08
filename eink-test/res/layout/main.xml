@@ -24,10 +24,6 @@
             android:layout_height="12dp" />
 
         <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="12dp" />
-
-        <TextView
             android:id="@+id/rk30xxText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -64,31 +60,17 @@
             android:layout_height="12dp" />
 
         <TextView
-            android:id="@+id/ntxTolinoText"
+            android:id="@+id/ntxNewText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:textSize="18sp" />
 
         <Button
-            android:id="@+id/ntxTolinoButton"
+            android:id="@+id/ntxNewButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="ntx/tolino update"
-            android:textSize="28sp" />
-
-        <TextView
-            android:id="@+id/ntxNookText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:textSize="18sp" />
-
-        <Button
-            android:id="@+id/ntxNookButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="ntx/nook update"
+            android:text="freescale/ntx update"
             android:textSize="28sp" />
 
         <TextView

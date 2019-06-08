@@ -9,7 +9,7 @@ ROCKCHIP_EPD="RK30xxEPDController RK33xxEPDController"
 
 # Freescale EPD Controllers
 FREESCALE_PATH="${BASE_PATH}/freescale"
-FREESCALE_EPD="NTXEPDController NookEPDController"
+FREESCALE_EPD="NTXEPDController"
 
 for EPD in ${ROCKCHIP_EPD}; do
     src="${ROCKCHIP_PATH}/${EPD}.java"

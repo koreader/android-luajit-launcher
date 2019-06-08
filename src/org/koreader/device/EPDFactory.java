@@ -8,7 +8,7 @@ package org.koreader.device;
 import org.koreader.device.rockchip.RK3026EPDController;
 import org.koreader.device.rockchip.RK3066EPDController;
 import org.koreader.device.rockchip.RK3368EPDController;
-import org.koreader.device.freescale.TolinoNewEPDController;
+import org.koreader.device.freescale.NTXNewEPDController;
 
 import android.util.Log;
 
@@ -48,16 +48,9 @@ public class EPDFactory {
 
             /** devices using imx/ntx platform */
             case TOLINO:
-                controllerName = "Tolino/ntx6sl";
-                epdController = new TolinoNewEPDController();
-                break;
-
-            /** devices using generic view methods */
-            case SONY_RP1:
             case NOOK_V520:
-            case EMULATOR_X86:
-                controllerName = "generic android surface";
-                epdController = new GenericEPDController();
+                controllerName = "Freescale NTX";
+                epdController = new NTXNewEPDController();
                 break;
 
             /** unsupported devices */
@@ -73,20 +66,6 @@ public class EPDFactory {
         }
 
         return epdController;
-    }
-
-    private static class GenericEPDController implements EPDController {
-        @Override
-        public void setEpdMode(android.view.View targetView, int mode, long delay, int x, int y, int width, int height, String epdMode) {
-            /** just invalidate current view */
-            try {
-                Class.forName("android.view.View").getMethod("postInvalidate",
-                    new Class[]{}).invoke(targetView, new Object[]{});
-                Log.i("epd", "root view invalidated");
-            } catch (Exception e) {
-                Log.e("epd", e.toString());
-            }
-        }
     }
 
     private static class FakeEPDController implements EPDController {

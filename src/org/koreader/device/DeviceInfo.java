@@ -13,9 +13,7 @@ import java.util.Iterator;
 public class DeviceInfo {
 
     public enum Device {
-        // unkown devices
         UNKNOWN,
-        // devices with supported driver
         BOYUE_T61,
         BOYUE_T62,
         BOYUE_T80S,
@@ -26,10 +24,7 @@ public class DeviceInfo {
         ENERGY,
         INKBOOK,
         TOLINO,
-        // devices using a generic workaround
-        SONY_RP1,
         NOOK_V520,
-        EMULATOR_X86,
     }
 
     public final static int EPD_FULL = 1;
@@ -53,10 +48,7 @@ public class DeviceInfo {
     public static final boolean EINK_ENERGY;
     public static final boolean EINK_INKBOOK;
     public static final boolean EINK_TOLINO;
-    public static final boolean EINK_SONY_RP1;
     public static final boolean EINK_NOOK_V520;
-    public static final boolean EINK_EMULATOR_X86;
-    public static final boolean EINK_GENERIC;
 
     public static final boolean EINK_SUPPORT;
     public static final boolean EINK_FULL_SUPPORT;
@@ -120,35 +112,18 @@ public class DeviceInfo {
                 && MODEL.toLowerCase().startsWith("prime");
         deviceMap.put(Device.INKBOOK, EINK_INKBOOK);
 
-        // Tolino Vision 2 and maybe others?
+        // Tolino
         EINK_TOLINO = (BRAND.toLowerCase().contentEquals("tolino") && (MODEL.toLowerCase().contentEquals("imx50_rdp")))
                 || (MODEL.toLowerCase().contentEquals("tolino")
                 && (DEVICE.toLowerCase().contentEquals("tolino_vision2") || DEVICE.toLowerCase().contentEquals("ntx_6sl")));
         deviceMap.put(Device.TOLINO, EINK_TOLINO);
-
-        // Sony DPT-RP1
-        EINK_SONY_RP1 = MANUFACTURER.toLowerCase().contentEquals("sony")
-                && MODEL.toLowerCase().contentEquals("dpt-rp1");
-        deviceMap.put(Device.SONY_RP1, EINK_SONY_RP1);
 
         // Nook Glowlight 3
         EINK_NOOK_V520 = MANUFACTURER.toLowerCase().contentEquals("barnesandnoble")
                 && MODEL.toLowerCase().contentEquals("bnrv520");
         deviceMap.put(Device.NOOK_V520, EINK_NOOK_V520);
 
-        // Android Emulator for x86
-        EINK_EMULATOR_X86 = MODEL.contentEquals("Android SDK built for x86");
-        deviceMap.put(Device.EMULATOR_X86, EINK_EMULATOR_X86);
-
         // add your eink device here...
-
-
-        // true if we use a generic workaround
-        EINK_GENERIC = (
-            EINK_SONY_RP1 ||
-            EINK_NOOK_V520 ||
-            EINK_EMULATOR_X86
-        );
 
         // true if we found a supported device
         EINK_SUPPORT = (
@@ -161,12 +136,13 @@ public class DeviceInfo {
             EINK_INKBOOK ||
             EINK_ONYX_C67 ||
             EINK_TOLINO ||
-            EINK_GENERIC
+            EINK_NOOK_V520
         );
 
         // true if we have full eink control over android
         EINK_FULL_SUPPORT = (
-            EINK_TOLINO
+            EINK_TOLINO ||
+            EINK_NOOK_V520
         );
 
         // find current device.

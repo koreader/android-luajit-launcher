@@ -15,9 +15,7 @@ public class MainActivity extends android.app.Activity {
 
     private static final int RK30xx = 1;
     private static final int RK33xx = 2;
-    private static final int NTX_TOLINO = 3;
-    private static final int NTX_NOOK = 4;
-    private static final int FAKE = 999;
+    private static final int NTX_NEW= 3;
 
     private static final String MANUFACTURER = android.os.Build.MANUFACTURER;
     private static final String BRAND = android.os.Build.BRAND;
@@ -40,13 +38,11 @@ public class MainActivity extends android.app.Activity {
 
         TextView rk30xx_description = (TextView) findViewById(R.id.rk30xxText);
         TextView rk33xx_description = (TextView) findViewById(R.id.rk33xxText);
-        TextView ntx_tolino_description = (TextView) findViewById(R.id.ntxTolinoText);
-        TextView ntx_nook_description = (TextView) findViewById(R.id.ntxNookText);
+        TextView ntx_new_description = (TextView) findViewById(R.id.ntxNewText);
 
         Button rk30xx_button = (Button) findViewById(R.id.rk30xxButton);
         Button rk33xx_button = (Button) findViewById(R.id.rk33xxButton);
-        Button ntx_tolino_button = (Button) findViewById(R.id.ntxTolinoButton);
-        Button ntx_nook_button = (Button) findViewById(R.id.ntxNookButton);
+        Button ntx_new_button = (Button) findViewById(R.id.ntxNewButton);
         Button share_button = (Button) findViewById(R.id.shareButton);
 
         /** current device info */
@@ -86,26 +82,15 @@ public class MainActivity extends android.app.Activity {
             }
         });
 
-        /** freescale/ntx - tolino fw11+ */
-        ntx_tolino_description.setText("This button should work on modern Tolinos and other ntx boards");
+        /** freescale/ntx - Newer Tolino/Nook devices */
+        ntx_new_description.setText("This button should work on modern Tolinos/Nooks and other ntx boards");
 
-        ntx_tolino_button.setOnClickListener(new View.OnClickListener() {
+        ntx_new_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                runEinkTest(NTX_TOLINO);
+                runEinkTest(NTX_NEW);
             }
         });
-
-        /** freescale/ntx - nook 4.4 */
-        ntx_nook_description.setText("This button should work on modern Nooks and other ntx boards");
-
-        ntx_nook_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                runEinkTest(NTX_NOOK);
-            }
-        });
-
 
         /** share button */
         share_button.setOnClickListener(new View.OnClickListener() {
@@ -127,7 +112,7 @@ public class MainActivity extends android.app.Activity {
             } else if (test == RK33xx) {
                 info.append("rk33xx\n");
                 RK33xxEPDController.requestEpdMode("EPD_FULL");
-            } else if (test == NTX_TOLINO) {
+            } else if (test == NTX_NEW) {
                 // get screen width and height
                 Display display = getWindowManager().getDefaultDisplay();
                 Point size = new Point();
@@ -136,9 +121,6 @@ public class MainActivity extends android.app.Activity {
                 int height = size.y;
                 info.append("tolino\n");
                 NTXEPDController.requestEpdMode(v, 34, 50, 0, 0, width, height);
-            } else if (test == NTX_NOOK) {
-                info.append("nook\n");
-                NookEPDController.requestEpdMode(v);
             } else {
                 info.append("error: invalid test\n");
             }
