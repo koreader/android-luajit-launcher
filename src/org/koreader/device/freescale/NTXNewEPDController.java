@@ -1,9 +1,4 @@
-/**
- * generic EPD Controller for Android devices,
- *
- * New freescale/ntx devices
- * Tested on Tolinos with FW 11+ and Nook Glowlight 3.
- */
+/* Tested on Tolino Vision2/Shine3 and a Nook Glowlight 3. */
 
 package org.koreader.device.freescale;
 
