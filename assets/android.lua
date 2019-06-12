@@ -1484,11 +1484,18 @@ local function run(android_app_state)
 
     android.isEink = function()
         return JNI:context(android.app.activity.vm, function(JNI)
-            return JNI:callIntMethod(
+            local is_supported = JNI:callIntMethod(
                 android.app.activity.clazz,
                 "isEink",
                 "()I"
             ) == 1
+
+            local platform = JNI:callObjectMethod(
+                android.app.activity.clazz,
+                "getEinkPlatform",
+                "()Ljava/lang/String;"
+            )
+            return is_supported, JNI:to_string(platform)
         end)
     end
 
@@ -1497,6 +1504,16 @@ local function run(android_app_state)
             return JNI:callIntMethod(
                 android.app.activity.clazz,
                 "isEinkFull",
+                "()I"
+            ) == 1
+        end)
+    end
+
+    android.needsWakelocks = function()
+        return JNI:context(android.app.activity.vm, function(JNI)
+            return JNI:callIntMethod(
+                android.app.activity.clazz,
+                "needsWakelocks",
                 "()I"
             ) == 1
         end)

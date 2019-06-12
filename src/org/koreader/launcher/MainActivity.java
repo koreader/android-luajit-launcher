@@ -203,18 +203,31 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         return (device.EINK_FULL_SUPPORT) ? 1 : 0;
     }
 
+    public String getEinkPlatform() {
+        if (device.EINK_FREESCALE) {
+            return "freescale";
+        } else if (device.EINK_ROCKCHIP){
+            return "rockchip";
+        } else {
+            return "none";
+        }
+    }
+
+    public int needsWakelocks() {
+        return (device.BUG_WAKELOCKS) ? 1 : 0;
+    }
 
     /** Used on Rockchip devices */
     public void einkUpdate(int mode) {
         String mode_name = "invalid mode";
 
-        if (mode == device.EPD_FULL) {
+        if (mode == 1) {
             mode_name = "EPD_FULL";
-        } else if (mode == device.EPD_PART) {
+        } else if (mode == 2) {
             mode_name = "EPD_PART";
-        } else if (mode == device.EPD_A2) {
+        } else if (mode == 3) {
             mode_name = "EPD_A2";
-        } else if (mode == device.EPD_AUTO) {
+        } else if (mode == 4) {
             mode_name = "EPD_AUTO";
         } else {
             Logger.e(TAG, String.format("%s: %d", mode_name, mode));
@@ -319,6 +332,7 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         return getWifiManager().isWifiEnabled() ? 1 : 0;
     }
 
+    @SuppressWarnings("deprecation")
     public String getNetworkInfo() {
         final WifiInfo wi = getWifiManager().getConnectionInfo();
         final DhcpInfo dhcp = getWifiManager().getDhcpInfo();
