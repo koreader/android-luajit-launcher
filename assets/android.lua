@@ -1355,6 +1355,16 @@ local function run(android_app_state)
         end)
     end
 
+    android.getScreenAvailableHeight = function()
+        return JNI:context(android.app.activity.vm, function(JNI)
+            return JNI:callIntMethod(
+                android.app.activity.clazz,
+                "getScreenAvailableHeight",
+                "()I"
+            )
+        end)
+    end
+
     android.screen = {}
     android.screen.width = android.getScreenWidth()
     android.screen.height = android.getScreenHeight()
