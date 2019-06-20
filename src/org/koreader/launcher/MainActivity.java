@@ -298,6 +298,10 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         return screen.getScreenHeight();
     }
 
+    public int getScreenAvailableHeight() {
+        return screen.getScreenAvailableHeight();
+    }
+
     public int getScreenWidth() {
         return screen.getScreenWidth();
     }
@@ -307,11 +311,31 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
     }
 
     public int isFullscreen() {
-        return screen.isFullscreen();
+        // for newer Jelly Bean devices (apis 17 - 18)
+        if ((SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR2) ||
+            (SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR1)) {
+            return screen.isFullscreen();
+        }
+        // for older devices (apis 14 - 15 - 16)
+        else if (SDK_INT <= Build.VERSION_CODES.JELLY_BEAN) {
+            return screen.isFullscreenDeprecated();
+        }
+        // for devices with immersive mode (api 19+)
+        else {
+            return 1;
+        }
     }
 
     public void setFullscreen(final boolean enabled) {
-        screen.setFullscreen(enabled);
+        // for newer Jelly Bean devices (apis 17 - 18)
+        if ((SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR2) ||
+            (SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR1)) {
+            screen.setFullscreen(enabled);
+        }
+        // for older devices (apis 14 - 15 - 16)
+        else if (SDK_INT <= Build.VERSION_CODES.JELLY_BEAN) {
+            screen.setFullscreenDeprecated(enabled);
+        }
     }
 
     public void setScreenBrightness(final int brightness) {

@@ -16,6 +16,8 @@ public class ScreenHelper {
     private String TAG;
     private Context context;
 
+    public boolean is_fullscreen = true;
+
     public ScreenHelper(Context context) {
         this.context = context;
         this.TAG = context.getResources().getString(R.string.app_name);
@@ -28,6 +30,10 @@ public class ScreenHelper {
 
     public int getScreenHeight() {
         return getScreenSize().y;
+    }
+
+    public int getScreenAvailableHeight() {
+        return getScreenSizeWithConstraints().y;
     }
 
     public int getStatusBarHeight() {
@@ -91,10 +97,18 @@ public class ScreenHelper {
 
     /** Screen layout */
     public int isFullscreen() {
+        return (is_fullscreen) ? 1 : 0;
+    }
+
+    public int isFullscreenDeprecated() {
         return ((((Activity)context).getWindow().getAttributes().flags & WindowManager.LayoutParams.FLAG_FULLSCREEN) != 0) ? 1 : 0;
     }
 
     public void setFullscreen(final boolean fullscreen) {
+        is_fullscreen = fullscreen;
+    }
+
+    public void setFullscreenDeprecated(final boolean fullscreen) {
         final CountDownLatch cd = new CountDownLatch(1);
         ((Activity)context).runOnUiThread(new Runnable() {
             @Override
@@ -125,6 +139,22 @@ public class ScreenHelper {
             // JellyBean 4.2 (API 17) and higher
             DisplayMetrics metrics = new DisplayMetrics();
             display.getRealMetrics(metrics);
+            size.set(metrics.widthPixels, metrics.heightPixels);
+        } catch (NoSuchMethodError e) {
+            // Honeycomb 3.0 (API 11) and higher
+            display.getSize(size);
+        }
+        return size;
+    }
+
+
+    private Point getScreenSizeWithConstraints() {
+        Point size = new Point();
+        Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
+        try {
+            // JellyBean 4.2 (API 17) and higher
+            DisplayMetrics metrics = new DisplayMetrics();
+            display.getMetrics(metrics);
             size.set(metrics.widthPixels, metrics.heightPixels);
         } catch (NoSuchMethodError e) {
             // Honeycomb 3.0 (API 11) and higher
