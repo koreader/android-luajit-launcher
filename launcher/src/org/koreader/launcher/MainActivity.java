@@ -48,6 +48,9 @@ public class MainActivity extends android.app.NativeActivity
     private ScreenHelper screen;
     private SurfaceView surface;
 
+    // size in pixels of the top notch, if any
+    private int notch_height = 0;
+
     /** Called when the activity is first created. */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -171,6 +174,32 @@ public class MainActivity extends android.app.NativeActivity
     public void surfaceDestroyed(SurfaceHolder holder) {
         Logger.d(TAG, "Surface destroyed");
         super.surfaceDestroyed(holder);
+    }
+
+    /** Called when the view is attached to a window */
+    @Override
+    public void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        Logger.d(TAG, "surface attached to a window");
+        if (SDK_INT >= Build.VERSION_CODES.P) {
+            // handle top "notch" on Android Pie
+            android.view.DisplayCutout cutout;
+            cutout = getWindow().getDecorView().getRootWindowInsets().getDisplayCutout();
+            if (cutout != null) {
+                int cutout_pixels = cutout.getSafeInsetTop();
+                if (notch_height != cutout_pixels) {
+                    Logger.d(TAG, String.format("found a top notch: %dpx", cutout_pixels));
+                    notch_height = cutout_pixels;
+                }
+            }
+        }
+    }
+
+    /** Called when the view is detached from its window */
+    @Override
+    public void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        Logger.d(TAG, "surface detached from its window");
     }
 
     /** Called on permission result */
@@ -356,7 +385,11 @@ public class MainActivity extends android.app.NativeActivity
 
     @SuppressWarnings("unused")
     public int getScreenHeight() {
-        return screen.getScreenHeight();
+        if (SDK_INT >= Build.VERSION_CODES.P) {
+            return (screen.getScreenHeight() - notch_height);
+        } else {
+            return screen.getScreenHeight();
+        }
     }
 
     @SuppressWarnings("unused")
