@@ -26,33 +26,35 @@ git submodule sync
 git submodule update
 ```
 
-### Update the project for your Android SDK/NDK
-
-This requires the `android` tool in your `$PATH`.
-
-```sh
-android update project --path .
-```
-
 ### Compile LuaJIT for your target architecture(s)
 
 ```sh
 ./mk-luajit.sh armeabi-v7a
 ./mk-luajit.sh clean
-./mk-luajit.sh armeabi
+./mk-luajit.sh x86
 ```
 
-### Compile NDK/native code
+### Update the project for your Android SDK/NDK
+
+Edit local.properties and set ndk.dir and sdk.dir accordly.
+Android Studio users can skip this step since the IDE will set the proper paths.
+
+
+### Compile native code and package APK with gradle
+
+You can see available tasks with
 
 ```sh
-ndk-build
+./gradlew tasks
 ```
 
-### Compile and package APK (debug variant)
+For example, you can build the debug variant for all archs with
 
 ```sh
-ant debug
+./gradlew assembleDebug
 ```
+
+For more examples please look at the Makefile.
 
 ## To-do
 
