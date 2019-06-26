@@ -8,6 +8,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import org.koreader.device.freescale.NTXEPDController;
+import org.koreader.device.rockchip.RK30xxEPDController;
+import org.koreader.device.rockchip.RK33xxEPDController;
 
 public class MainActivity extends android.app.Activity {
 
