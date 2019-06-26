@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-
+# shellcheck disable=SC2006,SC2034,SC2039,SC2046,SC2086,SC2116,SC2154,SC2164,SC2166,SC2181,SC2196
 ##############################################################################
 ##
 ##  Gradle start up script for UN*X
