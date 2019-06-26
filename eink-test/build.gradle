@@ -1,0 +1,44 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion rootProject.ext.sdkVersion
+
+    defaultConfig {
+        applicationId "org.koreader.einktest"
+        minSdkVersion 14
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+    }
+
+    sourceSets {
+        main {
+            manifest.srcFile('AndroidManifest.xml')
+            java.srcDirs = ['src']
+            res.srcDirs = ['res']
+        }
+    }
+
+    applicationVariants.all { variant ->
+        variant.outputs.all {
+            outputFileName = "einkTest.apk"
+        }
+    }
+
+    lintOptions {
+        checkReleaseBuilds true
+        abortOnError false
+        disable 'GoogleAppIndexingWarning'
+        disable 'MissingApplicationIcon'
+    }
+}
+
+// copy EPD abstract classes from the main module before the build
+task copyEPDFiles(type: Copy) {
+    from '../launcher/src/org/koreader/device/rockchip/RK30xxEPDController.java'
+    from '../launcher/src/org/koreader/device/rockchip/RK33xxEPDController.java'
+    from '../launcher/src/org/koreader/device/freescale/NTXEPDController.java'
+    into 'src/org/koreader/test/eink/'
+}
+
+preBuild.dependsOn(copyEPDFiles)

@@ -1,17 +1,22 @@
 package org.koreader.launcher;
 
+import android.Manifest;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.provider.Settings;
 import android.text.format.Formatter;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -23,8 +28,12 @@ import org.koreader.device.DeviceInfo;
 import org.koreader.device.EPDController;
 import org.koreader.device.EPDFactory;
 
-public class MainActivity extends android.app.NativeActivity implements SurfaceHolder.Callback2 {
+public class MainActivity extends android.app.NativeActivity
+    implements SurfaceHolder.Callback2,
+    ActivityCompat.OnRequestPermissionsResultCallback {
+
     private final static int SDK_INT = Build.VERSION.SDK_INT;
+    private final static int REQUEST_WRITE_STORAGE = 1;
 
     static {
         System.loadLibrary("luajit");
@@ -34,7 +43,6 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
 
     private FramelessProgressDialog dialog;
     private Clipboard clipboard;
-    private DeviceInfo device;
     private EPDController epd;
     private PowerHelper power;
     private ScreenHelper screen;
@@ -75,6 +83,16 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
                     setFullscreenLayout();
                 }
             });
+        }
+
+        /** runtime permissions: we need read and write on external storage to work! */
+        boolean is_granted = (ContextCompat.checkSelfPermission(this,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+
+        if (!is_granted) {
+            Logger.i(TAG, String.format("Requesting permission: %s", REQUEST_WRITE_STORAGE));
+            ActivityCompat.requestPermissions(this,
+                new String[]{ Manifest.permission.WRITE_EXTERNAL_STORAGE }, REQUEST_WRITE_STORAGE);
         }
     }
 
@@ -155,69 +173,103 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         super.surfaceDestroyed(holder);
     }
 
+    /** Called on permission result */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(ActivityCompat.checkSelfPermission(this, permissions[0]) == PackageManager.PERMISSION_GRANTED) {
+            Logger.d(TAG, String.format("Permission granted for request code: %d", requestCode));
+        } else {
+            String msg = String.format("Permission rejected for request code %d", requestCode);
+            switch (requestCode) {
+                case REQUEST_WRITE_STORAGE:
+                    // we can't work without external storage permissions
+                    Logger.e(TAG, msg);
+                    finish();
+                    break;
+                default:
+                    Logger.w(TAG, msg);
+                    break;
+            }
+        }
+    }
+
     /** These functions are exposed to lua in assets/android.lua
      *  If you add a new function here remember to write the companion
      *  lua function in that file */
 
 
     /** build */
+    @SuppressWarnings("unused")
     public int isDebuggable() {
         return (BuildConfig.DEBUG) ? 1 : 0;
     }
 
+    @SuppressWarnings("unused")
     public String getFlavor() {
         return getResources().getString(R.string.app_flavor);
     }
 
+    @SuppressWarnings("unused")
     public String getName() {
         return getResources().getString(R.string.app_name);
     }
 
     /** clipboard */
+    @SuppressWarnings("unused")
     public String getClipboardText() {
         return clipboard.getClipboardText();
     }
 
+    @SuppressWarnings("unused")
     public int hasClipboardTextIntResultWrapper() {
         return clipboard.hasClipboardText();
     }
 
+    @SuppressWarnings("unused")
     public void setClipboardText(final String text) {
         clipboard.setClipboardText(text);
     }
 
     /** device */
+    @SuppressWarnings("unused")
     public String getProduct() {
-        return device.PRODUCT;
+        return DeviceInfo.PRODUCT;
     }
 
+    @SuppressWarnings("unused")
     public String getVersion() {
         return android.os.Build.VERSION.RELEASE;
     }
 
+    @SuppressWarnings("unused")
     public int isEink() {
-        return (device.EINK_SUPPORT) ? 1 : 0;
+        return (DeviceInfo.EINK_SUPPORT) ? 1 : 0;
     }
 
+    @SuppressWarnings("unused")
     public int isEinkFull() {
-        return (device.EINK_FULL_SUPPORT) ? 1 : 0;
+        return (DeviceInfo.EINK_FULL_SUPPORT) ? 1 : 0;
     }
 
+    @SuppressWarnings("unused")
     public String getEinkPlatform() {
-        if (device.EINK_FREESCALE) {
+        if (DeviceInfo.EINK_FREESCALE) {
             return "freescale";
-        } else if (device.EINK_ROCKCHIP){
+        } else if (DeviceInfo.EINK_ROCKCHIP){
             return "rockchip";
         } else {
             return "none";
         }
     }
 
+    @SuppressWarnings("unused")
     public int needsWakelocks() {
-        return (device.BUG_WAKELOCKS) ? 1 : 0;
+        return (DeviceInfo.BUG_WAKELOCKS) ? 1 : 0;
     }
 
     /** Used on Rockchip devices */
+    @SuppressWarnings("unused")
     public void einkUpdate(int mode) {
         String mode_name = "invalid mode";
 
@@ -238,6 +290,7 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
     }
 
     /** Used on Freescale imx devices */
+    @SuppressWarnings("unused")
     public void einkUpdate(int mode, long delay, int x, int y, int width, int height) {
         Logger.v(TAG, String.format("requesting epd update, mode:%d, delay:%d, [x:%d, y:%d, w:%d, h:%d]",
             mode, delay, x, y, width, height));
@@ -245,6 +298,7 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
     }
 
     /** native dialogs and widgets run on UI Thread */
+    @SuppressWarnings("unused")
     public void showToast(final String message) {
         runOnUiThread(new Runnable() {
             @Override
@@ -255,6 +309,7 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         });
     }
 
+    @SuppressWarnings("unused")
     public void showProgress(final String title, final String message) {
         runOnUiThread(new Runnable() {
             @Override
@@ -265,6 +320,7 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         });
     }
 
+    @SuppressWarnings("unused")
     public void dismissProgress() {
         runOnUiThread(new Runnable() {
             @Override
@@ -277,39 +333,48 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
     }
 
     /** power */
+    @SuppressWarnings("unused")
     public int isCharging() {
         return power.batteryCharging();
     }
 
+    @SuppressWarnings("unused")
     public int getBatteryLevel() {
         return power.batteryPercent();
     }
 
+    @SuppressWarnings("unused")
     public void setWakeLock(final boolean enabled) {
         power.setWakelockState(enabled);
     }
 
     /** screen */
+    @SuppressWarnings("unused")
     public int getScreenBrightness() {
         return screen.getScreenBrightness();
     }
 
+    @SuppressWarnings("unused")
     public int getScreenHeight() {
         return screen.getScreenHeight();
     }
 
+    @SuppressWarnings("unused")
     public int getScreenAvailableHeight() {
         return screen.getScreenAvailableHeight();
     }
 
+    @SuppressWarnings("unused")
     public int getScreenWidth() {
         return screen.getScreenWidth();
     }
 
+    @SuppressWarnings("unused")
     public int getStatusBarHeight() {
         return screen.getStatusBarHeight();
     }
 
+    @SuppressWarnings("unused")
     public int isFullscreen() {
         // for newer Jelly Bean devices (apis 17 - 18)
         if ((SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR2) ||
@@ -326,6 +391,7 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         }
     }
 
+    @SuppressWarnings("unused")
     public void setFullscreen(final boolean enabled) {
         // for newer Jelly Bean devices (apis 17 - 18)
         if ((SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR2) ||
@@ -338,11 +404,22 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         }
     }
 
+    @SuppressWarnings("unused")
     public void setScreenBrightness(final int brightness) {
-        screen.setScreenBrightness(brightness);
+        if (SDK_INT >= Build.VERSION_CODES.M) {
+            if (Settings.System.canWrite(MainActivity.this)) {
+                screen.setScreenBrightness(brightness);
+            } else {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
+                MainActivity.this.startActivity(intent);
+            }
+        } else {
+            screen.setScreenBrightness(brightness);
+        }
     }
 
     /** wifi */
+    @SuppressWarnings("unused")
     public void setWifiEnabled(final boolean enabled) {
         runOnUiThread(new Runnable() {
             @Override
@@ -352,35 +429,23 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         });
     }
 
+    @SuppressWarnings("unused")
     public int isWifiEnabled() {
         return getWifiManager().isWifiEnabled() ? 1 : 0;
     }
 
-    @SuppressWarnings("deprecation")
+    @SuppressWarnings("unused")
     public String getNetworkInfo() {
         final WifiInfo wi = getWifiManager().getConnectionInfo();
         final DhcpInfo dhcp = getWifiManager().getDhcpInfo();
-
         int ip = wi.getIpAddress();
         int gw = dhcp.gateway;
-        String ip_address;
-        String gw_address;
-
-        if (ip > 0) {
-            ip_address = Formatter.formatIpAddress(ip);
-        } else {
-            ip_address = String.valueOf(ip);
-        }
-
-        if (gw > 0) {
-            gw_address = Formatter.formatIpAddress(gw);
-        } else {
-            gw_address = String.valueOf(gw);
-        }
-
+        String ip_address = formatIp(ip);
+        String gw_address = formatIp(gw);
         return String.format("%s;%s;%s", wi.getSSID(), ip_address, gw_address);
     }
 
+    @SuppressWarnings("unused")
     public int download(final String url, final String name) {
         File file = new File(Environment.getExternalStoragePublicDirectory(
             Environment.DIRECTORY_DOWNLOADS) + "/" + name);
@@ -397,13 +462,24 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         return 0;
     }
 
+    @SuppressWarnings("unused")
     public int openLink(String url) {
         return openWebPage(url) ? 0 : 1;
     }
 
-    // ----------------------------------
+    // --- end of public exported functions -------------
+
+    @SuppressWarnings("deprecation")
+    private String formatIp(int number) {
+        if (number > 0) {
+            return Formatter.formatIpAddress(number);
+        } else {
+            return String.valueOf(number);
+        }
+    }
+
     private WifiManager getWifiManager() {
-        return (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
+        return (WifiManager) this.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
     }
 
     private void setFullscreenLayout() {
@@ -416,9 +492,12 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
                 View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
                 View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
-        } else {
+        } else if(SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             decorView.setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_FULLSCREEN |
+                View.SYSTEM_UI_FLAG_LOW_PROFILE);
+        } else {
+            decorView.setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_LOW_PROFILE);
         }
     }

@@ -1,25 +1,13 @@
-# Supported Android ABIs: armeabi-v7a, x86 and x86_64
 ifdef ANDROID_ARCH
-	ifeq ($(ANDROID_ARCH), arm)
-		ANDROID_FULL_ARCH?=armeabi-v7a
-	else
+	ifeq ($(ANDROID_ARCH), x86)
 		ANDROID_FULL_ARCH?=$(ANDROID_ARCH)
+		GRADLE_TASK?=assembleX86
 	endif
 endif
 
 # Default is build for arm
 ANDROID_FULL_ARCH?=armeabi-v7a
-
-# API19 is used by the docker build image.
-# It's also required to use View.VERSION_CODES.KITKAT.
-TARGET_API=19
-
-ifdef NDKABI
-	# Update target API if is higher than current target
-	SDKAPI=$(shell [ ${NDKABI} -gt ${TARGET_API} ] && echo -n ${NDKABI} || echo -n ${TARGET_API})
-endif
-
-SDKAPI?=$(TARGET_API)
+GRADLE_TASK?=assembleArm
 
 # override android:versionName="string"
 ifdef ANDROID_NAME
@@ -36,48 +24,59 @@ ifdef ANDROID_APPNAME
 	APPNAME?=$(ANDROID_APPNAME)
 endif
 
-# support different flavors
+# support different build flavors
 ifdef ANDROID_FLAVOR
 	FLAVOR?=$(ANDROID_FLAVOR)
 endif
 
-# Defaults
+# Defaults, overriding fallback values in gradle.properties
 NAME?=1.5
 VERSION?=5
 APPNAME?="luajit-launcher"
 FLAVOR?="rocks"
 
 update:
-	# update local.properties and project.properties with sdk/ndk paths for current user
-	# this works with sdk tools <= 25.3.0
-	android update project --path . -t android-$(SDKAPI)
-
 	# update sources
 	git submodule init
 	git submodule sync
 	git submodule update
-
-build-native:
-	# build luajit, lzma and native activity for desired arch (armeabi-v7a, x86, x86_64)
-	./mk-luajit.sh $(ANDROID_FULL_ARCH)
 	@echo "#define LOGGER_NAME \"$(APPNAME)\"" > jni/logger.h
-	ndk-build ANDROID_FULL_ARCH=$(ANDROID_FULL_ARCH)
 
-debug: update build-native
-	# build signed debug apk, with version code and version name
-	ant -Dname=$(NAME) -Dcode=$(VERSION) -DappName=$(APPNAME) -Dflavor=$(FLAVOR) debug
-	cp -pv bin/NativeActivity-debug.apk bin/NativeActivity.apk
-	@echo "application was built, type: debug (signed)"
+build-luajit:
+	# build luajit
+	./mk-luajit.sh $(ANDROID_FULL_ARCH)
 
-release: update build-native
-        # build unsigned release apk, with version code and version name
+prepare: update
+	# for Android Studio users. Build luajit for all supported abis
+	./mk-luajit.sh clean
+	./mk-luajit.sh x86
+	./mk-luajit.sh clean
+	./mk-luajit.sh armeabi-v7a
+	@echo "project dependencies were built. Now you can build the project in Android Studio"
+
+debug: update build-luajit
+	# build signed debug apk
+	./gradlew -PversionName=$(NAME) -PversionCode=$(VERSION) -PprojectName=$(APPNAME) -PprojectFlavor=$(FLAVOR) $(GRADLE_TASK)Debug
+	@echo "application was built, type: debug (signed), flavor: $(FLAVOR), version: $(NAME), release $(VERSION)"
+	mkdir -p bin/
+	find launcher/build/outputs/apk/ -type f -name '*.apk' -exec mv -v {} bin/ \;
+
+release: update build-luajit
+	# build unsigned release apk, with version code and version name
 	@echo "Building release APK, Version $(NAME), release $(VERSION)"
-	ant -Dname=$(NAME) -Dcode=$(VERSION) -DappName=$(APPNAME) -Dflavor=$(FLAVOR) release
-	cp -pv bin/NativeActivity-release-unsigned.apk bin/NativeActivity.apk
-	@echo "application $(APPNAME) was built, type: release (unsigned), flavor: $(FLAVOR), version: $(NAME), release $(VERSION), api $(SDKAPI)"
+	./gradlew -PversionName=$(NAME) -PversionCode=$(VERSION) -PprojectName=$(APPNAME) -PprojectFlavor=$(FLAVOR) $(GRADLE_TASK)Release
+	@echo "application $(APPNAME) was built, type: release (unsigned), flavor: $(FLAVOR), version: $(NAME), release $(VERSION)"
 	@echo "WARNING: You'll need to sign this application to be able to install it"
+	mkdir -p bin/
+	find launcher/build/outputs/apk/ -type f -name '*.apk' -exec mv -v {} bin/ \;
 
 clean:
-	ndk-build ANDROID_FULL_ARCH=$(ANDROID_FULL_ARCH) clean
+	# clean luajit build tree and remove binaries (assets and apks)
 	./mk-luajit.sh clean
-	rm -rf bin obj libs gen jni/luajit-build local.properties assets/module
+	rm -rf assets/module/ bin/
+
+mrproper: clean
+	# deep clean, it will fail on non-built variants, so continue
+	# without doubt and finally remove luajit libraries
+	-./gradlew clean --continue
+	-rm -rf jni/luajit-build/
