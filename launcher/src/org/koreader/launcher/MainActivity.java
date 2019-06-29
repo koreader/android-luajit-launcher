@@ -1,19 +1,12 @@
 package org.koreader.launcher;
 
 import android.Manifest;
-import android.app.DownloadManager;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.net.DhcpInfo;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
 import android.provider.Settings;
-import android.text.format.Formatter;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -22,11 +15,6 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Toast;
 
-import java.io.File;
-
-import org.koreader.device.DeviceInfo;
-import org.koreader.device.EPDController;
-import org.koreader.device.EPDFactory;
 
 public class MainActivity extends android.app.NativeActivity
     implements SurfaceHolder.Callback2,
@@ -43,7 +31,8 @@ public class MainActivity extends android.app.NativeActivity
 
     private FramelessProgressDialog dialog;
     private Clipboard clipboard;
-    private EPDController epd;
+    private Device device;
+    private NetworkManager network;
     private PowerHelper power;
     private ScreenHelper screen;
     private SurfaceView surface;
@@ -68,13 +57,12 @@ public class MainActivity extends android.app.NativeActivity
         holder.addCallback(this);
         setContentView(surface);
 
-        // set a epd controller for eink devices
-        epd = EPDFactory.getEPDController(TAG);
-
         // helper classes
         clipboard = new Clipboard(this);
+        device = new Device(this);
         power = new PowerHelper(this);
         screen = new ScreenHelper(this);
+        network = new NetworkManager(this);
 
         /** Listen to visibility changes */
         if (SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -137,10 +125,11 @@ public class MainActivity extends android.app.NativeActivity
     protected void onDestroy() {
         Logger.d(TAG, "App destroyed");
         clipboard = null;
+        device = null;
         power = null;
-	screen = null;
-        epd = null;
+        screen = null;
         surface = null;
+        network = null;
         super.onDestroy();
     }
 
@@ -263,7 +252,7 @@ public class MainActivity extends android.app.NativeActivity
     /** device */
     @SuppressWarnings("unused")
     public String getProduct() {
-        return DeviceInfo.PRODUCT;
+        return device.getProduct();
     }
 
     @SuppressWarnings("unused")
@@ -273,57 +262,32 @@ public class MainActivity extends android.app.NativeActivity
 
     @SuppressWarnings("unused")
     public int isEink() {
-        return (DeviceInfo.EINK_SUPPORT) ? 1 : 0;
+        return device.isEink();
     }
 
     @SuppressWarnings("unused")
     public int isEinkFull() {
-        return (DeviceInfo.EINK_FULL_SUPPORT) ? 1 : 0;
+        return device.isFullEink();
     }
 
     @SuppressWarnings("unused")
     public String getEinkPlatform() {
-        if (DeviceInfo.EINK_FREESCALE) {
-            return "freescale";
-        } else if (DeviceInfo.EINK_ROCKCHIP){
-            return "rockchip";
-        } else {
-            return "none";
-        }
+        return device.einkPlatform();
     }
 
     @SuppressWarnings("unused")
     public int needsWakelocks() {
-        return (DeviceInfo.BUG_WAKELOCKS) ? 1 : 0;
+        return device.needsWakelock();
     }
 
-    /** Used on Rockchip devices */
     @SuppressWarnings("unused")
     public void einkUpdate(int mode) {
-        String mode_name = "invalid mode";
-
-        if (mode == 1) {
-            mode_name = "EPD_FULL";
-        } else if (mode == 2) {
-            mode_name = "EPD_PART";
-        } else if (mode == 3) {
-            mode_name = "EPD_A2";
-        } else if (mode == 4) {
-            mode_name = "EPD_AUTO";
-        } else {
-            Logger.e(TAG, String.format("%s: %d", mode_name, mode));
-            return;
-        }
-        Logger.v(TAG, String.format("requesting epd update, type: %s", mode_name));
-        epd.setEpdMode(surface, 0, 0, 0, 0, 0, 0, mode_name);
+        device.einkUpdate(surface, mode);
     }
 
-    /** Used on Freescale imx devices */
     @SuppressWarnings("unused")
     public void einkUpdate(int mode, long delay, int x, int y, int width, int height) {
-        Logger.v(TAG, String.format("requesting epd update, mode:%d, delay:%d, [x:%d, y:%d, w:%d, h:%d]",
-            mode, delay, x, y, width, height));
-        epd.setEpdMode(surface, mode, delay, x, y, width, height, null);
+        device.einkUpdate(surface, mode, delay, x, y, width, height);
     }
 
     /** native dialogs and widgets run on UI Thread */
@@ -454,66 +418,43 @@ public class MainActivity extends android.app.NativeActivity
     /** wifi */
     @SuppressWarnings("unused")
     public void setWifiEnabled(final boolean enabled) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                getWifiManager().setWifiEnabled(enabled);
-            }
-        });
+        network.setWifi(enabled);
     }
 
     @SuppressWarnings("unused")
     public int isWifiEnabled() {
-        return getWifiManager().isWifiEnabled() ? 1 : 0;
+        return network.isWifi();
     }
 
     @SuppressWarnings("unused")
     public String getNetworkInfo() {
-        final WifiInfo wi = getWifiManager().getConnectionInfo();
-        final DhcpInfo dhcp = getWifiManager().getDhcpInfo();
-        int ip = wi.getIpAddress();
-        int gw = dhcp.gateway;
-        String ip_address = formatIp(ip);
-        String gw_address = formatIp(gw);
-        return String.format("%s;%s;%s", wi.getSSID(), ip_address, gw_address);
+        return network.info();
     }
 
     @SuppressWarnings("unused")
     public int download(final String url, final String name) {
-        File file = new File(Environment.getExternalStoragePublicDirectory(
-            Environment.DIRECTORY_DOWNLOADS) + "/" + name);
-
-        Logger.d(TAG, file.getAbsolutePath());
-        if (file.exists()) return 1;
-
-        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
-        request.allowScanningByMediaScanner();
-        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, name);
-        DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
-        manager.enqueue(request);
-        return 0;
+        return network.download(url, name);
     }
 
     @SuppressWarnings("unused")
     public int openLink(String url) {
-        return openWebPage(url) ? 0 : 1;
+        Uri webpage = Uri.parse(url);
+        Intent intent = new Intent(Intent.ACTION_VIEW, webpage);
+
+        // try to find an application to open the url
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+            // link opened in app
+            return 0;
+        } else {
+            // app not found
+            return 1;
+        }
+
+
     }
 
     // --- end of public exported functions -------------
-
-    @SuppressWarnings("deprecation")
-    private String formatIp(int number) {
-        if (number > 0) {
-            return Formatter.formatIpAddress(number);
-        } else {
-            return String.valueOf(number);
-        }
-    }
-
-    private WifiManager getWifiManager() {
-        return (WifiManager) this.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-    }
 
     private void setFullscreenLayout() {
         View decorView = getWindow().getDecorView();
@@ -532,18 +473,6 @@ public class MainActivity extends android.app.NativeActivity
         } else {
             decorView.setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_LOW_PROFILE);
-        }
-    }
-
-    private boolean openWebPage(String url) {
-        Uri webpage = Uri.parse(url);
-        Intent intent = new Intent(Intent.ACTION_VIEW, webpage);
-        if (intent.resolveActivity(getPackageManager()) != null) {
-            startActivity(intent);
-            return true;
-        } else {
-            // cannot find a package able to open the page
-            return false;
         }
     }
 }
