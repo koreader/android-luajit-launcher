@@ -8,8 +8,8 @@ android {
         minSdkVersion 14
         targetSdkVersion 28
 
-        versionCode versionCode as Integer
-        versionName versionName
+        versionCode versCode as Integer
+        versionName versName
     }
 
     buildTypes {
