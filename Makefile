@@ -5,9 +5,32 @@ ifdef ANDROID_ARCH
 	endif
 endif
 
+
 # Default is build for arm
 ANDROID_FULL_ARCH?=armeabi-v7a
 GRADLE_TASK?=assembleArm
+
+# find the path where the SDK is installed
+ifdef SDK
+        ANDROID_SDK_FULLPATH?=$(SDK)
+else
+        ifdef ANDROID_HOME
+                ANDROID_SDK_FULLPATH?=$(ANDROID_HOME)
+        else
+                ANDROID_SDK_FULLPATH?=`realpath ../../../base/toolchain/android-sdk-linux`
+        endif
+endif
+
+# find the path where the NDK is installed
+ifdef NDK
+	ANDROID_NDK_FULLPATH?=$(NDK)
+else
+	ifdef ANDROID_NDK_HOME
+		ANDROID_NDK_FULLPATH?=$(ANDROID_NDK_HOME)
+	else
+		ANDROID_NDK_FULLPATH?=`realpath ../../../base/toolchain/android-ndk-r15c`
+	endif
+endif
 
 # override android:versionName="string"
 ifdef ANDROID_NAME
@@ -41,6 +64,10 @@ update:
 	git submodule sync
 	git submodule update
 	@echo "#define LOGGER_NAME \"$(APPNAME)\"" > jni/logger.h
+	@echo "sdk.dir=$(ANDROID_SDK_FULLPATH)" > local.properties
+	@echo "ndk.dir=$(ANDROID_NDK_FULLPATH)" >> local.properties
+	@echo "using sdk in path $(ANDROID_SDK_FULLPATH)"
+	@echo "using ndk in path $(ANDROID_NDK_FULLPATH)"
 
 build-luajit:
 	# build luajit
