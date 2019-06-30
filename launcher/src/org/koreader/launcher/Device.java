@@ -15,13 +15,11 @@ public class Device {
     private static final boolean NEEDS_WAKELOCK_ENABLED = DeviceInfo.BUG_WAKELOCKS;
 
     private String TAG;
-    private Context context;
     private EPDController epd;
 
     public Device(Context context) {
-        this.context = context.getApplicationContext();
+        this.TAG = context.getApplicationContext().getResources().getString(R.string.app_name);
         this.epd = EPDFactory.getEPDController(TAG);
-        this.TAG = this.context.getResources().getString(R.string.app_name);
     }
 
     /**
