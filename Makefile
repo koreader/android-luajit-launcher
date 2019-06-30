@@ -17,7 +17,7 @@ else
         ifdef ANDROID_HOME
                 ANDROID_SDK_FULLPATH?=$(ANDROID_HOME)
         else
-                ANDROID_SDK_FULLPATH?=`realpath ../../../base/toolchain/android-sdk-linux`
+                ANDROID_SDK_FULLPATH?=$(shell realpath ../../../base/toolchain/android-sdk-linux)
         endif
 endif
 
@@ -28,7 +28,7 @@ else
 	ifdef ANDROID_NDK_HOME
 		ANDROID_NDK_FULLPATH?=$(ANDROID_NDK_HOME)
 	else
-		ANDROID_NDK_FULLPATH?=`realpath ../../../base/toolchain/android-ndk-r15c`
+		ANDROID_NDK_FULLPATH?=$(shell realpath ../../../base/toolchain/android-ndk-r15c)
 	endif
 endif
 
