@@ -96,6 +96,7 @@ release: update build-luajit
 	@echo "WARNING: You'll need to sign this application to be able to install it"
 	mkdir -p bin/
 	find launcher/build/outputs/apk/ -type f -name '*.apk' -exec mv -v {} bin/ \;
+	find eink-test/build/outputs/apk/ -type f -name '*.apk' -exec mv -v {} bin/ \;
 
 clean:
 	# clean luajit build tree and remove binaries (assets and apks)

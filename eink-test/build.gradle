@@ -19,9 +19,27 @@ android {
         }
     }
 
+    flavorDimensions "abi"
+    productFlavors {
+        arm {
+            ndk { abiFilters "armeabi-v7a" }
+            dimension = 'abi'
+        }
+        x86 {
+            ndk { abiFilters "x86" }
+            dimension = 'abi'
+        }
+    }
+
+    variantFilter { variant ->
+        if (variant.buildType.name == 'debug') {
+            setIgnore(true)
+        }
+    }
+
     applicationVariants.all { variant ->
         variant.outputs.all {
-            outputFileName = "einkTest.apk"
+            outputFileName = "einkTest-${variant.getFlavorName()}.apk"
         }
     }
 
