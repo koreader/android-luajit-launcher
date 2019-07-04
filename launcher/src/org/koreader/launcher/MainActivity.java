@@ -33,6 +33,7 @@ public class MainActivity extends android.app.NativeActivity
     private FramelessProgressDialog dialog;
     private Clipboard clipboard;
     private Device device;
+    private ExternalDict dict;
     private NetworkManager network;
     private PowerHelper power;
     private ScreenHelper screen;
@@ -289,6 +290,17 @@ public class MainActivity extends android.app.NativeActivity
     @SuppressWarnings("unused")
     public void einkUpdate(int mode, long delay, int x, int y, int width, int height) {
         device.einkUpdate(surface, mode, delay, x, y, width, height);
+    }
+
+    /** external dictionaries */
+    @SuppressWarnings("unused")
+    public int isPackageEnabled(String pkg) {
+        return (dict.isAvailable(MainActivity.this, pkg)) ? 1 : 0;
+    }
+
+    @SuppressWarnings("unused")
+    public void dictLookup(String text, String pkg, String action) {
+        dict.lookup(MainActivity.this, text, pkg, action);
     }
 
     /** native dialogs and widgets run on UI Thread */
