@@ -1679,6 +1679,37 @@ local function run(android_app_state)
         end)
     end
 
+    android.isPackageEnabled = function(package)
+        return JNI:context(android.app.activity.vm, function(JNI)
+            local package = JNI.env[0].NewStringUTF(JNI.env, package)
+            local enabled = JNI:callIntMethod(
+                android.app.activity.clazz,
+                "isPackageEnabled",
+                "(Ljava/lang/String;)I",
+                package
+            ) == 1
+            JNI.env[0].DeleteLocalRef(JNI.env, package)
+            return enabled
+        end)
+    end
+
+    android.dictLookup = function(text, package, action)
+        JNI:context(android.app.activity.vm, function(JNI)
+            local text = JNI.env[0].NewStringUTF(JNI.env, text)
+            local package = JNI.env[0].NewStringUTF(JNI.env, package)
+            local action = JNI.env[0].NewStringUTF(JNI.env, action)
+            JNI:callVoidMethod(
+                android.app.activity.clazz,
+                "dictLookup",
+                "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
+                text, package, action
+            )
+            JNI.env[0].DeleteLocalRef(JNI.env, text)
+            JNI.env[0].DeleteLocalRef(JNI.env, package)
+            JNI.env[0].DeleteLocalRef(JNI.env, action)
+        end)
+    end
+
     android.notification = function(message)
         return JNI:context(android.app.activity.vm, function(JNI)
             local text = JNI.env[0].NewStringUTF(JNI.env, message)
