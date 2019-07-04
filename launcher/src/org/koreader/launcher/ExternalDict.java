@@ -58,6 +58,9 @@ public class ExternalDict {
         } else if ("search".equals(action)) {
             // Intent.ACTION_SEARCH
             intent = new Intent(getSearchIntent(text, pkg));
+        } else if ("text".equals(action)) {
+            // Intent.ACTION_PROCESS_TEXT
+            intent = new Intent(getTextIntent(text, pkg));
         } else if ("colordict".equals(action)) {
             // colordict.intent.action.SEARCH
             intent = new Intent(getColordictIntent(text, pkg));
@@ -89,6 +92,15 @@ public class ExternalDict {
         return intent;
     }
 
+    private static Intent getTextIntent(String text, String pkg) {
+        Intent intent = new Intent(Intent.ACTION_PROCESS_TEXT);
+        intent.putExtra(Intent.EXTRA_TEXT, text);
+        intent.putExtra(Intent.EXTRA_PROCESS_TEXT, text);
+        intent.putExtra(Intent.EXTRA_PROCESS_TEXT_READONLY, text);
+        intent.setType("text/plain");
+        intent.setPackage(pkg);
+        return intent;
+    }
 
     /* Android custom intents for some dict apps ------ */
 
