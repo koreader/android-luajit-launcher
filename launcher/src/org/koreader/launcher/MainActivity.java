@@ -3,6 +3,7 @@ package org.koreader.launcher;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.provider.Settings;
 import android.os.Build;
@@ -16,6 +17,7 @@ import android.widget.Toast;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import java.util.List;
 
 public class MainActivity extends android.app.NativeActivity implements SurfaceHolder.Callback2,
     ActivityCompat.OnRequestPermissionsResultCallback {
@@ -293,11 +295,9 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
     /** external dictionaries */
     @SuppressWarnings("unused")
     public void dictLookup(String text, String pkg, String action) {
-        try {
-            Intent intent = new Intent(intentUtils.getByAction(text, pkg, action));
-            startActivity(intent);
-        } catch (Exception e) {
-            Logger.e(TAG, "dictionary lookup: " +  e.toString());
+        Intent intent = new Intent(intentUtils.getByAction(text, pkg, action));
+        if (!startActivityIfSafe(intent)) {
+            Logger.e(TAG, "dictionary lookup: can't find a package able to resolve action " + action);
         }
     }
 
@@ -467,21 +467,25 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
     public int openLink(String url) {
         Uri webpage = Uri.parse(url);
         Intent intent = new Intent(Intent.ACTION_VIEW, webpage);
-
-        // try to find an application to open the url
-        if (intent.resolveActivity(getPackageManager()) != null) {
-            startActivity(intent);
-            // link opened in app
-            return 0;
-        } else {
-            // app not found
-            return 1;
-        }
-
-
+        return (startActivityIfSafe(intent)) ? 0 : 1;
     }
 
     // --- end of public exported functions -------------
+
+    // https://stackoverflow.com/a/36842135
+    public static String intentToString(Intent intent) {
+        if (intent == null) return "";
+        StringBuilder stringBuilder = new StringBuilder("\naction: ")
+            .append(intent.getAction())
+            .append("\ndata: ")
+            .append(intent.getDataString())
+            .append("\nextras: ")
+            ;
+        for (String key : intent.getExtras().keySet()) {
+            stringBuilder.append(key).append("=").append(intent.getExtras().get(key)).append(" ");
+        }
+        return stringBuilder.toString();
+    }
 
     private void setFullscreenLayout() {
         View decorView = getWindow().getDecorView();
@@ -500,6 +504,23 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         } else {
             decorView.setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_LOW_PROFILE);
+        }
+    }
+
+    private boolean startActivityIfSafe(Intent intent) {
+        try {
+            PackageManager pm = getPackageManager();
+            List<ResolveInfo> act = pm.queryIntentActivities(intent,
+                PackageManager.MATCH_DEFAULT_ONLY);
+
+            if (act.size() > 0) {
+                Logger.d(TAG, "starting activity with intent: " + intentToString(intent));
+                startActivity(intent);
+                return true;
+            }
+            return false;
+        } catch (Exception e) {
+            return false;
         }
     }
 }
