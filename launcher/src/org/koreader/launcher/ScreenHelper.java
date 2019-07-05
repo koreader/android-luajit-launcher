@@ -13,14 +13,14 @@ import android.view.WindowManager;
 import java.util.concurrent.CountDownLatch;
 
 public class ScreenHelper {
-    private String TAG;
+    private String tag;
     private Context context;
 
     public boolean is_fullscreen = true;
 
     public ScreenHelper(Context context) {
         this.context = context;
-        this.TAG = context.getResources().getString(R.string.app_name);
+        this.tag = context.getResources().getString(R.string.app_name);
     }
 
     /** Screen size */
@@ -56,7 +56,7 @@ public class ScreenHelper {
                         context.getContentResolver(),
                         Settings.System.SCREEN_BRIGHTNESS));
                 } catch (Exception e) {
-                    Logger.e(TAG, "getBrightness error: " + e.toString());
+                    Logger.e(tag, "getBrightness error: " + e.toString());
                     result.value = new Integer(0);
                 }
                 cd.countDown();
@@ -89,7 +89,7 @@ public class ScreenHelper {
                     Settings.System.putInt(context.getContentResolver(),
                         Settings.System.SCREEN_BRIGHTNESS, brightness);
                 } catch (Exception e) {
-                    Logger.e(TAG, "setBrightness error: " + e.toString());
+                    Logger.e(tag, "setBrightness error: " + e.toString());
                 }
             }
         });
@@ -121,7 +121,7 @@ public class ScreenHelper {
                         window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
                     }
                 } catch (Exception e) {
-                    Logger.e(TAG, "setFullscreen error: " + e.toString());
+                    Logger.e(tag, "setFullscreen error: " + e.toString());
                 }
                 cd.countDown();
             }

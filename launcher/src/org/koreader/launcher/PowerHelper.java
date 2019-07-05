@@ -10,7 +10,7 @@ import android.os.PowerManager;
 public class PowerHelper {
     private static final String WAKELOCK_ID = "ko-wakelock";
 
-    private String TAG;
+    private String tag;
     private Context context;
     private IntentFilter filter;
     private PowerManager.WakeLock wakelock;
@@ -20,7 +20,7 @@ public class PowerHelper {
         /* use application context */
         this.context = context.getApplicationContext();
         this.filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-        this.TAG = context.getResources().getString(R.string.app_name);
+        this.tag = context.getResources().getString(R.string.app_name);
     }
 
     public int batteryPercent() {
@@ -69,14 +69,14 @@ public class PowerHelper {
             wakelockRelease();
             PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
             wakelock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, WAKELOCK_ID);
-            Logger.d(TAG, "wakelock: acquiring " + WAKELOCK_ID);
+            Logger.d(tag, "wakelock: acquiring " + WAKELOCK_ID);
             wakelock.acquire();
         }
     }
 
     private void wakelockRelease() {
         if (isWakeLockAllowed && wakelock != null) {
-            Logger.d(TAG, "wakelock: releasing " + WAKELOCK_ID);
+            Logger.d(tag, "wakelock: releasing " + WAKELOCK_ID);
             wakelock.release();
             wakelock = null;
         }

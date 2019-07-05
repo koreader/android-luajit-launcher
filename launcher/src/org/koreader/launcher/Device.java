@@ -14,12 +14,12 @@ public class Device {
     private static final boolean HAS_FULL_EINK_SUPPORT = DeviceInfo.EINK_FULL_SUPPORT;
     private static final boolean NEEDS_WAKELOCK_ENABLED = DeviceInfo.BUG_WAKELOCKS;
 
-    private String TAG;
+    private String tag;
     private EPDController epd;
 
     public Device(Context context) {
-        this.TAG = context.getApplicationContext().getResources().getString(R.string.app_name);
-        this.epd = EPDFactory.getEPDController(TAG);
+        this.tag = context.getApplicationContext().getResources().getString(R.string.app_name);
+        this.epd = EPDFactory.getEPDController(tag);
     }
 
     /**
@@ -37,10 +37,10 @@ public class Device {
         } else if (mode == 4) {
             mode_name = "EPD_AUTO";
         } else {
-            Logger.e(TAG, String.format("%s: %d", mode_name, mode));
+            Logger.e(tag, String.format("%s: %d", mode_name, mode));
             return;
         }
-        Logger.v(TAG, String.format("requesting epd update, type: %s", mode_name));
+        Logger.v(tag, String.format("requesting epd update, type: %s", mode_name));
         epd.setEpdMode(view, 0, 0, 0, 0, 0, 0, mode_name);
     }
 
@@ -48,7 +48,7 @@ public class Device {
      * Used on Freescale imx devices
      */
     public void einkUpdate(SurfaceView view, int mode, long delay, int x, int y, int width, int height) {
-        Logger.v(TAG, String.format("requesting epd update, mode:%d, delay:%d, [x:%d, y:%d, w:%d, h:%d]",
+        Logger.v(tag, String.format("requesting epd update, mode:%d, delay:%d, [x:%d, y:%d, w:%d, h:%d]",
             mode, delay, x, y, width, height));
         epd.setEpdMode(view, mode, delay, x, y, width, height, null);
     }
