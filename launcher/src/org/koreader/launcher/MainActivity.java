@@ -17,8 +17,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 
-public class MainActivity extends android.app.NativeActivity
-    implements SurfaceHolder.Callback2,
+public class MainActivity extends android.app.NativeActivity implements SurfaceHolder.Callback2,
     ActivityCompat.OnRequestPermissionsResultCallback {
 
     private final static int SDK_INT = Build.VERSION.SDK_INT;
@@ -28,16 +27,15 @@ public class MainActivity extends android.app.NativeActivity
         System.loadLibrary("luajit");
     }
 
-    private String TAG;
-
-    private FramelessProgressDialog dialog;
     private Clipboard clipboard;
     private Device device;
-    private ExternalDict dict;
+    private FramelessProgressDialog dialog;
+    private IntentUtils intentUtils;
     private NetworkManager network;
     private PowerHelper power;
     private ScreenHelper screen;
     private SurfaceView surface;
+    private String TAG;
 
     // size in pixels of the top notch, if any
     private int notch_height = 0;
@@ -294,13 +292,13 @@ public class MainActivity extends android.app.NativeActivity
 
     /** external dictionaries */
     @SuppressWarnings("unused")
-    public int isPackageEnabled(String pkg) {
-        return (dict.isAvailable(MainActivity.this, pkg)) ? 1 : 0;
-    }
-
-    @SuppressWarnings("unused")
     public void dictLookup(String text, String pkg, String action) {
-        dict.lookup(MainActivity.this, text, pkg, action);
+        try {
+            Intent intent = new Intent(intentUtils.getByAction(text, pkg, action));
+            startActivity(intent);
+        } catch (Exception e) {
+            Logger.e(TAG, "dictionary lookup: " +  e.toString());
+        }
     }
 
     /** native dialogs and widgets run on UI Thread */
@@ -336,6 +334,22 @@ public class MainActivity extends android.app.NativeActivity
                 }
             }
         });
+    }
+
+    /** package manager */
+    @SuppressWarnings("unused")
+    public int isPackageEnabled(String pkg) {
+        try {
+            // is the package available (installed and enabled) ?
+            PackageManager pm = getPackageManager();
+            pm.getPackageInfo(pkg, PackageManager.GET_ACTIVITIES);
+            boolean enabled = pm.getApplicationInfo(pkg, 0).enabled;
+            Logger.d(TAG, String.format("Package %s is installed. Enabled? -> %s", pkg, Boolean.toString(enabled)));
+            return (enabled) ? 1 : 0;
+        } catch (PackageManager.NameNotFoundException e) {
+            Logger.d(TAG, String.format("Package %s is not installed.", pkg));
+            return 0;
+        }
     }
 
     /** power */
