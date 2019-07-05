@@ -47,6 +47,7 @@ public class EPDFactory {
                 break;
 
             /** devices using imx/ntx platform */
+            case CREMA:
             case TOLINO:
             case NOOK_V520:
                 controllerName = "Freescale NTX";

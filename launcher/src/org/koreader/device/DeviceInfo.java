@@ -29,6 +29,7 @@ public class DeviceInfo {
         BOYUE_T80D,
         BOYUE_T78D,
         BOYUE_T103D,
+        CREMA,
         ONYX_C67,
         ENERGY,
         INKBOOK,
@@ -44,6 +45,7 @@ public class DeviceInfo {
     public static final boolean BOYUE_T80D;
     public static final boolean BOYUE_T78D;
     public static final boolean BOYUE_T103D;
+    public static final boolean CREMA;
     public static final boolean ONYX_C67;
     public static final boolean ENERGY;
     public static final boolean INKBOOK;
@@ -100,6 +102,11 @@ public class DeviceInfo {
                 && PRODUCT.toLowerCase().contentEquals("t103d");
         deviceMap.put(EinkDevice.BOYUE_T103D, BOYUE_T103D);
 
+        // Crema Note (1010P)
+        CREMA = BRAND.toLowerCase().contentEquals("crema")
+                && PRODUCT.toLowerCase().contentEquals("note");
+        deviceMap.put(EinkDevice.CREMA, CREMA);
+
         // Onyx C67
         ONYX_C67 = MANUFACTURER.toLowerCase().contentEquals("onyx")
                 && ( PRODUCT.toLowerCase().startsWith("c67") || MODEL.contentEquals("rk30sdk") )
@@ -137,6 +144,7 @@ public class DeviceInfo {
 
         // freescale epd driver
         EINK_FREESCALE = (
+            CREMA ||
             TOLINO ||
             NOOK_V520
         );
@@ -161,6 +169,7 @@ public class DeviceInfo {
 
         // full support
         EINK_FULL_SUPPORT = (
+            CREMA ||
             TOLINO
         );
 
