@@ -35,6 +35,15 @@ public class IntentUtils {
         } else if ("quickdic".equals(action)) {
             // com.hughes.action.ACTION_SEARCH_DICT
             intent = new Intent(getQuickdicIntent(text));
+        } else if ("picker-send".equals(action)) {
+            // app picker for Intent.ACTION_SEND
+            intent = new Intent(getSendIntent(text));
+        } else if ("picker-search".equals(action)) {
+            // app picker for Intent.ACTION_SEARCH
+            intent = new Intent(getSearchIntent(text));
+        } else if ("picker-text".equals(action)) {
+            // app picker for Intent.ACTION_PROCESS_TEXT
+            intent = new Intent(getTextIntent(text));
         }
         return intent;
     }
