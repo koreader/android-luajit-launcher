@@ -37,7 +37,7 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
     private PowerHelper power;
     private ScreenHelper screen;
     private SurfaceView surface;
-    private String TAG;
+    private String tag;
 
     // size in pixels of the top notch, if any
     private int notch_height = 0;
@@ -48,8 +48,8 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         super.onCreate(savedInstanceState);
 
         // set a tag for logging
-        TAG = getName();
-        Logger.d(TAG, "App created");
+        tag = getName();
+        Logger.d(tag, "App created");
 
         // set the native window as an android surface. Useful in *some* eink devices,
         // where the epd driver is hooked in the View class framework.
@@ -83,7 +83,7 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
             Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
 
         if (!is_granted) {
-            Logger.i(TAG, String.format("Requesting permission: %s", REQUEST_WRITE_STORAGE));
+            Logger.i(tag, String.format("Requesting permission: %s", REQUEST_WRITE_STORAGE));
             ActivityCompat.requestPermissions(this,
                 new String[]{ Manifest.permission.WRITE_EXTERNAL_STORAGE }, REQUEST_WRITE_STORAGE);
         }
@@ -92,7 +92,7 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
     /** Called when the activity has become visible. */
     @Override
     protected void onResume() {
-        Logger.d(TAG, "App resumed");
+        Logger.d(tag, "App resumed");
         power.setWakelock(true);
         super.onResume();
         /** switch to fullscreen for older devices */
@@ -110,7 +110,7 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
     /** Called when another activity is taking focus. */
     @Override
     protected void onPause() {
-        Logger.d(TAG, "App paused");
+        Logger.d(tag, "App paused");
         power.setWakelock(false);
         super.onPause();
     }
@@ -118,14 +118,14 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
     /** Called when the activity is no longer visible. */
     @Override
     protected void onStop() {
-        Logger.d(TAG, "App stopped");
+        Logger.d(tag, "App stopped");
         super.onStop();
     }
 
     /** Called just before the activity is destroyed. */
     @Override
     protected void onDestroy() {
-        Logger.d(TAG, "App destroyed");
+        Logger.d(tag, "App destroyed");
         clipboard = null;
         device = null;
         power = null;
@@ -145,7 +145,7 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
     /** Called when a new surface is created */
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        Logger.d(TAG, "Surface created");
+        Logger.d(tag, "Surface created");
         super.surfaceCreated(holder);
         surface.setWillNotDraw(false);
     }
@@ -153,7 +153,7 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
     /** Called after a surface change */
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-        Logger.d(TAG, String.format(
+        Logger.d(tag, String.format(
             "Surface changed {\n  format:	%d\n  width:	%d\n  height:	%d\n}",
             format, width, height));
 
@@ -163,7 +163,7 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
     /** Called when the surface is destroyed */
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-        Logger.d(TAG, "Surface destroyed");
+        Logger.d(tag, "Surface destroyed");
         super.surfaceDestroyed(holder);
     }
 
@@ -171,7 +171,7 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
     @Override
     public void onAttachedToWindow() {
         super.onAttachedToWindow();
-        Logger.d(TAG, "surface attached to a window");
+        Logger.d(tag, "surface attached to a window");
         if (SDK_INT >= Build.VERSION_CODES.P) {
             // handle top "notch" on Android Pie
             android.view.DisplayCutout cutout;
@@ -179,7 +179,7 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
             if (cutout != null) {
                 int cutout_pixels = cutout.getSafeInsetTop();
                 if (notch_height != cutout_pixels) {
-                    Logger.d(TAG, String.format("found a top notch: %dpx", cutout_pixels));
+                    Logger.d(tag, String.format("found a top notch: %dpx", cutout_pixels));
                     notch_height = cutout_pixels;
                 }
             }
@@ -190,7 +190,7 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
     @Override
     public void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        Logger.d(TAG, "surface detached from its window");
+        Logger.d(tag, "surface detached from its window");
     }
 
     /** Called on permission result */
@@ -198,17 +198,17 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if(ActivityCompat.checkSelfPermission(this, permissions[0]) == PackageManager.PERMISSION_GRANTED) {
-            Logger.d(TAG, String.format("Permission granted for request code: %d", requestCode));
+            Logger.d(tag, String.format("Permission granted for request code: %d", requestCode));
         } else {
             String msg = String.format("Permission rejected for request code %d", requestCode);
             switch (requestCode) {
                 case REQUEST_WRITE_STORAGE:
                     // we can't work without external storage permissions
-                    Logger.e(TAG, msg);
+                    Logger.e(tag, msg);
                     finish();
                     break;
                 default:
-                    Logger.w(TAG, msg);
+                    Logger.w(tag, msg);
                     break;
             }
         }
@@ -297,7 +297,7 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
     public void dictLookup(String text, String pkg, String action) {
         Intent intent = new Intent(intentUtils.getByAction(text, pkg, action));
         if (!startActivityIfSafe(intent)) {
-            Logger.e(TAG, "dictionary lookup: can't find a package able to resolve action " + action);
+            Logger.e(tag, "dictionary lookup: can't find a package able to resolve action " + action);
         }
     }
 
@@ -344,10 +344,10 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
             PackageManager pm = getPackageManager();
             pm.getPackageInfo(pkg, PackageManager.GET_ACTIVITIES);
             boolean enabled = pm.getApplicationInfo(pkg, 0).enabled;
-            Logger.d(TAG, String.format("Package %s is installed. Enabled? -> %s", pkg, Boolean.toString(enabled)));
+            Logger.d(tag, String.format("Package %s is installed. Enabled? -> %s", pkg, Boolean.toString(enabled)));
             return (enabled) ? 1 : 0;
         } catch (PackageManager.NameNotFoundException e) {
-            Logger.d(TAG, String.format("Package %s is not installed.", pkg));
+            Logger.d(tag, String.format("Package %s is not installed.", pkg));
             return 0;
         }
     }
@@ -514,7 +514,7 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
                 PackageManager.MATCH_DEFAULT_ONLY);
 
             if (act.size() > 0) {
-                Logger.d(TAG, "starting activity with intent: " + intentToString(intent));
+                Logger.d(tag, "starting activity with intent: " + intentToString(intent));
                 startActivity(intent);
                 return true;
             }

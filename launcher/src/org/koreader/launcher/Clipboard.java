@@ -12,12 +12,12 @@ import java.util.concurrent.CountDownLatch;
 public class Clipboard {
     private Context context;
     private ClipboardManager clipboard;
-    private String TAG;
+    private String tag;
 
     public Clipboard(Context context) {
         this.context = context;
         this.clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-        this.TAG = context.getResources().getString(R.string.app_name);
+        this.tag = context.getResources().getString(R.string.app_name);
     }
 
     public String getClipboardText() {
@@ -32,7 +32,7 @@ public class Clipboard {
                         result.value = item.getText().toString();
                     }
                 } catch (Exception e) {
-                    Logger.e(TAG, "clipboard error: " + e.toString());
+                    Logger.e(tag, "clipboard error: " + e.toString());
                     result.value = "";
                 }
                 cd.countDown();
@@ -58,7 +58,7 @@ public class Clipboard {
                     ClipData clip = ClipData.newPlainText("KOReader_clipboard", text);
                     clipboard.setPrimaryClip(clip);
                 } catch (Exception e) {
-                    Logger.e(TAG, "clipboard error: " + e.toString());
+                    Logger.e(tag, "clipboard error: " + e.toString());
                 }
             }
         });

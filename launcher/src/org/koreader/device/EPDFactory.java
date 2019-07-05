@@ -16,7 +16,7 @@ import android.util.Log;
 @SuppressWarnings("unused")
 public class EPDFactory {
 
-    public static EPDController getEPDController(final String TAG) {
+    public static EPDController getEPDController(final String tag) {
         EPDController epdController = null;
         String controllerName = null;
 
@@ -62,7 +62,7 @@ public class EPDFactory {
         }
 
         if (controllerName != null) {
-            Log.i(TAG, String.format("Using %s EPD Controller", controllerName));
+            Log.i(tag, String.format("Using %s EPD Controller", controllerName));
         }
 
         return epdController;

@@ -3,21 +3,21 @@ package org.koreader.launcher;
 import android.util.Log;
 
 public class Logger {
-    public static void d(final String TAG, final String message) {
+    public static void d(final String tag, final String message) {
         if (BuildConfig.DEBUG) {
-            Log.d(TAG, message);
+            Log.d(tag, message);
         }
     }
-    public static void v(final String TAG, final String message) {
-        Log.v(TAG, message);
+    public static void v(final String tag, final String message) {
+        Log.v(tag, message);
     }
-    public static void i(final String TAG, final String message) {
-        Log.i(TAG, message);
+    public static void i(final String tag, final String message) {
+        Log.i(tag, message);
     }
-    public static void w(final String TAG, final String message) {
-        Log.w(TAG, message);
+    public static void w(final String tag, final String message) {
+        Log.w(tag, message);
     }
-    public static void e(final String TAG, final String message) {
-        Log.e(TAG, message);
+    public static void e(final String tag, final String message) {
+        Log.e(tag, message);
     }
 }
