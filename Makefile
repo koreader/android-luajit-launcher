@@ -83,7 +83,7 @@ prepare: update
 
 debug: update build-luajit
 	# build signed debug apk
-	./gradlew -PversName=$(NAME) -PversCode=$(VERSION) -PprojectName=$(APPNAME) -PprojectFlavor=$(FLAVOR) $(GRADLE_TASK)Debug
+	./gradlew -PversName=$(NAME) -PversCode=$(VERSION) -PprojectName=$(APPNAME) -PprojectFlavor=$(FLAVOR) $(GRADLE_TASK)Debug --warning-mode all
 	@echo "application was built, type: debug (signed), flavor: $(FLAVOR), version: $(NAME), release $(VERSION)"
 	mkdir -p bin/
 	find launcher/build/outputs/apk/ -type f -name '*.apk' -exec mv -v {} bin/ \;
@@ -91,7 +91,7 @@ debug: update build-luajit
 release: update build-luajit
 	# build unsigned release apk, with version code and version name
 	@echo "Building release APK, Version $(NAME), release $(VERSION)"
-	./gradlew -PversName=$(NAME) -PversCode=$(VERSION) -PprojectName=$(APPNAME) -PprojectFlavor=$(FLAVOR) $(GRADLE_TASK)Release
+	./gradlew -PversName=$(NAME) -PversCode=$(VERSION) -PprojectName=$(APPNAME) -PprojectFlavor=$(FLAVOR) $(GRADLE_TASK)Release --warning-mode all
 	@echo "application $(APPNAME) was built, type: release (unsigned), flavor: $(FLAVOR), version: $(NAME), release $(VERSION)"
 	@echo "WARNING: You'll need to sign this application to be able to install it"
 	mkdir -p bin/
