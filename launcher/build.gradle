@@ -59,6 +59,9 @@ android {
         abortOnError false
         disable 'DefaultLocale'
         disable 'GoogleAppIndexingWarning'
+        disable 'NewApi'
+        disable 'UseValueOf'
+        disable 'WakelockTimeout'
     }
 
     aaptOptions {
