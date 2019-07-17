@@ -1,6 +1,7 @@
 package org.koreader.launcher;
 
 import android.Manifest;
+import android.app.NativeActivity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -9,64 +10,69 @@ import android.provider.Settings;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import org.koreader.device.DeviceInfo;
+
 import java.util.List;
 
-public class MainActivity extends android.app.NativeActivity implements SurfaceHolder.Callback2,
-    ActivityCompat.OnRequestPermissionsResultCallback {
+@SuppressWarnings("unused")
+public class MainActivity extends NativeActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
 
     private final static int SDK_INT = Build.VERSION.SDK_INT;
     private final static int REQUEST_WRITE_STORAGE = 1;
-
-    static {
-        System.loadLibrary("luajit");
-    }
+    private final static boolean HAS_EINK_SUPPORT = DeviceInfo.EINK_SUPPORT;
+    private final static boolean HAS_FULL_EINK_SUPPORT = DeviceInfo.EINK_FULL_SUPPORT;
+    private final static boolean NEEDS_WAKELOCK_ENABLED = DeviceInfo.BUG_WAKELOCKS;
+    private final static String PRODUCT = DeviceInfo.PRODUCT;
 
     private Clipboard clipboard;
-    private Device device;
     private FramelessProgressDialog dialog;
     private IntentUtils intentUtils;
     private NetworkManager network;
     private PowerHelper power;
     private ScreenHelper screen;
-    private SurfaceView surface;
+    private NativeView view;
     private String tag;
+
+    static {
+        System.loadLibrary("luajit");
+    }
 
     // size in pixels of the top notch, if any
     private int notch_height = 0;
 
-    /** Called when the activity is first created. */
+    /* Called when the activity is first created. */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // (re)initialize helper classes to get rid of old values.
+        initHelperClasses();
 
         // set a tag for logging
         tag = getName();
         Logger.d(tag, "App created");
 
-        // set the native window as an android surface. Useful in *some* eink devices,
-        // where the epd driver is hooked in the View class framework.
+        // take ownership of the window
         getWindow().takeSurface(null);
-        surface = new SurfaceView(this);
-        SurfaceHolder holder = surface.getHolder();
-        holder.addCallback(this);
-        setContentView(surface);
 
-        // helper classes
+        // hook our native window inside the view hierarchy
+        view = new NativeView(this);
+        view.getHolder().addCallback(this);
+        setContentView(view);
+
+        // setup helper classes
         clipboard = new Clipboard(this);
-        device = new Device(this);
+        network = new NetworkManager(this);
         power = new PowerHelper(this);
         screen = new ScreenHelper(this);
-        network = new NetworkManager(this);
 
-        /** Listen to visibility changes */
+        // Listen to visibility changes
         if (SDK_INT >= Build.VERSION_CODES.KITKAT) {
             setFullscreenLayout();
             View decorView = getWindow().getDecorView();
@@ -78,7 +84,7 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
             });
         }
 
-        /** runtime permissions: we need read and write on external storage to work! */
+        // runtime permissions: we need read and write on external storage to work!
         boolean is_granted = (ContextCompat.checkSelfPermission(this,
             Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
 
@@ -89,7 +95,7 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         }
     }
 
-    /** Called when the activity has become visible. */
+    /* Called when the activity has become visible. */
     @Override
     protected void onResume() {
         Logger.d(tag, "App resumed");
@@ -107,7 +113,7 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         }
     }
 
-    /** Called when another activity is taking focus. */
+    /* Called when another activity is taking focus. */
     @Override
     protected void onPause() {
         Logger.d(tag, "App paused");
@@ -115,59 +121,28 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         super.onPause();
     }
 
-    /** Called when the activity is no longer visible. */
+    /* Called when the activity is no longer visible. */
     @Override
     protected void onStop() {
         Logger.d(tag, "App stopped");
         super.onStop();
     }
 
-    /** Called just before the activity is destroyed. */
+    /* Called just before the activity is destroyed. */
     @Override
     protected void onDestroy() {
         Logger.d(tag, "App destroyed");
-        clipboard = null;
-        device = null;
-        power = null;
-        screen = null;
-        surface = null;
-        network = null;
         super.onDestroy();
     }
 
-    /** Called just before the activity is resumed by an intent */
+    /* Called just before the activity is resumed by an intent */
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
     }
 
-    /** Called when a new surface is created */
-    @Override
-    public void surfaceCreated(SurfaceHolder holder) {
-        Logger.d(tag, "Surface created");
-        super.surfaceCreated(holder);
-        surface.setWillNotDraw(false);
-    }
-
-    /** Called after a surface change */
-    @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-        Logger.d(tag, String.format(
-            "Surface changed {\n  format:	%d\n  width:	%d\n  height:	%d\n}",
-            format, width, height));
-
-        super.surfaceChanged(holder,format,width,height);
-    }
-
-    /** Called when the surface is destroyed */
-    @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {
-        Logger.d(tag, "Surface destroyed");
-        super.surfaceDestroyed(holder);
-    }
-
-    /** Called when the view is attached to a window */
+    /* Called when the view is attached to a window */
     @Override
     public void onAttachedToWindow() {
         super.onAttachedToWindow();
@@ -186,14 +161,14 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         }
     }
 
-    /** Called when the view is detached from its window */
+    /* Called when the view is detached from its window */
     @Override
     public void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         Logger.d(tag, "surface detached from its window");
     }
 
-    /** Called on permission result */
+    /* Called on permission result */
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -214,86 +189,77 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         }
     }
 
-    /** These functions are exposed to lua in assets/android.lua
+    /*  These functions are exposed to lua in assets/android.lua
      *  If you add a new function here remember to write the companion
      *  lua function in that file */
 
 
-    /** build */
-    @SuppressWarnings("unused")
+    /* build */
     public int isDebuggable() {
         return (BuildConfig.DEBUG) ? 1 : 0;
     }
 
-    @SuppressWarnings("unused")
     public String getFlavor() {
         return getResources().getString(R.string.app_flavor);
     }
 
-    @SuppressWarnings("unused")
     public String getName() {
         return getResources().getString(R.string.app_name);
     }
 
-    /** clipboard */
-    @SuppressWarnings("unused")
+    /* clipboard */
     public String getClipboardText() {
         return clipboard.getClipboardText();
     }
 
-    @SuppressWarnings("unused")
     public int hasClipboardTextIntResultWrapper() {
         return clipboard.hasClipboardText();
     }
 
-    @SuppressWarnings("unused")
     public void setClipboardText(final String text) {
         clipboard.setClipboardText(text);
     }
 
-    /** device */
-    @SuppressWarnings("unused")
+    /* device */
     public String getProduct() {
-        return device.getProduct();
+        return PRODUCT;
     }
 
-    @SuppressWarnings("unused")
     public String getVersion() {
         return android.os.Build.VERSION.RELEASE;
     }
 
-    @SuppressWarnings("unused")
     public int isEink() {
-        return device.isEink();
+        return HAS_EINK_SUPPORT ? 1 : 0;
     }
 
-    @SuppressWarnings("unused")
     public int isEinkFull() {
-        return device.isFullEink();
+        return HAS_FULL_EINK_SUPPORT ? 1 : 0;
     }
 
-    @SuppressWarnings("unused")
     public String getEinkPlatform() {
-        return device.einkPlatform();
+        if (DeviceInfo.EINK_FREESCALE) {
+            return "freescale";
+        } else if (DeviceInfo.EINK_ROCKCHIP){
+            return "rockchip";
+        } else {
+            return "none";
+        }
     }
 
-    @SuppressWarnings("unused")
     public int needsWakelocks() {
-        return device.needsWakelock();
+        return NEEDS_WAKELOCK_ENABLED ? 1 : 0;
     }
 
-    @SuppressWarnings("unused")
     public void einkUpdate(int mode) {
-        device.einkUpdate(surface, mode);
+        view.einkUpdate(mode);
     }
 
-    @SuppressWarnings("unused")
     public void einkUpdate(int mode, long delay, int x, int y, int width, int height) {
-        device.einkUpdate(surface, mode, delay, x, y, width, height);
+        view.einkUpdate(mode, delay, x, y, width, height);
     }
 
-    /** external dictionaries */
-    @SuppressWarnings("unused")
+    /* external dictionaries */
     public void dictLookup(String text, String pkg, String action) {
         Intent intent = new Intent(intentUtils.getByAction(text, pkg, action));
         if (!startActivityIfSafe(intent)) {
@@ -301,8 +267,7 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         }
     }
 
-    /** native dialogs and widgets run on UI Thread */
-    @SuppressWarnings("unused")
+    /* native dialogs and widgets run on UI Thread */
     public void showToast(final String message) {
         runOnUiThread(new Runnable() {
             @Override
@@ -313,7 +278,6 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         });
     }
 
-    @SuppressWarnings("unused")
     public void showProgress(final String title, final String message) {
         runOnUiThread(new Runnable() {
             @Override
@@ -324,7 +288,6 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         });
     }
 
-    @SuppressWarnings("unused")
     public void dismissProgress() {
         runOnUiThread(new Runnable() {
             @Override
@@ -336,8 +299,7 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         });
     }
 
-    /** package manager */
-    @SuppressWarnings("unused")
+    /* package manager */
     public int isPackageEnabled(String pkg) {
         try {
             // is the package available (installed and enabled) ?
@@ -352,29 +314,24 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         }
     }
 
-    /** power */
-    @SuppressWarnings("unused")
+    /* power */
     public int isCharging() {
         return power.batteryCharging();
     }
 
-    @SuppressWarnings("unused")
     public int getBatteryLevel() {
         return power.batteryPercent();
     }
 
-    @SuppressWarnings("unused")
     public void setWakeLock(final boolean enabled) {
         power.setWakelockState(enabled);
     }
 
-    /** screen */
-    @SuppressWarnings("unused")
+    /* screen */
     public int getScreenBrightness() {
         return screen.getScreenBrightness();
     }
 
-    @SuppressWarnings("unused")
     public int getScreenHeight() {
         if (SDK_INT >= Build.VERSION_CODES.P) {
             return (screen.getScreenHeight() - notch_height);
@@ -383,22 +340,18 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         }
     }
 
-    @SuppressWarnings("unused")
     public int getScreenAvailableHeight() {
         return screen.getScreenAvailableHeight();
     }
 
-    @SuppressWarnings("unused")
     public int getScreenWidth() {
         return screen.getScreenWidth();
     }
 
-    @SuppressWarnings("unused")
     public int getStatusBarHeight() {
         return screen.getStatusBarHeight();
     }
 
-    @SuppressWarnings("unused")
     public int isFullscreen() {
         // for newer Jelly Bean devices (apis 17 - 18)
         if ((SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR2) ||
@@ -415,7 +368,6 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         }
     }
 
-    @SuppressWarnings("unused")
     public void setFullscreen(final boolean enabled) {
         // for newer Jelly Bean devices (apis 17 - 18)
         if ((SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR2) ||
@@ -428,7 +380,6 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         }
     }
 
-    @SuppressWarnings("unused")
     public void setScreenBrightness(final int brightness) {
         if (SDK_INT >= Build.VERSION_CODES.M) {
             if (Settings.System.canWrite(MainActivity.this)) {
@@ -442,28 +393,23 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         }
     }
 
-    /** wifi */
-    @SuppressWarnings("unused")
+    /* wifi */
     public void setWifiEnabled(final boolean enabled) {
         network.setWifi(enabled);
     }
 
-    @SuppressWarnings("unused")
     public int isWifiEnabled() {
         return network.isWifi();
     }
 
-    @SuppressWarnings("unused")
     public String getNetworkInfo() {
         return network.info();
     }
 
-    @SuppressWarnings("unused")
     public int download(final String url, final String name) {
         return network.download(url, name);
     }
 
-    @SuppressWarnings("unused")
     public int openLink(String url) {
         Uri webpage = Uri.parse(url);
         Intent intent = new Intent(Intent.ACTION_VIEW, webpage);
@@ -472,8 +418,16 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
 
     // --- end of public exported functions -------------
 
+    private void initHelperClasses() {
+        clipboard = null;
+        network = null;
+        power = null;
+        screen = null;
+        view = null;
+    }
+
     // https://stackoverflow.com/a/36842135
-    public static String intentToString(Intent intent) {
+    private static String intentToString(Intent intent) {
         if (intent == null) return "";
         StringBuilder stringBuilder = new StringBuilder("\naction: ")
             .append(intent.getAction())
