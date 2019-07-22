@@ -78,15 +78,8 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
             });
         }
 
-        /** runtime permissions: we need read and write on external storage to work! */
-        boolean is_granted = (ContextCompat.checkSelfPermission(this,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-
-        if (!is_granted) {
-            Logger.i(tag, String.format("Requesting permission: %s", REQUEST_WRITE_STORAGE));
-            ActivityCompat.requestPermissions(this,
-                new String[]{ Manifest.permission.WRITE_EXTERNAL_STORAGE }, REQUEST_WRITE_STORAGE);
-        }
+        // we need WRITE_STORAGE permission granted at launch
+        requestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, REQUEST_WRITE_STORAGE);
     }
 
     /** Called when the activity has become visible. */
@@ -430,14 +423,7 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
 
     @SuppressWarnings("unused")
     public void setScreenBrightness(final int brightness) {
-        if (SDK_INT >= Build.VERSION_CODES.M) {
-            if (Settings.System.canWrite(MainActivity.this)) {
-                screen.setScreenBrightness(brightness);
-            } else {
-                Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
-                MainActivity.this.startActivity(intent);
-            }
-        } else {
+        if (hasWriteSettingsEnabled()) {
             screen.setScreenBrightness(brightness);
         }
     }
@@ -472,6 +458,23 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
 
     // --- end of public exported functions -------------
 
+    // WRITE_SETTINGS is a special permission and needs to be granted through a permission management screen.
+    // see https://developer.android.com/reference/android/Manifest.permission.html#WRITE_SETTINGS
+    private boolean hasWriteSettingsEnabled() {
+        if (SDK_INT >= Build.VERSION_CODES.M) {
+            if (Settings.System.canWrite(MainActivity.this)) {
+                return true;
+            } else {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
+                MainActivity.this.startActivity(intent);
+                return false;
+            }
+        } else {
+            // on older apis permissions are granted at install time
+            return true;
+        }
+    }
+
     // https://stackoverflow.com/a/36842135
     public static String intentToString(Intent intent) {
         if (intent == null) return "";
@@ -485,6 +488,18 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
             stringBuilder.append(key).append("=").append(intent.getExtras().get(key)).append(" ");
         }
         return stringBuilder.toString();
+    }
+
+    // request normal/dangerous permissions at runtime.
+    // See https://developer.android.com/guide/topics/permissions/overview.html#normal-dangerous
+    private void requestPermission(String permission, int code) {
+        boolean is_granted = (ContextCompat.checkSelfPermission(MainActivity.this,
+            permission) == PackageManager.PERMISSION_GRANTED);
+
+        if (!is_granted) {
+            Logger.i(tag, String.format("Requesting %s permission", permission));
+            ActivityCompat.requestPermissions(this, new String[]{ permission }, code);
+        }
     }
 
     private void setFullscreenLayout() {
