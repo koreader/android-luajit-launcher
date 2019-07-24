@@ -86,7 +86,7 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
     @Override
     protected void onResume() {
         Logger.d(tag, "App resumed");
-        power.setWakelock(true);
+        setTimeout(true);
         super.onResume();
         /** switch to fullscreen for older devices */
         if (SDK_INT < Build.VERSION_CODES.KITKAT) {
@@ -104,7 +104,7 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
     @Override
     protected void onPause() {
         Logger.d(tag, "App paused");
-        power.setWakelock(false);
+        setTimeout(false);
         super.onPause();
     }
 
@@ -377,6 +377,22 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
     }
 
     @SuppressWarnings("unused")
+    public int getScreenTimeout() {
+        return screen.getTimeout();
+    }
+
+    @SuppressWarnings("unused")
+    public void setScreenTimeout(final int timeout) {
+        if (timeout == screen.TIMEOUT_WAKELOCK) {
+            power.setWakelockState(true);
+        } else {
+            power.setWakelockState(false);
+        }
+
+        screen.setTimeout(timeout);
+    }
+
+    @SuppressWarnings("unused")
     public int getScreenAvailableHeight() {
         return screen.getScreenAvailableHeight();
     }
@@ -519,6 +535,29 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         } else {
             decorView.setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_LOW_PROFILE);
+        }
+    }
+
+
+    /** set screen timeout based on activity state. Intended to be hooked
+     *  in onResume / onPause activity callbacks.
+     *
+     *  the method based on wakelocks works without problems.
+     *  the method based on modifying android system settings should work
+     *  but requires the special permission WRITE_SETTINGS.
+     *
+     *  @param focus - is the activity resumed and focused?
+     */
+    private void setTimeout(final boolean focus) {
+        int current_timeout = screen.getTimeout();
+        if (current_timeout == screen.TIMEOUT_WAKELOCK) {
+            Logger.d(tag, String.format("timeout callback, focus: %b -> using wakelocks", focus));
+            power.setWakelock(focus);
+        } else if ((current_timeout > screen.TIMEOUT_SYSTEM) && (hasWriteSettingsEnabled())) {
+            Logger.d(tag, String.format("timeout callback, focus: %b -> using custom settings", focus));
+            screen.updateTimeout(focus);
+        } else if (current_timeout == screen.TIMEOUT_SYSTEM) {
+            Logger.d(tag, String.format("timeout callback, focus: %b -> using system settings", focus));
         }
     }
 

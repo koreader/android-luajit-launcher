@@ -13,14 +13,24 @@ import android.view.WindowManager;
 import java.util.concurrent.CountDownLatch;
 
 public class ScreenHelper {
+
+    public final static int TIMEOUT_WAKELOCK = -1;
+    public final static int TIMEOUT_SYSTEM = 0;
+
     private String tag;
     private Context context;
 
-    public boolean is_fullscreen = true;
+    // track fullscreen state.
+    private boolean is_fullscreen = true;
+
+    // track system/application screen timeout
+    private int app_timeout;
+    private int sys_timeout;
 
     public ScreenHelper(Context context) {
         this.context = context;
         this.tag = context.getResources().getString(R.string.app_name);
+        this.sys_timeout = getScreenTimeout();
     }
 
     /** Screen size */
@@ -95,6 +105,54 @@ public class ScreenHelper {
         });
     }
 
+    /** Screen timeout */
+    public int getTimeout() {
+        return app_timeout;
+    }
+
+    public void setTimeout(final int new_timeout) {
+        app_timeout = new_timeout;
+        if (app_timeout > TIMEOUT_SYSTEM) {
+            // custom screen timeout
+            Logger.d(tag, String.format("set timeout for %s: %d seconds", tag, app_timeout / 1000));
+            setScreenTimeout(app_timeout);
+
+        } else if ((app_timeout == TIMEOUT_SYSTEM) || (app_timeout == TIMEOUT_WAKELOCK)) {
+            // default screen timeout or wakelocks, need to restore system timeout.
+            Logger.d(tag, String.format("set timeout for %s: (state: %d), restoring default timeout to %d seconds",
+                tag, app_timeout, sys_timeout / 1000));
+
+            setScreenTimeout(sys_timeout);
+        }
+    }
+
+    public void updateTimeout(final boolean focus) {
+        try {
+            if (focus) {
+                // app resumed. Apply custom timeout if any.
+                sys_timeout = getScreenTimeout();
+                if ((sys_timeout != app_timeout) && (app_timeout > TIMEOUT_SYSTEM)) {
+                    Logger.d(tag, String.format("restoring %s timeout: %d -> %d seconds",
+                        tag, sys_timeout / 1000, app_timeout / 1000));
+
+                    setScreenTimeout(app_timeout);
+                }
+            } else {
+                // app paused. Restore system timeout.
+                if ((sys_timeout != app_timeout) && (app_timeout > TIMEOUT_SYSTEM)) {
+                    Logger.d(tag, String.format("restoring system timeout: %d -> %d seconds",
+                        app_timeout / 1000, sys_timeout / 1000));
+
+                    setScreenTimeout(sys_timeout);
+                }
+            }
+
+
+        } catch (Exception e) {
+            Logger.e(tag, e.toString());
+        }
+    }
+
     /** Screen layout */
     public int isFullscreen() {
         return (is_fullscreen) ? 1 : 0;
@@ -165,5 +223,24 @@ public class ScreenHelper {
 
     private class Box<T> {
         public T value;
+    }
+
+    private int getScreenTimeout() {
+        try {
+            return Settings.System.getInt(context.getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT);
+        } catch (Exception e) {
+            Logger.e(tag, e.toString());
+            return 0;
+        }
+    }
+
+    private void setScreenTimeout(final int timeout) {
+        if (timeout <= 0) return;
+
+        try {
+            Settings.System.putInt(context.getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT, timeout);
+        } catch (Exception e) {
+            Logger.e(tag, e.toString());
+        }
     }
 }

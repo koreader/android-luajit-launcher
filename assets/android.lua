@@ -1407,6 +1407,27 @@ local function run(android_app_state)
         end)
     end
 
+    android.getScreenTimeout = function()
+        return JNI:context(android.app.activity.vm, function(JNI)
+            return JNI:callIntMethod(
+                android.app.activity.clazz,
+                "getScreenTimeout",
+                "()I"
+            )
+        end)
+    end
+
+    android.setScreenTimeout = function(timeout)
+        JNI:context(android.app.activity.vm, function(JNI)
+            JNI:callVoidMethod(
+                android.app.activity.clazz,
+                "setScreenTimeout",
+                "(I)V",
+                ffi.new('int32_t', timeout)
+            )
+        end)
+    end
+
     android.getBatteryLevel = function()
         return JNI:context(android.app.activity.vm, function(JNI)
             return JNI:callIntMethod(
