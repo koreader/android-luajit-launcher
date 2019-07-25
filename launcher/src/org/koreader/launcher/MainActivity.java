@@ -350,7 +350,9 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
             power.setWakelockState(false);
         }
 
-        screen.setTimeout(timeout);
+        if (hasWriteSettingsEnabled()) {
+            screen.setTimeout(timeout);
+        }
     }
 
     public int getScreenAvailableHeight() {
@@ -522,7 +524,7 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
             sb.append(resumed);
             Logger.d(tag, sb.toString());
             power.setWakelock(resumed);
-        } else if ((screen.app_timeout > screen.TIMEOUT_SYSTEM) && (hasWriteSettingsEnabled())) {
+        } else if (screen.app_timeout > screen.TIMEOUT_SYSTEM) {
             sb.append("custom settings: ");
             sb.append(resumed);
             Logger.d(tag, sb.toString());
