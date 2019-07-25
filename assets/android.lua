@@ -1407,21 +1407,21 @@ local function run(android_app_state)
         end)
     end
 
-    android.getScreenTimeout = function()
+    android.getScreenOffTimeout = function()
         return JNI:context(android.app.activity.vm, function(JNI)
             return JNI:callIntMethod(
                 android.app.activity.clazz,
-                "getScreenTimeout",
+                "getScreenOffTimeout",
                 "()I"
             )
         end)
     end
 
-    android.setScreenTimeout = function(timeout)
+    android.setScreenOffTimeout = function(timeout)
         JNI:context(android.app.activity.vm, function(JNI)
             JNI:callVoidMethod(
                 android.app.activity.clazz,
-                "setScreenTimeout",
+                "setScreenOffTimeout",
                 "(I)V",
                 ffi.new('int32_t', timeout)
             )
