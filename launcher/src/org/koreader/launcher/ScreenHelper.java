@@ -24,13 +24,13 @@ public class ScreenHelper {
     private boolean is_fullscreen = true;
 
     // track system/application screen timeout
-    private int app_timeout;
+    public int app_timeout;
     private int sys_timeout;
 
     public ScreenHelper(Context context) {
         this.context = context;
         this.tag = context.getResources().getString(R.string.app_name);
-        this.sys_timeout = getScreenTimeout();
+        this.sys_timeout = readSettingScreenOffTimeout();
     }
 
     /** Screen size */
@@ -106,48 +106,57 @@ public class ScreenHelper {
     }
 
     /** Screen timeout */
-    public int getTimeout() {
-        return app_timeout;
-    }
+
+    /** set the new timeout state
+     *
+     *  @param new_timeout - new timeout state:
+     *
+     *  known timeout states are TIMEOUT_SYSTEM, TIMEOUT_WAKELOCK
+     *  and values greater than 0 (milliseconds of the new timeout).
+     */
 
     public void setTimeout(final int new_timeout) {
+        // update app_timeout first
         app_timeout = new_timeout;
+        // custom timeout in milliseconds
         if (app_timeout > TIMEOUT_SYSTEM) {
-            // custom screen timeout
             Logger.d(tag, String.format("set timeout for %s: %d seconds", tag, app_timeout / 1000));
-            setScreenTimeout(app_timeout);
-
+            writeSettingScreenOffTimeout(app_timeout);
+        // default timeout (by using system settings with or without wakelocks)
         } else if ((app_timeout == TIMEOUT_SYSTEM) || (app_timeout == TIMEOUT_WAKELOCK)) {
-            // default screen timeout or wakelocks, need to restore system timeout.
-            Logger.d(tag, String.format("set timeout for %s: (state: %d), restoring default timeout to %d seconds",
+            Logger.d(tag, String.format("set timeout for %s: (state: %d), restoring defaults: %d seconds",
                 tag, app_timeout, sys_timeout / 1000));
-
-            setScreenTimeout(sys_timeout);
+            writeSettingScreenOffTimeout(sys_timeout);
         }
     }
 
-    public void updateTimeout(final boolean focus) {
+    /** set timeout based on activity state
+     *
+     *  @param resumed - is the activity resumed and focused?
+     */
+
+    public void setTimeout(final boolean resumed) {
         try {
-            if (focus) {
-                // app resumed. Apply custom timeout if any.
-                sys_timeout = getScreenTimeout();
+            if (resumed) {
+                // back from paused: update android screen off timeout first
+                sys_timeout = readSettingScreenOffTimeout();
+
+                // apply a custom timeout for the application
                 if ((sys_timeout != app_timeout) && (app_timeout > TIMEOUT_SYSTEM)) {
                     Logger.d(tag, String.format("restoring %s timeout: %d -> %d seconds",
                         tag, sys_timeout / 1000, app_timeout / 1000));
 
-                    setScreenTimeout(app_timeout);
+                    writeSettingScreenOffTimeout(app_timeout);
                 }
             } else {
-                // app paused. Restore system timeout.
+                // app paused: restore system timeout.
                 if ((sys_timeout != app_timeout) && (app_timeout > TIMEOUT_SYSTEM)) {
                     Logger.d(tag, String.format("restoring system timeout: %d -> %d seconds",
                         app_timeout / 1000, sys_timeout / 1000));
 
-                    setScreenTimeout(sys_timeout);
+                    writeSettingScreenOffTimeout(sys_timeout);
                 }
             }
-
-
         } catch (Exception e) {
             Logger.e(tag, e.toString());
         }
@@ -225,7 +234,7 @@ public class ScreenHelper {
         public T value;
     }
 
-    private int getScreenTimeout() {
+    private int readSettingScreenOffTimeout() {
         try {
             return Settings.System.getInt(context.getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT);
         } catch (Exception e) {
@@ -234,7 +243,7 @@ public class ScreenHelper {
         }
     }
 
-    private void setScreenTimeout(final int timeout) {
+    private void writeSettingScreenOffTimeout(final int timeout) {
         if (timeout <= 0) return;
 
         try {
