@@ -40,11 +40,11 @@ public class PowerHelper {
     }
 
     public void setWakelockState(final boolean enabled) {
-        /** release wakelock first, if present and wakelocks are allowed */
+        /* release wakelock first, if present and wakelocks are allowed */
         if (isWakeLockAllowed && wakelock != null) wakelockRelease();
-        /** update wakelock settings */
+        /* update wakelock settings */
         isWakeLockAllowed = enabled;
-        /** acquire wakelock if we don't have one and wakelocks are allowed */
+        /* acquire wakelock if we don't have one and wakelocks are allowed */
         if (isWakeLockAllowed && wakelock == null) wakelockAcquire();
     }
 

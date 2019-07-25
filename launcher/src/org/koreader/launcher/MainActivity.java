@@ -42,7 +42,7 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
     // size in pixels of the top notch, if any
     private int notch_height = 0;
 
-    /** Called when the activity is first created. */
+    /* Called when the activity is first created. */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,7 +82,7 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         requestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, REQUEST_WRITE_STORAGE);
     }
 
-    /** Called when the activity has become visible. */
+    /* Called when the activity has become visible. */
     @Override
     protected void onResume() {
         Logger.d(tag, "App resumed");
@@ -100,7 +100,7 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         }
     }
 
-    /** Called when another activity is taking focus. */
+    /* Called when another activity is taking focus. */
     @Override
     protected void onPause() {
         Logger.d(tag, "App paused");
@@ -108,14 +108,14 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         super.onPause();
     }
 
-    /** Called when the activity is no longer visible. */
+    /* Called when the activity is no longer visible. */
     @Override
     protected void onStop() {
         Logger.d(tag, "App stopped");
         super.onStop();
     }
 
-    /** Called just before the activity is destroyed. */
+    /* Called just before the activity is destroyed. */
     @Override
     protected void onDestroy() {
         Logger.d(tag, "App destroyed");
@@ -128,14 +128,14 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         super.onDestroy();
     }
 
-    /** Called just before the activity is resumed by an intent */
+    /* Called just before the activity is resumed by an intent */
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
     }
 
-    /** Called when a new surface is created */
+    /* Called when a new surface is created */
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         Logger.d(tag, "Surface created");
@@ -143,7 +143,7 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         surface.setWillNotDraw(false);
     }
 
-    /** Called after a surface change */
+    /* Called after a surface change */
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
         Logger.d(tag, String.format(
@@ -153,14 +153,14 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         super.surfaceChanged(holder,format,width,height);
     }
 
-    /** Called when the surface is destroyed */
+    /* Called when the surface is destroyed */
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
         Logger.d(tag, "Surface destroyed");
         super.surfaceDestroyed(holder);
     }
 
-    /** Called when the view is attached to a window */
+    /* Called when the view is attached to a window */
     @Override
     public void onAttachedToWindow() {
         super.onAttachedToWindow();
@@ -179,14 +179,14 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         }
     }
 
-    /** Called when the view is detached from its window */
+    /* Called when the view is detached from its window */
     @Override
     public void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         Logger.d(tag, "surface detached from its window");
     }
 
-    /** Called on permission result */
+    /* Called on permission result */
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -207,9 +207,9 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         }
     }
 
-    /** These functions are exposed to lua in assets/android.lua
-     *  If you add a new function here remember to write the companion
-     *  lua function in that file */
+    /* These functions are exposed to lua in assets/android.lua
+     * If you add a new function here remember to write the companion
+     * lua function in that file */
 
 
     /** build */
@@ -228,7 +228,7 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         return getResources().getString(R.string.app_name);
     }
 
-    /** clipboard */
+    /* clipboard */
     @SuppressWarnings("unused")
     public String getClipboardText() {
         return clipboard.getClipboardText();
@@ -244,7 +244,7 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         clipboard.setClipboardText(text);
     }
 
-    /** device */
+    /* device */
     @SuppressWarnings("unused")
     public String getProduct() {
         return device.getProduct();
@@ -285,7 +285,7 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         device.einkUpdate(surface, mode, delay, x, y, width, height);
     }
 
-    /** external dictionaries */
+    /* external dictionaries */
     @SuppressWarnings("unused")
     public void dictLookup(String text, String pkg, String action) {
         Intent intent = new Intent(intentUtils.getByAction(text, pkg, action));
@@ -294,7 +294,7 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         }
     }
 
-    /** native dialogs and widgets run on UI Thread */
+    /* native dialogs and widgets run on UI Thread */
     @SuppressWarnings("unused")
     public void showToast(final String message) {
         runOnUiThread(new Runnable() {
@@ -329,7 +329,7 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         });
     }
 
-    /** package manager */
+    /* package manager */
     @SuppressWarnings("unused")
     public int isPackageEnabled(String pkg) {
         try {
@@ -345,7 +345,7 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         }
     }
 
-    /** power */
+    /* power */
     @SuppressWarnings("unused")
     public int isCharging() {
         return power.batteryCharging();
@@ -361,7 +361,7 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         power.setWakelockState(enabled);
     }
 
-    /** screen */
+    /* screen */
     @SuppressWarnings("unused")
     public int getScreenBrightness() {
         return screen.getScreenBrightness();
@@ -444,7 +444,7 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         }
     }
 
-    /** wifi */
+    /* wifi */
     @SuppressWarnings("unused")
     public void setWifiEnabled(final boolean enabled) {
         network.setWifi(enabled);
@@ -539,15 +539,17 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
     }
 
 
-    /** set screen timeout based on activity state. Intended to be hooked
-     *  in onResume/onPause activity callbacks.
+    /**
+     * set screen timeout based on activity state.
+     * Intended to be hooked in onResume/onPause activity callbacks.
      *
-     *  TIMEOUT_SYSTEM does nothing!
-     *  TIMEOUT_WAKELOCK uses the standard permission WAKELOCKS.
-     *  Custom timeouts use the special permission WRITE_SETTINGS.
+     * TIMEOUT_SYSTEM does nothing!
+     * TIMEOUT_WAKELOCK uses the standard permission WAKELOCKS.
+     * Custom timeouts use the special permission WRITE_SETTINGS.
      *
-     *  @param resumed - is the activity resumed and focused?
+     * @param resumed The state of this activity.
      */
+
     private void setTimeout(final boolean resumed) {
         StringBuilder sb = new StringBuilder("timeout: ");
         if (resumed)

@@ -6,13 +6,14 @@ import android.content.Intent;
 
 public class IntentUtils {
 
-    /* get intent by action type, used to do dict lookups on 3rd party apps.
+    /**
+     * get intent by action type, used to do dict lookups on 3rd party apps.
      *
      * @param text to search
      * @param package that receives the query
      * @param action associated to the package
      *
-     * @returns a Intent based on package/action ready to do a text lookup
+     * @return a Intent based on package/action ready to do a text lookup
      */
 
     public static Intent getByAction(String text, String pkg, String action) {

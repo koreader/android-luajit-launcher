@@ -1,10 +1,8 @@
-/**
- * Device info using Android build properties,
+/* Device info using Android build properties,
  * based on https://github.com/unwmun/refreshU
  *
  * Note: devices don't need to be declared here unless
- * they have known eink update routines and/or bug workarounds.
- */
+ * they have known eink update routines and/or bug workarounds. */
 
 package org.koreader.device;
 
