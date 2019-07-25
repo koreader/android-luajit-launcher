@@ -57,6 +57,9 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         tag = getName();
         Logger.d(tag, "App created");
 
+        // (re)initialize helper classes.
+        initHelperClasses();
+
         // set the native window as an android surface. Useful in *some* eink devices,
         // where the epd driver is hooked in the View class framework.
         getWindow().takeSurface(null);
@@ -125,12 +128,6 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
     @Override
     protected void onDestroy() {
         Logger.d(tag, "App destroyed");
-        clipboard = null;
-        device = null;
-        power = null;
-        screen = null;
-        surface = null;
-        network = null;
         super.onDestroy();
     }
 
@@ -441,6 +438,15 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
 
     /* --- JNI/FFI interface ends --- */
 
+
+    private void initHelperClasses() {
+        clipboard = null;
+        device = null;
+        power = null;
+        screen = null;
+        surface = null;
+        network = null;
+    }
 
     // WRITE_SETTINGS is a special permission and needs to be granted through a permission management screen.
     // see https://developer.android.com/reference/android/Manifest.permission.html#WRITE_SETTINGS
