@@ -19,6 +19,12 @@ import androidx.core.content.ContextCompat;
 
 import java.util.List;
 
+/* LuaJIT launcher main Activity, based on NativeActivity.
+   Most of the methods of this class are intended to be used
+   from lua using the JNI/FFI interface in assets/android.lua. */
+
+
+@SuppressWarnings("unused")
 public class MainActivity extends android.app.NativeActivity implements SurfaceHolder.Callback2,
     ActivityCompat.OnRequestPermissionsResultCallback {
 
@@ -66,7 +72,7 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         screen = new ScreenHelper(this);
         network = new NetworkManager(this);
 
-        /** Listen to visibility changes */
+        // listen to visibility changes
         if (SDK_INT >= Build.VERSION_CODES.KITKAT) {
             setFullscreenLayout();
             View decorView = getWindow().getDecorView();
@@ -88,7 +94,7 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         Logger.d(tag, "App resumed");
         setTimeout(true);
         super.onResume();
-        /** switch to fullscreen for older devices */
+        // switch to fullscreen for older devices
         if (SDK_INT < Build.VERSION_CODES.KITKAT) {
             final Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
@@ -207,86 +213,69 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         }
     }
 
-    /* These functions are exposed to lua in assets/android.lua
-     * If you add a new function here remember to write the companion
-     * lua function in that file */
 
+    /* --- JNI/FFI interface begins --- */
 
-    /** build */
-    @SuppressWarnings("unused")
+    /* build */
     public int isDebuggable() {
         return (BuildConfig.DEBUG) ? 1 : 0;
     }
 
-    @SuppressWarnings("unused")
     public String getFlavor() {
         return getResources().getString(R.string.app_flavor);
     }
 
-    @SuppressWarnings("unused")
     public String getName() {
         return getResources().getString(R.string.app_name);
     }
 
     /* clipboard */
-    @SuppressWarnings("unused")
     public String getClipboardText() {
         return clipboard.getClipboardText();
     }
 
-    @SuppressWarnings("unused")
     public int hasClipboardTextIntResultWrapper() {
         return clipboard.hasClipboardText();
     }
 
-    @SuppressWarnings("unused")
     public void setClipboardText(final String text) {
         clipboard.setClipboardText(text);
     }
 
     /* device */
-    @SuppressWarnings("unused")
     public String getProduct() {
         return device.getProduct();
     }
 
-    @SuppressWarnings("unused")
     public String getVersion() {
         return android.os.Build.VERSION.RELEASE;
     }
 
-    @SuppressWarnings("unused")
     public int isEink() {
         return device.isEink();
     }
 
-    @SuppressWarnings("unused")
     public int isEinkFull() {
         return device.isFullEink();
     }
 
-    @SuppressWarnings("unused")
     public String getEinkPlatform() {
         return device.einkPlatform();
     }
 
-    @SuppressWarnings("unused")
     public int needsWakelocks() {
         return device.needsWakelock();
     }
 
-    @SuppressWarnings("unused")
     public void einkUpdate(int mode) {
         device.einkUpdate(surface, mode);
     }
 
-    @SuppressWarnings("unused")
     public void einkUpdate(int mode, long delay, int x, int y, int width, int height) {
         device.einkUpdate(surface, mode, delay, x, y, width, height);
     }
 
     /* external dictionaries */
-    @SuppressWarnings("unused")
     public void dictLookup(String text, String pkg, String action) {
         Intent intent = new Intent(intentUtils.getByAction(text, pkg, action));
         if (!startActivityIfSafe(intent)) {
@@ -295,7 +284,6 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
     }
 
     /* native dialogs and widgets run on UI Thread */
-    @SuppressWarnings("unused")
     public void showToast(final String message) {
         runOnUiThread(new Runnable() {
             @Override
@@ -306,7 +294,6 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         });
     }
 
-    @SuppressWarnings("unused")
     public void showProgress(final String title, final String message) {
         runOnUiThread(new Runnable() {
             @Override
@@ -317,7 +304,6 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         });
     }
 
-    @SuppressWarnings("unused")
     public void dismissProgress() {
         runOnUiThread(new Runnable() {
             @Override
@@ -330,7 +316,6 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
     }
 
     /* package manager */
-    @SuppressWarnings("unused")
     public int isPackageEnabled(String pkg) {
         try {
             // is the package available (installed and enabled) ?
@@ -346,28 +331,23 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
     }
 
     /* power */
-    @SuppressWarnings("unused")
     public int isCharging() {
         return power.batteryCharging();
     }
 
-    @SuppressWarnings("unused")
     public int getBatteryLevel() {
         return power.batteryPercent();
     }
 
-    @SuppressWarnings("unused")
     public void setWakeLock(final boolean enabled) {
         power.setWakelockState(enabled);
     }
 
     /* screen */
-    @SuppressWarnings("unused")
     public int getScreenBrightness() {
         return screen.getScreenBrightness();
     }
 
-    @SuppressWarnings("unused")
     public int getScreenHeight() {
         if (SDK_INT >= Build.VERSION_CODES.P) {
             return (screen.getScreenHeight() - notch_height);
@@ -376,12 +356,10 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         }
     }
 
-    @SuppressWarnings("unused")
     public int getScreenOffTimeout() {
         return screen.app_timeout;
     }
 
-    @SuppressWarnings("unused")
     public void setScreenOffTimeout(final int timeout) {
         if (timeout == screen.TIMEOUT_WAKELOCK) {
             power.setWakelockState(true);
@@ -392,22 +370,18 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         screen.setTimeout(timeout);
     }
 
-    @SuppressWarnings("unused")
     public int getScreenAvailableHeight() {
         return screen.getScreenAvailableHeight();
     }
 
-    @SuppressWarnings("unused")
     public int getScreenWidth() {
         return screen.getScreenWidth();
     }
 
-    @SuppressWarnings("unused")
     public int getStatusBarHeight() {
         return screen.getStatusBarHeight();
     }
 
-    @SuppressWarnings("unused")
     public int isFullscreen() {
         // for newer Jelly Bean devices (apis 17 - 18)
         if ((SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR2) ||
@@ -424,7 +398,6 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         }
     }
 
-    @SuppressWarnings("unused")
     public void setFullscreen(final boolean enabled) {
         // for newer Jelly Bean devices (apis 17 - 18)
         if ((SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR2) ||
@@ -437,7 +410,6 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         }
     }
 
-    @SuppressWarnings("unused")
     public void setScreenBrightness(final int brightness) {
         if (hasWriteSettingsEnabled()) {
             screen.setScreenBrightness(brightness);
@@ -445,34 +417,30 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
     }
 
     /* wifi */
-    @SuppressWarnings("unused")
     public void setWifiEnabled(final boolean enabled) {
         network.setWifi(enabled);
     }
 
-    @SuppressWarnings("unused")
     public int isWifiEnabled() {
         return network.isWifi();
     }
 
-    @SuppressWarnings("unused")
     public String getNetworkInfo() {
         return network.info();
     }
 
-    @SuppressWarnings("unused")
     public int download(final String url, final String name) {
         return network.download(url, name);
     }
 
-    @SuppressWarnings("unused")
     public int openLink(String url) {
         Uri webpage = Uri.parse(url);
         Intent intent = new Intent(Intent.ACTION_VIEW, webpage);
         return (startActivityIfSafe(intent)) ? 0 : 1;
     }
 
-    // --- end of public exported functions -------------
+    /* --- JNI/FFI interface ends --- */
+
 
     // WRITE_SETTINGS is a special permission and needs to be granted through a permission management screen.
     // see https://developer.android.com/reference/android/Manifest.permission.html#WRITE_SETTINGS
