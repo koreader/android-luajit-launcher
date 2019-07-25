@@ -117,20 +117,6 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         super.onPause();
     }
 
-    /* Called when the activity is no longer visible. */
-    @Override
-    protected void onStop() {
-        Logger.d(tag, "App stopped");
-        super.onStop();
-    }
-
-    /* Called just before the activity is destroyed. */
-    @Override
-    protected void onDestroy() {
-        Logger.d(tag, "App destroyed");
-        super.onDestroy();
-    }
-
     /* Called just before the activity is resumed by an intent */
     @Override
     protected void onNewIntent(Intent intent) {
