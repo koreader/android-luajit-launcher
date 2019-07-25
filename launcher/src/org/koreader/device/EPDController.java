@@ -1,7 +1,5 @@
-/**
- * generic EPD Controller for Android devices,
- * based on https://github.com/unwmun/refreshU
- */
+/* generic EPD Controller for Android devices,
+ * based on https://github.com/unwmun/refreshU */
 
 package org.koreader.device;
 

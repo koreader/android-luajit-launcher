@@ -33,7 +33,7 @@ public class ScreenHelper {
         this.sys_timeout = readSettingScreenOffTimeout();
     }
 
-    /** Screen size */
+    /* Screen size */
     public int getScreenWidth() {
         return getScreenSize().x;
     }
@@ -54,7 +54,7 @@ public class ScreenHelper {
         return statusBarHeight;
     }
 
-    /** Screen brightness */
+    /* Screen brightness */
     public int getScreenBrightness() {
         final Box<Integer> result = new Box<Integer>();
         final CountDownLatch cd = new CountDownLatch(1);
@@ -105,14 +105,15 @@ public class ScreenHelper {
         });
     }
 
-    /** Screen timeout */
+    /* Screen timeout */
 
-    /** set the new timeout state
+    /**
+     * set the new timeout state
      *
-     *  @param new_timeout - new timeout state:
+     * known timeout states are TIMEOUT_SYSTEM, TIMEOUT_WAKELOCK
+     * and values greater than 0 (milliseconds of the new timeout).
      *
-     *  known timeout states are TIMEOUT_SYSTEM, TIMEOUT_WAKELOCK
-     *  and values greater than 0 (milliseconds of the new timeout).
+     * @param new_timeout - new timeout state:
      */
 
     public void setTimeout(final int new_timeout) {
@@ -130,9 +131,10 @@ public class ScreenHelper {
         }
     }
 
-    /** set timeout based on activity state
+    /**
+     * set timeout based on activity state
      *
-     *  @param resumed - is the activity resumed and focused?
+     * @param resumed - is the activity resumed and focused?
      */
 
     public void setTimeout(final boolean resumed) {
@@ -162,7 +164,7 @@ public class ScreenHelper {
         }
     }
 
-    /** Screen layout */
+    /* Screen layout */
     public int isFullscreen() {
         return (is_fullscreen) ? 1 : 0;
     }

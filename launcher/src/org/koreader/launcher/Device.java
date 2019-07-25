@@ -22,9 +22,7 @@ public class Device {
         this.epd = EPDFactory.getEPDController(tag);
     }
 
-    /**
-     * Used on Rockchip devices
-     */
+    /* Used on Rockchip devices */
     public void einkUpdate(SurfaceView view, int mode) {
         String mode_name = "invalid mode";
 
@@ -44,9 +42,7 @@ public class Device {
         epd.setEpdMode(view, 0, 0, 0, 0, 0, 0, mode_name);
     }
 
-    /**
-     * Used on Freescale imx devices
-     */
+    /* Used on Freescale imx devices */
     public void einkUpdate(SurfaceView view, int mode, long delay, int x, int y, int width, int height) {
         Logger.v(tag, String.format("requesting epd update, mode:%d, delay:%d, [x:%d, y:%d, w:%d, h:%d]",
             mode, delay, x, y, width, height));

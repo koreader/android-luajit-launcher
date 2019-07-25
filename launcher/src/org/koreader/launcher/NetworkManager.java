@@ -29,7 +29,8 @@ public class NetworkManager {
         wifi.setWifiEnabled(state);
     }
 
-    /** Basic network information
+    /**
+     * Basic network information
      *
      * @return a string containing wifi name, ip and gateway.
      */
@@ -44,7 +45,8 @@ public class NetworkManager {
         return String.format("%s;%s;%s", wi.getSSID(), ip_address, gw_address);
     }
 
-    /** Download a file
+    /**
+     * Download a file
      *
      * @param url   - the full qualified url to the file you'll want to download
      * @param name  - the name of the file with the extension (ie: "foo.mp4")
@@ -75,15 +77,3 @@ public class NetworkManager {
         }
     }
 }
-
-
-/*
-    public void setWifiEnabled(final boolean enabled) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                getWifiManager().setWifiEnabled(enabled);
-            }
-        });
-    }
- */

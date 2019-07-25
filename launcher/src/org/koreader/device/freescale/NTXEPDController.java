@@ -1,5 +1,4 @@
-/**
- * generic EPD Controller for Android,
+/* generic EPD Controller for Android,
  *
  * interface for newer ntx devices.
  * based on https://github.com/koreader/koreader/issues/3517

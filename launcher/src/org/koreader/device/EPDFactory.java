@@ -1,7 +1,5 @@
-/**
- * generic EPD Controller for Android devices,
- * based on https://github.com/unwmun/refreshU
- */
+/* generic EPD Controller for Android devices,
+ * based on https://github.com/unwmun/refreshU */
 
 package org.koreader.device;
 
@@ -22,7 +20,7 @@ public class EPDFactory {
 
         switch (DeviceInfo.CURRENT_DEVICE) {
 
-            /** Supported rk3026 devices */
+            /* Supported rk3026 devices */
             case BOYUE_T61:
             case BOYUE_T80S:
             case ONYX_C67:
@@ -32,13 +30,13 @@ public class EPDFactory {
                 epdController = new RK3026EPDController();
                 break;
 
-            /** supported rk3066 devices */
+            /* supported rk3066 devices */
             case BOYUE_T62:
                 controllerName = "Rockchip RK3066";
                 epdController = new RK3066EPDController();
                 break;
 
-            /** supported rk3368 devices */
+            /* supported rk3368 devices */
             case BOYUE_T80D:
             case BOYUE_T78D:
             case BOYUE_T103D:
@@ -46,7 +44,7 @@ public class EPDFactory {
                 epdController = new RK3368EPDController();
                 break;
 
-            /** devices using imx/ntx platform */
+            /* devices using imx/ntx platform */
             case CREMA:
             case TOLINO:
             case NOOK_V520:
@@ -54,7 +52,7 @@ public class EPDFactory {
                 epdController = new NTXNewEPDController();
                 break;
 
-            /** unsupported devices */
+            /* unsupported devices */
             case UNKNOWN:
                 epdController = new FakeEPDController();
                 break;
@@ -72,7 +70,7 @@ public class EPDFactory {
     private static class FakeEPDController implements EPDController {
         @Override
         public void setEpdMode(android.view.View targetView, int mode, long delay, int x, int y, int width, int height, String epdMode) {
-            /** do nothing */
+            /* do nothing */
         }
     }
 }

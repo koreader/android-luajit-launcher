@@ -1,5 +1,4 @@
-/**
- * This file was created by unw on 15. 3. 25 as part of
+/* This file was created by unw on 15. 3. 25 as part of
  * https://github.com/unwmun/refreshU
  *
  * interface for Boyue T61/T62 clones
