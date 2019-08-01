@@ -1429,6 +1429,26 @@ local function run(android_app_state)
         end)
     end
 
+    android.isTouchscreenIgnored = function()
+        return JNI:context(android.app.activity.vm, function(JNI)
+            return JNI:callIntMethod(
+                android.app.activity.clazz,
+                "isTouchscreenIgnored",
+                "()I"
+            ) == 1
+        end)
+    end
+
+    android.toggleTouchscreenIgnored = function()
+        JNI:context(android.app.activity.vm, function(JNI)
+            JNI:callVoidMethod(
+                android.app.activity.clazz,
+                "toggleTouchscreenIgnored",
+                "()V"
+            )
+        end)
+    end
+
     -- properties that don't change during the execution of the program.
     android.prop = {}
 
