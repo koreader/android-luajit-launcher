@@ -1407,46 +1407,27 @@ local function run(android_app_state)
         end)
     end
 
+    -- input settings
+    android.input = {}
+
+    -- ignore some events
+    android.input.ignore_touchscreen = false
+    android.input.ignore_volume_keys = false
+
     android.getVolumeKeysIgnored = function()
-        return JNI:context(android.app.activity.vm, function(JNI)
-            return JNI:callIntMethod(
-                android.app.activity.clazz,
-                "getVolumeKeysIgnored",
-                "()I"
-            ) == 1
-        end)
+        return android.input.ignore_volume_keys
     end
 
     android.setVolumeKeysIgnored = function(ignored)
-        android.DEBUG("ignoring volume keys: " .. tostring(ignored))
-        JNI:context(android.app.activity.vm, function(JNI)
-            JNI:callVoidMethod(
-                android.app.activity.clazz,
-                "setVolumeKeysIgnored",
-                "(Z)V",
-                ffi.new("bool", ignored)
-            )
-        end)
+        android.input.ignore_volume_keys = ignored
     end
 
     android.isTouchscreenIgnored = function()
-        return JNI:context(android.app.activity.vm, function(JNI)
-            return JNI:callIntMethod(
-                android.app.activity.clazz,
-                "isTouchscreenIgnored",
-                "()I"
-            ) == 1
-        end)
+        return android.input.ignore_touchscreen
     end
 
     android.toggleTouchscreenIgnored = function()
-        JNI:context(android.app.activity.vm, function(JNI)
-            JNI:callVoidMethod(
-                android.app.activity.clazz,
-                "toggleTouchscreenIgnored",
-                "()V"
-            )
-        end)
+        android.input.ignore_touchscreen = not android.input.ignore_touchscreen
     end
 
     -- properties that don't change during the execution of the program.
