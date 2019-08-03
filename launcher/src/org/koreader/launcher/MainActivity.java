@@ -48,9 +48,6 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
     // size in pixels of the top notch, if any
     private int notch_height = 0;
 
-    private boolean touchscreen_ignored = false;
-    private boolean volume_keys_ignored = false;
-
     /* Called when the activity is first created. */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -267,23 +264,6 @@ public class MainActivity extends android.app.NativeActivity implements SurfaceH
         if (!startActivityIfSafe(intent)) {
             Logger.e(tag, "dictionary lookup: can't find a package able to resolve action " + action);
         }
-    }
-
-    /* input */
-    public int isTouchscreenIgnored() {
-        return touchscreen_ignored ? 1 : 0;
-    }
-
-    public int getVolumeKeysIgnored() {
-        return volume_keys_ignored ? 1 : 0;
-    }
-
-    public void toggleTouchscreenIgnored() {
-        touchscreen_ignored = !touchscreen_ignored;
-    }
-
-    public void setVolumeKeysIgnored(boolean ignored) {
-        volume_keys_ignored = ignored;
     }
 
     /* native dialogs and widgets run on UI Thread */
