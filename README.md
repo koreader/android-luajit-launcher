@@ -1,5 +1,7 @@
 # android-luajit-launcher
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/fad3459994294ffcaee05fe7ddae240d)](https://app.codacy.com/app/KOReader/android-luajit-launcher_2?utm_source=github.com&utm_medium=referral&utm_content=koreader/android-luajit-launcher&utm_campaign=Badge_Grade_Settings)
+
 Android NativeActivity based launcher for LuaJIT, implementing the main loop within Lua land via FFI.
 
 NativeActivity is available starting with platform android-9.
