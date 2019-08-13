@@ -244,10 +244,6 @@ abstract class BaseActivity extends NativeActivity implements JNILuaInterface {
             "einkUpdate(mode, delay, x, y, width, height) not implemented in this class!");
     }
 
-    public int getScreenBrightness() {
-        return screen.getScreenBrightness();
-    }
-
     public int getScreenOffTimeout() {
         return screen.app_timeout;
     }
@@ -257,7 +253,6 @@ abstract class BaseActivity extends NativeActivity implements JNILuaInterface {
     }
 
     public int getScreenHeight() {
-        //return screen.getScreenHeight();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             return (screen.getScreenHeight() - top_inset_height);
         } else {
@@ -302,14 +297,12 @@ abstract class BaseActivity extends NativeActivity implements JNILuaInterface {
     }
 
     public void setScreenBrightness(final int brightness) {
-        //screen.setScreenBrightness(brightness);
         if (hasWriteSettingsEnabled()) {
             screen.setScreenBrightness(brightness);
         }
     }
 
     public void setScreenOffTimeout(final int timeout) {
-        //screen.setTimeout(timeout);
         if (timeout == ScreenHelper.TIMEOUT_WAKELOCK) {
             power.setWakelockState(true);
         } else {
