@@ -18,7 +18,8 @@
         android:largeHeap="true"
         android:vmSafeMode="true"
         android:allowBackup="false"
-        android:fullBackupContent="false" >
+        android:fullBackupContent="false"
+        android:usesCleartextTraffic="true">
         <meta-data android:name="android.max_aspect" android:value="3.1" />
         <activity
             android:name=".MainActivity"
