@@ -28,9 +28,6 @@ public class MainActivity extends android.app.Activity {
     private static final String PRODUCT = android.os.Build.PRODUCT;
     private static final String HARDWARE = android.os.Build.HARDWARE;
 
-    // device platform
-    private String platform;
-
     // text view with device info
     private TextView info;
 
@@ -59,6 +56,8 @@ public class MainActivity extends android.app.Activity {
         info.append("Hardware: " + HARDWARE + "\n");
 
         /* add platform if available */
+        String platform = "unknown";
+
         try {
             platform = (String) Class.forName("android.os.SystemProperties").getMethod(
                 "get", String.class).invoke(null, "ro.board.platform");
@@ -66,9 +65,11 @@ public class MainActivity extends android.app.Activity {
                 platform = "unknown";
             }
         } catch (Exception e) {
-            platform = "unknown";
+            e.printStackTrace();
         } finally {
-            info.append("Platform: " + platform + "\n");
+            if (platform != null) {
+                info.append("Platform: " + platform + "\n");
+            }
         }
 
         readmeReport.setText("Did you see a flashing black to white eink update? Cool\n\n");
