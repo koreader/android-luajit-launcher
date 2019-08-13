@@ -24,23 +24,14 @@ The real starting point, called from JNI/C, is the run() function in android.lua
 ### Init and update the submodules
 
 ```sh
-git submodule init
-git submodule sync
-git submodule update
+make update
 ```
 
-### Compile LuaJIT for your target architecture(s)
+### Compile LuaJIT for all target architecture(s)
 
 ```sh
-./mk-luajit.sh armeabi-v7a
-./mk-luajit.sh clean
-./mk-luajit.sh x86
+make prepare
 ```
-
-### Update the project for your Android SDK/NDK
-
-Edit local.properties and set ndk.dir and sdk.dir accordly.
-Android Studio users can skip this step since the IDE will set the proper paths.
 
 
 ### Compile native code and package APK with gradle
@@ -51,7 +42,7 @@ You can see available tasks with
 ./gradlew tasks
 ```
 
-For example, you can build the debug variant for all archs with
+For example, you can build the debug variant for all supported ABIs with
 
 ```sh
 ./gradlew assembleDebug
