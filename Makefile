@@ -53,13 +53,13 @@ ifdef ANDROID_FLAVOR
 endif
 
 # Defaults, overriding fallback values in gradle.properties
-NAME?=1.5
-VERSION?=5
+NAME?=1.0
+VERSION?=1
 APPNAME?="luajit-launcher"
 FLAVOR?="rocks"
 
 update:
-	# update sources
+	@echo "Updating sources"
 	git submodule init
 	git submodule sync
 	git submodule update
@@ -70,41 +70,49 @@ update:
 	@echo "using ndk in path $(ANDROID_NDK_FULLPATH)"
 
 build-luajit:
-	# build luajit
-	./mk-luajit.sh $(ANDROID_FULL_ARCH)
+	@echo "Building LuaJIT for $(ANDROID_FULL_ARCH)"
+	cd jni/luajit && \
+		./mk-luajit.sh $(ANDROID_FULL_ARCH)
 
 prepare: update
-	# for Android Studio users. Build luajit for all supported abis
-	./mk-luajit.sh clean
-	./mk-luajit.sh x86
-	./mk-luajit.sh clean
-	./mk-luajit.sh armeabi-v7a
-	@echo "project dependencies were built. Now you can build the project in Android Studio"
+	@echo "Building LuaJIT for all supported ABIs"
+	cd jni/luajit &&  \
+		./mk-luajit.sh clean && \
+		./mk-luajit.sh x86 && \
+		./mk-luajit.sh clean && \
+		./mk-luajit.sh armeabi-v7a
 
 debug: update build-luajit
-	# build signed debug apk
-	./gradlew -PversName=$(NAME) -PversCode=$(VERSION) -PprojectName=$(APPNAME) -PprojectFlavor=$(FLAVOR) $(GRADLE_TASK)Debug
-	@echo "application was built, type: debug (signed), flavor: $(FLAVOR), version: $(NAME), release $(VERSION)"
+	@echo "Building $(APPNAME) debug APK: Version $(NAME), release $(VERSION), flavor $(FLAVOR)"
+	./gradlew -PversName=$(NAME) -PversCode=$(VERSION) -PprojectName=$(APPNAME) \
+		-PprojectFlavor=$(FLAVOR) app:$(GRADLE_TASK)Debug --warning-mode all
 	mkdir -p bin/
-	find launcher/build/outputs/apk/ -type f -name '*.apk' -exec mv -v {} bin/ \;
+	find app/build/outputs/apk/ -type f -name '*.apk' -exec mv -v {} bin/ \;
+	@echo "Application $(APPNAME) was built, type: debug (signed), \
+		flavor: $(FLAVOR), version: $(NAME), release $(VERSION)"
 
 release: update build-luajit
-	# build unsigned release apk, with version code and version name
-	@echo "Building release APK, Version $(NAME), release $(VERSION)"
-	./gradlew -PversName=$(NAME) -PversCode=$(VERSION) -PprojectName=$(APPNAME) -PprojectFlavor=$(FLAVOR) $(GRADLE_TASK)Release
-	@echo "application $(APPNAME) was built, type: release (unsigned), flavor: $(FLAVOR), version: $(NAME), release $(VERSION)"
-	@echo "WARNING: You'll need to sign this application to be able to install it"
+	@echo "Building $(APPNAME) release APK: Version $(NAME), release $(VERSION), flavor $(FLAVOR)"
+	./gradlew -PversName=$(NAME) -PversCode=$(VERSION) -PprojectName=$(APPNAME) \
+		-PprojectFlavor=$(FLAVOR) app:$(GRADLE_TASK)Release --warning-mode all
 	mkdir -p bin/
-	find launcher/build/outputs/apk/ -type f -name '*.apk' -exec mv -v {} bin/ \;
-	find eink-test/build/outputs/apk/ -type f -name '*.apk' -exec mv -v {} bin/ \;
+	find app/build/outputs/apk/ -type f -name '*.apk' -exec mv -v {} bin/ \;
+	@echo "Application $(APPNAME) was built, type: release (unsigned), \
+		flavor: $(FLAVOR), version: $(NAME), release $(VERSION)"
+	@echo "WARNING: You'll need to sign this application to be able to install it"
 
+test: update
+	@echo "Building tests/eink"
+	./gradlew tests:einkTest:assemble --warning-mode all
+	mkdir -p bin/
+	find tests/eink/build/outputs/apk/ -type f -name '*.apk' -exec mv -v {} bin/ \;
+	@echo "WARNING: You'll need to sign this application to be able to install it"
 clean:
-	# clean luajit build tree and remove binaries (assets and apks)
-	./mk-luajit.sh clean
-	rm -rf assets/module/ bin/
+	@echo "Cleaning binaries, assets and LuaJIT build"
+	rm -rf assets/module/ bin/ jni/luajit/build
+	cd jni/luajit && \
+		./mk-luajit.sh clean
 
 mrproper: clean
-	# deep clean, it will fail on non-built variants, so continue
-	# without doubt and finally remove luajit libraries
+	@echo "Cleaning Gradle, this could fail if some tasks were never triggered before"
 	-./gradlew clean --continue
-	-rm -rf jni/luajit-build/

@@ -1979,10 +1979,6 @@ local function run(android_app_state)
         return android.execute(unpack(argv))
     end
 
-    android.LOGI(string.format(
-        "Loading %s using paths {\n  assets:	%s\n  library:	%s\n  storage:	%s\n}\nScreen size: %dx%d",
-        android.prop.name, android.dir, android.nativeLibraryDir, android.externalStorage(), android.screen.width, android.screen.height))
-
     -- register the "android" module (ourself)
     package.loaded.android = android
 

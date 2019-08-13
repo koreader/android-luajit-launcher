@@ -1,1 +1,2 @@
-include ':launcher', ':eink-test'
+include ':app'
+include 'tests:einkTest'
