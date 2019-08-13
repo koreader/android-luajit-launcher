@@ -66,37 +66,6 @@ public class ScreenHelper {
     }
 
     /* Screen brightness */
-    public int getScreenBrightness() {
-        final Box<Integer> result = new Box<>();
-        final CountDownLatch cd = new CountDownLatch(1);
-        ((Activity)context).runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    result.value = Settings.System.getInt(
-                        context.getContentResolver(),
-                        Settings.System.SCREEN_BRIGHTNESS);
-                } catch (Exception e) {
-                    Logger.w(tag, e.toString());
-                    result.value = 0;
-                }
-                cd.countDown();
-
-            }
-        });
-        try {
-            cd.await();
-        } catch (InterruptedException ex) {
-            return 0;
-        }
-
-        if (result.value == null) {
-            return 0;
-        }
-
-        return result.value;
-    }
-
     public void setScreenBrightness(final int brightness) {
         ((Activity)context).runOnUiThread(new Runnable() {
             @Override
