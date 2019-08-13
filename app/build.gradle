@@ -65,8 +65,10 @@ android {
         // WRITE_SETTINGS permission
         disable 'ProtectedPermissions'
 
-        // Activity is not resizeable. We set the flag android:resizeableActivity="false",
-        // available on api 23+. When targeting lower apis flag won't be recognized.
+        // Some application flags were introduced on newer API levels and they
+        // won't be used when targeting low level apis.
+        // This applies to android:resizeableActivity and android:usesClearTextTraffic,
+        // both available on API level 23 or higher.
         disable 'UnusedAttribute'
     }
 
