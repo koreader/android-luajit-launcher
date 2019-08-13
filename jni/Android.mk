@@ -13,46 +13,32 @@
 # limitations under the License.
 #
 
-LOCAL_PATH := $(call my-dir)
+BASE_PATH := $(call my-dir)
 
+# Android Native App Glue
+LOCAL_PATH := $(BASE_PATH)
+include $(LOCAL_PATH)/android_native_app_glue/Android.mk
 include $(CLEAR_VARS)
 
-LOCAL_MODULE	:= libluajit-prebuilt
-LOCAL_SRC_FILES	:= luajit-build/$(TARGET_ARCH_ABI)/lib/libluajit-5.1.a
-LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/luajit-build/$(TARGET_ARCH_ABI)/include
-
-include $(PREBUILT_STATIC_LIBRARY)
-
+# LZMA
+LOCAL_PATH := $(BASE_PATH)
+include $(LOCAL_PATH)/lzma/Android.mk
 include $(CLEAR_VARS)
 
-DEFLATE7_DIR := $(LOCAL_PATH)/7z
-PATCH_OUTPUT := $(shell cd $(DEFLATE7_DIR) && patch -N -p1 < ../7zMain.patch)
-lzma_SOURCES := \
-        7zStream.c 7zFile.c Ppmd7Dec.c Ppmd7.c Bcj2.c \
-        Bra86.c BraIA64.c Bra.c CpuArch.c Lzma2Dec.c LzmaDec.c 7zDec.c \
-        7zCrcOpt.c 7zCrc.c 7zBuf2.c 7zBuf.c 7zAlloc.c \
-        7zArcIn.c \
-        Delta.c \
-        Util/7z/7zMain.c
-
-LOCAL_MODULE := lzma
-LOCAL_SRC_FILES := $(addprefix 7z/C/, $(lzma_SOURCES))
-LOCAL_CFLAGS := -O2 -I$(DEFLATE7_DIR)/C -D_7ZIP_PPMD_SUPPPORT -Wno-enum-conversion
-
-include $(BUILD_SHARED_LIBRARY)
-
+# LuaJIT
+LOCAL_PATH := $(BASE_PATH)
+include $(LOCAL_PATH)/luajit/Android.mk
 include $(CLEAR_VARS)
 
-LOCAL_MODULE    := luajit
+# final shared library to load via the NativeActivity framework.
+LOCAL_PATH := $(BASE_PATH)
+LOCAL_MODULE := luajit
 LOCAL_SRC_FILES := android-main.c
-# remember to add libraries here that you plan to use via FFI:
-LOCAL_EXPORT_LDLIBS := -lm -llog -landroid
-# The linker will strip this as "unused" since this is a static library, but we
-# need to keep it around since it's the interface for JNI.
-LOCAL_EXPORT_LDFLAGS := -u ANativeActivity_onCreate
 LOCAL_STATIC_LIBRARIES := android_native_app_glue
 LOCAL_WHOLE_STATIC_LIBRARIES += libluajit-prebuilt
 
+# remember to add libraries here that you plan to use via FFI:
+LOCAL_EXPORT_LDLIBS := -lm -llog -landroid
+
 include $(BUILD_SHARED_LIBRARY)
 
-$(call import-module,android/native_app_glue)

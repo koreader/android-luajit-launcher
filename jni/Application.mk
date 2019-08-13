@@ -1,1 +1,1 @@
-APP_ABI := armeabi-v7a x86
+# see https://developer.android.com/ndk/guides/application_mk

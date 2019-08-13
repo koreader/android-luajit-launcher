@@ -20,27 +20,30 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 #include <stdlib.h>
-#include <android_native_app_glue.h>
-
 #include <linux/elf.h>
 
 #include <android/log.h>
 #include <android/asset_manager.h>
 
+#include "android_native_app_glue.h"
+#include "logger.h"
+
 #include "luajit-2.1/lua.h"
 #include "luajit-2.1/lualib.h"
 #include "luajit-2.1/lauxlib.h"
 
-#include "logger.h"
+#define  TAG "[NativeThread]"
 
-#define  TAG "[main thread]"
+#define LOGE(...) ((void)__android_log_print(ANDROID_LOG_ERROR, LOGGER_NAME, __VA_ARGS__))
+#define LOGV(...) ((void)__android_log_print(ANDROID_LOG_VERBOSE, LOGGER_NAME, __VA_ARGS__))
 
-#define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR,LOGGER_NAME,__VA_ARGS__)
-#define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO,LOGGER_NAME,__VA_ARGS__)
-#define  LOGV(...)  __android_log_print(ANDROID_LOG_VERBOSE,LOGGER_NAME,__VA_ARGS__)
+#ifndef NDEBUG
+#  define LOGD(...) ((void)__android_log_print(ANDROID_LOG_DEBUG, LOGGER_NAME, __VA_ARGS__))
+#else
+#  define LOGD(...) ((void)0)
+#endif
 
 #define  LOADER_ASSET "android.lua"
-
 
 static int window_ready = 0;
 static int gained_focus = 0;
@@ -51,11 +54,11 @@ static void handle_cmd(struct android_app* app, int32_t cmd) {
         case APP_CMD_INIT_WINDOW:
             // The window is being shown, get it ready.
             window_ready = 1;
-            LOGV("%s: App window ready.", TAG);
+            LOGV("%s: activity window ready.", TAG);
             break;
         case APP_CMD_GAINED_FOCUS:
             gained_focus = 1;
-            LOGV("%s: App gained focus.", TAG);
+            LOGV("%s: activity gained focus.", TAG);
             break;
     }
 }
@@ -67,11 +70,11 @@ void android_main(struct android_app* state) {
     off_t bufsize;
     int status;
 
-    LOGI("%s: starting %s", TAG, LOGGER_NAME);
+    LOGD("%s: starting", TAG);
 
-    // wait until everything is initialized before launching LuaJIT assets
+    // wait until the activity is initialized before launching LuaJIT assets
     state->onAppCmd = handle_cmd;
-    LOGV("%s: waiting for app ready...", TAG);
+    LOGV("%s: waiting for activity", TAG);
     int events;
     struct android_poll_source* source;
     // we block forever waiting for events.
@@ -89,7 +92,7 @@ void android_main(struct android_app* state) {
         }
     }
 
-    LOGV("%s: launching LuaJIT assets...", TAG);
+    LOGV("%s: launching LuaJIT assets", TAG);
     luaCode = AAssetManager_open(state->activity->assetManager, LOADER_ASSET, AASSET_MODE_BUFFER);
     if (luaCode == NULL) {
         LOGE("%s: error loading loader asset", TAG);
@@ -127,7 +130,7 @@ void android_main(struct android_app* state) {
     lua_close(L);
 
 quit:
-    LOGE("%s: Stopping %s due to previous errors", TAG, LOGGER_NAME);
+    LOGE("%s: Stopping due to previous errors", TAG);
     ANativeActivity_finish(state->activity);
     exit(1);
 }
