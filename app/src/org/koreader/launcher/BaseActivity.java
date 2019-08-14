@@ -18,7 +18,7 @@ import org.koreader.launcher.helper.*;
 /* BaseActivity.java
  *
  * Convenience wrapper on top of NativeActivity with a base implementation of the JNILuaInterface.
- * This class doesn't know about views and runtime permissions.
+ * This class doesn't know about views, runtime permissions or activity results.
  */
 
 abstract class BaseActivity extends NativeActivity implements JNILuaInterface {
@@ -34,12 +34,19 @@ abstract class BaseActivity extends NativeActivity implements JNILuaInterface {
     // windows insets
     private int top_inset_height;
 
-    // helpers
+    // fullscreen dialog using while uncompressing assets.
     private FramelessProgressDialog dialog;
+
+    // helpers
     private ClipboardHelper clipboard;
     private NetworkHelper network;
+
+    FileHelper files;
     PowerHelper power;
     ScreenHelper screen;
+
+    // absolute path of the last document imported to cache
+    String last_imported_file;
 
     /*---------------------------------------------------------------
      *                        activity callbacks                    *
@@ -50,6 +57,7 @@ abstract class BaseActivity extends NativeActivity implements JNILuaInterface {
         Logger.d(TAG, "onCreate()");
         super.onCreate(savedInstanceState);
         clipboard = new ClipboardHelper(this);
+        files = new FileHelper(this);
         network = new NetworkHelper(this);
         power = new PowerHelper(this);
         screen = new ScreenHelper(this);
@@ -77,6 +85,7 @@ abstract class BaseActivity extends NativeActivity implements JNILuaInterface {
     protected void onDestroy() {
         Logger.d(TAG, "onDestroy()");
         clipboard = null;
+        files = null;
         network = null;
         power = null;
         screen = null;
@@ -174,6 +183,26 @@ abstract class BaseActivity extends NativeActivity implements JNILuaInterface {
     public void einkUpdate(int mode, long delay, int x, int y, int width, int height) {
         Logger.w(TAG,
             "einkUpdate(mode, delay, x, y, width, height) not implemented in this class!");
+    }
+
+    /* file utils */
+    public String getFilePathFromIntent() {
+        return files.getAbsolutePath(getIntent().getData());
+    }
+
+    public String getLastImportedFilePath() {
+        if (last_imported_file == null) {
+            return "none";
+        } else {
+            String cur = last_imported_file;
+            last_imported_file = null;
+            return cur;
+        }
+    }
+
+    public int importFileFromStorageAccessFramework() {
+        // not implemented here.
+        return 0;
     }
 
     /* intents */

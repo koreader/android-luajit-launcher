@@ -211,10 +211,6 @@ public class ScreenHelper {
         return size;
     }
 
-    private class Box<T> {
-        T value;
-    }
-
     private int readSettingScreenOffTimeout() {
         try {
             return Settings.System.getInt(context.getContentResolver(),

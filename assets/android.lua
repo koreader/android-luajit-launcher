@@ -1334,23 +1334,36 @@ local function run(android_app_state)
 
     android.getIntent = function()
         return JNI:context(android.app.activity.vm, function(JNI)
-            local uri = JNI:callObjectMethod(
-                JNI:callObjectMethod(
-                    android.app.activity.clazz,
-                    "getIntent",
-                    "()Landroid/content/Intent;"
-                ),
-                "getData",
-                "()Landroid/net/Uri;"
+            local path = JNI:callObjectMethod(
+                android.app.activity.clazz,
+                "getFilePathFromIntent",
+                "()Ljava/lang/String;"
             )
-            if uri ~= nil then
-                local path = JNI:callObjectMethod(
-                    uri,
-                    "getPath",
-                    "()Ljava/lang/String;"
-                )
+            if path ~= nil then
                 return JNI:to_string(path)
             end
+        end)
+    end
+
+    android.importFile = function()
+        return JNI:context(android.app.activity.vm, function(JNI)
+            return JNI:callIntMethod(
+                android.app.activity.clazz,
+                "importFileFromStorageAccessFramework",
+                "()I"
+            ) == 1
+        end)
+    end
+
+    android.getLastImportedFile = function()
+        return JNI:context(android.app.activity.vm, function(JNI)
+            -- get last imported file path
+            local path = JNI:callObjectMethod(
+                android.app.activity.clazz,
+                "getLastImportedFile",
+                "()Ljava/lang/String;"
+            )
+            return JNI:to_string(path)
         end)
     end
 

@@ -2,8 +2,10 @@ package org.koreader.launcher;
 
 import java.util.Locale;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -34,6 +36,7 @@ public final class MainActivity extends BaseActivity implements
 
     private final static String TAG = "MainActivity";
     private final static int REQUEST_WRITE_STORAGE = 1;
+    private final static int REQUEST_STORAGE_FRAMEWORK = 2;
 
     private NativeSurfaceView view;
 
@@ -118,6 +121,19 @@ public final class MainActivity extends BaseActivity implements
         }
     }
 
+    /* Called on activity result */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent resultData) {
+        if ((requestCode == REQUEST_STORAGE_FRAMEWORK) && (resultCode == Activity.RESULT_OK)) {
+            Uri uri;
+            if (resultData != null) {
+                uri = resultData.getData();
+                // retrieve the absolute path to a file, if any
+                last_imported_file = files.getAbsolutePath(uri);
+            }
+        }
+    }
+
     /* Called when the activity is going to be destroyed */
     @Override
     public void onDestroy() {
@@ -157,6 +173,23 @@ public final class MainActivity extends BaseActivity implements
         } else {
             // on older apis permissions are granted at install time
             return 1;
+        }
+    }
+
+    @Override
+    public int importFileFromStorageAccessFramework() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            intent.setType("*/*");
+            try {
+                startActivityForResult(intent, REQUEST_STORAGE_FRAMEWORK);
+                return 1;
+            } catch (Exception e) {
+                return 0;
+            }
+        } else {
+            return 0;
         }
     }
 

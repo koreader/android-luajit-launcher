@@ -20,6 +20,7 @@ interface JNILuaInterface {
     void setWifiEnabled(boolean enabled);
     void showProgress(String title, String message);
     void showToast(String message);
+    void showToast(String message, final boolean is_long);
 
     int download(String url, String name);
     int getBatteryLevel();
@@ -31,6 +32,7 @@ interface JNILuaInterface {
     int hasClipboardTextIntResultWrapper();
     int hasExternalStoragePermission();
     int hasWriteSettingsPermission();
+    int importFileFromStorageAccessFramework();
     int isCharging();
     int isDebuggable();
     int isEink();
@@ -43,7 +45,9 @@ interface JNILuaInterface {
 
     String getClipboardText();
     String getEinkPlatform();
+    String getFilePathFromIntent();
     String getFlavor();
+    String getLastImportedFilePath();
     String getName();
     String getNetworkInfo();
     String getProduct();
