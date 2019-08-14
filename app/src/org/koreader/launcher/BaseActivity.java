@@ -10,23 +10,15 @@ import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.widget.Toast;
-
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import org.koreader.launcher.device.DeviceInfo;
 import org.koreader.launcher.helper.*;
 
 /* BaseActivity.java
  *
- * Convenience wrapper on top of NativeActivity that implements JNILuaInterface
- *
- * This class is intended to be subclassed. It requests read&write permission at launch
- * but it doesn't care about return values. Please implement OnRequestPermissionsResultCallback
- * on classes that extend from this class.
- *
+ * Convenience wrapper on top of NativeActivity with a base implementation of the JNILuaInterface.
+ * This class doesn't know about views and runtime permissions.
  */
 
 abstract class BaseActivity extends NativeActivity implements JNILuaInterface {
@@ -38,9 +30,6 @@ abstract class BaseActivity extends NativeActivity implements JNILuaInterface {
     private final static boolean HAS_EINK_SUPPORT = DeviceInfo.EINK_SUPPORT;
     private final static boolean HAS_FULL_EINK_SUPPORT = DeviceInfo.EINK_FULL_SUPPORT;
     private final static boolean NEEDS_WAKELOCK_ENABLED = DeviceInfo.BUG_WAKELOCKS;
-
-    // permissions
-    final static int REQUEST_WRITE_STORAGE = 1;
 
     // windows insets
     private int top_inset_height;
@@ -60,7 +49,6 @@ abstract class BaseActivity extends NativeActivity implements JNILuaInterface {
     protected void onCreate(Bundle savedInstanceState) {
         Logger.d(TAG, "onCreate()");
         super.onCreate(savedInstanceState);
-        requestReadAndWritePermission();
         clipboard = new ClipboardHelper(this);
         network = new NetworkHelper(this);
         power = new PowerHelper(this);
@@ -177,6 +165,17 @@ abstract class BaseActivity extends NativeActivity implements JNILuaInterface {
         });
     }
 
+    /* eink updates: to be implemented on subclasses. Here we just log */
+    public void einkUpdate(int mode) {
+        Logger.w(TAG,
+            "einkUpdate(mode) not implemented in this class!");
+    }
+
+    public void einkUpdate(int mode, long delay, int x, int y, int width, int height) {
+        Logger.w(TAG,
+            "einkUpdate(mode, delay, x, y, width, height) not implemented in this class!");
+    }
+
     /* intents */
     public int openLink(String url) {
         Uri webpage = Uri.parse(url);
@@ -187,7 +186,8 @@ abstract class BaseActivity extends NativeActivity implements JNILuaInterface {
     public void dictLookup(String text, String pkg, String action) {
         Intent intent = new Intent(IntentUtils.getByAction(text, pkg, action));
         if (!startActivityIfSafe(intent)) {
-            Logger.e(TAG, "dictionary lookup: can't find a package able to resolve action " + action);
+            Logger.e(TAG,
+                "dictionary lookup: can't find a package able to resolve action " + action);
         }
     }
 
@@ -220,6 +220,15 @@ abstract class BaseActivity extends NativeActivity implements JNILuaInterface {
         }
     }
 
+    /* permissions: to be implemented on subclasses. Here we pretend that all permissions
+     * are already granted */
+    public int hasExternalStoragePermission() {
+        return 1; // we don't know but we pretend the permission is granted.
+    }
+    public int hasWriteSettingsPermission() {
+        return 1; // we don't know but we pretend the permission is granted.
+    }
+
     /* power */
     public int isCharging() {
         return power.batteryCharging();
@@ -234,16 +243,6 @@ abstract class BaseActivity extends NativeActivity implements JNILuaInterface {
     }
 
     /* screen */
-    public void einkUpdate(int mode) {
-        Logger.w(TAG,
-            "einkUpdate(mode) not implemented in this class!");
-    }
-
-    public void einkUpdate(int mode, long delay, int x, int y, int width, int height) {
-        Logger.w(TAG,
-            "einkUpdate(mode, delay, x, y, width, height) not implemented in this class!");
-    }
-
     public int getScreenOffTimeout() {
         return screen.app_timeout;
     }
@@ -297,70 +296,39 @@ abstract class BaseActivity extends NativeActivity implements JNILuaInterface {
     }
 
     public void setScreenBrightness(final int brightness) {
-        if (hasWriteSettingsEnabled()) {
-            screen.setScreenBrightness(brightness);
-        }
+        screen.setScreenBrightness(brightness);
     }
 
     public void setScreenOffTimeout(final int timeout) {
-        if (timeout == ScreenHelper.TIMEOUT_WAKELOCK) {
-            power.setWakelockState(true);
-        } else {
-            power.setWakelockState(false);
-        }
-
-        if (hasWriteSettingsEnabled()) {
-            screen.setTimeout(timeout);
-        }
+        screen.setTimeout(timeout);
     }
 
     /* widgets */
     public void showToast(final String message) {
+        showToast(message, false);
+    }
+
+    public void showToast(final String message, final boolean is_long) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                final Toast toast = Toast.makeText(BaseActivity.this,
-                    message, Toast.LENGTH_SHORT);
-                toast.show();
+                if (is_long) {
+                    final Toast toast = Toast.makeText(BaseActivity.this,
+                        message, Toast.LENGTH_LONG);
+                    toast.show();
+                } else {
+                    final Toast toast = Toast.makeText(BaseActivity.this,
+                        message, Toast.LENGTH_SHORT);
+                    toast.show();
+                }
             }
         });
     }
 
+
     /*---------------------------------------------------------------
      *                       private methods                        *
      *--------------------------------------------------------------*/
-
-    /* WRITE_SETTINGS needs to be granted through a permission management screen.
-     * See https://developer.android.com/reference/android/Manifest.permission.html#WRITE_SETTINGS */
-    private boolean hasWriteSettingsEnabled() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (Settings.System.canWrite(BaseActivity.this)) {
-                return true;
-            } else {
-                Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
-                startActivity(intent);
-                return false;
-            }
-        } else {
-            // on older apis permissions are granted at install time
-            return true;
-        }
-    }
-
-    /* request WRITE_EXTERNAL_STORAGE permission (READ_EXTERNAL_STORAGE is implicitly granted)
-     * see https://developer.android.com/guide/topics/permissions/overview.html#normal-dangerous */
-    private void requestReadAndWritePermission() {
-        String permission = android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
-        boolean is_granted = (ContextCompat.checkSelfPermission(BaseActivity.this,
-            permission) == PackageManager.PERMISSION_GRANTED);
-
-        if (!is_granted) {
-            Logger.i(TAG, String.format(Locale.US,
-                "Requesting %s permission", permission));
-            ActivityCompat.requestPermissions(this, new String[]{ permission },
-                REQUEST_WRITE_STORAGE);
-        }
-    }
 
     /* start activity if we find a package able to handle a given intent */
     private boolean startActivityIfSafe(Intent intent) {

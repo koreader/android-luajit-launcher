@@ -3,6 +3,7 @@ local ffi = require("ffi")
 ffi.cdef[[
     void *mmap(void *addr, size_t length, int prot, int flags, int fd, size_t offset);
     int munmap(void *addr, size_t length);
+    unsigned int sleep(unsigned int seconds);
 ]]
 
 -- reservation enough mmap slots for mcode allocation
@@ -1707,6 +1708,29 @@ local function run(android_app_state)
         end
     end
 
+    -- android permission check
+    android.canWriteSettings = function()
+        android.DEBUG("checking write settings permission")
+        return JNI:context(android.app.activity.vm, function(JNI)
+            return JNI:callIntMethod(
+                android.app.activity.clazz,
+                "hasWriteSettingsPermission",
+                "()I"
+            ) == 1
+        end)
+    end
+
+    android.canWriteStorage = function()
+        android.DEBUG("checking write storage permission")
+        return JNI:context(android.app.activity.vm, function(JNI)
+            return JNI:callIntMethod(
+                android.app.activity.clazz,
+                "hasExternalStoragePermission",
+                "()I"
+            ) == 1
+        end)
+    end
+
     android.setWakeLock = function(enabled)
         android.DEBUG("Switching wakelock to " .. tostring(enabled))
         JNI:context(android.app.activity.vm, function(JNI)
@@ -1848,15 +1872,25 @@ local function run(android_app_state)
         end)
     end
 
-    android.notification = function(message)
+    android.notification = function(message, is_long)
         return JNI:context(android.app.activity.vm, function(JNI)
             local text = JNI.env[0].NewStringUTF(JNI.env, message)
-            JNI:callVoidMethod(
-                android.app.activity.clazz,
-                "showToast",
-                "(Ljava/lang/String;)V",
-                text
-            )
+            if duration ~= nil then
+                JNI:callVoidMethod(
+                    android.app.activity.clazz,
+                    "showToast",
+                    "(Ljava/lang/String;Z)V",
+                    text,
+                    ffi.new("bool", is_long)
+                )
+            else
+                JNI:callVoidMethod(
+                    android.app.activity.clazz,
+                    "showToast",
+                    "(Ljava/lang/String;)V",
+                    text
+                )
+            end
             JNI.env[0].DeleteLocalRef(JNI.env, text)
         end)
     end
@@ -2008,6 +2042,14 @@ local function run(android_app_state)
     -- install native libraries into libs
     local install = android.asset_loader("install")
     if type(install) == "function" then
+        -- Don't uncompress assets if we don't have write permissions on external storage.
+        if not android.canWriteStorage() then
+            android.notification("Insuficient permissions", true)
+            ffi.C.sleep(1) -- to show notification
+            android.lib.ANativeActivity_finish(android.app.activity)
+            ffi.C.sleep(1) -- to do onPause -> onStop -> onDestroy.
+            error("can't work without rw external storage")
+        end
         android.showProgress()
         local start_time = os.time()
         install()

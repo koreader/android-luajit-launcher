@@ -29,6 +29,8 @@ interface JNILuaInterface {
     int getScreenWidth();
     int getStatusBarHeight();
     int hasClipboardTextIntResultWrapper();
+    int hasExternalStoragePermission();
+    int hasWriteSettingsPermission();
     int isCharging();
     int isDebuggable();
     int isEink();
