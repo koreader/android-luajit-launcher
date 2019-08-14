@@ -1877,7 +1877,7 @@ local function run(android_app_state)
     android.notification = function(message, is_long)
         return JNI:context(android.app.activity.vm, function(JNI)
             local text = JNI.env[0].NewStringUTF(JNI.env, message)
-            if duration ~= nil then
+            if is_long ~= nil then
                 JNI:callVoidMethod(
                     android.app.activity.clazz,
                     "showToast",
