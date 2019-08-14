@@ -308,6 +308,8 @@ enum {
     AKEYCODE_MEDIA_PREVIOUS = 88,
     AKEYCODE_MEDIA_REWIND = 89,
     AKEYCODE_MEDIA_FAST_FORWARD = 90,
+    AKEYCODE_MUTE = 91,
+    AKEYCODE_VOLUME_MUTE = 164,
 };
 
 int32_t AInputEvent_getType(const AInputEvent* event);
