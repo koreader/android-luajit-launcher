@@ -7,17 +7,24 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import org.koreader.launcher.helper.ScreenHelper;
 
 /* MainActivity.java
  *
  * Takes care of activity callbacks.
- * Implements OnRequestPermissionsResultCallback
+ *
+ * Implements runtime permissions:
+ *     WRITE_EXTERNAL_STORAGE is requested onCreate() and needed to work.
+ *     WRITE_SETTINGS is requested when the user does an action that requires it:
+ *         - change screen brightness
+ *         - change screen off timeout
  *
  * Uses a NativeSurfaceView to hook the window on top of the view hierarchy and
  * overrides einkUpdate methods with working implementations.
@@ -26,6 +33,8 @@ public final class MainActivity extends BaseActivity implements
     ActivityCompat.OnRequestPermissionsResultCallback{
 
     private final static String TAG = "MainActivity";
+    private final static int REQUEST_WRITE_STORAGE = 1;
+
     private NativeSurfaceView view;
 
     /*---------------------------------------------------------------
@@ -52,6 +61,7 @@ public final class MainActivity extends BaseActivity implements
                 }
             });
         }
+        requestExternalStoragePermission();
     }
 
     /* Called when the activity has become visible. */
@@ -101,9 +111,7 @@ public final class MainActivity extends BaseActivity implements
             String msg = String.format(Locale.US,
                 "Permission rejected for request code %d", requestCode);
             if (requestCode == REQUEST_WRITE_STORAGE) {
-                // we can't work without external storage permissions
-                Logger.e(TAG, msg + ". Permission is mandatory to run the application.");
-                finish();
+                Logger.e(TAG, msg);
             } else {
                 Logger.w(TAG, msg);
             }
@@ -118,7 +126,7 @@ public final class MainActivity extends BaseActivity implements
     }
 
     /*---------------------------------------------------------------
-     *             implement methods used by lua/JNI                *
+     *             override methods used by lua/JNI                *
      *--------------------------------------------------------------*/
 
     @Override
@@ -131,10 +139,82 @@ public final class MainActivity extends BaseActivity implements
         view.einkUpdate(mode, delay, x, y, width, height);
     }
 
+    @Override
+    public int hasExternalStoragePermission() {
+        return (ContextCompat.checkSelfPermission(
+            MainActivity.this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            == PackageManager.PERMISSION_GRANTED) ? 1 : 0;
+    }
+
+    @Override
+    public int hasWriteSettingsPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (Settings.System.canWrite(MainActivity.this)) {
+                return 1;
+            } else {
+                return 0;
+            }
+        } else {
+            // on older apis permissions are granted at install time
+            return 1;
+        }
+    }
+
+    @Override
+    public void setScreenBrightness(final int brightness) {
+        if (hasWriteSettingsPermission() == 1) {
+            screen.setScreenBrightness(brightness);
+        } else {
+            requestWriteSettingsPermission();
+        }
+    }
+
+    @Override
+    public void setScreenOffTimeout(final int timeout) {
+        if (timeout == ScreenHelper.TIMEOUT_WAKELOCK) {
+            power.setWakelockState(true);
+        } else {
+            power.setWakelockState(false);
+        }
+
+        if (hasWriteSettingsPermission() == 1) {
+            screen.setTimeout(timeout);
+        } else {
+            requestWriteSettingsPermission();
+        }
+    }
+
 
     /*---------------------------------------------------------------
      *                       private methods                        *
      *--------------------------------------------------------------*/
+
+    /* request WRITE_EXTERNAL_STORAGE permission.
+     * see https://developer.android.com/guide/topics/permissions/overview.html#normal-dangerous
+     */
+    private void requestExternalStoragePermission() {
+        if (hasExternalStoragePermission() == 0) {
+            Logger.i(TAG,"Requesting WRITE_EXTERNAL_STORAGE permission");
+            ActivityCompat.requestPermissions(this,
+                new String[]{ android.Manifest.permission.WRITE_EXTERNAL_STORAGE },
+                REQUEST_WRITE_STORAGE);
+        }
+    }
+
+    /* request WRITE_SETTINGS permission.
+     * It needs to be granted through a management screen.
+     * See https://developer.android.com/reference/android/Manifest.permission.html#WRITE_SETTINGS
+     */
+    @SuppressWarnings("InlinedApi")
+    private void requestWriteSettingsPermission() {
+        if (hasWriteSettingsPermission() == 0) {
+            Logger.i(TAG, "Requesting WRITE_SETTINGS permission");
+            Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
+            startActivity(intent);
+        } else {
+            Logger.v(TAG, "write settings permission is already granted");
+        }
+    }
 
     /* set a fullscreen layout */
     private void setFullscreenLayout() {
