@@ -14,6 +14,8 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import org.koreader.launcher.device.EPDController;
+import org.koreader.launcher.device.EPDFactory;
 import org.koreader.launcher.helper.ScreenHelper;
 
 /* MainActivity.java
@@ -26,8 +28,7 @@ import org.koreader.launcher.helper.ScreenHelper;
  *         - change screen brightness
  *         - change screen off timeout
  *
- * Uses a NativeSurfaceView to hook the window on top of the view hierarchy and
- * overrides einkUpdate methods with working implementations.
+ * Overrides einkUpdate methods with working implementations.
  */
 public final class MainActivity extends BaseActivity implements
     ActivityCompat.OnRequestPermissionsResultCallback{
@@ -35,7 +36,10 @@ public final class MainActivity extends BaseActivity implements
     private final static String TAG = "MainActivity";
     private final static int REQUEST_WRITE_STORAGE = 1;
 
+    private final EPDController epd = EPDFactory.getEPDController();
+
     private NativeSurfaceView view;
+    private boolean takes_window_ownership;
 
     /*---------------------------------------------------------------
      *                        activity callbacks                    *
@@ -46,10 +50,27 @@ public final class MainActivity extends BaseActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         Logger.d(TAG, "onCreate()");
         super.onCreate(savedInstanceState);
-        getWindow().takeSurface(null);
-        view = new NativeSurfaceView(this);
-        view.getHolder().addCallback(this);
-        setContentView(view);
+
+        /* The NativeActivity framework takes care of the surface/view.
+           It seems to work just-fine(TM) in all devices.
+
+           But, apparently, Tolinos (and other ntx boards) need to take control
+           of the underlying surface to be able to refresh their e-ink screen.
+
+           This is just a guess based on user feedback, needs to be tested on
+           real hardware */
+
+        if ("freescale".equals(getEinkPlatform())) {
+            Logger.d(TAG, "onNativeSurfaceViewImpl()");
+            getWindow().takeSurface(null);
+            view = new NativeSurfaceView(this);
+            view.getHolder().addCallback(this);
+            setContentView(view);
+            takes_window_ownership = true;
+        } else {
+            Logger.d(TAG, "onNativeWindowImpl()");
+        }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             setFullscreenLayout();
             View decorView = getWindow().getDecorView();
@@ -129,14 +150,49 @@ public final class MainActivity extends BaseActivity implements
      *             override methods used by lua/JNI                *
      *--------------------------------------------------------------*/
 
+    // update the entire screen (rockchip)
+
     @Override
     public void einkUpdate(int mode) {
-        view.einkUpdate(mode);
+        String mode_name = "invalid mode";
+        if (mode == 1) {
+            mode_name = "EPD_FULL";
+        } else if (mode == 2) {
+            mode_name = "EPD_PART";
+        } else if (mode == 3) {
+            mode_name = "EPD_A2";
+        } else if (mode == 4) {
+            mode_name = "EPD_AUTO";
+        } else {
+            Logger.e(String.format(Locale.US,"%s: %d", mode_name, mode));
+            return;
+        }
+        Logger.v(TAG, String.format(Locale.US,
+            "requesting epd update, type: %s", mode_name));
+
+        if (takes_window_ownership) {
+            epd.setEpdMode(view, 0, 0, 0, 0, 0, 0, mode_name);
+        } else {
+            final View rootView = getWindow().getDecorView().findViewById(android.R.id.content);
+            epd.setEpdMode(rootView, 0, 0, 0, 0, 0, 0, mode_name);
+        }
     }
+
+    // update a region or the entire screen (freescale)
 
     @Override
     public void einkUpdate(int mode, long delay, int x, int y, int width, int height) {
-        view.einkUpdate(mode, delay, x, y, width, height);
+
+        Logger.v(TAG, String.format(Locale.US,
+            "requesting epd update, mode:%d, delay:%d, [x:%d, y:%d, w:%d, h:%d]",
+            mode, delay, x, y, width, height));
+
+        if (takes_window_ownership) {
+            epd.setEpdMode(view, mode, delay, x, y, width, height, null);
+        } else {
+            final View rootView = getWindow().getDecorView().findViewById(android.R.id.content);
+            epd.setEpdMode(rootView, mode, delay, x, y, width, height, null);
+        }
     }
 
     @Override
