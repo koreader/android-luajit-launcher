@@ -17,9 +17,12 @@ import android.view.WindowManager;
 import org.koreader.launcher.Logger;
 
 
-public class ScreenHelper {
-    private final Context context;
-    private final String tag;
+/* Screen helper.
+
+   Some methods are intended to be executed on the UIThread.
+   You'll need to pass an Activity as a parameter of your methods. */
+
+public class ScreenHelper extends BaseHelper {
 
     // keep track of system timeout, to restore it when the application looses focus.
     private int sys_timeout;
@@ -38,48 +41,46 @@ public class ScreenHelper {
     public int app_timeout;
 
     public ScreenHelper(Context context) {
-        this.context = context;
+        super(context);
         this.sys_timeout = readSettingScreenOffTimeout();
-        this.tag = this.getClass().getSimpleName();
-        Logger.d(tag, "Starting");
     }
 
     /* Screen size */
-    public int getScreenWidth() {
-        return getScreenSize().x;
+    public int getScreenWidth(Activity activity) {
+        return getScreenSize(activity).x;
     }
 
-    public int getScreenHeight() {
-        return getScreenSize().y;
+    public int getScreenHeight(Activity activity) {
+        return getScreenSize(activity).y;
     }
 
-    public int getScreenAvailableHeight() {
-        return getScreenSizeWithConstraints().y;
+    public int getScreenAvailableHeight(Activity activity) {
+        return getScreenSizeWithConstraints(activity).y;
     }
 
     // DEPRECATED: returns 0 on API16+
-    public int getStatusBarHeight() {
+    public int getStatusBarHeight(Activity activity) {
+        final Activity a = activity;
         Rect rectangle = new Rect();
-        Window window = ((Activity)context).getWindow();
+        final Window window = a.getWindow();
         window.getDecorView().getWindowVisibleDisplayFrame(rectangle);
         return rectangle.top;
     }
 
     /* Screen brightness */
     public void setScreenBrightness(final int brightness) {
-        ((Activity)context).runOnUiThread(new Runnable() {
+        runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 try {
                     //this will set the manual mode (set the automatic mode off)
-                    Settings.System.putInt(context.getContentResolver(),
+                    Settings.System.putInt(getApplicationContext().getContentResolver(),
                         Settings.System.SCREEN_BRIGHTNESS_MODE,
                         Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
-
-                    Settings.System.putInt(context.getContentResolver(),
+                    Settings.System.putInt(getApplicationContext().getContentResolver(),
                         Settings.System.SCREEN_BRIGHTNESS, brightness);
                 } catch (Exception e) {
-                    Logger.w(tag, e.toString());
+                    Logger.w(getTag(), e.toString());
                 }
             }
         });
@@ -101,13 +102,13 @@ public class ScreenHelper {
         app_timeout = new_timeout;
         // custom timeout in milliseconds
         if (app_timeout > TIMEOUT_SYSTEM) {
-            Logger.v(tag, String.format(Locale.US,
+            Logger.v(getTag(), String.format(Locale.US,
                 "set timeout for app: %d seconds",
                 app_timeout / 1000));
             writeSettingScreenOffTimeout(app_timeout);
         // default timeout (by using system settings with or without wakelocks)
         } else if ((app_timeout == TIMEOUT_SYSTEM) || (app_timeout == TIMEOUT_WAKELOCK)) {
-            Logger.v(tag, String.format(Locale.US,
+            Logger.v(getTag(), String.format(Locale.US,
                 "set timeout for app: (state: %d), restoring defaults: %d seconds",
                 app_timeout, sys_timeout / 1000));
             writeSettingScreenOffTimeout(sys_timeout);
@@ -128,7 +129,7 @@ public class ScreenHelper {
 
                 // apply a custom timeout for the application
                 if ((sys_timeout != app_timeout) && (app_timeout > TIMEOUT_SYSTEM)) {
-                    Logger.v(tag, String.format(Locale.US,
+                    Logger.v(getTag(), String.format(Locale.US,
                         "restoring app timeout: %d -> %d seconds",
                         sys_timeout / 1000, app_timeout / 1000));
 
@@ -137,7 +138,7 @@ public class ScreenHelper {
             } else {
                 // app paused: restore system timeout.
                 if ((sys_timeout != app_timeout) && (app_timeout > TIMEOUT_SYSTEM)) {
-                    Logger.v(tag, String.format(Locale.US,
+                    Logger.v(getTag(), String.format(Locale.US,
                         "restoring system timeout: %d -> %d seconds",
                         app_timeout / 1000, sys_timeout / 1000));
 
@@ -145,7 +146,7 @@ public class ScreenHelper {
                 }
             }
         } catch (Exception e) {
-            Logger.w(tag, e.toString());
+            Logger.w(getTag(), e.toString());
         }
     }
 
@@ -154,8 +155,8 @@ public class ScreenHelper {
         return (is_fullscreen) ? 1 : 0;
     }
 
-    public int isFullscreenDeprecated() {
-        return ((((Activity)context).getWindow().getAttributes().flags &
+    public int isFullscreenDeprecated(Activity activity) {
+        return ((activity.getWindow().getAttributes().flags &
             WindowManager.LayoutParams.FLAG_FULLSCREEN) != 0) ? 1 : 0;
     }
 
@@ -163,20 +164,21 @@ public class ScreenHelper {
         is_fullscreen = fullscreen;
     }
 
-    public void setFullscreenDeprecated(final boolean fullscreen) {
+    public void setFullscreenDeprecated(Activity activity, final boolean fullscreen) {
         final CountDownLatch cd = new CountDownLatch(1);
-        ((Activity)context).runOnUiThread(new Runnable() {
+        final Activity a = activity;
+        runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    final Window window = ((Activity)context).getWindow();
+                    final Window window = a.getWindow();
                     if (fullscreen) {
                         window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
                     } else {
                         window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
                     }
                 } catch (Exception e) {
-                    Logger.w(tag, e.toString());
+                    Logger.w(getTag(), e.toString());
                 }
                 cd.countDown();
             }
@@ -184,13 +186,13 @@ public class ScreenHelper {
         try {
             cd.await();
         } catch (InterruptedException ex) {
-            Logger.e(tag, ex.toString());
+            Logger.e(getTag(), ex.toString());
         }
     }
 
-    private Point getScreenSize() {
+    private Point getScreenSize(Activity activity) {
         Point size = new Point();
-        Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
+        Display display = activity.getWindowManager().getDefaultDisplay();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
             DisplayMetrics metrics = new DisplayMetrics();
@@ -202,9 +204,9 @@ public class ScreenHelper {
         return size;
     }
 
-    private Point getScreenSizeWithConstraints() {
+    private Point getScreenSizeWithConstraints(Activity activity) {
         Point size = new Point();
-        Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
+        Display display = activity.getWindowManager().getDefaultDisplay();
         DisplayMetrics metrics = new DisplayMetrics();
         display.getMetrics(metrics);
         size.set(metrics.widthPixels, metrics.heightPixels);
@@ -217,10 +219,10 @@ public class ScreenHelper {
 
     private int readSettingScreenOffTimeout() {
         try {
-            return Settings.System.getInt(context.getContentResolver(),
+            return Settings.System.getInt(getApplicationContext().getContentResolver(),
                 Settings.System.SCREEN_OFF_TIMEOUT);
         } catch (Exception e) {
-            Logger.w(tag, e.toString());
+            Logger.w(getTag(), e.toString());
             return 0;
         }
     }
@@ -229,10 +231,10 @@ public class ScreenHelper {
         if (timeout <= 0) return;
 
         try {
-            Settings.System.putInt(context.getContentResolver(),
+            Settings.System.putInt(getApplicationContext().getContentResolver(),
                 Settings.System.SCREEN_OFF_TIMEOUT, timeout);
         } catch (Exception e) {
-            Logger.w(tag, e.toString());
+            Logger.w(getTag(), e.toString());
         }
     }
 }

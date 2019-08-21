@@ -10,29 +10,28 @@ import android.content.ClipboardManager;
 import org.koreader.launcher.Logger;
 
 
-public class ClipboardHelper {
-    private final Context context;
+public class ClipboardHelper extends BaseHelper {
+
     private final ClipboardManager clipboard;
-    private final String tag;
 
     public ClipboardHelper(Context context) {
-        this.context = context;
-        this.clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-        this.tag = this.getClass().getSimpleName();
-        Logger.d(tag, "Starting");
+        super(context);
+        this.clipboard = (ClipboardManager)
+            getApplicationContext().getSystemService(Context.CLIPBOARD_SERVICE);
     }
 
     public String getClipboardText() {
         final Box<String> result = new Box<>();
         final CountDownLatch cd = new CountDownLatch(1);
-        ((Activity)context).runOnUiThread(new Runnable() {
+        runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 try {
                     if (clipboard.hasPrimaryClip()) {
                         ClipData data = clipboard.getPrimaryClip();
                         if (data != null && data.getItemCount() > 0) {
-                            CharSequence text = data.getItemAt(0).coerceToText(context);
+                            CharSequence text = data.getItemAt(0).coerceToText(
+                                getApplicationContext());
                             if (text != null) {
                                 result.value = text.toString();
                             } else {
@@ -41,7 +40,7 @@ public class ClipboardHelper {
                         }
                     }
                 } catch (Exception e) {
-                    Logger.w(tag, e.toString());
+                    Logger.w(getTag(), e.toString());
                     result.value = "";
                 }
                 cd.countDown();
@@ -60,14 +59,14 @@ public class ClipboardHelper {
     }
 
     public void setClipboardText(final String text) {
-        ((Activity)context).runOnUiThread(new Runnable() {
+        runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 try {
                     ClipData clip = ClipData.newPlainText("KOReader_clipboard", text);
                     clipboard.setPrimaryClip(clip);
                 } catch (Exception e) {
-                    Logger.w(tag, e.toString());
+                    Logger.w(getTag(), e.toString());
                 }
             }
         });

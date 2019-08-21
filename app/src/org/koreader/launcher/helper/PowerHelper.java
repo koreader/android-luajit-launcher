@@ -10,21 +10,17 @@ import android.os.PowerManager;
 import org.koreader.launcher.Logger;
 
 
-public class PowerHelper {
-    private static final String WAKELOCK_ID = "wakelock:screen_bright";
+public class PowerHelper extends BaseHelper {
 
-    private final Context context;
+    private static final String WAKELOCK_ID = "wakelock:screen_bright";
     private final IntentFilter filter;
-    private final String tag;
 
     private PowerManager.WakeLock wakelock;
     private boolean isWakeLockAllowed = false;
 
     public PowerHelper(Context context) {
-        this.context = context.getApplicationContext();
+        super(context);
         this.filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-        this.tag = this.getClass().getSimpleName();
-        Logger.d(tag, "Starting");
     }
 
     public int batteryPercent() {
@@ -53,7 +49,7 @@ public class PowerHelper {
     }
 
     private int getBatteryState(boolean isPercent) {
-        Intent intent = context.registerReceiver(null, filter);
+        Intent intent = getApplicationContext().registerReceiver(null, filter);
 
         if (intent != null) {
             final int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
@@ -77,9 +73,9 @@ public class PowerHelper {
     private void wakelockAcquire() {
         if (isWakeLockAllowed) {
             wakelockRelease();
-            PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+            PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
             wakelock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, WAKELOCK_ID);
-            Logger.v(tag, "acquiring " + WAKELOCK_ID);
+            Logger.v(getTag(), "acquiring " + WAKELOCK_ID);
             // release the wakelock after 30 minutes running in the foreground without inputs.
             // it will be acquired again on the next resume callback.
             wakelock.acquire( 30 * 60 * 1000);
@@ -88,7 +84,7 @@ public class PowerHelper {
 
     private void wakelockRelease() {
         if (isWakeLockAllowed && wakelock != null) {
-            Logger.v(tag, "releasing " + WAKELOCK_ID);
+            Logger.v(getTag(), "releasing " + WAKELOCK_ID);
             wakelock.release();
             wakelock = null;
         }

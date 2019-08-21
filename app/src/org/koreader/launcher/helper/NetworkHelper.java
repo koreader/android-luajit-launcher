@@ -15,16 +15,14 @@ import android.text.format.Formatter;
 import org.koreader.launcher.Logger;
 
 
-public class NetworkHelper {
-    private final Context context;
+public class NetworkHelper extends BaseHelper {
+
     private final WifiManager wifi;
-    private final String tag;
 
     public NetworkHelper(Context context) {
-        this.context = context.getApplicationContext();
-        this.wifi = (WifiManager) this.context.getSystemService(Context.WIFI_SERVICE);
-        this.tag = this.getClass().getSimpleName();
-        Logger.d(tag, "Starting");
+        super(context);
+        this.wifi = (WifiManager) 
+            getApplicationContext().getSystemService(Context.WIFI_SERVICE);
     }
 
     public int isWifi() {
@@ -65,7 +63,7 @@ public class NetworkHelper {
             Environment.DIRECTORY_DOWNLOADS) + "/" + name);
 
         if (file.exists()) {
-            Logger.w(tag, "File already exists: skipping download");
+            Logger.w(getTag(), "File already exists: skipping download");
             return 1;
         }
 
@@ -73,7 +71,8 @@ public class NetworkHelper {
         request.allowScanningByMediaScanner();
         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
         request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, name);
-        DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+        DownloadManager manager = (DownloadManager)
+            getApplicationContext().getSystemService(Context.DOWNLOAD_SERVICE);
         manager.enqueue(request);
         return 0;
     }
