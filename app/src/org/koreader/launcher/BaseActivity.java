@@ -267,23 +267,23 @@ abstract class BaseActivity extends NativeActivity implements JNILuaInterface {
     }
 
     public int getScreenAvailableHeight() {
-        return screen.getScreenAvailableHeight();
+        return screen.getScreenAvailableHeight(this);
     }
 
     public int getScreenHeight() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            return (screen.getScreenHeight() - top_inset_height);
+            return (screen.getScreenHeight(this) - top_inset_height);
         } else {
-            return screen.getScreenHeight();
+            return screen.getScreenHeight(this);
         }
     }
 
     public int getScreenWidth() {
-        return screen.getScreenWidth();
+        return screen.getScreenWidth(this);
     }
 
     public int getStatusBarHeight() {
-        return screen.getStatusBarHeight();
+        return screen.getStatusBarHeight(this);
     }
 
     public int isFullscreen() {
@@ -294,7 +294,7 @@ abstract class BaseActivity extends NativeActivity implements JNILuaInterface {
         }
         // for older devices (apis 14 - 15 - 16)
         else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.JELLY_BEAN) {
-            return screen.isFullscreenDeprecated();
+            return screen.isFullscreenDeprecated(this);
         }
         // for devices with immersive mode (api 19+)
         else {
@@ -310,7 +310,7 @@ abstract class BaseActivity extends NativeActivity implements JNILuaInterface {
         }
         // for older devices (apis 14 - 15 - 16)
         else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.JELLY_BEAN) {
-            screen.setFullscreenDeprecated(enabled);
+            screen.setFullscreenDeprecated(this, enabled);
         }
     }
 
