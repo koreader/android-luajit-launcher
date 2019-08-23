@@ -116,7 +116,11 @@ abstract class BaseActivity extends NativeActivity implements JNILuaInterface {
     /* device */
     public String getEinkPlatform() {
         if (DeviceInfo.EINK_FREESCALE) {
-            return "freescale";
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                return "freescale";
+            } else {
+                return "freescale-legacy";
+            }
         } else if (DeviceInfo.EINK_ROCKCHIP){
             return "rockchip";
         } else {
