@@ -1,3 +1,9 @@
+--[[--
+Java Native Interface (JNI) wrapper.
+
+@module android
+]]
+
 local ffi = require("ffi")
 
 ffi.cdef[[
@@ -1710,7 +1716,8 @@ local function run(android_app_state)
         end
     end
 
-    -- android permission check
+    --- Android permission check
+    -- @treturn bool hasWriteSettingsPermission
     android.canWriteSettings = function()
         android.DEBUG("checking write settings permission")
         return JNI:context(android.app.activity.vm, function(JNI)
