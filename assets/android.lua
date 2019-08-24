@@ -1237,8 +1237,11 @@ function android.LOGE(message)
     android.LOG(ffi.C.ANDROID_LOG_ERROR, message)
 end
 
---[[
-a loader function for Lua which will look for assets when loading modules
+--[[--
+A loader function for Lua which will look for assets when loading modules.
+
+@string modulename
+@return module or error message
 --]]
 function android.asset_loader(modulename)
     local errmsg = ""
@@ -1268,8 +1271,11 @@ function android.asset_loader(modulename)
     return errmsg
 end
 
---[[
-this loader function just loads dependency libraries for C module
+--[[--
+This loader function just loads dependency libraries for the C module.
+
+@string modulename
+@treturn bool success or failure
 --]]
 function android.deplib_loader(modulename)
     local function readable(filename)
@@ -1297,8 +1303,8 @@ end
 function android.get_application_directory()
 end
 
---[[
-the C code will call this function:
+--[[--
+The C code will call this function.
 --]]
 local function run(android_app_state)
     android.app = ffi.cast("struct android_app*", android_app_state)
@@ -1360,7 +1366,8 @@ local function run(android_app_state)
         end)
     end
 
-    -- device identification
+    --- Device identification.
+    -- @treturn string product
     android.getProduct = function()
         return JNI:context(android.app.activity.vm, function(JNI)
             local product = JNI:callObjectMethod(
@@ -1383,7 +1390,8 @@ local function run(android_app_state)
         end)
     end
 
-    -- build identification
+    --- Build identification.
+    -- @treturn string flavor
     android.getFlavor = function()
         return JNI:context(android.app.activity.vm, function(JNI)
             local flavor = JNI:callObjectMethod(
@@ -1461,6 +1469,8 @@ local function run(android_app_state)
         end
     end
 
+    --- Gets screen width.
+    -- @treturn int screen width
     android.getScreenWidth = function()
         return JNI:context(android.app.activity.vm, function(JNI)
             return JNI:callIntMethod(
@@ -1471,6 +1481,8 @@ local function run(android_app_state)
         end)
     end
 
+    --- Gets screen height.
+    -- @treturn int screen height
     android.getScreenHeight = function()
         return JNI:context(android.app.activity.vm, function(JNI)
             return JNI:callIntMethod(
@@ -1716,7 +1728,7 @@ local function run(android_app_state)
         end
     end
 
-    --- Android permission check
+    --- Android permission check.
     -- @treturn bool hasWriteSettingsPermission
     android.canWriteSettings = function()
         android.DEBUG("checking write settings permission")
