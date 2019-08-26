@@ -107,6 +107,17 @@ test: update
 	mkdir -p bin/
 	find tests/einkTest/build/outputs/apk/ -type f -name '*.apk' -exec mv -v {} bin/ \;
 	@echo "WARNING: You'll need to sign this application to be able to install it"
+
+example: update clean build-luajit
+	@echo "Building HelloWorld example"
+	@echo "#define LOGGER_NAME \"HelloFromLua\"" > jni/logger.h
+	mkdir -p assets/module/
+	cp -pv examples/helloWorld/*.lua assets/module/
+	./gradlew -PversName=1.0 -PversCode=1 -PprojectName=HelloFromLua \
+		app:$(GRADLE_TASK)Debug --warning-mode all
+	mkdir -p bin/
+	find app/build/outputs/apk/ -type f -name '*.apk' -exec mv -v {} bin/ \;
+
 clean:
 	@echo "Cleaning binaries, assets and LuaJIT build"
 	rm -rf assets/module/ bin/ jni/luajit/build
