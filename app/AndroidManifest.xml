@@ -19,6 +19,7 @@
         android:vmSafeMode="true"
         android:allowBackup="false"
         android:fullBackupContent="false"
+        android:extractNativeLibs="true"
         android:usesCleartextTraffic="true">
         <meta-data android:name="android.max_aspect" android:value="3.1" />
         <activity

@@ -1278,9 +1278,13 @@ This loader function just loads dependency libraries for the C module.
 @treturn bool success or failure
 --]]
 function android.deplib_loader(modulename)
+    if modulename:match("^libs/") then modulename = string.sub(modulename, 6) end
     local function readable(filename)
-        local f = io.open(filename, "r")
-        if f == nil then return false end
+        local f, err = io.open(filename, "r")
+        if f == nil then
+            android.DEBUG("can't open module "..filename, err)
+            return false
+        end
         f:close()
         return true
     end
@@ -2050,7 +2054,7 @@ local function run(android_app_state)
     -- set up a sensible package.path
     package.path = "?.lua;"..android.dir.."/?.lua;"
     -- set absolute cpath
-    package.cpath = "?.so;"..android.dir.."/?.so;"
+    package.cpath = "?.so;"..android.dir.."/?.so;"..android.nativeLibraryDir.."/?.so"
     -- register the asset loader
     table.insert(package.loaders, 2, android.asset_loader)
 

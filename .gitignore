@@ -8,6 +8,7 @@ project.properties
 *.iml
 
 bin
+libs
 build
 app/.*
 app/build
