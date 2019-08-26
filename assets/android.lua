@@ -1344,6 +1344,16 @@ local function run(android_app_state)
                 JNI:to_string(JNI:getObjectField(app_info, "nativeLibraryDir", "Ljava/lang/String;"))
         end)
 
+    android.extractAssets = function()
+        return JNI:context(android.app.activity.vm, function(JNI)
+            return JNI:callIntMethod(
+                android.app.activity.clazz,
+                "extractAssets",
+                "()I"
+            ) == 1
+        end)
+    end
+
     android.getIntent = function()
         return JNI:context(android.app.activity.vm, function(JNI)
             local uri = JNI:callObjectMethod(
@@ -2060,28 +2070,26 @@ local function run(android_app_state)
         return android.dl.dlopen(library, ffi_load)
     end
 
-    -- install native libraries into libs
-    local install = android.asset_loader("install")
-    if type(install) == "function" then
-        -- Don't uncompress assets if we don't have write permissions on external storage.
-        if not android.canWriteStorage() then
-            android.notification("Insuficient permissions", true)
-            ffi.C.sleep(1) -- to show notification
-            android.lib.ANativeActivity_finish(android.app.activity)
-            ffi.C.sleep(1) -- to do onPause -> onStop -> onDestroy.
-            error("can't work without rw external storage")
-        end
-        android.showProgress()
-        local start_time = os.time()
-        install()
-        local end_time = os.time()
-        android.dismissProgress()
-        local elapsed_time = os.difftime(end_time, start_time)
-        if elapsed_time > 0 then
-            android.LOGV(string.format("update installed in %d seconds", elapsed_time))
-        end
-    else
-        error("error loading install.lua")
+    -- Do not extract assets if we don't have write permissions on external storage.
+    if not android.canWriteStorage() then
+        android.notification("Insufficient permissions", true)
+        ffi.C.sleep(1) -- to show notification
+        android.lib.ANativeActivity_finish(android.app.activity)
+        ffi.C.sleep(1) -- to do onPause -> onStop -> onDestroy.
+        error("Write permission required to extract resources")
+    end
+
+    android.showProgress()
+    local start_time = os.time()
+    local installed = android.extractAssets()
+    local end_time = os.time()
+    android.dismissProgress()
+    local elapsed_time = os.difftime(end_time, start_time)
+    if elapsed_time > 0 then
+        android.LOGV(string.format("update installed in %d seconds", elapsed_time))
+    end
+    if not installed then
+        error("error extracting assets")
     end
     local launch = android.asset_loader("launcher")
     if type(launch) == "function" then
