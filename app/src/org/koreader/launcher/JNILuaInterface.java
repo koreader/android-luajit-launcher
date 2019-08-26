@@ -22,6 +22,7 @@ interface JNILuaInterface {
     void showToast(String message);
 
     int download(String url, String name);
+    int extractAssets();
     int getBatteryLevel();
     int getScreenOffTimeout();
     int getScreenAvailableHeight();

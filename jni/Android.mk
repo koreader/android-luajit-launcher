@@ -20,11 +20,6 @@ LOCAL_PATH := $(BASE_PATH)
 include $(LOCAL_PATH)/android_native_app_glue/Android.mk
 include $(CLEAR_VARS)
 
-# LZMA
-LOCAL_PATH := $(BASE_PATH)
-include $(LOCAL_PATH)/lzma/Android.mk
-include $(CLEAR_VARS)
-
 # LuaJIT
 LOCAL_PATH := $(BASE_PATH)
 include $(LOCAL_PATH)/luajit/Android.mk

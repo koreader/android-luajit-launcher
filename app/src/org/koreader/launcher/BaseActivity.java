@@ -87,6 +87,11 @@ abstract class BaseActivity extends NativeActivity implements JNILuaInterface {
      *             implement methods used by lua/JNI                *
      *--------------------------------------------------------------*/
 
+    /* assets */
+    public int extractAssets() {
+        return AssetsUtils.extract(this);
+    }
+
     /* build */
     public String getFlavor() {
         return getResources().getString(R.string.app_flavor);
