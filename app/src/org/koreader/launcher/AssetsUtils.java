@@ -29,15 +29,17 @@ class AssetsUtils {
             String zipFile = getZipFile(context);
             if (zipFile != null) {
                 // zipfile found! it will be extracted or not based on its version name
+                Logger.i("Check file in asset module: " + zipFile);
                 if (!isSameVersion(context, zipFile)) {
-                    InputStream stream = context.getAssets().open(zipFile);
+                    Logger.i("Installing new package to " + output);
+                    InputStream stream = context.getAssets().open("module/" + zipFile);
                     unzip(stream, output);
                 }
                 // extracted without errors.
                 return 1;
             } else {
                 // check if the app has other, non-zipped, raw assets
-                Logger.i(TAG, "zip file not found, trying raw assets...");
+                Logger.i("Zip file not found, trying raw assets...");
                 return copyUncompressedAssets(context) ? 1 : 0;
             }
         } catch (IOException e) {
@@ -48,17 +50,32 @@ class AssetsUtils {
 
     /* do not extract assets if the same version is already installed */
     private static boolean isSameVersion(Context context, String zipFile) {
+        final String new_version = getPackageRevision(zipFile);
         try {
             String output = context.getFilesDir().getAbsolutePath();
             FileReader fileReader = new FileReader(output + "/git-rev");
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             String installed_version = bufferedReader.readLine();
             bufferedReader.close();
-            return zipFile.contains(installed_version) ? true : false;
+            if (new_version.equals(installed_version)) {
+                Logger.i("Skip installation for revision " + new_version);
+                return true;
+            } else {
+                Logger.i("Found new package revision " + new_version);
+                return false;
+            }
         } catch (Exception e) {
-            Logger.d(TAG, "git revision not found, we should update");
+            Logger.i("Found new package revision " + new_version);
             return false;
         }
+    }
+
+    /* get package revision from zipFile name
+       zips must use the scheme: name-revision.zip */
+    private static String getPackageRevision(String zipFile) {
+        String zipName = zipFile.replace(".zip","");
+        String[] parts = zipName.split("-");
+        return zipName.replace(parts[0] + "-", "");
     }
 
     /* get the first zip file inside the assets module */
@@ -68,7 +85,7 @@ class AssetsUtils {
             String[] assets = assetManager.list("module");
             for (String asset: assets) {
                 if (asset.endsWith(".zip")) {
-                    return "module/" + asset;
+                    return asset;
                 }
             }
             return null;
