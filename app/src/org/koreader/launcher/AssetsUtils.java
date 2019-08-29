@@ -31,9 +31,13 @@ class AssetsUtils {
                 // zipfile found! it will be extracted or not based on its version name
                 Logger.i("Check file in asset module: " + zipFile);
                 if (!isSameVersion(context, zipFile)) {
+                    long startTime = System.nanoTime();
                     Logger.i("Installing new package to " + output);
                     InputStream stream = context.getAssets().open("module/" + zipFile);
                     unzip(stream, output);
+                    long endTime = System.nanoTime();
+                    long elapsedTime = endTime - startTime;
+                    Logger.v("update installed in " + elapsedTime / 1000000000 + " seconds");
                 }
                 // extracted without errors.
                 return 1;

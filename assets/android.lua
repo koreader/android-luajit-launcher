@@ -2080,14 +2080,8 @@ local function run(android_app_state)
     end
 
     android.showProgress()
-    local start_time = os.time()
     local installed = android.extractAssets()
-    local end_time = os.time()
     android.dismissProgress()
-    local elapsed_time = os.difftime(end_time, start_time)
-    if elapsed_time > 0 then
-        android.LOGV(string.format("update installed in %d seconds", elapsed_time))
-    end
     if not installed then
         error("error extracting assets")
     end
