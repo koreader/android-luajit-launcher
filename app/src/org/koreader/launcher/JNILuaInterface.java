@@ -22,6 +22,7 @@ interface JNILuaInterface {
     int download(String url, String name);
     int extractAssets();
     int getBatteryLevel();
+    int getScreenBrightness();
     int getScreenOffTimeout();
     int getScreenAvailableHeight();
     int getScreenHeight();

@@ -1519,31 +1519,17 @@ local function run(android_app_state)
 
     android.getScreenBrightness = function()
         return JNI:context(android.app.activity.vm, function(JNI)
-            local str_brightness = JNI.env[0].NewStringUTF(JNI.env, "screen_brightness")
-            local res = JNI:callStaticIntMethod(
-                "android/provider/Settings$System",
-                "getInt",
-                "(Landroid/content/ContentResolver;Ljava/lang/String;)I",
-                JNI:callObjectMethod(
-                    android.app.activity.clazz,
-                    "getContentResolver",
-                    "()Landroid/content/ContentResolver;"
-                ),
-                str_brightness
-                )
-            JNI.env[0].DeleteLocalRef(JNI.env, str_brightness)
-            return res
+            return JNI:callIntMethod(
+                android.app.activity.clazz,
+                "getScreenBrightness",
+                "()I"
+            )
         end)
     end
 
     android.setScreenBrightness = function(brightness)
         android.DEBUG("set screen brightness "..brightness)
         JNI:context(android.app.activity.vm, function(JNI)
-            if brightness > 255 then
-                brightness = 255
-            elseif brightness < 0 then
-                brightness = 0
-            end
             JNI:callVoidMethod(
                 android.app.activity.clazz,
                 "setScreenBrightness",
