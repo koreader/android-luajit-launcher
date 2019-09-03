@@ -233,7 +233,9 @@ public final class MainActivity extends BaseActivity implements
             power.setWakelockState(false);
         }
 
-        if (hasWriteSettingsPermission() == 1) {
+        if ((timeout == ScreenHelper.TIMEOUT_SYSTEM) ||
+            (timeout == ScreenHelper.TIMEOUT_WAKELOCK) ||
+            (hasWriteSettingsPermission() == 1)) {
             screen.setTimeout(timeout);
         } else {
             requestWriteSettingsPermission();
