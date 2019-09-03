@@ -21,39 +21,8 @@ class AssetsUtils {
     private static final int BASE_BUFFER_SIZE = 1024;
     private static final String TAG = "AssetsUtils";
 
-    /* extract APK assets on the internal app storage */
-    static int extract(Context context) {
-        String output = context.getFilesDir().getAbsolutePath();
-        try {
-            // is there any zip file inside the asset module?
-            String zipFile = getZipFile(context);
-            if (zipFile != null) {
-                // zipfile found! it will be extracted or not based on its version name
-                Logger.i("Check file in asset module: " + zipFile);
-                if (!isSameVersion(context, zipFile)) {
-                    long startTime = System.nanoTime();
-                    Logger.i("Installing new package to " + output);
-                    InputStream stream = context.getAssets().open("module/" + zipFile);
-                    unzip(stream, output);
-                    long endTime = System.nanoTime();
-                    long elapsedTime = endTime - startTime;
-                    Logger.v("update installed in " + elapsedTime / 1000000000 + " seconds");
-                }
-                // extracted without errors.
-                return 1;
-            } else {
-                // check if the app has other, non-zipped, raw assets
-                Logger.i("Zip file not found, trying raw assets...");
-                return copyUncompressedAssets(context) ? 1 : 0;
-            }
-        } catch (IOException e) {
-            Logger.e(TAG, "error extracting assets:\n" + e.toString());
-            return 0;
-        }
-    }
-
     /* do not extract assets if the same version is already installed */
-    private static boolean isSameVersion(Context context, String zipFile) {
+    static boolean isSameVersion(Context context, String zipFile) {
         final String new_version = getPackageRevision(zipFile);
         try {
             String output = context.getFilesDir().getAbsolutePath();
@@ -76,14 +45,14 @@ class AssetsUtils {
 
     /* get package revision from zipFile name
        zips must use the scheme: name-revision.zip */
-    private static String getPackageRevision(String zipFile) {
+    static String getPackageRevision(String zipFile) {
         String zipName = zipFile.replace(".zip","");
         String[] parts = zipName.split("-");
         return zipName.replace(parts[0] + "-", "");
     }
 
     /* get the first zip file inside the assets module */
-    private static String getZipFile(Context context) {
+    static String getZipFile(Context context) {
         AssetManager assetManager = context.getAssets();
         try {
             String[] assets = assetManager.list("module");
@@ -104,7 +73,7 @@ class AssetsUtils {
        and put there your start code. You can place other files under
        assets/module and they will be copied too. */
 
-    private static boolean copyUncompressedAssets(Context context) {
+    static boolean copyUncompressedAssets(Context context) {
         AssetManager assetManager = context.getAssets();
         String assets_dir = context.getFilesDir().getAbsolutePath();
         // llapp_main.lua is the entry point for frontend code.
@@ -132,7 +101,7 @@ class AssetsUtils {
     }
 
     /* unzip from stream */
-    private static void unzip(InputStream stream, String output) {
+    static void unzip(InputStream stream, String output) {
         byte[] buffer = new byte[BASE_BUFFER_SIZE * 512];
         try {
             ZipInputStream inputStream = new ZipInputStream(stream);
