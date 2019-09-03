@@ -1611,34 +1611,6 @@ local function run(android_app_state)
         end)
     end
 
-    android.showProgress = function(title, message)
-        android.DEBUG("show progress dialog")
-        JNI:context(android.app.activity.vm, function(JNI)
-            local title = JNI.env[0].NewStringUTF(JNI.env, title)
-            local message = JNI.env[0].NewStringUTF(JNI.env, message)
-            JNI:callVoidMethod(
-                android.app.activity.clazz,
-                "showProgress",
-                "(Ljava/lang/String;Ljava/lang/String;)V",
-                title, message
-            )
-            JNI.env[0].DeleteLocalRef(JNI.env, title)
-            JNI.env[0].DeleteLocalRef(JNI.env, message)
-        end)
-    end
-
-    android.dismissProgress = function()
-        android.DEBUG("dismiss progress dialog")
-        JNI:context(android.app.activity.vm, function(JNI)
-            JNI:callVoidMethod(
-                android.app.activity.clazz,
-                "dismissProgress",
-                "()V",
-                title, message
-            )
-        end)
-    end
-
     android.isFullscreen = function()
         return JNI:context(android.app.activity.vm, function(JNI)
             return JNI:callIntMethod(
@@ -2079,9 +2051,7 @@ local function run(android_app_state)
         error("Write permission required to extract resources")
     end
 
-    android.showProgress()
     local installed = android.extractAssets()
-    android.dismissProgress()
     if not installed then
         error("error extracting assets")
     end

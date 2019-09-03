@@ -12,13 +12,11 @@ interface JNILuaInterface {
     void einkUpdate(int mode);
     void einkUpdate(int mode, long delay, int x, int y, int width, int height);
     void dictLookup(String text, String pkg, String action);
-    void dismissProgress();
     void setFullscreen(boolean enabled);
     void setScreenBrightness(int brightness);
     void setScreenOffTimeout(int timeout);
     void setWakeLock(boolean enabled);
     void setWifiEnabled(boolean enabled);
-    void showProgress(String title, String message);
     void showToast(String message);
 
     int download(String url, String name);

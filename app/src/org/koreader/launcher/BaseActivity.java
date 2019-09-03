@@ -1,5 +1,7 @@
 package org.koreader.launcher;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Locale;
 
@@ -89,7 +91,36 @@ abstract class BaseActivity extends NativeActivity implements JNILuaInterface {
 
     /* assets */
     public int extractAssets() {
-        return AssetsUtils.extract(this);
+        String output = getFilesDir().getAbsolutePath();
+        try {
+            // is there any zip file inside the asset module?
+            String zipFile = AssetsUtils.getZipFile(this);
+            if (zipFile != null) {
+                // zipfile found! it will be extracted or not based on its version name
+                Logger.i("Check file in asset module: " + zipFile);
+                if (!AssetsUtils.isSameVersion(this, zipFile)) {
+                    showProgress("");
+                    long startTime = System.nanoTime();
+                    Logger.i("Installing new package to " + output);
+                    InputStream stream = getAssets().open("module/" + zipFile);
+                    AssetsUtils.unzip(stream, output);
+                    long endTime = System.nanoTime();
+                    long elapsedTime = endTime - startTime;
+                    Logger.v("update installed in " + elapsedTime / 1000000000 + " seconds");
+                    dismissProgress();
+                }
+                // extracted without errors.
+                return 1;
+            } else {
+                // check if the app has other, non-zipped, raw assets
+                Logger.i("Zip file not found, trying raw assets...");
+                return AssetsUtils.copyUncompressedAssets(this) ? 1 : 0;
+            }
+        } catch (IOException e) {
+            Logger.e(TAG, "error extracting assets:\n" + e.toString());
+            dismissProgress();
+            return 0;
+        }
     }
 
     /* build */
@@ -151,27 +182,6 @@ abstract class BaseActivity extends NativeActivity implements JNILuaInterface {
 
     public int needsWakelocks() {
         return NEEDS_WAKELOCK_ENABLED ? 1 : 0;
-    }
-
-    /* dialogs */
-    public void showProgress(final String title, final String message) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                dialog = FramelessProgressDialog.show(BaseActivity.this, title);
-            }
-        });
-    }
-
-    public void dismissProgress() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (dialog != null && dialog.isShowing()) {
-                    dialog.dismiss();
-                }
-            }
-        });
     }
 
     /* eink updates: to be implemented on subclasses. Here we just log */
@@ -338,6 +348,27 @@ abstract class BaseActivity extends NativeActivity implements JNILuaInterface {
     /*---------------------------------------------------------------
      *                       private methods                        *
      *--------------------------------------------------------------*/
+
+    /* dialogs */
+    private void showProgress(final String title) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                dialog = FramelessProgressDialog.show(BaseActivity.this, title);
+            }
+        });
+    }
+
+    private void dismissProgress() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (dialog != null && dialog.isShowing()) {
+                    dialog.dismiss();
+                }
+            }
+        });
+    }
 
     /* start activity if we find a package able to handle a given intent */
     private boolean startActivityIfSafe(Intent intent) {
