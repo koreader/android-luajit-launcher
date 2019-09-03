@@ -262,6 +262,10 @@ abstract class BaseActivity extends NativeActivity implements JNILuaInterface {
     }
 
     /* screen */
+    public int getScreenBrightness() {
+        return screen.getScreenBrightness();
+    }
+
     public int getScreenOffTimeout() {
         return screen.app_timeout;
     }
@@ -315,7 +319,7 @@ abstract class BaseActivity extends NativeActivity implements JNILuaInterface {
     }
 
     public void setScreenBrightness(final int brightness) {
-        screen.setScreenBrightness(brightness);
+        screen.setScreenBrightness(this, brightness);
     }
 
     public void setScreenOffTimeout(final int timeout) {

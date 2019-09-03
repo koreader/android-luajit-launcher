@@ -217,15 +217,6 @@ public final class MainActivity extends BaseActivity implements
     }
 
     @Override
-    public void setScreenBrightness(final int brightness) {
-        if (hasWriteSettingsPermission() == 1) {
-            screen.setScreenBrightness(brightness);
-        } else {
-            requestWriteSettingsPermission();
-        }
-    }
-
-    @Override
     public void setScreenOffTimeout(final int timeout) {
         if (timeout == ScreenHelper.TIMEOUT_WAKELOCK) {
             power.setWakelockState(true);
