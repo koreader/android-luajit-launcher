@@ -441,7 +441,7 @@ abstract class BaseActivity : NativeActivity(), ILuaJNI {
     private fun wakelockAcquire() {
         if (isWakeLockAllowed) {
             wakelockRelease()
-            val pm = applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager
+            val pm: PowerManager = applicationContext.getSystemService(Context.POWER_SERVICE)
             wakelock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, WAKELOCK_ID)
             Logger.v(TAG, "acquiring $WAKELOCK_ID")
             // release the wakelock after 30 minutes running in the foreground without inputs.
