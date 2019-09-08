@@ -2,12 +2,11 @@ package org.koreader.launcher
 
 import java.io.IOException
 import java.util.Locale
+import java.util.concurrent.CountDownLatch
 
 import android.app.Dialog
 import android.app.NativeActivity
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.content.*
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.BatteryManager
@@ -19,13 +18,13 @@ import android.widget.ProgressBar
 import android.widget.Toast
 
 import org.koreader.launcher.device.DeviceInfo
-import org.koreader.launcher.helper.ClipboardHelper
 import org.koreader.launcher.helper.NetworkHelper
 import org.koreader.launcher.helper.ScreenHelper
 
 
+
 abstract class BaseActivity : NativeActivity(), ILuaJNI {
-    private var clipboard: ClipboardHelper? = null
+    private var clipboard: ClipboardManager? = null
     private var network: NetworkHelper? = null
     private var wakelock: PowerManager.WakeLock? = null
     private var isWakeLockAllowed: Boolean = false
@@ -41,6 +40,7 @@ abstract class BaseActivity : NativeActivity(), ILuaJNI {
         private val HAS_FULL_EINK_SUPPORT = DeviceInfo.EINK_FULL_SUPPORT
         private val NEEDS_WAKELOCK_ENABLED = DeviceInfo.BUG_WAKELOCKS
         private val BATTERY_FILTER = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
+
     }
 
     /* the fullscreen dialog with a spinning circle used while uncompressing assets */
@@ -71,7 +71,7 @@ abstract class BaseActivity : NativeActivity(), ILuaJNI {
     override fun onCreate(savedInstanceState: Bundle?) {
         Logger.d(TAG, "onCreate()")
         super.onCreate(savedInstanceState)
-        clipboard = ClipboardHelper(this)
+        clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
         network = NetworkHelper(this)
         screen = ScreenHelper(this)
     }
@@ -156,15 +156,49 @@ abstract class BaseActivity : NativeActivity(), ILuaJNI {
     override val isDebuggable: Int
         get() = if (BuildConfig.DEBUG) 1 else 0
 
+
+
     /* clipboard */
     override var clipboardText: String
-        get() = clipboard!!.clipboardText
-        set(text) {
-            clipboard!!.clipboardText = text
+        get() {
+            val result = Box<String>()
+            val cd = CountDownLatch(1)
+            result.value = ""
+            runOnUiThread {
+                try {
+                    val hasText = clipboard?.hasPrimaryClip()
+                    if (hasText != null) {
+                        val data = clipboard?.primaryClip
+                        if (data != null && data.itemCount > 0) {
+                            val text = data.getItemAt(0).coerceToText(applicationContext)
+                            if (text != null) {
+                                result.value = text.toString()
+                            }
+                        }
+                    }
+                } catch (e: Exception) {
+                    Logger.w(TAG, e.toString())
+                }
+                cd.countDown()
+            }
+            try {
+                cd.await()
+            } catch (ex: InterruptedException) {
+                return ""
+            }
+            return if (result.value == null) "" else result.value.toString()
+        }
+        set(text) = runOnUiThread {
+            try {
+                val clip = ClipData.newPlainText("KOReader_clipboard", text)
+                clipboard?.primaryClip = clip
+            } catch (e: Exception) {
+                Logger.w(TAG, e.toString())
+            }
         }
 
     override fun hasClipboardTextIntResultWrapper(): Int {
-        return clipboard!!.hasClipboardText()
+        return if (clipboardHasText()) 1 else 0
     }
 
     /* device */
@@ -381,6 +415,17 @@ abstract class BaseActivity : NativeActivity(), ILuaJNI {
             return false
         }
 
+    }
+
+    private fun clipboardHasText(): Boolean {
+        return if (clipboard!!.hasPrimaryClip()) {
+            val data = clipboard?.primaryClip
+            data != null && data.itemCount > 0
+        } else false
+    }
+
+    private inner class Box<T> {
+        internal var value: T? = null
     }
 
     /* wakelocks */

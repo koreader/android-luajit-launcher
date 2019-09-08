@@ -11,14 +11,9 @@ import java.util.HashMap
 import android.os.Build
 
 object DeviceInfo {
-
-    val PRODUCT: String
-    val EINK_FREESCALE: Boolean
-    val EINK_ROCKCHIP: Boolean
-    val EINK_SUPPORT: Boolean
-    val EINK_FULL_SUPPORT: Boolean
-    val BUG_WAKELOCKS: Boolean
-
+    private const val T61: String = "t61"
+    private const val T62: String = "t62"
+    private const val RK30SDK: String = "rk30sdk"
     private val MANUFACTURER: String
     private val BRAND: String
     private val MODEL: String
@@ -38,6 +33,12 @@ object DeviceInfo {
     private val SONY_RP1: Boolean
     private val EMULATOR_X86: Boolean
     private val IS_BOYUE: Boolean
+    val PRODUCT: String
+    val EINK_FREESCALE: Boolean
+    val EINK_ROCKCHIP: Boolean
+    val EINK_SUPPORT: Boolean
+    val EINK_FULL_SUPPORT: Boolean
+    val BUG_WAKELOCKS: Boolean
 
     // default values for generic devices.
     internal var EINK = EinkDevice.UNKNOWN
@@ -77,18 +78,19 @@ object DeviceInfo {
         DEVICE = getBuildField("DEVICE")
         PRODUCT = getBuildField("PRODUCT")
 
-        IS_BOYUE = MANUFACTURER.toLowerCase().contentEquals("boeye") || MANUFACTURER.toLowerCase().contentEquals("boyue")
+        IS_BOYUE = MANUFACTURER.toLowerCase().contentEquals("boeye")
+                || MANUFACTURER.toLowerCase().contentEquals("boyue")
 
         // Boyue T62, manufacturer uses both "boeye" and "boyue" ids.
         BOYUE_T62 = (IS_BOYUE
-                && (PRODUCT.toLowerCase().startsWith("t62") || MODEL.contentEquals("rk30sdk"))
-                && DEVICE.toLowerCase().startsWith("t62"))
+                && (PRODUCT.toLowerCase().startsWith(T62) || MODEL.contentEquals(RK30SDK))
+                && DEVICE.toLowerCase().startsWith(T62))
         deviceMap[EinkDevice.BOYUE_T62] = BOYUE_T62
 
         // Boyue T61, uses RK3066 chipset
         BOYUE_T61 = (IS_BOYUE
-                && (PRODUCT.toLowerCase().startsWith("t61") || MODEL.contentEquals("rk30sdk"))
-                && DEVICE.toLowerCase().startsWith("t61"))
+                && (PRODUCT.toLowerCase().startsWith(T61) || MODEL.contentEquals(RK30SDK))
+                && DEVICE.toLowerCase().startsWith(T61))
         deviceMap[EinkDevice.BOYUE_T61] = BOYUE_T61
 
         // Boyue Likebook Plus
@@ -108,17 +110,21 @@ object DeviceInfo {
         deviceMap[EinkDevice.BOYUE_T103D] = BOYUE_T103D
 
         // Crema Note (1010P)
-        CREMA = BRAND.toLowerCase().contentEquals("crema") && PRODUCT.toLowerCase().contentEquals("note")
+        CREMA = BRAND.toLowerCase().contentEquals("crema")
+                &&  PRODUCT.toLowerCase().contentEquals("note")
         deviceMap[EinkDevice.CREMA] = CREMA
 
         // Onyx C67
         ONYX_C67 = (MANUFACTURER.toLowerCase().contentEquals("onyx")
-                && (PRODUCT.toLowerCase().startsWith("c67") || MODEL.contentEquals("rk30sdk"))
+                && (PRODUCT.toLowerCase().startsWith("c67")
+                || MODEL.contentEquals("rk30sdk"))
                 && DEVICE.toLowerCase().startsWith("c67"))
         deviceMap[EinkDevice.ONYX_C67] = ONYX_C67
 
         // Energy Sistem eReaders. Tested on Energy Ereader Pro 4
-        ENERGY = (BRAND.toLowerCase().contentEquals("energysistem") || BRAND.toLowerCase().contentEquals("energy_sistem")) && MODEL.toLowerCase().startsWith("ereader")
+        ENERGY = (BRAND.toLowerCase().contentEquals("energysistem")
+                || BRAND.toLowerCase().contentEquals("energy_sistem"))
+                && MODEL.toLowerCase().startsWith("ereader")
         deviceMap[EinkDevice.ENERGY] = ENERGY
 
         // Artatech Inkbook Prime/Prime HD.
@@ -128,15 +134,21 @@ object DeviceInfo {
         deviceMap[EinkDevice.INKBOOK] = INKBOOK
 
         // Tolino
-        TOLINO = BRAND.toLowerCase().contentEquals("tolino") && MODEL.toLowerCase().contentEquals("imx50_rdp") || MODEL.toLowerCase().contentEquals("tolino") && (DEVICE.toLowerCase().contentEquals("tolino_vision2") || DEVICE.toLowerCase().contentEquals("ntx_6sl"))
+        TOLINO = BRAND.toLowerCase().contentEquals("tolino")
+                && MODEL.toLowerCase().contentEquals("imx50_rdp")
+                || MODEL.toLowerCase().contentEquals("tolino")
+                && (DEVICE.toLowerCase().contentEquals("tolino_vision2")
+                || DEVICE.toLowerCase().contentEquals("ntx_6sl"))
         deviceMap[EinkDevice.TOLINO] = TOLINO
 
         // Nook Glowlight 3
-        NOOK_V520 = MANUFACTURER.toLowerCase().contentEquals("barnesandnoble") && MODEL.toLowerCase().contentEquals("bnrv520")
+        NOOK_V520 = MANUFACTURER.toLowerCase().contentEquals("barnesandnoble")
+                && MODEL.toLowerCase().contentEquals("bnrv520")
         deviceMap[EinkDevice.NOOK_V520] = NOOK_V520
 
         // Sony DPT-RP1
-        SONY_RP1 = MANUFACTURER.toLowerCase().contentEquals("sony") && MODEL.toLowerCase().contentEquals("dpt-rp1")
+        SONY_RP1 = MANUFACTURER.toLowerCase().contentEquals("sony")
+                && MODEL.toLowerCase().contentEquals("dpt-rp1")
         bugMap[BugDevice.SONY_RP1] = SONY_RP1
 
         // Android emulator for x86
@@ -189,10 +201,10 @@ object DeviceInfo {
     }
 
     private fun getBuildField(fieldName: String): String {
-        try {
-            return Build::class.java.getField(fieldName).get(null) as String
+        return try {
+            Build::class.java.getField(fieldName).get(null) as String
         } catch (e: Exception) {
-            return ""
+            ""
         }
 
     }
