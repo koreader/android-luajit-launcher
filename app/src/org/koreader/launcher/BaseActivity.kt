@@ -24,7 +24,6 @@ import org.koreader.launcher.helper.ScreenHelper
 
 
 abstract class BaseActivity : NativeActivity(), ILuaJNI {
-    private var clipboard: ClipboardManager? = null
     private var network: NetworkHelper? = null
     private var wakelock: PowerManager.WakeLock? = null
     private var isWakeLockAllowed: Boolean = false
@@ -71,7 +70,6 @@ abstract class BaseActivity : NativeActivity(), ILuaJNI {
     override fun onCreate(savedInstanceState: Bundle?) {
         Logger.d(TAG, "onCreate()")
         super.onCreate(savedInstanceState)
-        clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
         network = NetworkHelper(this)
         screen = ScreenHelper(this)
     }
@@ -94,7 +92,6 @@ abstract class BaseActivity : NativeActivity(), ILuaJNI {
 
     override fun onDestroy() {
         Logger.d(TAG, "onDestroy()")
-        clipboard = null
         network = null
         screen = null
         super.onDestroy()
@@ -163,6 +160,8 @@ abstract class BaseActivity : NativeActivity(), ILuaJNI {
         get() {
             val result = Box<String>()
             val cd = CountDownLatch(1)
+            val clipboard: ClipboardManager = getSystemService(Context.CLIPBOARD_SERVICE)
+                as ClipboardManager
             result.value = ""
             runOnUiThread {
                 try {
@@ -186,12 +185,14 @@ abstract class BaseActivity : NativeActivity(), ILuaJNI {
             } catch (ex: InterruptedException) {
                 return ""
             }
-            return if (result.value == null) "" else result.value.toString()
+            return result.value?.let { it.toString() } ?: ""
         }
         set(text) = runOnUiThread {
             try {
+                val clipboard: ClipboardManager = getSystemService(Context.CLIPBOARD_SERVICE)
+                    as ClipboardManager
                 val clip = ClipData.newPlainText("KOReader_clipboard", text)
-                clipboard?.primaryClip = clip
+                clipboard.primaryClip = clip
             } catch (e: Exception) {
                 Logger.w(TAG, e.toString())
             }
@@ -418,9 +419,11 @@ abstract class BaseActivity : NativeActivity(), ILuaJNI {
     }
 
     private fun clipboardHasText(): Boolean {
-        return if (clipboard!!.hasPrimaryClip()) {
-            val data = clipboard?.primaryClip
-            data != null && data.itemCount > 0
+        val clipboard: ClipboardManager = getSystemService(Context.CLIPBOARD_SERVICE)
+            as ClipboardManager
+        return if (clipboard.hasPrimaryClip()) {
+            val data = clipboard.primaryClip
+            data.itemCount > 0
         } else false
     }
 
