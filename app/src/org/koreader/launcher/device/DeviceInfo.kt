@@ -201,12 +201,12 @@ object DeviceInfo {
     }
 
     private fun getBuildField(fieldName: String): String {
-        return try {
-            var property: String? = Build::class.java.getField(fieldName).get(null)
-            if (property != null) property = ""
-            property
+        val name: String = return try {
+            var property: String? = Build::class.java.getField(fieldName).get(null) as String?
+            property?.let { it } ?: ""
         } catch (e: Exception) {
             ""
         }
+        return name
     }
 }

@@ -71,7 +71,7 @@ abstract class BaseActivity : NativeActivity(), ILuaJNI {
     override fun onCreate(savedInstanceState: Bundle?) {
         Logger.d(TAG, "onCreate()")
         super.onCreate(savedInstanceState)
-        clipboard = getSystemService(Context.CLIPBOARD_SERVICE)
+        clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
         network = NetworkHelper(this)
         screen = ScreenHelper(this)
     }
@@ -442,6 +442,8 @@ abstract class BaseActivity : NativeActivity(), ILuaJNI {
         if (isWakeLockAllowed) {
             wakelockRelease()
             val pm: PowerManager = applicationContext.getSystemService(Context.POWER_SERVICE)
+                as PowerManager
+
             wakelock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, WAKELOCK_ID)
             Logger.v(TAG, "acquiring $WAKELOCK_ID")
             // release the wakelock after 30 minutes running in the foreground without inputs.
