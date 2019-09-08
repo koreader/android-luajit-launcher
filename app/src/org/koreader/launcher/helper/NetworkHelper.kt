@@ -15,7 +15,7 @@ import org.koreader.launcher.Logger
 
 class NetworkHelper(context: Context) : BaseHelper(context) {
 
-    private val wifi = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+    private val wifi: WifiManager = applicationContext.getSystemService(Context.WIFI_SERVICE)
 
     val isWifi: Int
         get() = if (wifi.isWifiEnabled) 1 else 0
@@ -66,7 +66,7 @@ class NetworkHelper(context: Context) : BaseHelper(context) {
         request.allowScanningByMediaScanner()
         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
         request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, name)
-        val manager = applicationContext.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+        val manager: DownloadManager = applicationContext.getSystemService(Context.DOWNLOAD_SERVICE)
         manager.enqueue(request)
         return 0
     }

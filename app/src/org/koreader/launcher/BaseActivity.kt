@@ -71,7 +71,7 @@ abstract class BaseActivity : NativeActivity(), ILuaJNI {
     override fun onCreate(savedInstanceState: Bundle?) {
         Logger.d(TAG, "onCreate()")
         super.onCreate(savedInstanceState)
-        clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
+        clipboard = getSystemService(Context.CLIPBOARD_SERVICE)
         network = NetworkHelper(this)
         screen = ScreenHelper(this)
     }
