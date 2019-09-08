@@ -1,15 +1,22 @@
 package org.koreader.launcher
 
+import android.app.DownloadManager
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.pm.ApplicationInfo
+import android.net.wifi.WifiManager
 import android.os.Environment
+import android.os.PowerManager
 import android.util.Log
 
 
 class MainApp : android.app.Application() {
 
     companion object {
+
         var name: String? = null
             private set
+
         private var assets_path: String? = null
         private var library_path: String? = null
         private var storage_path: String? = null

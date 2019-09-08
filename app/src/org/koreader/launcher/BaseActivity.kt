@@ -5,26 +5,24 @@ import java.util.Locale
 import java.util.concurrent.CountDownLatch
 
 import android.app.Dialog
+import android.app.DownloadManager
 import android.app.NativeActivity
 import android.content.*
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.BatteryManager
-import android.os.Build
-import android.os.Bundle
-import android.os.PowerManager
+import android.net.wifi.WifiManager
+import android.os.*
+import android.text.format.Formatter
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.Toast
 
 import org.koreader.launcher.device.DeviceInfo
-import org.koreader.launcher.helper.NetworkHelper
 import org.koreader.launcher.helper.ScreenHelper
-
+import java.io.File
 
 
 abstract class BaseActivity : NativeActivity(), ILuaJNI {
-    private var network: NetworkHelper? = null
     private var wakelock: PowerManager.WakeLock? = null
     private var isWakeLockAllowed: Boolean = false
     private var topInsetHeight: Int = 0
@@ -62,6 +60,21 @@ abstract class BaseActivity : NativeActivity(), ILuaJNI {
             }
         }
     }
+    private fun showProgress(title: String) {
+        runOnUiThread { dialog = FramelessProgressDialog.show(this@BaseActivity, title) }
+    }
+
+    private fun dismissProgress() {
+        runOnUiThread {
+            if (dialog != null && dialog!!.isShowing) {
+                dialog!!.dismiss()
+            }
+        }
+    }
+
+    private inner class Box<T> {
+        internal var value: T? = null
+    }
 
     /*---------------------------------------------------------------
      *                        activity callbacks                    *
@@ -70,7 +83,6 @@ abstract class BaseActivity : NativeActivity(), ILuaJNI {
     override fun onCreate(savedInstanceState: Bundle?) {
         Logger.d(TAG, "onCreate()")
         super.onCreate(savedInstanceState)
-        network = NetworkHelper(this)
         screen = ScreenHelper(this)
     }
 
@@ -92,16 +104,15 @@ abstract class BaseActivity : NativeActivity(), ILuaJNI {
 
     override fun onDestroy() {
         Logger.d(TAG, "onDestroy()")
-        network = null
         screen = null
         super.onDestroy()
     }
 
     /*---------------------------------------------------------------
-     *             implement methods used by lua/JNI                *
+     *               override methods used by lua/JNI               *
      *--------------------------------------------------------------*/
 
-    /* assets */
+    /* assets ----------------------- */
     override fun extractAssets(): Int {
         val output = filesDir.absolutePath
         try {
@@ -136,14 +147,29 @@ abstract class BaseActivity : NativeActivity(), ILuaJNI {
 
     }
 
-    /* battery */
+    /* battery ---------------- */
     override val isCharging: Int
         get() = getBatteryState(false)
 
     override val batteryLevel: Int
         get() = getBatteryState(true)
 
-    /* build */
+    private fun getBatteryState(isPercent: Boolean): Int {
+        val intent = applicationContext.registerReceiver(null, BATTERY_FILTER)
+        return if (intent != null) {
+            val level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0)
+            val scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, 100)
+            val plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1)
+            val percent = level * 100 / scale
+            if (isPercent) percent else if (plugged == BatteryManager.BATTERY_PLUGGED_AC ||
+                plugged == BatteryManager.BATTERY_PLUGGED_USB)
+                if (percent != 100) 1
+                else 0
+            else 0
+        } else 0
+    }
+
+    /* build ------------------ */
     override val flavor: String
         get() = resources.getString(R.string.app_flavor)
 
@@ -153,28 +179,23 @@ abstract class BaseActivity : NativeActivity(), ILuaJNI {
     override val isDebuggable: Int
         get() = if (BuildConfig.DEBUG) 1 else 0
 
-
-
-    /* clipboard */
+    /* clipboard -------------------- */
     override var clipboardText: String
         get() {
             val result = Box<String>()
             val cd = CountDownLatch(1)
-            val clipboard: ClipboardManager = getSystemService(Context.CLIPBOARD_SERVICE)
-                as ClipboardManager
+            val clipboard: ClipboardManager = Utils.getClipboardManager(this)
             result.value = ""
             runOnUiThread {
                 try {
-                    val hasText = clipboard?.hasPrimaryClip()
-                    if (hasText != null) {
-                        val data = clipboard?.primaryClip
-                        if (data != null && data.itemCount > 0) {
-                            val text = data.getItemAt(0).coerceToText(applicationContext)
-                            if (text != null) {
-                                result.value = text.toString()
-                            }
+                    val data = clipboard.primaryClip
+                    if (data != null && data.itemCount > 0) {
+                        val text = data.getItemAt(0).coerceToText(applicationContext)
+                        if (text != null) {
+                            result.value = text.toString()
                         }
                     }
+
                 } catch (e: Exception) {
                     Logger.w(TAG, e.toString())
                 }
@@ -185,12 +206,11 @@ abstract class BaseActivity : NativeActivity(), ILuaJNI {
             } catch (ex: InterruptedException) {
                 return ""
             }
-            return result.value?.let { it.toString() } ?: ""
+            return result.value.toString()
         }
         set(text) = runOnUiThread {
             try {
-                val clipboard: ClipboardManager = getSystemService(Context.CLIPBOARD_SERVICE)
-                    as ClipboardManager
+                val clipboard: ClipboardManager = Utils.getClipboardManager(this)
                 val clip = ClipData.newPlainText("KOReader_clipboard", text)
                 clipboard.primaryClip = clip
             } catch (e: Exception) {
@@ -198,11 +218,29 @@ abstract class BaseActivity : NativeActivity(), ILuaJNI {
             }
         }
 
-    override fun hasClipboardTextIntResultWrapper(): Int {
-        return if (clipboardHasText()) 1 else 0
+    override fun hasClipboardText(): Int {
+        val clipboard = Utils.getClipboardManager(this)
+        val bool: Boolean = if (clipboard.hasPrimaryClip()) {
+            val data = clipboard.primaryClip
+            data?.let { it.itemCount > 0 } ?: false
+        } else false
+
+        return if (bool) 1 else 0
     }
 
-    /* device */
+    /* device ------------------ */
+    override val product: String
+        get() = PRODUCT
+
+    override val version: String
+        get() = RUNTIME_VERSION
+
+    override val isEink: Int
+        get() = if (HAS_EINK_SUPPORT) 1 else 0
+
+    override val isEinkFull: Int
+        get() = if (HAS_FULL_EINK_SUPPORT) 1 else 0
+
     override val einkPlatform: String
         get() = if (DeviceInfo.EINK_FREESCALE) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
@@ -216,40 +254,11 @@ abstract class BaseActivity : NativeActivity(), ILuaJNI {
             "none"
         }
 
-    override val product: String
-        get() = PRODUCT
-
-    override val version: String
-        get() = RUNTIME_VERSION
-
-    override val isEink: Int
-        get() = if (HAS_EINK_SUPPORT) 1 else 0
-
-    override val isEinkFull: Int
-        get() = if (HAS_FULL_EINK_SUPPORT) 1 else 0
-
-    override val networkInfo: String
-        get() = network!!.info()
-
-    override val isWifiEnabled: Int
-        get() = network!!.isWifi
-
     override fun needsWakelocks(): Int {
         return if (NEEDS_WAKELOCK_ENABLED) 1 else 0
     }
 
-    /* eink updates: to be implemented on subclasses. Here we just log */
-    override fun einkUpdate(mode: Int) {
-        Logger.w(TAG,
-                "einkUpdate(mode) not implemented in this class!")
-    }
-
-    override fun einkUpdate(mode: Int, delay: Long, x: Int, y: Int, width: Int, height: Int) {
-        Logger.w(TAG,
-                "einkUpdate(mode, delay, x, y, width, height) not implemented in this class!")
-    }
-
-    /* intents */
+    /* intents ---------------------------- */
     override fun openLink(url: String): Int {
         val webpage = Uri.parse(url)
         val intent = Intent(Intent.ACTION_VIEW, webpage)
@@ -260,30 +269,38 @@ abstract class BaseActivity : NativeActivity(), ILuaJNI {
         val intent = Intent(IntentUtils.getByAction(text, pkg, action))
         if (!startActivityIfSafe(intent)) {
             Logger.e(TAG,
-                    "dictionary lookup: can't find a package able to resolve action $action")
+                "dictionary lookup: can't find a package able to resolve action $action")
         }
     }
 
-    /* network */
-    override fun download(url: String, name: String): Int {
-        return network!!.download(url, name)
-    }
-
-    override fun setWifiEnabled(enabled: Boolean) {
-        network!!.setWifi(enabled)
+    private fun startActivityIfSafe(intent: Intent?): Boolean {
+        val intentStr: String? = IntentUtils.intentToString(intent)
+        try {
+            val pm = packageManager
+            val act = pm.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY)
+            if (act.size > 0) {
+                Logger.d(TAG, "starting activity with intent: $intentStr")
+                startActivity(intent)
+                return true
+            } else Logger.w(TAG, "unable to find a package for $intentStr")
+            return false
+        } catch (e: Exception) {
+            Logger.e(TAG,"Error while looking for a package to open " + intentStr +
+                    "\nException: " + e.toString())
+            return false
+        }
     }
 
     /* package manager */
     override fun isPackageEnabled(pkg: String): Int {
-        try {
+        return try {
             val pm = packageManager
             pm.getPackageInfo(pkg, PackageManager.GET_ACTIVITIES)
             val enabled = pm.getApplicationInfo(pkg, 0).enabled
-            return if (enabled) 1 else 0
+            if (enabled) 1 else 0
         } catch (e: PackageManager.NameNotFoundException) {
-            return 0
+            0
         }
-
     }
 
     /* screen */
@@ -320,7 +337,6 @@ abstract class BaseActivity : NativeActivity(), ILuaJNI {
         } else {
             1
         }
-
     override fun setFullscreen(enabled: Boolean) {
         if (Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR2
             || Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR1) {
@@ -329,109 +345,61 @@ abstract class BaseActivity : NativeActivity(), ILuaJNI {
             screen!!.setFullscreenDeprecated(this, enabled)
         }
     }
+
+    /* network */
+    override val networkInfo: String
+        get() = getNetworkInfo(this)
+
+    override fun download(url: String, name: String): Int {
+        val file = File(Environment.getExternalStoragePublicDirectory(
+            Environment.DIRECTORY_DOWNLOADS).toString() + "/" + name)
+
+        if (file.exists()) {
+            Logger.w(TAG, "File already exists: skipping download")
+            return 1
+        }
+        val request = DownloadManager.Request(Uri.parse(url))
+        request.allowScanningByMediaScanner()
+        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, name)
+        val manager = Utils.getDownloadManager(this)
+        manager.enqueue(request)
+        return 0
+    }
+    private fun getNetworkInfo(context: Context): String {
+        val wifi: WifiManager = Utils.getWifiManager(context)
+        val wi = wifi.connectionInfo
+        val dhcp = wifi.dhcpInfo
+        val ip = wi.ipAddress
+        val gw = dhcp.gateway
+        val ipAddr = formatIp(ip)
+        val gwAddr = formatIp(gw)
+        return String.format(Locale.US, "%s;%s;%s", wi.ssid, ipAddr, gwAddr)
+    }
+    private fun formatIp(number: Int): String {
+        return if (number > 0) {
+            Formatter.formatIpAddress(number)
+        } else {
+            number.toString()
+        }
+    }
+
+    /* wifi */
+    override var wifiEnabled: Int
+        get() = if (Utils.getWifiManager(this).isWifiEnabled) 1 else 0
+        set(enabled) = toggleWifi(enabled == 1)
+
+    override fun setWifiEnabled(enabled: Boolean) {
+        toggleWifi(enabled)
+    }
+    private fun toggleWifi(enabled: Boolean) {
+        Utils.getWifiManager(this).isWifiEnabled = enabled
+    }
+
     /* wakelocks */
     override fun setWakeLock(enabled: Boolean) {
         setWakelockState(enabled)
     }
-
-    /* widgets */
-    override fun showToast(message: String) {
-        showToast(message, false)
-    }
-
-    override fun showToast(message: String, is_long: Boolean) {
-        runOnUiThread {
-            if (is_long) {
-                val toast = Toast.makeText(this@BaseActivity,
-                        message, Toast.LENGTH_LONG)
-                toast.show()
-            } else {
-                val toast = Toast.makeText(this@BaseActivity,
-                        message, Toast.LENGTH_SHORT)
-                toast.show()
-            }
-        }
-    }
-
-
-    /*---------------------------------------------------------------
-     *                       private methods                        *
-     *--------------------------------------------------------------*/
-
-    /* battery */
-    private fun getBatteryState(isPercent: Boolean): Int {
-        val intent = applicationContext.registerReceiver(null, BATTERY_FILTER)
-        return if (intent != null) {
-            val level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0)
-            val scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, 100)
-            val plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1)
-            val percent = level * 100 / scale
-            if (isPercent) percent else if (plugged == BatteryManager.BATTERY_PLUGGED_AC ||
-                                            plugged == BatteryManager.BATTERY_PLUGGED_USB)
-                if (percent != 100) 1
-                else 0
-            else 0
-        } else 0
-    }
-
-    /* dialogs */
-    private fun showProgress(title: String) {
-        runOnUiThread { dialog = FramelessProgressDialog.show(this@BaseActivity, title) }
-    }
-
-    private fun dismissProgress() {
-        runOnUiThread {
-            if (dialog != null && dialog!!.isShowing) {
-                dialog!!.dismiss()
-            }
-        }
-    }
-
-    /* start activity if we find a package able to handle a given intent */
-    private fun startActivityIfSafe(intent: Intent?): Boolean {
-
-        if (intent == null) {
-            return false
-        }
-
-        val intentStr = IntentUtils.intentToString(intent)
-
-        try {
-            val pm = packageManager
-            val act = pm.queryIntentActivities(intent,
-                    PackageManager.MATCH_DEFAULT_ONLY)
-
-            if (act.size > 0) {
-                Logger.d(TAG, "starting activity with intent: $intentStr")
-                startActivity(intent)
-                return true
-            } else {
-                Logger.w(TAG, "unable to find a package for $intentStr")
-            }
-            return false
-        } catch (e: Exception) {
-            Logger.e(TAG,
-                    "Error while looking for a package to open " + intentStr +
-                            "\nException: " + e.toString())
-            return false
-        }
-
-    }
-
-    private fun clipboardHasText(): Boolean {
-        val clipboard: ClipboardManager = getSystemService(Context.CLIPBOARD_SERVICE)
-            as ClipboardManager
-        return if (clipboard.hasPrimaryClip()) {
-            val data = clipboard.primaryClip
-            data.itemCount > 0
-        } else false
-    }
-
-    private inner class Box<T> {
-        internal var value: T? = null
-    }
-
-    /* wakelocks */
     fun setWakelockState(enabled: Boolean) {
         /* release wakelock first, if present and wakelocks are allowed */
         if (isWakeLockAllowed && wakelock != null) wakelockRelease()
@@ -440,13 +408,10 @@ abstract class BaseActivity : NativeActivity(), ILuaJNI {
         /* acquire wakelock if we don't have one and wakelocks are allowed */
         if (isWakeLockAllowed && wakelock == null) wakelockAcquire()
     }
-
     private fun wakelockAcquire() {
         if (isWakeLockAllowed) {
             wakelockRelease()
-            val pm: PowerManager = applicationContext.getSystemService(Context.POWER_SERVICE)
-                as PowerManager
-
+            val pm = Utils.getPowerManager(this)
             wakelock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, WAKELOCK_ID)
             Logger.v(TAG, "acquiring $WAKELOCK_ID")
             // release the wakelock after 30 minutes running in the foreground without inputs.
@@ -454,7 +419,6 @@ abstract class BaseActivity : NativeActivity(), ILuaJNI {
             wakelock!!.acquire((30 * 60 * 1000).toLong())
         }
     }
-
     private fun wakelockRelease() {
         if (isWakeLockAllowed && wakelock != null) {
             Logger.v(TAG, "releasing $WAKELOCK_ID")
@@ -463,4 +427,15 @@ abstract class BaseActivity : NativeActivity(), ILuaJNI {
         }
     }
 
+    /* widgets */
+    override fun showToast(message: String) {
+        showToast(message, false)
+    }
+    override fun showToast(message: String, is_long: Boolean) {
+        runOnUiThread {
+            val toast = Toast.makeText(this@BaseActivity, message,
+                if (is_long) Toast.LENGTH_LONG else Toast.LENGTH_SHORT)
+            toast.show()
+        }
+    }
 }

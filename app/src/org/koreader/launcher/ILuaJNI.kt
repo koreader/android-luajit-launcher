@@ -3,8 +3,6 @@ package org.koreader.launcher
 /* kotlin functions and properties used by lua/JNI */
 
 interface ILuaJNI {
-
-    // read only properties
     val batteryLevel: Int
     val einkPlatform: String
     val flavor: String
@@ -13,7 +11,6 @@ interface ILuaJNI {
     val isEink: Int
     val isEinkFull: Int
     val isFullscreen: Int
-    val isWifiEnabled: Int
     val name: String
     val networkInfo: String
     val product: String
@@ -22,19 +19,16 @@ interface ILuaJNI {
     val screenWidth: Int
     val statusBarHeight: Int
     val version: String
-
-    // mutable properties
     var clipboardText: String
     var screenBrightness: Int
     var screenOffTimeout: Int
-
-    // functions
+    var wifiEnabled: Int
     fun dictLookup(text: String, pkg: String, action: String)
     fun download(url: String, name: String): Int
     fun einkUpdate(mode: Int)
     fun einkUpdate(mode: Int, delay: Long, x: Int, y: Int, width: Int, height: Int)
     fun extractAssets(): Int
-    fun hasClipboardTextIntResultWrapper(): Int
+    fun hasClipboardText(): Int
     fun hasExternalStoragePermission(): Int
     fun hasWriteSettingsPermission(): Int
     fun needsWakelocks(): Int
