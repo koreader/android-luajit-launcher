@@ -108,7 +108,7 @@ test: update
 	find tests/einkTest/build/outputs/apk/ -type f -name '*.apk' -exec mv -v {} bin/ \;
 	@echo "WARNING: You'll need to sign this application to be able to install it"
 
-example: update clean build-luajit
+example: update build-luajit
 	@echo "Building HelloWorld example"
 	@echo "#define LOGGER_NAME \"HelloFromLua\"" > jni/logger.h
 	mkdir -p assets/module/

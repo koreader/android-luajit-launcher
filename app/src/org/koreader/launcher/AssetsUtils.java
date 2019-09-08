@@ -15,7 +15,9 @@ import android.content.res.AssetManager;
 
 
 /* Utils to extract compressed assets from the asset loader.
-   Heavily inspired by https://stackoverflow.com/a/27375602 */
+   Heavily inspired by https://stackoverflow.com/a/27375602
+
+   This file needs a refactor to work with kotlin */
 
 class AssetsUtils {
     private static final int BASE_BUFFER_SIZE = 1024;
@@ -31,24 +33,16 @@ class AssetsUtils {
             String installed_version = bufferedReader.readLine();
             bufferedReader.close();
             if (new_version.equals(installed_version)) {
-                Logger.i("Skip installation for revision " + new_version);
+                Logger.INSTANCE.i("Skip installation for revision " + new_version);
                 return true;
             } else {
-                Logger.i("Found new package revision " + new_version);
+                Logger.INSTANCE.i("Found new package revision " + new_version);
                 return false;
             }
         } catch (Exception e) {
-            Logger.i("Found new package revision " + new_version);
+            Logger.INSTANCE.i("Found new package revision " + new_version);
             return false;
         }
-    }
-
-    /* get package revision from zipFile name
-       zips must use the scheme: name-revision.zip */
-    static String getPackageRevision(String zipFile) {
-        String zipName = zipFile.replace(".zip","");
-        String[] parts = zipName.split("-");
-        return zipName.replace(parts[0] + "-", "");
     }
 
     /* get the first zip file inside the assets module */
@@ -56,23 +50,21 @@ class AssetsUtils {
         AssetManager assetManager = context.getAssets();
         try {
             String[] assets = assetManager.list("module");
-            for (String asset: assets) {
-                if (asset.endsWith(".zip")) {
-                    return asset;
+            if (assets != null) {
+                for (String asset : assets) {
+                    if (asset.endsWith(".zip")) {
+                        return asset;
+                    }
                 }
             }
             return null;
         } catch (IOException e) {
-            Logger.e(TAG, "error listing assets:\n" + e.toString());
+            Logger.INSTANCE.e(TAG, "error listing assets:\n" + e.toString());
             return null;
         }
     }
 
-    /* little programs don't need zipped assets.
-       ie: create a file under assets/module/ called llapp_main.lua,
-       and put there your start code. You can place other files under
-       assets/module and they will be copied too. */
-
+    /* copy raw assets under assets/module */
     static boolean copyUncompressedAssets(Context context) {
         AssetManager assetManager = context.getAssets();
         String assets_dir = context.getFilesDir().getAbsolutePath();
@@ -80,21 +72,24 @@ class AssetsUtils {
         boolean entry_point = false;
         try {
             String[] assets = assetManager.list("module");
-            for (String asset: assets) {
-                File file = new File(assets_dir, asset);
-                InputStream input = assetManager.open("module/" + asset);
-                OutputStream output = new FileOutputStream(file);
-                Logger.d(TAG, "copying " + asset + " to " + file.getAbsolutePath());
-                copyFile(input, output);
-                input.close();
-                output.flush();
-                output.close();
-                if ("llapp_main.lua".equals(asset)) {
-                    entry_point = true;
+            if (assets != null) {
+                for (String asset : assets) {
+                    File file = new File(assets_dir, asset);
+                    InputStream input = assetManager.open("module/" + asset);
+                    OutputStream output = new FileOutputStream(file);
+                    Logger.INSTANCE.d(TAG, "copying " + asset +
+                        " to " + file.getAbsolutePath());
+                    copyFile(input, output);
+                    input.close();
+                    output.flush();
+                    output.close();
+                    if ("llapp_main.lua".equals(asset)) {
+                        entry_point = true;
+                    }
                 }
             }
         } catch (IOException e) {
-            Logger.e(TAG, "error with raw assets:\n" + e.toString());
+            Logger.INSTANCE.e(TAG, "error with raw assets:\n" + e.toString());
             entry_point = false;
         }
         return entry_point;
@@ -108,7 +103,7 @@ class AssetsUtils {
             ZipEntry zipEntry = null;
 
             while ((zipEntry = inputStream.getNextEntry()) != null) {
-                Logger.d(TAG, "unzipping " + zipEntry.getName());
+                Logger.INSTANCE.d(TAG, "unzipping " + zipEntry.getName());
 
                 if (zipEntry.isDirectory()) {
                     dirChecker(output, zipEntry.getName());
@@ -117,7 +112,8 @@ class AssetsUtils {
                     if (!f.exists()) {
                         boolean success = f.createNewFile();
                         if (!success) {
-                            Logger.w(TAG, "Failed to create file " + f.getName());
+                            Logger.INSTANCE.w(TAG,
+                                "Failed to create file " + f.getName());
                             continue;
                         }
                         FileOutputStream outputStream = new FileOutputStream(f);
@@ -132,7 +128,7 @@ class AssetsUtils {
             }
             inputStream.close();
         } catch (Exception e) {
-            Logger.e(TAG, "error unzipping assets:\n" + e.toString());
+            Logger.INSTANCE.e(TAG, "error unzipping assets:\n" + e.toString());
         }
     }
 
@@ -151,8 +147,15 @@ class AssetsUtils {
         if (!f.isDirectory()) {
             boolean success = f.mkdirs();
             if (!success) {
-                Logger.w(TAG, "failed to create folder " + f.getName());
+                Logger.INSTANCE.w(TAG, "failed to create folder " + f.getName());
             }
         }
+    }
+
+    /* get package revision from zipFile with scheme: name-revision.zip */
+    private static String getPackageRevision(String zipFile) {
+        String zipName = zipFile.replace(".zip","");
+        String[] parts = zipName.split("-");
+        return zipName.replace(parts[0] + "-", "");
     }
 }
