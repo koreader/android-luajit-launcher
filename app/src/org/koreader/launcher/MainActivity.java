@@ -22,12 +22,7 @@ import org.koreader.launcher.helper.ScreenHelper;
  *
  * Takes care of activity callbacks.
  *
- * Implements runtime permissions:
- *     WRITE_EXTERNAL_STORAGE is requested onCreate() and needed to work.
- *     WRITE_SETTINGS is requested when the user does an action that requires it:
- *         - change screen brightness
- *         - change screen off timeout
- *
+ * WRITE_EXTERNAL_STORAGE is requested onCreate() and needed to work.
  * Overrides einkUpdate methods with working implementations.
  */
 public final class MainActivity extends BaseActivity implements
@@ -89,7 +84,7 @@ public final class MainActivity extends BaseActivity implements
     @Override
     protected void onResume() {
         Logger.d(TAG, "onResume()");
-        setTimeout(true);
+        power.setWakelockState(true);
         super.onResume();
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
             final Handler handler = new Handler();
@@ -106,7 +101,7 @@ public final class MainActivity extends BaseActivity implements
     @Override
     protected void onPause() {
         Logger.d(TAG, "onPause()");
-        setTimeout(false);
+        power.setWakelockState(false);
         super.onPause();
     }
 
@@ -202,37 +197,6 @@ public final class MainActivity extends BaseActivity implements
             == PackageManager.PERMISSION_GRANTED) ? 1 : 0;
     }
 
-    @Override
-    public int hasWriteSettingsPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (Settings.System.canWrite(MainActivity.this)) {
-                return 1;
-            } else {
-                return 0;
-            }
-        } else {
-            // on older apis permissions are granted at install time
-            return 1;
-        }
-    }
-
-    @Override
-    public void setScreenOffTimeout(final int timeout) {
-        if (timeout == ScreenHelper.TIMEOUT_WAKELOCK) {
-            power.setWakelockState(true);
-        } else {
-            power.setWakelockState(false);
-        }
-
-        if ((timeout == ScreenHelper.TIMEOUT_SYSTEM) ||
-            (timeout == ScreenHelper.TIMEOUT_WAKELOCK) ||
-            (hasWriteSettingsPermission() == 1)) {
-            screen.setTimeout(timeout);
-        } else {
-            requestWriteSettingsPermission();
-        }
-    }
-
 
     /*---------------------------------------------------------------
      *                       private methods                        *
@@ -247,21 +211,6 @@ public final class MainActivity extends BaseActivity implements
             ActivityCompat.requestPermissions(this,
                 new String[]{ android.Manifest.permission.WRITE_EXTERNAL_STORAGE },
                 REQUEST_WRITE_STORAGE);
-        }
-    }
-
-    /* request WRITE_SETTINGS permission.
-     * It needs to be granted through a management screen.
-     * See https://developer.android.com/reference/android/Manifest.permission.html#WRITE_SETTINGS
-     */
-    @SuppressWarnings("InlinedApi")
-    private void requestWriteSettingsPermission() {
-        if (hasWriteSettingsPermission() == 0) {
-            Logger.i(TAG, "Requesting WRITE_SETTINGS permission");
-            Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
-            startActivity(intent);
-        } else {
-            Logger.v(TAG, "write settings permission is already granted");
         }
     }
 
@@ -283,27 +232,6 @@ public final class MainActivity extends BaseActivity implements
         } else {
             decorView.setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_LOW_PROFILE);
-        }
-    }
-
-    /* set screen timeout based on activity state */
-    private void setTimeout(final boolean resumed) {
-        StringBuilder sb = new StringBuilder("timeout: ");
-        if (resumed)
-            sb.append("onResume callback -> ");
-        else
-            sb.append("onPause callback -> ");
-
-        if (screen.app_timeout == ScreenHelper.TIMEOUT_WAKELOCK) {
-            sb.append("using wakelocks: ");
-            sb.append(resumed);
-            Logger.d(TAG, sb.toString());
-            power.setWakelock(resumed);
-        } else if (screen.app_timeout > ScreenHelper.TIMEOUT_SYSTEM) {
-            sb.append("custom settings: ");
-            sb.append(resumed);
-            Logger.d(TAG, sb.toString());
-            screen.setTimeout(resumed);
         }
     }
 }

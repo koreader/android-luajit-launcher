@@ -7,15 +7,22 @@ import java.util.Locale;
 
 import android.app.NativeActivity;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
+import android.os.BatteryManager;
+import android.os.PowerManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.widget.Toast;
 
 import org.koreader.launcher.device.DeviceInfo;
-import org.koreader.launcher.helper.*;
+import org.koreader.launcher.helper.ClipboardHelper;
+import org.koreader.launcher.helper.NetworkHelper;
+import org.koreader.launcher.helper.PowerHelper;
+import org.koreader.launcher.helper.ScreenHelper;
+
 
 /* BaseActivity.java
  *
@@ -33,11 +40,20 @@ abstract class BaseActivity extends NativeActivity implements JNILuaInterface {
     private final static boolean HAS_FULL_EINK_SUPPORT = DeviceInfo.EINK_FULL_SUPPORT;
     private final static boolean NEEDS_WAKELOCK_ENABLED = DeviceInfo.BUG_WAKELOCKS;
 
+    // power
+    private static final int WAKELOCK_MIN_DURATION = 15 * 1000;
+    private static final int WAKELOCK_MAX_DURATION = 45 * 60 * 1000;
+    private static final String WAKELOCK_ID = "wakelock:screen_bright";
+    private int wakelock_duration = WAKELOCK_MAX_DURATION;
+    private boolean isWakeLockAllowed = false;
+    private PowerManager.WakeLock wakelock;
+
     // windows insets
     private int top_inset_height;
 
     // helpers
     private FramelessProgressDialog dialog;
+    private IntentFilter powerFilter;
     private ClipboardHelper clipboard;
     private NetworkHelper network;
     PowerHelper power;
@@ -54,6 +70,7 @@ abstract class BaseActivity extends NativeActivity implements JNILuaInterface {
         clipboard = new ClipboardHelper(this);
         network = new NetworkHelper(this);
         power = new PowerHelper(this);
+        powerFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
         screen = new ScreenHelper(this);
     }
 
@@ -239,31 +256,22 @@ abstract class BaseActivity extends NativeActivity implements JNILuaInterface {
         }
     }
 
-    /* permissions: to be implemented on subclasses. Here we pretend that all permissions
-     * are already granted */
-    public int hasExternalStoragePermission() {
-        return 1; // we don't know but we pretend the permission is granted.
-    }
-    public int hasWriteSettingsPermission() {
-        return 1; // we don't know but we pretend the permission is granted.
-    }
-
     /* power */
     public int isCharging() {
-        return power.batteryCharging();
+        return getBatteryState(false);
     }
 
     public int getBatteryLevel() {
-        return power.batteryPercent();
-    }
-
-    public void setWakeLock(final boolean enabled) {
-        power.setWakelockState(enabled);
+        return getBatteryState(true);
     }
 
     /* screen */
     public int getScreenBrightness() {
         return screen.getScreenBrightness();
+    }
+
+    public int getSystemTimeout() {
+        return screen.getSystemTimeout();
     }
 
     public int getScreenOffTimeout() {
@@ -323,7 +331,16 @@ abstract class BaseActivity extends NativeActivity implements JNILuaInterface {
     }
 
     public void setScreenOffTimeout(final int timeout) {
-        screen.setTimeout(timeout);
+        // update app timeout first
+        screen.app_timeout = timeout;
+        // toggle wakelocks
+        if ((timeout > ScreenHelper.TIMEOUT_SYSTEM) || (timeout == ScreenHelper.TIMEOUT_WAKELOCK)) {
+            power.setWakelockDuration(timeout);
+            power.setWakelockState(true);
+        } else {
+            power.setWakelockDuration(0);
+            power.setWakelockState(false);
+        }
     }
 
     /* widgets */
@@ -353,6 +370,30 @@ abstract class BaseActivity extends NativeActivity implements JNILuaInterface {
      *                       private methods                        *
      *--------------------------------------------------------------*/
 
+    /* battery */
+    private int getBatteryState(boolean isPercent) {
+        Intent intent = getApplicationContext().registerReceiver(null, filter);
+
+        if (intent != null) {
+            final int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
+            final int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, 100);
+            final int plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
+            final int percent = (level * 100) / scale;
+
+            if (isPercent) {
+                return percent;
+            } else if (plugged == BatteryManager.BATTERY_PLUGGED_AC ||
+                       plugged == BatteryManager.BATTERY_PLUGGED_USB) {
+                return (percent != 100) ? 1 : 0;
+            } else {
+                return 0;
+            }
+        } else {
+            return 0;
+        }
+    }
+
+
     /* dialogs */
     private void showProgress(final String title) {
         runOnUiThread(new Runnable() {
@@ -372,6 +413,39 @@ abstract class BaseActivity extends NativeActivity implements JNILuaInterface {
                 }
             }
         });
+    }
+
+    private void setWakelockState(final boolean enabled) {
+        /* release wakelock first, if present and wakelocks are allowed */
+        if (isWakeLockAllowed && wakelock != null) wakelockRelease();
+        /* update wakelock settings */
+        isWakeLockAllowed = enabled;
+        /* acquire wakelock if we don't have one and wakelocks are allowed */
+        if (isWakeLockAllowed && wakelock == null) wakelockAcquire();
+    }
+
+    private void wakelockAcquire() {
+        if (isWakeLockAllowed) {
+            wakelockRelease();
+            PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
+            // release after a custom time running in the foreground without inputs.
+            // it will be acquired again on the next resume callback.
+            int time = getWakelockDuration();
+            if (time > 0) {
+                wakelock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, WAKELOCK_ID);
+                Logger.v(getTag(), "acquiring " + WAKELOCK_ID + " during " +
+                    String.valueOf(wakelock_duration / (60 * 1000)) + " minutes");
+                wakelock.acquire(time);
+            }
+        }
+    }
+
+    private void wakelockRelease() {
+        if (isWakeLockAllowed && wakelock != null) {
+            Logger.v(getTag(), "releasing " + WAKELOCK_ID);
+            wakelock.release();
+            wakelock = null;
+        }
     }
 
     /* start activity if we find a package able to handle a given intent */

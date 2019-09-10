@@ -40,9 +40,6 @@ public class ScreenHelper extends BaseHelper {
     // keep track of system brightness
     private int sys_brightness;
 
-    // keep track of system timeout, to restore it when the application looses focus.
-    private int sys_timeout;
-
     // fullscreen state, only used on API levels 16-18
     private boolean is_fullscreen = true;
 
@@ -50,7 +47,6 @@ public class ScreenHelper extends BaseHelper {
     public ScreenHelper(Context context) {
         super(context);
         this.sys_brightness = readSettingScreenBrightness();
-        this.sys_timeout = readSettingScreenOffTimeout();
     }
 
     /* Screen size */
@@ -115,67 +111,8 @@ public class ScreenHelper extends BaseHelper {
     }
 
     /* Screen timeout */
-
-    /**
-     * set the new timeout state
-     *
-     * known timeout states are TIMEOUT_SYSTEM, TIMEOUT_WAKELOCK
-     * and values greater than 0 (milliseconds of the new timeout).
-     *
-     * @param new_timeout - new timeout state:
-     */
-
-    public void setTimeout(final int new_timeout) {
-        // update app_timeout first
-        app_timeout = new_timeout;
-        // custom timeout in milliseconds
-        if (app_timeout > TIMEOUT_SYSTEM) {
-            Logger.v(getTag(), String.format(Locale.US,
-                "set timeout for app: %d seconds",
-                app_timeout / 1000));
-            writeSettingScreenOffTimeout(app_timeout);
-        // default timeout (by using system settings with or without wakelocks)
-        } else if ((app_timeout == TIMEOUT_SYSTEM) || (app_timeout == TIMEOUT_WAKELOCK)) {
-            Logger.v(getTag(), String.format(Locale.US,
-                "set timeout for app: (state: %d), restoring defaults: %d seconds",
-                app_timeout, sys_timeout / 1000));
-            writeSettingScreenOffTimeout(sys_timeout);
-        }
-    }
-
-    /**
-     * set timeout based on activity state
-     *
-     * @param resumed - is the activity resumed and focused?
-     */
-
-    public void setTimeout(final boolean resumed) {
-        try {
-            if (resumed) {
-                // back from paused: update android screen off timeout first
-                sys_timeout = readSettingScreenOffTimeout();
-
-                // apply a custom timeout for the application
-                if ((sys_timeout != app_timeout) && (app_timeout > TIMEOUT_SYSTEM)) {
-                    Logger.v(getTag(), String.format(Locale.US,
-                        "restoring app timeout: %d -> %d seconds",
-                        sys_timeout / 1000, app_timeout / 1000));
-
-                    writeSettingScreenOffTimeout(app_timeout);
-                }
-            } else {
-                // app paused: restore system timeout.
-                if ((sys_timeout != app_timeout) && (app_timeout > TIMEOUT_SYSTEM)) {
-                    Logger.v(getTag(), String.format(Locale.US,
-                        "restoring system timeout: %d -> %d seconds",
-                        app_timeout / 1000, sys_timeout / 1000));
-
-                    writeSettingScreenOffTimeout(sys_timeout);
-                }
-            }
-        } catch (Exception e) {
-            Logger.w(getTag(), e.toString());
-        }
+    public int getSystemTimeout() {
+        return readSettingScreenOffTimeout();
     }
 
     /* Screen layout */
@@ -262,17 +199,6 @@ public class ScreenHelper extends BaseHelper {
         } catch (Exception e) {
             Logger.w(getTag(), e.toString());
             return 0;
-        }
-    }
-
-    private void writeSettingScreenOffTimeout(final int timeout) {
-        if (timeout <= 0) return;
-
-        try {
-            Settings.System.putInt(getApplicationContext().getContentResolver(),
-                Settings.System.SCREEN_OFF_TIMEOUT, timeout);
-        } catch (Exception e) {
-            Logger.w(getTag(), e.toString());
         }
     }
 }

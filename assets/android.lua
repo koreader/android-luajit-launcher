@@ -318,6 +318,11 @@ enum {
     AKEYCODE_VOLUME_MUTE = 164,
 };
 
+enum {
+    ATIMEOUT_WAKELOCK = -1,
+    ATIMEOUT_SYSTEM = 0,
+};
+
 int32_t AInputEvent_getType(const AInputEvent* event);
 int32_t AInputEvent_getDeviceId(const AInputEvent* event);
 int32_t AInputEvent_getSource(const AInputEvent* event);
@@ -1457,6 +1462,33 @@ local function run(android_app_state)
         android.input.ignore_touchscreen = not android.input.ignore_touchscreen
     end
 
+    -- timeout settings
+    android.timeout = {}
+    android.timeout.activity = ffi.C.ATIMEOUT_SYSTEM
+
+    android.getSystemTimeout = function()
+        return JNI:context(android.app.activity.vm, function(JNI)
+            return JNI:callIntMethod(
+                android.app.activity.clazz,
+                "getSystemTimeout",
+                "()I"
+            )
+        end)
+    end
+    android.timeout.system = android.getSystemTimeout()
+
+    android.setScreenOffTimeout = function(timeout)
+        android.timeout.activity = timeout
+        JNI:context(android.app.activity.vm, function(JNI)
+            JNI:callVoidMethod(
+                android.app.activity.clazz,
+                "setScreenOffTimeout",
+                "(I)V",
+                ffi.new('int32_t', timeout)
+            )
+        end)
+    end
+
     -- properties that don't change during the execution of the program.
     android.prop = {}
 
@@ -1537,27 +1569,6 @@ local function run(android_app_state)
                 ffi.new('int32_t', brightness)
                 -- Note that JNI won't covert lua number to int, we need to convert
                 -- it explictly.
-            )
-        end)
-    end
-
-    android.getScreenOffTimeout = function()
-        return JNI:context(android.app.activity.vm, function(JNI)
-            return JNI:callIntMethod(
-                android.app.activity.clazz,
-                "getScreenOffTimeout",
-                "()I"
-            )
-        end)
-    end
-
-    android.setScreenOffTimeout = function(timeout)
-        JNI:context(android.app.activity.vm, function(JNI)
-            JNI:callVoidMethod(
-                android.app.activity.clazz,
-                "setScreenOffTimeout",
-                "(I)V",
-                ffi.new('int32_t', timeout)
             )
         end)
     end
@@ -1697,18 +1708,7 @@ local function run(android_app_state)
     end
 
     --- Android permission check.
-    -- @treturn bool hasWriteSettingsPermission
-    android.canWriteSettings = function()
-        android.DEBUG("checking write settings permission")
-        return JNI:context(android.app.activity.vm, function(JNI)
-            return JNI:callIntMethod(
-                android.app.activity.clazz,
-                "hasWriteSettingsPermission",
-                "()I"
-            ) == 1
-        end)
-    end
-
+    -- @treturn bool hasWriteExternalStoragePermission
     android.canWriteStorage = function()
         android.DEBUG("checking write storage permission")
         return JNI:context(android.app.activity.vm, function(JNI)
@@ -1717,18 +1717,6 @@ local function run(android_app_state)
                 "hasExternalStoragePermission",
                 "()I"
             ) == 1
-        end)
-    end
-
-    android.setWakeLock = function(enabled)
-        android.DEBUG("Switching wakelock to " .. tostring(enabled))
-        JNI:context(android.app.activity.vm, function(JNI)
-            JNI:callVoidMethod(
-                android.app.activity.clazz,
-                "setWakeLock",
-                "(Z)V",
-                ffi.new("bool", enabled)
-            )
         end)
     end
 

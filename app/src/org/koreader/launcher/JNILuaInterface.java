@@ -15,7 +15,6 @@ interface JNILuaInterface {
     void setFullscreen(boolean enabled);
     void setScreenBrightness(int brightness);
     void setScreenOffTimeout(int timeout);
-    void setWakeLock(boolean enabled);
     void setWifiEnabled(boolean enabled);
     void showToast(String message);
 
@@ -28,9 +27,9 @@ interface JNILuaInterface {
     int getScreenHeight();
     int getScreenWidth();
     int getStatusBarHeight();
+    int getSystemTimeout();
     int hasClipboardTextIntResultWrapper();
     int hasExternalStoragePermission();
-    int hasWriteSettingsPermission();
     int isCharging();
     int isDebuggable();
     int isEink();
