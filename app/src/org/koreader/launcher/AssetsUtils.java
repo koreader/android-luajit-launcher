@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -43,22 +44,16 @@ class AssetsUtils {
         }
     }
 
-    /* get package revision from zipFile name
-       zips must use the scheme: name-revision.zip */
-    static String getPackageRevision(String zipFile) {
-        String zipName = zipFile.replace(".zip","");
-        String[] parts = zipName.split("-");
-        return zipName.replace(parts[0] + "-", "");
-    }
-
     /* get the first zip file inside the assets module */
     static String getZipFile(Context context) {
         AssetManager assetManager = context.getAssets();
         try {
             String[] assets = assetManager.list("module");
-            for (String asset: assets) {
-                if (asset.endsWith(".zip")) {
-                    return asset;
+            if (assets != null) {
+                for (String asset : assets) {
+                    if (asset.endsWith(".zip")) {
+                        return asset;
+                    }
                 }
             }
             return null;
@@ -80,17 +75,19 @@ class AssetsUtils {
         boolean entry_point = false;
         try {
             String[] assets = assetManager.list("module");
-            for (String asset: assets) {
-                File file = new File(assets_dir, asset);
-                InputStream input = assetManager.open("module/" + asset);
-                OutputStream output = new FileOutputStream(file);
-                Logger.d(TAG, "copying " + asset + " to " + file.getAbsolutePath());
-                copyFile(input, output);
-                input.close();
-                output.flush();
-                output.close();
-                if ("llapp_main.lua".equals(asset)) {
-                    entry_point = true;
+            if (assets != null) {
+                for (String asset : assets) {
+                    File file = new File(assets_dir, asset);
+                    InputStream input = assetManager.open("module/" + asset);
+                    OutputStream output = new FileOutputStream(file);
+                    Logger.d(TAG, "copying " + asset + " to " + file.getAbsolutePath());
+                    copyFile(input, output);
+                    input.close();
+                    output.flush();
+                    output.close();
+                    if ("llapp_main.lua".equals(asset)) {
+                        entry_point = true;
+                    }
                 }
             }
         } catch (IOException e) {
@@ -103,37 +100,49 @@ class AssetsUtils {
     /* unzip from stream */
     static void unzip(InputStream stream, String output) {
         byte[] buffer = new byte[BASE_BUFFER_SIZE * 512];
+        int new_files = 0;
+        int updated_files = 0;
         try {
             ZipInputStream inputStream = new ZipInputStream(stream);
-            ZipEntry zipEntry = null;
-
+            ZipEntry zipEntry;
             while ((zipEntry = inputStream.getNextEntry()) != null) {
-                Logger.d(TAG, "unzipping " + zipEntry.getName());
-
                 if (zipEntry.isDirectory()) {
                     dirChecker(output, zipEntry.getName());
                 } else {
                     File f = new File(output, zipEntry.getName());
-                    if (!f.exists()) {
+                    if (f.exists()) {
+                        updated_files = ++updated_files;
+                    } else {
+                        new_files = ++new_files;
                         boolean success = f.createNewFile();
                         if (!success) {
                             Logger.w(TAG, "Failed to create file " + f.getName());
                             continue;
                         }
-                        FileOutputStream outputStream = new FileOutputStream(f);
-                        int count;
-                        while ((count = inputStream.read(buffer)) != -1) {
-                            outputStream.write(buffer, 0, count);
-                        }
-                        inputStream.closeEntry();
-                        outputStream.close();
                     }
+                    FileOutputStream outputStream = new FileOutputStream(f);
+                    int count;
+                    while ((count = inputStream.read(buffer)) != -1) {
+                        outputStream.write(buffer, 0, count);
+                    }
+                    inputStream.closeEntry();
+                    outputStream.close();
                 }
             }
             inputStream.close();
+            Logger.i(String.format(Locale.US,
+                "Assets extracted without errors: %d updated, %d new",
+                updated_files, new_files));
         } catch (Exception e) {
-            Logger.e(TAG, "error unzipping assets:\n" + e.toString());
+            Logger.e(TAG, "Error extracting assets:\n" + e.toString());
         }
+    }
+
+    /* get package revision from zipFile name. Zips must use the scheme: name-revision.zip */
+    private static String getPackageRevision(String zipFile) {
+        String zipName = zipFile.replace(".zip","");
+        String[] parts = zipName.split("-");
+        return zipName.replace(parts[0] + "-", "");
     }
 
     /* copy files from stream */
