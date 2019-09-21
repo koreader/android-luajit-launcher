@@ -188,11 +188,11 @@ formatting:
     active: false
     autoCorrect: true
   ChainWrapping:
-    active: true
-    autoCorrect: true
+    active: false
+    autoCorrect: false
   CommentSpacing:
-    active: true
-    autoCorrect: true
+    active: false
+    autoCorrect: false
   Filename:
     active: true
   FinalNewline:
@@ -213,8 +213,8 @@ formatting:
     active: true
     autoCorrect: true
   MultiLineIfElse:
-    active: true
-    autoCorrect: true
+    active: false
+    autoCorrect: false
   NoBlankLineBeforeRbrace:
     active: true
     autoCorrect: true
@@ -251,21 +251,21 @@ formatting:
     active: true
     autoCorrect: true
   ParameterListWrapping:
-    active: true
-    autoCorrect: true
+    active: false
+    autoCorrect: false
     indentSize: 4
   SpacingAroundColon:
-    active: true
-    autoCorrect: true
+    active: false
+    autoCorrect: false
   SpacingAroundComma:
-    active: true
-    autoCorrect: true
+    active: false
+    autoCorrect: false
   SpacingAroundCurly:
-    active: true
-    autoCorrect: true
+    active: false
+    autoCorrect: false
   SpacingAroundDot:
-    active: true
-    autoCorrect: true
+    active: false
+    autoCorrect: false
   SpacingAroundKeyword:
     active: true
     autoCorrect: true
