@@ -66,19 +66,17 @@ internal object DeviceInfo {
     }
 
     init {
-        // --------------- device probe --------------- //
-        val deviceMap = HashMap<EinkDevice, Boolean>()
-        val bugMap = HashMap<BugDevice, Boolean>()
-
-        // we use the standard android build properties for device identification
         MANUFACTURER = getBuildField("MANUFACTURER")
         BRAND = getBuildField("BRAND")
         MODEL = getBuildField("MODEL")
         DEVICE = getBuildField("DEVICE")
         PRODUCT = getBuildField("PRODUCT")
-
         IS_BOYUE = MANUFACTURER.toLowerCase().contentEquals("boeye")
             || MANUFACTURER.toLowerCase().contentEquals("boyue")
+
+        // --------------- device probe --------------- //
+        val deviceMap = HashMap<EinkDevice, Boolean>()
+        val bugMap = HashMap<BugDevice, Boolean>()
 
         // Boyue T62, manufacturer uses both "boeye" and "boyue" ids.
         BOYUE_T62 = (IS_BOYUE

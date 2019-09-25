@@ -95,7 +95,7 @@ internal object AssetsUtils {
      *
      * @param stream the InputStream where the zip file is stored
      * @param output full path to the folder where the zip is extracted
-     * @param overwrite if true existing files will be overwritten.
+     * @param overwrite files on destination
      * @return boolean ok
      */
     fun unzip(stream: InputStream, output: String, overwrite: Boolean = true): Boolean {
