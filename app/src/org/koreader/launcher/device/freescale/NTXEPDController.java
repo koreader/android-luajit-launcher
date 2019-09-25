@@ -32,15 +32,7 @@ import java.util.Locale;
 import android.util.Log;
 
 
-/* This abstract class is copied and used on einkTest.
-   Suppress some warnings to avoid distractions */
-
-@SuppressWarnings ({
-    "JavaReflectionMemberAccess",
-    "UnusedReturnValue",
-    "WeakerAccess",
-    "unused" })
-
+@SuppressWarnings ({"JavaReflectionMemberAccess", "UnusedReturnValue"})
 public abstract class NTXEPDController {
     private static final String TAG = "epd";
 

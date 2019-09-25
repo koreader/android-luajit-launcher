@@ -1,4 +1,6 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion rootProject.ext.targetSdk
@@ -62,9 +64,6 @@ android {
         // reflection
         disable 'PrivateApi'
 
-        // WRITE_SETTINGS permission
-        disable 'ProtectedPermissions'
-
         // Some application flags were introduced on newer API levels and they
         // won't be used when targeting low level apis.
         // This applies to android:resizeableActivity and android:usesClearTextTraffic,
@@ -84,5 +83,11 @@ android {
 }
 
 dependencies {
+    implementation 'androidx.core:core-ktx:1.1.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+}
+
+repositories {
+    mavenCentral()
 }

@@ -318,6 +318,11 @@ enum {
     AKEYCODE_VOLUME_MUTE = 164,
 };
 
+enum {
+    ATIMEOUT_WAKELOCK = -1,
+    ATIMEOUT_SYSTEM = 0,
+};
+
 int32_t AInputEvent_getType(const AInputEvent* event);
 int32_t AInputEvent_getDeviceId(const AInputEvent* event);
 int32_t AInputEvent_getSource(const AInputEvent* event);
@@ -1457,6 +1462,20 @@ local function run(android_app_state)
         android.input.ignore_touchscreen = not android.input.ignore_touchscreen
     end
 
+    -- timeout settings
+    android.timeout = {}
+    android.timeout.activity = ffi.C.ATIMEOUT_SYSTEM
+    android.timeout.system = function()
+        return JNI:context(android.app.activity.vm, function(JNI)
+            return JNI:callIntMethod(
+                android.app.activity.clazz,
+                "getSystemTimeout",
+                "()I"
+            )
+        end)
+    end
+
+
     -- properties that don't change during the execution of the program.
     android.prop = {}
 
@@ -1537,16 +1556,6 @@ local function run(android_app_state)
                 ffi.new('int32_t', brightness)
                 -- Note that JNI won't covert lua number to int, we need to convert
                 -- it explictly.
-            )
-        end)
-    end
-
-    android.getScreenOffTimeout = function()
-        return JNI:context(android.app.activity.vm, function(JNI)
-            return JNI:callIntMethod(
-                android.app.activity.clazz,
-                "getScreenOffTimeout",
-                "()I"
             )
         end)
     end
