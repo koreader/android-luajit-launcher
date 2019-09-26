@@ -71,7 +71,7 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
                 val progressBar = ProgressBar(context)
                 try {
                     ContextCompat.getDrawable(context, R.drawable.discrete_spinner)
-                        .let { progressBar.setIndeterminateDrawable(it) }
+                        ?.let { spinDrawable -> progressBar.setIndeterminateDrawable(spinDrawable) }
                 } catch (e: Exception) {
                     Logger.w("Failed to set progress drawable:\n" + e.toString())
                 }
