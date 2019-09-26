@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animation-list xmlns:android="http://schemas.android.com/apk/res/android"
+  android:oneshot="false">
+  <item android:duration="600">
+    <layer-list>
+      <item android:drawable="@drawable/discrete_spinner_node_a"
+        android:left="0dp" android:right="36dp"
+        android:top="18dp" android:bottom="18dp"/>
+      <item android:drawable="@drawable/discrete_spinner_node_b"
+        android:left="18dp" android:right="18dp"
+        android:top="18dp" android:bottom="18dp"/>
+      <item android:drawable="@drawable/discrete_spinner_node_b"
+        android:left="36dp" android:right="0dp"
+        android:top="18dp" android:bottom="18dp"/>
+    </layer-list>
+  </item>
+  <item android:duration="600">
+    <layer-list>
+      <item android:drawable="@drawable/discrete_spinner_node_a"
+        android:left="0dp" android:right="36dp"
+        android:top="18dp" android:bottom="18dp"/>
+      <item android:drawable="@drawable/discrete_spinner_node_a"
+        android:left="18dp" android:right="18dp"
+        android:top="18dp" android:bottom="18dp"/>
+      <item android:drawable="@drawable/discrete_spinner_node_b"
+        android:left="36dp" android:right="0dp"
+        android:top="18dp" android:bottom="18dp"/>
+    </layer-list>
+  </item>
+<item android:duration="600">
+    <layer-list>
+      <item android:drawable="@drawable/discrete_spinner_node_a"
+        android:left="0dp" android:right="36dp"
+        android:top="18dp" android:bottom="18dp"/>
+      <item android:drawable="@drawable/discrete_spinner_node_a"
+        android:left="18dp" android:right="18dp"
+        android:top="18dp" android:bottom="18dp"/>
+      <item android:drawable="@drawable/discrete_spinner_node_a"
+        android:left="36dp" android:right="0dp"
+        android:top="18dp" android:bottom="18dp"/>
+    </layer-list>
+  </item>
+  <item android:duration="600">
+    <layer-list>
+      <item android:drawable="@drawable/discrete_spinner_node_b"
+        android:left="0dp" android:right="36dp"
+        android:top="18dp" android:bottom="18dp"/>
+      <item android:drawable="@drawable/discrete_spinner_node_a"
+        android:left="18dp" android:right="18dp"
+        android:top="18dp" android:bottom="18dp"/>
+      <item android:drawable="@drawable/discrete_spinner_node_a"
+        android:left="36dp" android:right="0dp"
+        android:top="18dp" android:bottom="18dp"/>
+    </layer-list>
+  </item>
+<item android:duration="600">
+    <layer-list>
+      <item android:drawable="@drawable/discrete_spinner_node_b"
+        android:left="0dp" android:right="36dp"
+        android:top="18dp" android:bottom="18dp"/>
+      <item android:drawable="@drawable/discrete_spinner_node_b"
+        android:left="18dp" android:right="18dp"
+        android:top="18dp" android:bottom="18dp"/>
+      <item android:drawable="@drawable/discrete_spinner_node_a"
+        android:left="36dp" android:right="0dp"
+        android:top="18dp" android:bottom="18dp"/>
+    </layer-list>
+  </item>
+  <item android:duration="600">
+    <layer-list>
+      <item android:drawable="@drawable/discrete_spinner_node_b"
+        android:left="0dp" android:right="36dp"
+        android:top="18dp" android:bottom="18dp"/>
+      <item android:drawable="@drawable/discrete_spinner_node_b"
+        android:left="18dp" android:right="18dp"
+        android:top="18dp" android:bottom="18dp"/>
+      <item android:drawable="@drawable/discrete_spinner_node_b"
+        android:left="36dp" android:right="0dp"
+        android:top="18dp" android:bottom="18dp"/>
+    </layer-list>
+  </item>
+</animation-list>
