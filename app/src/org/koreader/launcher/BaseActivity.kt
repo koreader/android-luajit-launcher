@@ -73,7 +73,7 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
                     ContextCompat.getDrawable(context, R.drawable.discrete_spinner)
                         ?.let { spinDrawable -> progressBar.setIndeterminateDrawable(spinDrawable) }
                 } catch (e: Exception) {
-                    Logger.w("Failed to set progress drawable:\n" + e.toString())
+                    Logger.w("Failed to set progress drawable:\n$e")
                 }
                 /* The next line will add the ProgressBar to the dialog. */
                 dialog.addContentView(progressBar, ViewGroup.LayoutParams(
