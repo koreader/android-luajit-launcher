@@ -19,6 +19,7 @@ import android.widget.ProgressBar
 import android.widget.Toast
 
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 
 /* BaseActivity.java - convenience wrapper on top of NativeActivity that
  * implements most of the kotlin/java methods exposed to lua. */
@@ -67,8 +68,15 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
                 dialog.setTitle(title)
                 dialog.setCancelable(false)
                 dialog.setOnCancelListener(null)
+                val progressBar = ProgressBar(context)
+                try {
+                    ContextCompat.getDrawable(context, R.drawable.discrete_spinner)
+                        .let { progressBar.setIndeterminateDrawable(it) }
+                } catch (e: Exception) {
+                    Logger.w("Failed to set progress drawable:\n" + e.toString())
+                }
                 /* The next line will add the ProgressBar to the dialog. */
-                dialog.addContentView(ProgressBar(context), ViewGroup.LayoutParams(
+                dialog.addContentView(progressBar, ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT)
                 )
