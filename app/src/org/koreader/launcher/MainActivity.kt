@@ -5,6 +5,8 @@ import java.util.Locale
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Canvas
+import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -41,6 +43,17 @@ class MainActivity : BaseActivity() {
         override fun surfaceCreated(holder: SurfaceHolder) {
             Logger.v(tag, "surface created")
             setWillNotDraw(false)
+            holder.lockCanvas()?.let { canvas ->
+                try {
+                    ContextCompat.getDrawable(context, R.drawable.splash_icon)?.let { splashDrawable ->
+                        splashDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight())
+                        splashDrawable.draw(canvas)
+                    }
+                } catch (e: Exception) {
+                    Logger.w(tag, "Failed to draw splash screen:\n" + e.toString())
+                }
+                holder.unlockCanvasAndPost(canvas)
+            }
         }
         override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
             Logger.v(tag, String.format(Locale.US,
@@ -59,6 +72,9 @@ class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         Logger.d(TAG, "onCreate()")
         super.onCreate(savedInstanceState)
+        setTheme(R.style.Fullscreen)
+        // Window background must be black for vertical and horizontal lines to be visible
+        getWindow().setBackgroundDrawableResource(android.R.color.black)
         if ("freescale" == getEinkPlatform()) {
             /* take control of the native window from the java framework
                as it seems the only option to forward screen refreshes */

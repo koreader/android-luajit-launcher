@@ -14,6 +14,7 @@ import android.net.Uri
 import android.net.wifi.WifiManager
 import android.os.*
 import android.text.format.Formatter
+import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.Toast
@@ -68,6 +69,7 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
                 dialog.setTitle(title)
                 dialog.setCancelable(false)
                 dialog.setOnCancelListener(null)
+                dialog.getWindow()?.setGravity(Gravity.BOTTOM)
                 val progressBar = ProgressBar(context)
                 try {
                     ContextCompat.getDrawable(context, R.drawable.discrete_spinner)
