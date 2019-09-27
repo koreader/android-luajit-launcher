@@ -27,10 +27,29 @@ class MainActivity : BaseActivity() {
     private val epd = EPDFactory.epdController
     private var view: NativeSurfaceView? = null
     private var takesWindowOwnership: Boolean = false
+    private var drawSplashScreen: Boolean = true
 
     companion object {
         private const val TAG = "MainActivity"
         private const val REQUEST_WRITE_STORAGE = 1
+    }
+
+    override fun surfaceCreated(holder: SurfaceHolder) {
+        super.surfaceCreated(holder)
+        if (drawSplashScreen == true) {
+            drawSplashScreen = false
+            holder.lockCanvas()?.let { canvas ->
+                try {
+                    ContextCompat.getDrawable(this, R.drawable.splash_icon)?.let { splashDrawable ->
+                        splashDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight())
+                        splashDrawable.draw(canvas)
+                    }
+                } catch (e: Exception) {
+                    Logger.w(TAG, "Failed to draw splash screen:\n$e")
+                }
+                holder.unlockCanvasAndPost(canvas)
+            }
+        }
     }
 
     /* dumb surface used on Tolinos and other ntx boards to refresh the e-ink screen */
@@ -41,17 +60,6 @@ class MainActivity : BaseActivity() {
         override fun surfaceCreated(holder: SurfaceHolder) {
             Logger.v(tag, "surface created")
             setWillNotDraw(false)
-            holder.lockCanvas()?.let { canvas ->
-                try {
-                    ContextCompat.getDrawable(context, R.drawable.splash_icon)?.let { splashDrawable ->
-                        splashDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight())
-                        splashDrawable.draw(canvas)
-                    }
-                } catch (e: Exception) {
-                    Logger.w(tag, "Failed to draw splash screen:\n" + e.toString())
-                }
-                holder.unlockCanvasAndPost(canvas)
-            }
         }
         override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
             Logger.v(tag, String.format(Locale.US,
