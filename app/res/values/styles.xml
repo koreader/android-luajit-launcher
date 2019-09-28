@@ -16,4 +16,7 @@
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowFullscreen">true</item>
     </style>
+    <style name="SplashScreen" parent="Fullscreen">
+        <item name="android:windowBackground">@drawable/splash_icon</item>
+    </style>
 </resources>

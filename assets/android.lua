@@ -1809,6 +1809,17 @@ local function run(android_app_state)
         end)
     end
 
+    android.setShowSplashScreen = function(show)
+        JNI:context(android.app.activity.vm, function(JNI)
+            JNI:callVoidMethod(
+                android.app.activity.clazz,
+                "setShowSplashScreen",
+                "(Z)V",
+                ffi.new("bool", show)
+            )
+        end)
+    end
+
     android.download = function(url, name)
         return JNI:context(android.app.activity.vm, function(JNI)
             local uri_string = JNI.env[0].NewStringUTF(JNI.env, url)
@@ -2052,6 +2063,7 @@ local function run(android_app_state)
     end
     local launch = android.asset_loader("launcher")
     if type(launch) == "function" then
+        android.setShowSplashScreen(false)
         return launch()
     else
         error("error loading launcher.lua")

@@ -26,7 +26,7 @@
             android:screenOrientation="sensorPortrait"
             android:resizeableActivity="false"
             android:launchMode="singleInstance"
-            android:theme="@style/Fullscreen">
+            android:theme="@style/SplashScreen">
             <meta-data android:name="android.app.lib_name" android:value="luajit" />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
