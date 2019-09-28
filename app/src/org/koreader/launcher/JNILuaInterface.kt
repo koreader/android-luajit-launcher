@@ -39,6 +39,7 @@ internal interface JNILuaInterface {
     fun setClipboardText(text: String)
     fun setScreenBrightness(brightness: Int)
     fun setScreenOffTimeout(timeout: Int)
+    fun setShowSplashScreen(show: Boolean)
     fun setWifiEnabled(enabled: Boolean)
     fun showToast(message: String)
     fun showToast(message: String, longTimeout: Boolean)

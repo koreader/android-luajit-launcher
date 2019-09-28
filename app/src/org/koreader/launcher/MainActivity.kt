@@ -27,7 +27,7 @@ class MainActivity : BaseActivity() {
     private val epd = EPDFactory.epdController
     private var view: NativeSurfaceView? = null
     private var takesWindowOwnership: Boolean = false
-    private var drawSplashScreen: Boolean = true
+    private var showSplashScreen: Boolean = true
 
     companion object {
         private const val TAG = "MainActivity"
@@ -36,19 +36,8 @@ class MainActivity : BaseActivity() {
 
     override fun surfaceCreated(holder: SurfaceHolder) {
         super.surfaceCreated(holder)
-        if (drawSplashScreen == true) {
-            drawSplashScreen = false
-            holder.lockCanvas()?.let { canvas ->
-                try {
-                    ContextCompat.getDrawable(this, R.drawable.splash_icon)?.let { splashDrawable ->
-                        splashDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight())
-                        splashDrawable.draw(canvas)
-                    }
-                } catch (e: Exception) {
-                    Logger.w(TAG, "Failed to draw splash screen:\n$e")
-                }
-                holder.unlockCanvasAndPost(canvas)
-            }
+        if (showSplashScreen == true) {
+            drawSplashScreen(holder)
         }
     }
 
@@ -202,6 +191,10 @@ class MainActivity : BaseActivity() {
             1 else 0
     }
 
+    override fun setShowSplashScreen(show: Boolean) {
+        showSplashScreen = show
+    }
+
     /*---------------------------------------------------------------
      *                       private methods                        *
      *--------------------------------------------------------------*/
@@ -215,6 +208,21 @@ class MainActivity : BaseActivity() {
             ActivityCompat.requestPermissions(this,
                     arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
                     REQUEST_WRITE_STORAGE)
+        }
+    }
+
+    /* draw splash screen to surface */
+    private fun drawSplashScreen(holder: SurfaceHolder) {
+        holder.lockCanvas()?.let { canvas ->
+            try {
+                ContextCompat.getDrawable(this, R.drawable.splash_icon)?.let { splashDrawable ->
+                    splashDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight())
+                    splashDrawable.draw(canvas)
+                }
+            } catch (e: Exception) {
+                Logger.w(TAG, "Failed to draw splash screen:\n$e")
+            }
+            holder.unlockCanvasAndPost(canvas)
         }
     }
 
