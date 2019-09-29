@@ -27,18 +27,10 @@ class MainActivity : BaseActivity() {
     private val epd = EPDFactory.epdController
     private var view: NativeSurfaceView? = null
     private var takesWindowOwnership: Boolean = false
-    private var showSplashScreen: Boolean = true
 
     companion object {
         private const val TAG = "MainActivity"
         private const val REQUEST_WRITE_STORAGE = 1
-    }
-
-    override fun surfaceCreated(holder: SurfaceHolder) {
-        super.surfaceCreated(holder)
-        if (showSplashScreen == true) {
-            drawSplashScreen(holder)
-        }
     }
 
     /* dumb surface used on Tolinos and other ntx boards to refresh the e-ink screen */
@@ -67,9 +59,6 @@ class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         Logger.d(TAG, "onCreate()")
         super.onCreate(savedInstanceState)
-        setTheme(R.style.Fullscreen)
-        // Window background must be black for vertical and horizontal lines to be visible
-        getWindow().setBackgroundDrawableResource(android.R.color.black)
         if ("freescale" == getEinkPlatform()) {
             /* take control of the native window from the java framework
                as it seems the only option to forward screen refreshes */
@@ -191,10 +180,6 @@ class MainActivity : BaseActivity() {
             1 else 0
     }
 
-    override fun setShowSplashScreen(show: Boolean) {
-        showSplashScreen = show
-    }
-
     /*---------------------------------------------------------------
      *                       private methods                        *
      *--------------------------------------------------------------*/
@@ -208,21 +193,6 @@ class MainActivity : BaseActivity() {
             ActivityCompat.requestPermissions(this,
                     arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
                     REQUEST_WRITE_STORAGE)
-        }
-    }
-
-    /* draw splash screen to surface */
-    private fun drawSplashScreen(holder: SurfaceHolder) {
-        holder.lockCanvas()?.let { canvas ->
-            try {
-                ContextCompat.getDrawable(this, R.drawable.splash_icon)?.let { splashDrawable ->
-                    splashDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight())
-                    splashDrawable.draw(canvas)
-                }
-            } catch (e: Exception) {
-                Logger.w(TAG, "Failed to draw splash screen:\n$e")
-            }
-            holder.unlockCanvasAndPost(canvas)
         }
     }
 

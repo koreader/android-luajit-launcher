@@ -15,6 +15,7 @@ import android.net.wifi.WifiManager
 import android.os.*
 import android.text.format.Formatter
 import android.view.Gravity
+import android.view.SurfaceHolder
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.Toast
@@ -40,7 +41,8 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
     private var applicationTimeout: Int = 0
 
     private var customBrightness: Boolean = false
-    private var fullscreen = true // only used on API levels 16-18
+    private var showSplashScreen: Boolean = true
+    private var fullscreen: Boolean = true // only used on API levels 16-18
 
     companion object {
         private const val TAG = "BaseActivity"
@@ -69,11 +71,11 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
                 dialog.setTitle(title)
                 dialog.setCancelable(false)
                 dialog.setOnCancelListener(null)
-                dialog.getWindow()?.setGravity(Gravity.BOTTOM)
+                dialog.window?.setGravity(Gravity.BOTTOM)
                 val progressBar = ProgressBar(context)
                 try {
                     ContextCompat.getDrawable(context, R.drawable.discrete_spinner)
-                        ?.let { spinDrawable -> progressBar.setIndeterminateDrawable(spinDrawable) }
+                        ?.let { spinDrawable -> progressBar.indeterminateDrawable = spinDrawable }
                 } catch (e: Exception) {
                     Logger.w("Failed to set progress drawable:\n$e")
                 }
@@ -99,6 +101,21 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
     override fun onCreate(savedInstanceState: Bundle?) {
         Logger.d(TAG, "onCreate()")
         super.onCreate(savedInstanceState)
+        setTheme(R.style.Fullscreen)
+        // Window background must be black for vertical and horizontal lines to be visible
+        window.setBackgroundDrawableResource(android.R.color.black)
+    }
+
+    override fun surfaceCreated(holder: SurfaceHolder) {
+        super.surfaceCreated(holder)
+        drawSplashScreen(holder)
+    }
+
+    override fun surfaceChanged(holder: SurfaceHolder?, format: Int, width: Int, height: Int) {
+        super.surfaceChanged(holder, format, width, height)
+        if (holder != null) {
+            drawSplashScreen(holder)
+        }
     }
 
     override fun onAttachedToWindow() {
@@ -129,10 +146,10 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
     /* assets */
     override fun extractAssets(): Int {
         val output = filesDir.absolutePath
-        var ok = true
-        try {
+        val check = try {
             val zipFile = AssetsUtils.getZipFromAsset(this)
             if (zipFile != null) {
+                var ok = true
                 Logger.i("Check file in asset module: $zipFile")
                 // upgrade or downgrade files from zip
                 if (!AssetsUtils.isSameVersion(this, zipFile)) {
@@ -146,17 +163,19 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
                     Logger.v("update installed in " + elapsedTime / 1000000000 + " seconds")
                     dismissProgress() // spinning circle stops
                 }
-                return if (ok) 1 else 0
+                if (ok) 1 else 0
             } else {
                 // check if the app has other, non-zipped, raw assets
                 Logger.i("Zip file not found, trying raw assets...")
-                return if (AssetsUtils.copyRawAssets(this)) 1 else 0
+                if (AssetsUtils.copyRawAssets(this)) 1 else 0
             }
         } catch (e: IOException) {
             Logger.e(TAG, "error extracting assets:\n$e")
             dismissProgress()
-            return 0
+            0
         }
+        showSplashScreen = false
+        return check
     }
 
     /* build */
@@ -458,6 +477,24 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
     private fun dismissProgress() {
         runOnUiThread {
             dialog?.dismiss()
+        }
+    }
+
+    /* draw splash screen to surface */
+    private fun drawSplashScreen(holder: SurfaceHolder) {
+        if (showSplashScreen) {
+            /* draw splash screen to surface */
+            holder.lockCanvas()?.let { canvas ->
+                try {
+                    ContextCompat.getDrawable(this, R.drawable.splash_icon)?.let { splashDrawable ->
+                        splashDrawable.setBounds(0, 0, canvas.width, canvas.height)
+                        splashDrawable.draw(canvas)
+                    }
+                } catch (e: Exception) {
+                    Logger.w(TAG, "Failed to draw splash screen:\n$e")
+                }
+                holder.unlockCanvasAndPost(canvas)
+            }
         }
     }
 
