@@ -1439,6 +1439,29 @@ local function run(android_app_state)
         end)
     end
 
+    android.canVibrate = function()
+        return JNI:context(android.app.activity.vm, function(JNI)
+            return JNI:callIntMethod(
+                android.app.activity.clazz,
+                "canVibrate",
+                "()I"
+            ) == 1
+        end)
+    end
+
+    android.vibrate = function(milliseconds)
+        if android.prop.vibration and type(milliseconds) == "number" then
+            JNI:context(android.app.activity.vm, function(JNI)
+                JNI:callVoidMethod(
+                    android.app.activity.clazz,
+                    "vibrate",
+                    "(I)V",
+                    ffi.new("int32_t", milliseconds)
+                )
+            end)
+        end
+    end
+
     -- input settings
     android.input = {}
 
@@ -1487,6 +1510,7 @@ local function run(android_app_state)
     -- device properties
     android.prop.product = android.getProduct()
     android.prop.version = android.getVersion()
+    android.prop.vibration = android.canVibrate()
 
     -- update logger name
     android.log_name = android.prop.name

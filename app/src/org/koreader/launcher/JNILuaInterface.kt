@@ -4,6 +4,7 @@ package org.koreader.launcher
  * See https://github.com/koreader/android-luajit-launcher/blob/master/assets/android.lua */
 
 internal interface JNILuaInterface {
+    fun canVibrate(): Int
     fun dictLookup(text: String, pkg: String, action: String)
     fun download(url: String, name: String): Int
     fun einkUpdate(mode: Int)
@@ -42,4 +43,5 @@ internal interface JNILuaInterface {
     fun setWifiEnabled(enabled: Boolean)
     fun showToast(message: String)
     fun showToast(message: String, longTimeout: Boolean)
+    fun vibrate(milliseconds: Int)
 }

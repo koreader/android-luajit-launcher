@@ -42,6 +42,7 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
 
     private var customBrightness: Boolean = false
     private var showSplashScreen: Boolean = true
+    private var hasVibrator: Boolean = false
     private var fullscreen: Boolean = true // only used on API levels 16-18
 
     companion object {
@@ -104,6 +105,7 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
         setTheme(R.style.Fullscreen)
         // Window background must be black for vertical and horizontal lines to be visible
         window.setBackgroundDrawableResource(android.R.color.black)
+        hasVibrator = getVibrator().hasVibrator()
     }
 
     override fun surfaceCreated(holder: SurfaceHolder) {
@@ -432,6 +434,17 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
         setTimeout(applicationTimeout)
     }
 
+    /* vibration */
+    override fun canVibrate(): Int {
+        return if (hasVibrator) 1 else 0
+    }
+
+    override fun vibrate(milliseconds: Int) {
+        if (hasVibrator) {
+            doVibrate(milliseconds.toLong())
+        }
+    }
+
     /* widgets */
     override fun showToast(message: String) {
         showToast(message, false)
@@ -471,12 +484,22 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
     /* dialogs */
     private fun showProgress() {
         runOnUiThread {
-            dialog = FramelessProgressDialog.show(this@BaseActivity, "") }
+            dialog = FramelessProgressDialog.show(this@BaseActivity, "")
+        }
     }
 
     private fun dismissProgress() {
         runOnUiThread {
             dialog?.dismiss()
+        }
+    }
+
+    private fun doVibrate(ms: Long) {
+        val v = getVibrator()
+        runOnUiThread {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                v.vibrate(VibrationEffect.createOneShot(ms, VibrationEffect.DEFAULT_AMPLITUDE))
+            else v.vibrate(ms)
         }
     }
 
@@ -527,6 +550,16 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
         } else {
             return 0
         }
+    }
+
+    private fun getVibrator(): Vibrator {
+        return this.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+    }
+
+    private fun getWakelock(): PowerManager.WakeLock? {
+        val pm: PowerManager? = applicationContext.getSystemService(Context.POWER_SERVICE)
+            as? PowerManager
+        return pm?.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, WAKELOCK_ID)
     }
 
     private fun setTimeout(timeout: Int) {
@@ -581,12 +614,6 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
             Logger.d(TAG, "releasing $WAKELOCK_ID")
             wakelock?.release()
         }
-    }
-
-    private fun getWakelock(): PowerManager.WakeLock? {
-        val pm: PowerManager? = applicationContext.getSystemService(Context.POWER_SERVICE)
-            as? PowerManager
-        return pm?.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, WAKELOCK_ID)
     }
 
     /* start activity if we find a package able to handle a given intent */
