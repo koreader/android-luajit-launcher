@@ -323,6 +323,17 @@ enum {
     ATIMEOUT_SYSTEM = 0,
 };
 
+enum {
+    AHAPTIC_LONG_PRESS = 0,
+    AHAPTIC_VIRTUAL_KEY = 1,
+    AHAPTIC_KEYBOARD_TAP = 3,
+    AHAPTIC_CLOCK_TICK = 4,
+    AHAPTIC_CONTEXT_CLICK = 6,
+    AHAPTIC_KEYBOARD_RELEASE = 7,
+    AHAPTIC_VIRTUAL_KEY_RELEASE = 8,
+    AHAPTIC_TEXT_HANDLE_MOVE = 9,
+};
+
 int32_t AInputEvent_getType(const AInputEvent* event);
 int32_t AInputEvent_getDeviceId(const AInputEvent* event);
 int32_t AInputEvent_getSource(const AInputEvent* event);
@@ -1475,6 +1486,27 @@ local function run(android_app_state)
         end)
     end
 
+    android.hapticFeedback = function(type)
+        JNI:context(android.app.activity.vm, function(JNI)
+            JNI:callVoidMethod(
+                android.app.activity.clazz,
+                "performHapticFeedback",
+                "(I)V",
+                ffi.new('int32_t', type)
+            )
+        end)
+    end
+
+    android.setHapticOverride = function(enable)
+        JNI:context(android.app.activity.vm, function(JNI)
+            JNI:callVoidMethod(
+                android.app.activity.clazz,
+                "setHapticOverride",
+                "(Z)V",
+                ffi.new("bool", enable)
+            )
+        end)
+    end
 
     -- properties that don't change during the execution of the program.
     android.prop = {}

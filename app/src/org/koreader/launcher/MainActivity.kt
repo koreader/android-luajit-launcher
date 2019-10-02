@@ -26,11 +26,13 @@ class MainActivity : BaseActivity() {
 
     private val epd = EPDFactory.epdController
     private var view: NativeSurfaceView? = null
+    private var isHapticOverride: Boolean = false
     private var takesWindowOwnership: Boolean = false
 
     companion object {
         private const val TAG = "MainActivity"
         private const val REQUEST_WRITE_STORAGE = 1
+        private const val HAPTIC_FLAG_IGNORE_GLOBAL_SETTING = 2
     }
 
     /* dumb surface used on Tolinos and other ntx boards to refresh the e-ink screen */
@@ -180,9 +182,30 @@ class MainActivity : BaseActivity() {
             1 else 0
     }
 
+    override fun performHapticFeedback(constant: Int) {
+        if (!takesWindowOwnership) {
+            val rootView = window.decorView.findViewById<View>(android.R.id.content)
+            hapticFeedback(constant, rootView)
+        }
+    }
+
+    override fun setHapticOverride(enabled: Boolean) {
+        isHapticOverride = enabled
+    }
+
     /*---------------------------------------------------------------
      *                       private methods                        *
      *--------------------------------------------------------------*/
+
+    private fun hapticFeedback(constant: Int, view: View) {
+        runOnUiThread {
+            if (isHapticOverride) {
+                view.performHapticFeedback(constant, HAPTIC_FLAG_IGNORE_GLOBAL_SETTING)
+            } else {
+                view.performHapticFeedback(constant)
+            }
+        }
+    }
 
     /* request WRITE_EXTERNAL_STORAGE permission.
      * see https://developer.android.com/guide/topics/permissions/overview.html#normal-dangerous
