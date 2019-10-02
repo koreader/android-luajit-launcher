@@ -7,13 +7,14 @@ import android.util.Log
 class MainApp : android.app.Application() {
 
     companion object {
-        var name: String? = null
+        lateinit var name: String
             private set
-        private var assets_path: String? = null
-        private var library_path: String? = null
-        private var storage_path: String? = null
+        private lateinit var assets_path: String
+        private lateinit var library_path: String
+        private lateinit var storage_path: String
         private var debuggable: Boolean = false
         private var is_system_app: Boolean = false
+        private const val UNKNOWN_STRING = "Unknown"
     }
 
     override fun onCreate() {
@@ -50,10 +51,10 @@ class MainApp : android.app.Application() {
             if (ai.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0) debuggable = true
             if (ai.flags and ApplicationInfo.FLAG_SYSTEM == 1) is_system_app = true
         } catch (e: Exception) {
-            name = "MainApp"
-            assets_path = "?"
-            library_path = "?"
-            storage_path = "?"
+            name = UNKNOWN_STRING
+            assets_path = UNKNOWN_STRING
+            library_path = UNKNOWN_STRING
+            storage_path = UNKNOWN_STRING
         }
     }
 }
