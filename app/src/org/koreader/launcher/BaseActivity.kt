@@ -29,36 +29,20 @@ import androidx.core.content.ContextCompat
 abstract class BaseActivity : NativeActivity(), JNILuaInterface,
     ActivityCompat.OnRequestPermissionsResultCallback{
 
-    private var wakelock: PowerManager.WakeLock? = null
-
-    // window cutout used by notch
-    private var topInsetHeight: Int = 0
-
-    // application brightness override
-    private var applicationBrightness: Int = 0
-
-    // application timeout override
-    private var applicationTimeout: Int = 0
-
+    private var brightness: Int = 0
     private var customBrightness: Boolean = false
-    private var showSplashScreen: Boolean = true
     private var fullscreen: Boolean = true // only used on API levels 16-18
+    private var splashScreen: Boolean = true
+    private var topInsetHeight: Int = 0 // only used on API 28+
 
     companion object {
         private const val TAG = "BaseActivity"
-        private const val WAKELOCK_ID = "wakelock:screen_bright"
-        private const val WAKELOCK_FORCED = -1
-        private const val WAKELOCK_DISABLED = 0
-        private const val WAKELOCK_MIN_TIMEOUT = 15 * 1000
-        private const val WAKELOCK_MAX_TIMEOUT = 45 * 60 * 1000
-
+        private val BATTERY_FILTER = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
         private val PRODUCT = DeviceInfo.PRODUCT
         private val RUNTIME_VERSION = Build.VERSION.RELEASE
         private val HAS_EINK_SUPPORT = DeviceInfo.EINK_SUPPORT
         private val HAS_FULL_EINK_SUPPORT = DeviceInfo.EINK_FULL_SUPPORT
         private val NEEDS_WAKELOCK_ENABLED = DeviceInfo.BUG_WAKELOCKS
-
-        private val BATTERY_FILTER = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
     }
 
     /* dialog used while extracting assets from zip */
@@ -126,8 +110,8 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
             if (cut != null) {
                 val cutPixels = cut.safeInsetTop
                 if (topInsetHeight != cutPixels) {
-                    Logger.v(TAG, String.format(Locale.US,
-                            "top %dpx are not available, reason: window inset", cutPixels))
+                    Logger.v(TAG,
+                        "top $cutPixels pixels are not available, reason: window inset")
                     topInsetHeight = cutPixels
                 }
             }
@@ -174,7 +158,7 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
             dismissProgress()
             0
         }
-        showSplashScreen = false
+        splashScreen = false
         return check
     }
 
@@ -369,14 +353,11 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
     /* screen */
     override fun getScreenBrightness(): Int {
         return if (customBrightness) {
-            applicationBrightness
+            brightness
         } else {
-            ScreenUtils.readSettingScreenBrightness(this)
+            SystemSettings.getSystemBrightness(this)
+            //ScreenUtils.readSettingScreenBrightness(this)
         }
-    }
-
-    override fun getScreenOffTimeout(): Int {
-        return applicationTimeout
     }
 
     override fun getScreenAvailableHeight(): Int {
@@ -397,10 +378,6 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
 
     override fun getStatusBarHeight(): Int {
         return ScreenUtils.getStatusBarHeight(this)
-    }
-
-    override fun getSystemTimeout(): Int {
-        return ScreenUtils.readSettingScreenOffTimeout(this)
     }
 
     override fun isFullscreen(): Int {
@@ -427,11 +404,6 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
         ScreenUtils.setScreenBrightness(this, brightness)
     }
 
-    override fun setScreenOffTimeout(timeout: Int) {
-        applicationTimeout = timeout
-        setTimeout(applicationTimeout)
-    }
-
     /* widgets */
     override fun showToast(message: String) {
         showToast(message, false)
@@ -448,19 +420,6 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
                         message, Toast.LENGTH_SHORT)
                 toast.show()
             }
-        }
-    }
-
-    /* apply internal settings based on activity state */
-    internal fun setAppCustomSettings(resumed: Boolean) {
-        if (resumed) {
-            // apply custom timeout for the activity once resumed
-            if (applicationTimeout != WAKELOCK_DISABLED) {
-                setTimeout(applicationTimeout)
-            }
-        } else {
-            // release on pause
-            setTimeout(WAKELOCK_DISABLED)
         }
     }
 
@@ -482,7 +441,7 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
 
     /* draw splash screen to surface */
     private fun drawSplashScreen(holder: SurfaceHolder) {
-        if (showSplashScreen) {
+        if (splashScreen) {
             /* draw splash screen to surface */
             holder.lockCanvas()?.let { canvas ->
                 try {
@@ -527,66 +486,6 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
         } else {
             return 0
         }
-    }
-
-    private fun setTimeout(timeout: Int) {
-        if (timeout != WAKELOCK_DISABLED) {
-            applicationTimeout = when {
-                timeout < WAKELOCK_DISABLED -> WAKELOCK_MAX_TIMEOUT
-                timeout > WAKELOCK_MAX_TIMEOUT -> WAKELOCK_MAX_TIMEOUT
-                timeout < WAKELOCK_MIN_TIMEOUT -> WAKELOCK_MIN_TIMEOUT
-                else -> {
-                    val system = getSystemTimeout() / 1000
-                    val activity = timeout / 1000
-                    val wakeTimeout = activity - system
-                    Logger.d(TAG, String.format(Locale.US,
-                        "using custom timeout: %d seconds (%d system, %d wakelock)",
-                        activity, system, wakeTimeout))
-                    wakeTimeout * 1000
-                }
-            }
-            wakelockAcquire()
-        } else {
-            wakelockRelease()
-        }
-    }
-
-    private fun wakelockAcquire() {
-        if (wakelock == null) {
-            wakelock = getWakelock()
-        } else {
-            wakelockRelease()
-        }
-        if (wakelock != null) {
-            val timeoutString: String = when {
-                applicationTimeout == WAKELOCK_FORCED -> "max timeout"
-                applicationTimeout > WAKELOCK_DISABLED -> String.format(Locale.US,
-                    "timeout: %d minutes", applicationTimeout / 1000 / 60)
-                else -> {
-                    applicationTimeout = WAKELOCK_DISABLED
-                    "wakelocks disabled"
-                }
-            }
-            if (applicationTimeout != WAKELOCK_DISABLED) {
-                Logger.d(TAG, "acquiring $WAKELOCK_ID: $timeoutString")
-                wakelock?.acquire(applicationTimeout.toLong())
-            } else {
-                Logger.d(TAG, "skipping $WAKELOCK_ID: $timeoutString")
-            }
-        }
-    }
-
-    private fun wakelockRelease() {
-        if (wakelock?.isHeld == true) {
-            Logger.d(TAG, "releasing $WAKELOCK_ID")
-            wakelock?.release()
-        }
-    }
-
-    private fun getWakelock(): PowerManager.WakeLock? {
-        val pm: PowerManager? = applicationContext.getSystemService(Context.POWER_SERVICE)
-            as? PowerManager
-        return pm?.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, WAKELOCK_ID)
     }
 
     /* start activity if we find a package able to handle a given intent */

@@ -319,8 +319,8 @@ enum {
 };
 
 enum {
-    ATIMEOUT_WAKELOCK = -1,
-    ATIMEOUT_SYSTEM = 0,
+    AKEEP_SCREEN_ON_ENABLED = -1,
+    AKEEP_SCREEN_ON_DISABLED = 0,
 };
 
 enum {
@@ -1475,13 +1475,40 @@ local function run(android_app_state)
 
     -- timeout settings
     android.timeout = {}
-    android.timeout.activity = ffi.C.ATIMEOUT_SYSTEM
-    android.timeout.system = function()
+    android.timeout.app = 0
+    android.timeout.get = function() return android.timeout.app end
+    android.timeout.set = function(timeout)
+        if type(timeout) == "number" then
+            android.timeout.app = timeout
+            JNI:context(android.app.activity.vm, function(JNI)
+                JNI:callVoidMethod(
+                    android.app.activity.clazz,
+                    "setScreenOffTimeout",
+                    "(I)V",
+                    ffi.new('int32_t', timeout)
+                )
+            end)
+        end
+    end
+
+    -- system settings
+    android.settings = {}
+    android.settings.canWrite = function()
         return JNI:context(android.app.activity.vm, function(JNI)
             return JNI:callIntMethod(
                 android.app.activity.clazz,
-                "getSystemTimeout",
+                "canWriteSystemSettings",
                 "()I"
+            ) == 1
+        end)
+    end
+
+    android.settings.requestWritePermission = function()
+        JNI:context(android.app.activity.vm, function(JNI)
+            JNI:callVoidMethod(
+                android.app.activity.clazz,
+                "requestWriteSystemSettings",
+                "()V"
             )
         end)
     end
@@ -1588,17 +1615,6 @@ local function run(android_app_state)
                 ffi.new('int32_t', brightness)
                 -- Note that JNI won't covert lua number to int, we need to convert
                 -- it explictly.
-            )
-        end)
-    end
-
-    android.setScreenOffTimeout = function(timeout)
-        JNI:context(android.app.activity.vm, function(JNI)
-            JNI:callVoidMethod(
-                android.app.activity.clazz,
-                "setScreenOffTimeout",
-                "(I)V",
-                ffi.new('int32_t', timeout)
             )
         end)
     end
@@ -1758,18 +1774,6 @@ local function run(android_app_state)
                 "hasExternalStoragePermission",
                 "()I"
             ) == 1
-        end)
-    end
-
-    android.setWakeLock = function(enabled)
-        android.DEBUG("Switching wakelock to " .. tostring(enabled))
-        JNI:context(android.app.activity.vm, function(JNI)
-            JNI:callVoidMethod(
-                android.app.activity.clazz,
-                "setWakeLock",
-                "(Z)V",
-                ffi.new("bool", enabled)
-            )
         end)
     end
 

@@ -64,8 +64,10 @@ android {
         // reflection
         disable 'PrivateApi'
 
-        // Some application flags were introduced on newer API levels and they
-        // won't be used when targeting low level apis.
+        // WRITE_SETTINGS permission
+        disable 'ProtectedPermissions'
+
+        // Some application flags cannot be used when targeting low level apis.
         // This applies to android:resizeableActivity and android:usesClearTextTraffic,
         // both available on API level 23 or higher.
         disable 'UnusedAttribute'

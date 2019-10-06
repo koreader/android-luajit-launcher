@@ -24,7 +24,7 @@ class MainApp : android.app.Application() {
         Log.v(name, formatAppInfo())
     }
 
-    /* app information into a String */
+    /* app info into a String */
     private fun formatAppInfo(): String {
         val sb = StringBuilder(400)
         sb.append("Application info {\n  Flags: ")
@@ -38,7 +38,7 @@ class MainApp : android.app.Application() {
         return sb.toString()
     }
 
-    /* get app information that doesn't change during the lifetime of the application. */
+    /* get read-only app info */
     private fun getAppInfo() {
         try {
             val pm = packageManager

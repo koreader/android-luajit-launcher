@@ -1,11 +1,9 @@
 package org.koreader.launcher
 
 import android.app.Activity
-import android.content.Context
 import android.graphics.Point
 import android.graphics.Rect
 import android.os.Build
-import android.provider.Settings
 import android.util.DisplayMetrics
 import android.view.WindowManager
 
@@ -38,26 +36,6 @@ internal object ScreenUtils {
     fun isFullscreenDeprecated(activity: Activity): Int {
         return if (activity.window.attributes.flags and
             WindowManager.LayoutParams.FLAG_FULLSCREEN != 0) 1 else 0
-    }
-
-    fun readSettingScreenBrightness(context: Context): Int {
-        return try {
-            Settings.System.getInt(context.applicationContext.contentResolver,
-                Settings.System.SCREEN_BRIGHTNESS)
-        } catch (e: Exception) {
-            Logger.w(TAG, e.toString())
-            0
-        }
-    }
-
-    fun readSettingScreenOffTimeout(context: Context): Int {
-        return try {
-            Settings.System.getInt(context.applicationContext.contentResolver,
-                Settings.System.SCREEN_OFF_TIMEOUT)
-        } catch (e: Exception) {
-            Logger.w(TAG, e.toString())
-            0
-        }
     }
 
     fun setScreenBrightness(activity: Activity, brightness: Int) {
