@@ -4,6 +4,7 @@ package org.koreader.launcher
  * See https://github.com/koreader/android-luajit-launcher/blob/master/assets/android.lua */
 
 internal interface JNILuaInterface {
+    fun canWriteSystemSettings(): Int
     fun dictLookup(text: String, pkg: String, action: String)
     fun download(url: String, name: String): Int
     fun einkUpdate(mode: Int)
@@ -36,6 +37,7 @@ internal interface JNILuaInterface {
     fun needsWakelocks(): Int
     fun openLink(url: String): Int
     fun performHapticFeedback(constant: Int)
+    fun requestWriteSystemSettings()
     fun setFullscreen(enabled: Boolean)
     fun setClipboardText(text: String)
     fun setHapticOverride(enabled: Boolean)
