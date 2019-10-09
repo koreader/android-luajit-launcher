@@ -34,6 +34,7 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
     private var fullscreen: Boolean = true // only used on API levels 16-18
     private var splashScreen: Boolean = true
     private var topInsetHeight: Int = 0 // only used on API 28+
+    private lateinit var clipboard: ClipboardManager
 
     companion object {
         private const val TAG = "BaseActivity"
@@ -88,6 +89,9 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
         setTheme(R.style.Fullscreen)
         // Window background must be black for vertical and horizontal lines to be visible
         window.setBackgroundDrawableResource(android.R.color.black)
+
+        clipboard = applicationContext.getSystemService(Context.CLIPBOARD_SERVICE)
+            as ClipboardManager
     }
 
     override fun surfaceCreated(holder: SurfaceHolder) {
@@ -177,42 +181,36 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
 
     /* clipboard */
     override fun getClipboardText(): String {
-        val clipboard: ClipboardManager? = applicationContext.getSystemService(
-            Context.CLIPBOARD_SERVICE) as? ClipboardManager
         val result = Box<String>()
         val cd = CountDownLatch(1)
-        if (clipboard != null) {
-            runOnUiThread {
-                try {
-                    val data = clipboard.primaryClip
-                    if (data != null && data.itemCount > 0) {
-                        val text = data.getItemAt(0).coerceToText(
-                            applicationContext)
-                        if (text != null) {
-                            result.value = text.toString()
-                        } else {
-                            result.value = ""
-                        }
-                    }
-                } catch (e: Exception) {
-                    Logger.w(TAG, e.toString())
-                    result.value = ""
-                }
-                cd.countDown()
-            }
+        runOnUiThread {
             try {
-                cd.await()
-            } catch (ex: InterruptedException) {
-                return ""
+                val data = clipboard.primaryClip
+                if (data != null && data.itemCount > 0) {
+                    val text = data.getItemAt(0).coerceToText(
+                        applicationContext)
+                    if (text != null) {
+                        result.value = text.toString()
+                    } else {
+                        result.value = ""
+                    }
+                }
+            } catch (e: Exception) {
+                Logger.w(TAG, e.toString())
+                result.value = ""
             }
-            return result.value ?: ""
-        } else return ""
+            cd.countDown()
+        }
+        try {
+            cd.await()
+        } catch (ex: InterruptedException) {
+            return ""
+        }
+        return result.value ?: ""
     }
 
     override fun hasClipboardText(): Int {
-        val clipboard: ClipboardManager? = applicationContext.getSystemService(
-            Context.CLIPBOARD_SERVICE) as? ClipboardManager
-        val clipdata = clipboard?.primaryClip
+        val clipdata = clipboard.primaryClip
         return if (clipdata != null) {
             val number = clipdata.itemCount
             if (number > 0) 1 else 0
@@ -220,16 +218,12 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
     }
 
     override fun setClipboardText(text: String) {
-        val clipboard: ClipboardManager? = applicationContext.getSystemService(
-            Context.CLIPBOARD_SERVICE) as? ClipboardManager
-        if (clipboard != null) {
-            runOnUiThread {
-                try {
-                    val clip = ClipData.newPlainText("KOReader_clipboard", text)
-                    clipboard.primaryClip = clip
-                } catch (e: Exception) {
-                    Logger.w(TAG, e.toString())
-                }
+        runOnUiThread {
+            try {
+                val clip = ClipData.newPlainText("KOReader_clipboard", text)
+                clipboard.primaryClip = clip
+            } catch (e: Exception) {
+                Logger.w(TAG, e.toString())
             }
         }
     }
