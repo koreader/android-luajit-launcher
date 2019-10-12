@@ -243,6 +243,10 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
         }
     }
 
+    override fun getExternalPath(): String {
+        return MainApp.storage_path
+    }
+
     override fun getProduct(): String {
         return PRODUCT
     }

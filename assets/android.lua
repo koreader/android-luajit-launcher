@@ -1392,6 +1392,17 @@ local function run(android_app_state)
         end)
     end
 
+    android.getExternalStoragePath = function()
+        return JNI:context(android.app.activity.vm, function(JNI)
+            local external_path = JNI:callObjectMethod(
+                android.app.activity.clazz,
+                "getExternalPath",
+                "()Ljava/lang/String;"
+            )
+            return JNI:to_string(external_path)
+        end)
+    end
+
     --- Device identification.
     -- @treturn string product
     android.getProduct = function()

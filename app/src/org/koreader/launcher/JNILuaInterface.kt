@@ -13,6 +13,7 @@ internal interface JNILuaInterface {
     fun getBatteryLevel(): Int
     fun getClipboardText(): String
     fun getEinkPlatform(): String
+    fun getExternalPath(): String
     fun getFlavor(): String
     fun getName(): String
     fun getNetworkInfo(): String
