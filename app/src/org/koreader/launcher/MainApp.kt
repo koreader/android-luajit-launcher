@@ -9,9 +9,10 @@ class MainApp : android.app.Application() {
     companion object {
         lateinit var name: String
             private set
+        lateinit var storage_path: String
+            private set
         private lateinit var assets_path: String
         private lateinit var library_path: String
-        private lateinit var storage_path: String
         private var debuggable: Boolean = false
         private var is_system_app: Boolean = false
         private const val UNKNOWN_STRING = "Unknown"
