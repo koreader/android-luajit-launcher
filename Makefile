@@ -2,6 +2,9 @@ ifdef ANDROID_ARCH
 	ifeq ($(ANDROID_ARCH), x86)
 		ANDROID_FULL_ARCH?=$(ANDROID_ARCH)
 		GRADLE_TASK?=assembleX86
+	else ifeq($(ANDROID_ARCH), arm64)
+		ANDROID_FULL_ARCH?=arm64-v8a
+		GRADLE_TASK?=assembleArm64
 	endif
 endif
 
