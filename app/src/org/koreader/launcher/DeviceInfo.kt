@@ -29,6 +29,7 @@ internal object DeviceInfo {
     private val BOYUE_T80D: Boolean
     private val BOYUE_T78D: Boolean
     private val BOYUE_T103D: Boolean
+    private val BOYUE_K103: Boolean
     private val CREMA: Boolean
     private val ONYX_C67: Boolean
     private val ENERGY: Boolean
@@ -51,6 +52,7 @@ internal object DeviceInfo {
         BOYUE_T80D,
         BOYUE_T78D,
         BOYUE_T103D,
+        BOYUE_K103,
         CREMA,
         ONYX_C67,
         ENERGY,
@@ -105,6 +107,10 @@ internal object DeviceInfo {
         // Boyue Likebook Mimas
         BOYUE_T103D = IS_BOYUE && PRODUCT.toLowerCase().contentEquals("t103d")
         deviceMap[DeviceInfo.EinkDevice.BOYUE_T103D] = BOYUE_T103D
+
+        // Boyue Likebook Alita
+        BOYUE_K103 = IS_BOYUE && PRODUCT.toLowerCase().contentEquals("k103")
+        deviceMap[DeviceInfo.EinkDevice.BOYUE_K103] = BOYUE_K103
 
         // Crema Note (1010P)
         CREMA = BRAND.toLowerCase().contentEquals("crema") && PRODUCT.toLowerCase().contentEquals("note")
@@ -179,6 +185,7 @@ internal object DeviceInfo {
                 BOYUE_T78D ||
                 BOYUE_T80D ||
                 BOYUE_T103D ||
+                BOYUE_K103 ||
                 ENERGY ||
                 INKBOOK ||
                 ONYX_C67

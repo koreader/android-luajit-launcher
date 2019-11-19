@@ -25,7 +25,8 @@ internal object EPDFactory {
                 }
                 DeviceInfo.EinkDevice.BOYUE_T80D,
                 DeviceInfo.EinkDevice.BOYUE_T78D,
-                DeviceInfo.EinkDevice.BOYUE_T103D -> {
+                DeviceInfo.EinkDevice.BOYUE_T103D,
+                DeviceInfo.EinkDevice.BOYUE_K103 -> {
                     logController("Rockchip RK3368")
                     RK3368EPDController()
                 }
