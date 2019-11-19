@@ -15,16 +15,13 @@ internal object EPDFactory {
         get() {
             return when (DeviceInfo.EINK) {
                 DeviceInfo.EinkDevice.BOYUE_T61,
+                DeviceInfo.EinkDevice.BOYUE_T62,
                 DeviceInfo.EinkDevice.BOYUE_T80S,
                 DeviceInfo.EinkDevice.ONYX_C67,
                 DeviceInfo.EinkDevice.ENERGY,
                 DeviceInfo.EinkDevice.INKBOOK -> {
                     logController("Rockchip RK3026")
                     RK3026EPDController()
-                }
-                DeviceInfo.EinkDevice.BOYUE_T62 -> {
-                    logController("Rockchip RK3066")
-                    RK3066EPDController()
                 }
                 DeviceInfo.EinkDevice.BOYUE_T80D,
                 DeviceInfo.EinkDevice.BOYUE_T78D,
