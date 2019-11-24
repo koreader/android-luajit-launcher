@@ -6,7 +6,6 @@ package org.koreader.launcher
 import java.util.Locale
 
 import org.koreader.launcher.device.rockchip.RK3026EPDController
-import org.koreader.launcher.device.rockchip.RK3066EPDController
 import org.koreader.launcher.device.rockchip.RK3368EPDController
 import org.koreader.launcher.device.freescale.NTXNewEPDController
 
