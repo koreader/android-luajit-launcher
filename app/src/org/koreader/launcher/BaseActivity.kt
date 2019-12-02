@@ -274,7 +274,11 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
         return if (startActivityIfSafe(intent)) 0 else 1
     }
 
-    override fun dictLookup(text: String, pkg: String, action: String) {
+    override fun dictLookup(text: String, action: String) {
+        dictLookup(text, null, action)
+    }
+
+    override fun dictLookup(text: String, pkg: String?, action: String) {
         val intent = Intent(IntentUtils.getByAction(text, pkg, action))
         if (!startActivityIfSafe(intent)) {
             Logger.e(TAG,

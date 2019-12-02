@@ -5,7 +5,8 @@ package org.koreader.launcher
 
 internal interface JNILuaInterface {
     fun canWriteSystemSettings(): Int
-    fun dictLookup(text: String, pkg: String, action: String)
+    fun dictLookup(text: String, action: String)
+    fun dictLookup(text: String, pkg: String?, action: String)
     fun download(url: String, name: String): Int
     fun einkUpdate(mode: Int)
     fun einkUpdate(mode: Int, delay: Long, x: Int, y: Int, width: Int, height: Int)
