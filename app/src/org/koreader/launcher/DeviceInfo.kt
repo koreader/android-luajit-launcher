@@ -6,9 +6,8 @@
 
 package org.koreader.launcher
 
-import java.util.HashMap
-
 import android.os.Build
+import java.util.*
 
 internal object DeviceInfo {
 
@@ -41,8 +40,8 @@ internal object DeviceInfo {
     private val IS_BOYUE: Boolean
 
     // default values for generic devices.
-    internal var EINK = DeviceInfo.EinkDevice.UNKNOWN
-    private var BUG = DeviceInfo.BugDevice.NONE
+    internal var EINK = EinkDevice.UNKNOWN
+    private var BUG = BugDevice.NONE
 
     enum class EinkDevice {
         UNKNOWN,
@@ -68,13 +67,12 @@ internal object DeviceInfo {
     }
 
     init {
-        MANUFACTURER = getBuildField("MANUFACTURER")
-        BRAND = getBuildField("BRAND")
-        MODEL = getBuildField("MODEL")
-        DEVICE = getBuildField("DEVICE")
-        PRODUCT = getBuildField("PRODUCT")
-        IS_BOYUE = MANUFACTURER.toLowerCase().contentEquals("boeye")
-            || MANUFACTURER.toLowerCase().contentEquals("boyue")
+        MANUFACTURER = lowerCase(getBuildField("MANUFACTURER"))
+        BRAND = lowerCase(getBuildField("BRAND"))
+        MODEL = lowerCase(getBuildField("MODEL"))
+        DEVICE = lowerCase(getBuildField("DEVICE"))
+        PRODUCT = lowerCase(getBuildField("PRODUCT"))
+        IS_BOYUE = MANUFACTURER.contentEquals("boeye") || MANUFACTURER.contentEquals("boyue")
 
         // --------------- device probe --------------- //
         val deviceMap = HashMap<EinkDevice, Boolean>()
@@ -82,75 +80,75 @@ internal object DeviceInfo {
 
         // Boyue T62, manufacturer uses both "boeye" and "boyue" ids.
         BOYUE_T62 = (IS_BOYUE
-                && (PRODUCT.toLowerCase().startsWith("t62") || MODEL.contentEquals("rk30sdk"))
-                && DEVICE.toLowerCase().startsWith("t62"))
-        deviceMap[DeviceInfo.EinkDevice.BOYUE_T62] = BOYUE_T62
+                && (PRODUCT.startsWith("t62") || MODEL.contentEquals("rk30sdk"))
+                && DEVICE.startsWith("t62"))
+        deviceMap[EinkDevice.BOYUE_T62] = BOYUE_T62
 
         // Boyue T61, uses RK3066 chipset
         BOYUE_T61 = (IS_BOYUE
-                && (PRODUCT.toLowerCase().startsWith("t61") || MODEL.contentEquals("rk30sdk"))
-                && DEVICE.toLowerCase().startsWith("t61"))
-        deviceMap[DeviceInfo.EinkDevice.BOYUE_T61] = BOYUE_T61
+                && (PRODUCT.startsWith("t61") || MODEL.contentEquals("rk30sdk"))
+                && DEVICE.startsWith("t61"))
+        deviceMap[EinkDevice.BOYUE_T61] = BOYUE_T61
 
         // Boyue Likebook Plus
-        BOYUE_T80S = IS_BOYUE && PRODUCT.toLowerCase().contentEquals("t80s")
-        deviceMap[DeviceInfo.EinkDevice.BOYUE_T80S] = BOYUE_T80S
+        BOYUE_T80S = IS_BOYUE && PRODUCT.contentEquals("t80s")
+        deviceMap[EinkDevice.BOYUE_T80S] = BOYUE_T80S
 
         // Boyue Likebook Mars
-        BOYUE_T80D = IS_BOYUE && PRODUCT.toLowerCase().contentEquals("t80d")
-        deviceMap[DeviceInfo.EinkDevice.BOYUE_T80D] = BOYUE_T80D
+        BOYUE_T80D = IS_BOYUE && PRODUCT.contentEquals("t80d")
+        deviceMap[EinkDevice.BOYUE_T80D] = BOYUE_T80D
 
         // Boyue Likebook Muses
-        BOYUE_T78D = IS_BOYUE && PRODUCT.toLowerCase().contentEquals("t78d")
-        deviceMap[DeviceInfo.EinkDevice.BOYUE_T78D] = BOYUE_T78D
+        BOYUE_T78D = IS_BOYUE && PRODUCT.contentEquals("t78d")
+        deviceMap[EinkDevice.BOYUE_T78D] = BOYUE_T78D
 
         // Boyue Likebook Mimas
-        BOYUE_T103D = IS_BOYUE && PRODUCT.toLowerCase().contentEquals("t103d")
-        deviceMap[DeviceInfo.EinkDevice.BOYUE_T103D] = BOYUE_T103D
+        BOYUE_T103D = IS_BOYUE && PRODUCT.contentEquals("t103d")
+        deviceMap[EinkDevice.BOYUE_T103D] = BOYUE_T103D
 
         // Boyue Likebook Alita
-        BOYUE_K103 = IS_BOYUE && PRODUCT.toLowerCase().contentEquals("k103")
-        deviceMap[DeviceInfo.EinkDevice.BOYUE_K103] = BOYUE_K103
+        BOYUE_K103 = IS_BOYUE && PRODUCT.contentEquals("k103")
+        deviceMap[EinkDevice.BOYUE_K103] = BOYUE_K103
 
         // Crema Note (1010P)
-        CREMA = BRAND.toLowerCase().contentEquals("crema") && PRODUCT.toLowerCase().contentEquals("note")
-        deviceMap[DeviceInfo.EinkDevice.CREMA] = CREMA
+        CREMA = BRAND.contentEquals("crema") && PRODUCT.contentEquals("note")
+        deviceMap[EinkDevice.CREMA] = CREMA
 
         // Onyx C67
-        ONYX_C67 = (MANUFACTURER.toLowerCase().contentEquals("onyx")
-                && (PRODUCT.toLowerCase().startsWith("c67") || MODEL.contentEquals("rk30sdk"))
-                && DEVICE.toLowerCase().startsWith("c67"))
-        deviceMap[DeviceInfo.EinkDevice.ONYX_C67] = ONYX_C67
+        ONYX_C67 = (MANUFACTURER.contentEquals("onyx")
+                && (PRODUCT.startsWith("c67") || MODEL.contentEquals("rk30sdk"))
+                && DEVICE.startsWith("c67"))
+        deviceMap[EinkDevice.ONYX_C67] = ONYX_C67
 
         // Energy Sistem eReaders. Tested on Energy Ereader Pro 4
-        ENERGY = (BRAND.toLowerCase().contentEquals("energysistem") || BRAND.toLowerCase().contentEquals("energy_sistem"))
-            && MODEL.toLowerCase().startsWith("ereader")
-        deviceMap[DeviceInfo.EinkDevice.ENERGY] = ENERGY
+        ENERGY = (BRAND.contentEquals("energysistem") || BRAND.contentEquals("energy_sistem"))
+            && MODEL.startsWith("ereader")
+        deviceMap[EinkDevice.ENERGY] = ENERGY
 
         // Artatech Inkbook Prime/Prime HD.
-        INKBOOK = (MANUFACTURER.toLowerCase().contentEquals("artatech")
-                && BRAND.toLowerCase().contentEquals("inkbook")
-                && MODEL.toLowerCase().startsWith("prime"))
-        deviceMap[DeviceInfo.EinkDevice.INKBOOK] = INKBOOK
+        INKBOOK = (MANUFACTURER.contentEquals("artatech")
+                && BRAND.contentEquals("inkbook")
+                && MODEL.startsWith("prime"))
+        deviceMap[EinkDevice.INKBOOK] = INKBOOK
 
         // Tolino
-        TOLINO = BRAND.toLowerCase().contentEquals("tolino") && MODEL.toLowerCase().contentEquals("imx50_rdp")
-                || MODEL.toLowerCase().contentEquals("tolino") && (DEVICE.toLowerCase().contentEquals("tolino_vision2")
-                || DEVICE.toLowerCase().contentEquals("ntx_6sl"))
-        deviceMap[DeviceInfo.EinkDevice.TOLINO] = TOLINO
+        TOLINO = BRAND.contentEquals("tolino") && MODEL.contentEquals("imx50_rdp")
+                || MODEL.contentEquals("tolino") && (DEVICE.contentEquals("tolino_vision2")
+                || DEVICE.contentEquals("ntx_6sl"))
+        deviceMap[EinkDevice.TOLINO] = TOLINO
 
         // Nook Glowlight 3
-        NOOK_V520 = MANUFACTURER.toLowerCase().contentEquals("barnesandnoble")
-                && MODEL.toLowerCase().contentEquals("bnrv520")
-        deviceMap[DeviceInfo.EinkDevice.NOOK_V520] = NOOK_V520
+        NOOK_V520 = MANUFACTURER.contentEquals("barnesandnoble")
+                && MODEL.contentEquals("bnrv520")
+        deviceMap[EinkDevice.NOOK_V520] = NOOK_V520
 
         // Sony DPT-RP1
-        SONY_RP1 = MANUFACTURER.toLowerCase().contentEquals("sony") && MODEL.toLowerCase().contentEquals("dpt-rp1")
-        bugMap[DeviceInfo.BugDevice.SONY_RP1] = SONY_RP1
+        SONY_RP1 = MANUFACTURER.contentEquals("sony") && MODEL.contentEquals("dpt-rp1")
+        bugMap[BugDevice.SONY_RP1] = SONY_RP1
 
         // Android emulator for x86
         EMULATOR_X86 = MODEL.contentEquals("Android SDK built for x86")
-        bugMap[DeviceInfo.BugDevice.EMULATOR] = EMULATOR_X86
+        bugMap[BugDevice.EMULATOR] = EMULATOR_X86
 
         // find current eink device.
         val einkIter = deviceMap.keys.iterator()
@@ -197,7 +195,7 @@ internal object DeviceInfo {
         EINK_FULL_SUPPORT = CREMA || TOLINO
 
         // need wakelocks
-        BUG_WAKELOCKS = BUG == DeviceInfo.BugDevice.SONY_RP1
+        BUG_WAKELOCKS = BUG == BugDevice.SONY_RP1
     }
 
     private fun getBuildField(fieldName: String): String {
@@ -206,5 +204,9 @@ internal object DeviceInfo {
         } catch (e: Exception) {
              ""
         }
+    }
+
+    private fun lowerCase(text: String): String {
+        return text.toLowerCase(Locale.US)
     }
 }

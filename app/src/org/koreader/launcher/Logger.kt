@@ -54,11 +54,11 @@ internal object Logger {
     /* log using application name as the logger tag */
     private fun doLog(message: String, level: LogLevel) {
         when (level) {
-            Logger.LogLevel.ERROR -> Log.e(MainApp.name, message)
-            Logger.LogLevel.WARNING -> Log.w(MainApp.name, message)
-            Logger.LogLevel.INFO -> Log.i(MainApp.name, message)
-            Logger.LogLevel.DEBUG -> Log.d(MainApp.name, message)
-            Logger.LogLevel.VERBOSE -> Log.v(MainApp.name, message)
+            LogLevel.ERROR -> Log.e(MainApp.name, message)
+            LogLevel.WARNING -> Log.w(MainApp.name, message)
+            LogLevel.INFO -> Log.i(MainApp.name, message)
+            LogLevel.DEBUG -> Log.d(MainApp.name, message)
+            LogLevel.VERBOSE -> Log.v(MainApp.name, message)
         }
     }
 }
