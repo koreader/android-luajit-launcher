@@ -10,21 +10,20 @@ internal object IntentUtils {
      * get intent by action type, used to do dict lookups on 3rd party apps.
      *
      * @param text to search
-     * @param pkg that receives the query
+     * @param pkg that receives the query - null to show the app picker
      * @param action associated to the package
      *
      * @return a Intent based on package/action ready to do a text lookup
      */
 
-    fun getByAction(text: String, pkg: String, action: String): Intent {
+    fun getByAction(text: String, pkg: String?, action: String): Intent {
         var intent = Intent()
         when (action) {
+            // generic actions used by a lot of apps
             "send" -> intent = Intent(getSendIntent(text, pkg))
             "search" -> intent = Intent(getSearchIntent(text, pkg))
             "text" -> intent = Intent(getTextIntent(text, pkg))
-            "picker-send" -> intent = Intent(getSendIntent(text))
-            "picker-search" -> intent = Intent(getSearchIntent(text))
-            "picker-text" -> intent = Intent(getTextIntent(text))
+            // actions for specific apps
             "aard2" -> intent = Intent(getAard2Intent(text))
             "colordict" -> intent = Intent(getColordictIntent(text, pkg))
             "quickdic" -> intent = Intent(getQuickdicIntent(text))
@@ -43,7 +42,7 @@ internal object IntentUtils {
         return if (intent == null) "" else "\naction: " + intent.action + "\ndata: " + intent.dataString + "\n"
     }
 
-    // Intent.ACTION_SEND with a specific package
+    // Intent.ACTION_SEND
     private fun getSendIntent(text: String, pkg: String? = null): Intent {
         val intent = Intent(Intent.ACTION_SEND)
         intent.putExtra(Intent.EXTRA_TEXT, text)
@@ -52,7 +51,7 @@ internal object IntentUtils {
         return intent
     }
 
-    // Intent.ACTION_SEARCH with a specific package
+    // Intent.ACTION_SEARCH
     private fun getSearchIntent(text: String, pkg: String? = null): Intent {
         val intent = Intent(Intent.ACTION_SEARCH)
         intent.putExtra(SearchManager.QUERY, text)
@@ -61,7 +60,7 @@ internal object IntentUtils {
         return intent
     }
 
-    // Intent.ACTION_PROCESS_TEXT with a specific package (available on api23+)
+    // Intent.ACTION_PROCESS_TEXT (available on api23+)
     private fun getTextIntent(text: String, pkg: String? = null): Intent {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             val intent = Intent(Intent.ACTION_PROCESS_TEXT)
@@ -85,11 +84,11 @@ internal object IntentUtils {
         return intent
     }
 
-    private fun getColordictIntent(text: String, pkg: String): Intent {
+    private fun getColordictIntent(text: String, pkg: String?): Intent {
         val intent = Intent("colordict.intent.action.SEARCH")
         intent.putExtra("EXTRA_QUERY", text)
         intent.putExtra("EXTRA_FULLSCREEN", true)
-        intent.setPackage(pkg)
+        if (pkg != null) intent.setPackage(pkg)
         return intent
     }
 

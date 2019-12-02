@@ -1887,6 +1887,7 @@ local function run(android_app_state)
     end
 
     android.isPackageEnabled = function(package)
+        if not package then return true end
         return JNI:context(android.app.activity.vm, function(JNI)
             local package = JNI.env[0].NewStringUTF(JNI.env, package)
             local enabled = JNI:callIntMethod(
@@ -1901,20 +1902,35 @@ local function run(android_app_state)
     end
 
     android.dictLookup = function(text, package, action)
-        JNI:context(android.app.activity.vm, function(JNI)
-            local text = JNI.env[0].NewStringUTF(JNI.env, text)
-            local package = JNI.env[0].NewStringUTF(JNI.env, package)
-            local action = JNI.env[0].NewStringUTF(JNI.env, action)
-            JNI:callVoidMethod(
-                android.app.activity.clazz,
-                "dictLookup",
-                "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
-                text, package, action
-            )
-            JNI.env[0].DeleteLocalRef(JNI.env, text)
-            JNI.env[0].DeleteLocalRef(JNI.env, package)
-            JNI.env[0].DeleteLocalRef(JNI.env, action)
-        end)
+        if not package then
+            JNI:context(android.app.activity.vm, function(JNI)
+                local text = JNI.env[0].NewStringUTF(JNI.env, text)
+                local action = JNI.env[0].NewStringUTF(JNI.env, action)
+                JNI:callVoidMethod(
+                    android.app.activity.clazz,
+                    "dictLookup",
+                    "(Ljava/lang/String;Ljava/lang/String;)V",
+                    text, action
+                )
+                JNI.env[0].DeleteLocalRef(JNI.env, text)
+                JNI.env[0].DeleteLocalRef(JNI.env, action)
+            end)
+        else
+            JNI:context(android.app.activity.vm, function(JNI)
+                local text = JNI.env[0].NewStringUTF(JNI.env, text)
+                local package = JNI.env[0].NewStringUTF(JNI.env, package)
+                local action = JNI.env[0].NewStringUTF(JNI.env, action)
+                JNI:callVoidMethod(
+                    android.app.activity.clazz,
+                    "dictLookup",
+                    "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
+                    text, package, action
+                )
+                JNI.env[0].DeleteLocalRef(JNI.env, text)
+                JNI.env[0].DeleteLocalRef(JNI.env, package)
+                JNI.env[0].DeleteLocalRef(JNI.env, action)
+            end)
+        end
     end
 
     android.notification = function(message, is_long)
