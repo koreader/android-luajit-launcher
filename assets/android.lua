@@ -1887,7 +1887,7 @@ local function run(android_app_state)
     end
 
     android.isPackageEnabled = function(package)
-        if not package then return true end
+        if not package then return false end
         return JNI:context(android.app.activity.vm, function(JNI)
             local package = JNI.env[0].NewStringUTF(JNI.env, package)
             local enabled = JNI:callIntMethod(
