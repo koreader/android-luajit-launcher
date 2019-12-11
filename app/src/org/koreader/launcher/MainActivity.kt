@@ -101,7 +101,11 @@ class MainActivity : BaseActivity() {
             val decorView = window.decorView
             decorView.setOnSystemUiVisibilityChangeListener { setFullscreenLayout() }
         }
-        requestExternalStoragePermission()
+
+        if (MainApp.legacy_storage) {
+            requestExternalStoragePermission()
+        }
+
         systemTimeout = SystemSettings.getSystemScreenOffTimeout(this)
     }
 
@@ -213,9 +217,11 @@ class MainActivity : BaseActivity() {
     }
 
     override fun hasExternalStoragePermission(): Int {
-        return if (ContextCompat.checkSelfPermission(this@MainActivity,
-            android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
-            1 else 0
+        return if (MainApp.legacy_storage) {
+            if (ContextCompat.checkSelfPermission(this@MainActivity,
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
+                1 else 0
+        } else 1
     }
 
     override fun performHapticFeedback(constant: Int) {
