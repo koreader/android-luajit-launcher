@@ -1650,21 +1650,6 @@ local function run(android_app_state)
         end)
     end
 
-    android.externalStorage = function()
-        return JNI:context(android.app.activity.vm, function(JNI)
-            local dir = JNI:callObjectMethod(
-                JNI:callStaticObjectMethod(
-                    "android/os/Environment",
-                    "getExternalStorageDirectory",
-                    "()Ljava/io/File;"
-                ),
-                "getAbsolutePath",
-                "()Ljava/lang/String;"
-            )
-            return JNI:to_string(dir)
-        end)
-    end
-
     android.isFullscreen = function()
         return JNI:context(android.app.activity.vm, function(JNI)
             return JNI:callIntMethod(

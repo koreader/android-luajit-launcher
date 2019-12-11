@@ -68,8 +68,8 @@ android {
         disable 'ProtectedPermissions'
 
         // Some application flags cannot be used when targeting low level apis.
-        // This applies to android:resizeableActivity and android:usesClearTextTraffic,
-        // both available on API level 23 or higher.
+        // This applies to resizeableActivity and usesClearTextTraffic, both available on API level 23 or higher.
+        // And requestLegacyExternalStorage, available on API 29
         disable 'UnusedAttribute'
     }
 

@@ -27,6 +27,12 @@
             android:resizeableActivity="false"
             android:launchMode="singleInstance"
             android:theme="@style/SplashScreen">
+            <!--add android:requestLegacyExternalStorage="true" when bumping targetApi to 29+
+
+                This will allow upgrades from previous versions keeping the legacy storage model.
+                New installations won't be affected and will use scoped storage instead on
+                compatible devices. -->
+
             <meta-data android:name="android.app.lib_name" android:value="luajit" />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
