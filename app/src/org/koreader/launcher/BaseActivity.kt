@@ -221,7 +221,7 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
         runOnUiThread {
             try {
                 val clip = ClipData.newPlainText("KOReader_clipboard", text)
-                clipboard.primaryClip = clip
+                clipboard.setPrimaryClip(clip)
             } catch (e: Exception) {
                 Logger.w(TAG, e.toString())
             }
