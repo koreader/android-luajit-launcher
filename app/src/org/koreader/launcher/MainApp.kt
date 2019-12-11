@@ -20,7 +20,7 @@ class MainApp : android.app.Application() {
 
         // change to false if you want to experiment with the sandbox
         // Switch to Environment.isExternalStorageLegacy() when bumping api to 29+
-        private val legacy_storage: Boolean = true
+        val legacy_storage: Boolean = true
 
         private const val UNKNOWN_STRING = "Unknown"
     }
