@@ -137,9 +137,9 @@ internal object DeviceInfo {
                 || DEVICE.contentEquals("ntx_6sl"))
         deviceMap[EinkDevice.TOLINO] = TOLINO
 
-        // Nook Glowlight 3
-        NOOK_V520 = MANUFACTURER.contentEquals("barnesandnoble")
-                && MODEL.contentEquals("bnrv520")
+        // Nook Glowlight 3 et al.
+        NOOK_V520 = (MANUFACTURER.contentEquals("barnesandnoble") || MANUFACTURER.contentEquals("freescale"))
+                && (MODEL.contentEquals("bnrv520") || MODEL.contentEquals("bnrv700") || MODEL.startsWith("ereader"))
         deviceMap[EinkDevice.NOOK_V520] = NOOK_V520
 
         // Sony DPT-RP1
