@@ -221,7 +221,7 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
         runOnUiThread {
             try {
                 val clip = ClipData.newPlainText("KOReader_clipboard", text)
-                clipboard.setPrimaryClip(clip)
+                clipboard.primaryClip = clip
             } catch (e: Exception) {
                 Logger.w(TAG, e.toString())
             }
@@ -245,6 +245,10 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
 
     override fun getExternalPath(): String {
         return MainApp.storage_path
+    }
+
+    override fun getCachePath(): String {
+        return MainApp.cache_path
     }
 
     override fun getProduct(): String {

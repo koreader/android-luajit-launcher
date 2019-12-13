@@ -2,6 +2,7 @@ package org.koreader.launcher
 
 import java.util.Locale
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -25,6 +26,7 @@ import androidx.core.content.ContextCompat
  * It handles custom timeout based on activity state too.
  */
 
+@Suppress("ConstantConditionIf")
 class MainActivity : BaseActivity() {
 
     // EPD driver for this device
@@ -46,6 +48,8 @@ class MainActivity : BaseActivity() {
     private var systemTimeout: Int = 0
     private var appTimeout: Int = 0
 
+    private var lastImportedFile: String? = null
+
     companion object {
         private const val HAPTIC_OVERRIDE = 2
         private const val TAG_MAIN = "MainActivity"
@@ -55,6 +59,7 @@ class MainActivity : BaseActivity() {
         private const val SCREEN_ON_ENABLED = -1
         private const val SCREEN_ON_DISABLED = 0
         private const val WRITE_STORAGE = 1
+        private const val STORAGE_ACCESS_FRAMEWORK = 2
     }
 
     // Dumb surface used on Tolinos and other ntx boards to refresh the e-ink screen
@@ -154,6 +159,23 @@ class MainActivity : BaseActivity() {
         }
     }
 
+    /* Called on activity result */
+    override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
+        if (requestCode == STORAGE_ACCESS_FRAMEWORK && resultCode == Activity.RESULT_OK) {
+            lastImportedFile = FileUtils.getAbsolutePath(this@MainActivity, resultData?.data)
+        }
+    }
+
+    override fun getFilePathFromIntent(): String? {
+        return FileUtils.getAbsoluteFilePath(this@MainActivity, intent.data)
+    }
+
+    override fun getLastImportedFilePath(): String? {
+        val current = lastImportedFile
+        lastImportedFile = null
+        return current
+    }
+
     /* Called when the activity is going to be destroyed */
     public override fun onDestroy() {
         Logger.d(TAG_MAIN, "onDestroy()")
@@ -222,6 +244,22 @@ class MainActivity : BaseActivity() {
                 android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
                 1 else 0
         } else 1
+    }
+
+    override fun importFileFromSAF(): Int {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+            intent.addCategory(Intent.CATEGORY_OPENABLE)
+            intent.type = "*/*"
+            try {
+                startActivityForResult(intent, STORAGE_ACCESS_FRAMEWORK)
+                1
+            } catch (e: Exception) {
+                0
+            }
+        } else {
+            0
+        }
     }
 
     override fun performHapticFeedback(constant: Int) {

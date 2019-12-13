@@ -6,6 +6,7 @@ import android.content.pm.ApplicationInfo
 import android.os.Environment
 import android.util.Log
 
+@Suppress("ConstantConditionIf")
 class MainApp : android.app.Application() {
 
     companion object {
@@ -13,6 +14,9 @@ class MainApp : android.app.Application() {
             private set
         lateinit var storage_path: String
             private set
+        lateinit var cache_path: String
+            private set
+
         private lateinit var assets_path: String
         private lateinit var library_path: String
         private var debuggable: Boolean = false
@@ -20,7 +24,7 @@ class MainApp : android.app.Application() {
 
         // change to false if you want to experiment with the sandbox
         // Switch to Environment.isExternalStorageLegacy() when bumping api to 29+
-        val legacy_storage: Boolean = true
+        const val legacy_storage: Boolean = true
 
         private const val UNKNOWN_STRING = "Unknown"
     }
@@ -28,11 +32,11 @@ class MainApp : android.app.Application() {
     override fun onCreate() {
         super.onCreate()
         getAppInfo()
-        Log.i(name, "Application started")
-        Log.v(name, formatAppInfo())
+        Log.i(name, "Application started\n" + formatAppInfo())
     }
 
     /* app info into a String */
+
     private fun formatAppInfo(): String {
         val sb = StringBuilder(400)
         sb.append("Application info {\n  Flags: ")
@@ -41,6 +45,7 @@ class MainApp : android.app.Application() {
         sb.append(if (debuggable) ", debuggable" else ".")
         sb.append("\n  Paths {")
                 .append("\n    Assets: ").append(assets_path)
+                .append("\n    Cache: ").append(cache_path)
                 .append("\n    Library: ").append(library_path)
                 .append("\n    Storage: ").append(storage_path)
                 .append("\n  }\n}")
@@ -57,15 +62,16 @@ class MainApp : android.app.Application() {
             name = getString(pi.applicationInfo.labelRes)
             library_path = ai.nativeLibraryDir
             assets_path = filesDir.absolutePath
+            cache_path = cacheDir.absolutePath
 
-            if (legacy_storage) {
-                storage_path = Environment.getExternalStorageDirectory().absolutePath
+            storage_path = if (legacy_storage) {
+                Environment.getExternalStorageDirectory().absolutePath
             } else {
-                val writable_folder: File? = getApplicationContext().getExternalFilesDir(null)
-                if (writable_folder != null) {
-                    storage_path = writable_folder.absolutePath
+                val writableFolder: File? = applicationContext.getExternalFilesDir(null)
+                if (writableFolder != null) {
+                    writableFolder.absolutePath
                 } else {
-                    storage_path = UNKNOWN_STRING
+                    UNKNOWN_STRING
                 }
             }
 
