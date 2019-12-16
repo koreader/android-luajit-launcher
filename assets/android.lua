@@ -1396,12 +1396,12 @@ local function run(android_app_state)
 
     android.getCachePath = function()
         return JNI:context(android.app.activity.vm, function(JNI)
-            local cache_path = JNI:callObjectMethod(
+            local path = JNI:callObjectMethod(
                 android.app.activity.clazz,
                 "getCachePath",
                 "()Ljava/lang/String;"
             )
-            return JNI:to_string(cache_path)
+            return JNI:to_string(path)
         end)
     end
 
@@ -1424,7 +1424,9 @@ local function run(android_app_state)
                 "getLastImportedFilePath",
                 "()Ljava/lang/String;"
             )
-            return JNI:to_string(path)
+            if path ~= nil then
+                return JNI:to_string(path)
+            end
         end)
     end
 
