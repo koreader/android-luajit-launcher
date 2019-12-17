@@ -107,7 +107,7 @@ class MainActivity : BaseActivity() {
             decorView.setOnSystemUiVisibilityChangeListener { setFullscreenLayout() }
         }
 
-        if (MainApp.legacy_storage) {
+        if (MainApp.LEGACY_STORAGE) {
             requestExternalStoragePermission()
         }
 
@@ -248,7 +248,7 @@ class MainActivity : BaseActivity() {
     }
 
     override fun hasExternalStoragePermission(): Int {
-        return if (MainApp.legacy_storage) {
+        return if (MainApp.LEGACY_STORAGE) {
             if (ContextCompat.checkSelfPermission(this@MainActivity,
                 android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
                 1 else 0

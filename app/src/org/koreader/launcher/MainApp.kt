@@ -10,6 +10,8 @@ import android.util.Log
 class MainApp : android.app.Application() {
 
     companion object {
+        const val LEGACY_STORAGE = BuildConfig.legacy_storage
+
         lateinit var name: String
             private set
         lateinit var storage_path: String
@@ -17,16 +19,11 @@ class MainApp : android.app.Application() {
         lateinit var cache_path: String
             private set
 
+        private const val UNKNOWN_STRING = "Unknown"
         private lateinit var assets_path: String
         private lateinit var library_path: String
         private var debuggable: Boolean = false
         private var is_system_app: Boolean = false
-
-        // change to false if you want to experiment with the sandbox
-        // Switch to Environment.isExternalStorageLegacy() when bumping api to 29+
-        const val legacy_storage: Boolean = true
-
-        private const val UNKNOWN_STRING = "Unknown"
     }
 
     override fun onCreate() {
@@ -36,12 +33,11 @@ class MainApp : android.app.Application() {
     }
 
     /* app info into a String */
-
     private fun formatAppInfo(): String {
         val sb = StringBuilder(400)
         sb.append("Application info {\n  Flags: ")
         sb.append(if (is_system_app) "system" else "user")
-        sb.append(if (legacy_storage) ", legacy" else ", scoped").append(" storage")
+        sb.append(if (LEGACY_STORAGE) ", legacy" else ", scoped").append(" storage")
         sb.append(if (debuggable) ", debuggable" else ".")
         sb.append("\n  Paths {")
                 .append("\n    Assets: ").append(assets_path)
@@ -64,7 +60,7 @@ class MainApp : android.app.Application() {
             assets_path = filesDir.absolutePath
             cache_path = cacheDir.absolutePath
 
-            storage_path = if (legacy_storage) {
+            storage_path = if (LEGACY_STORAGE) {
                 // deprecated in API 29
                 Environment.getExternalStorageDirectory().absolutePath
             } else {
