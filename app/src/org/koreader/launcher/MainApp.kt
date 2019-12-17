@@ -65,21 +65,21 @@ class MainApp : android.app.Application() {
             cache_path = cacheDir.absolutePath
 
             storage_path = if (legacy_storage) {
+                // deprecated in API 29
                 Environment.getExternalStorageDirectory().absolutePath
             } else {
                 val writableFolder: File? = applicationContext.getExternalFilesDir(null)
-                if (writableFolder != null) {
-                    writableFolder.absolutePath
-                } else {
-                    UNKNOWN_STRING
-                }
+                writableFolder?.absolutePath ?: UNKNOWN_STRING
             }
 
             if (ai.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0) debuggable = true
             if (ai.flags and ApplicationInfo.FLAG_SYSTEM == 1) is_system_app = true
         } catch (e: Exception) {
+            /* early exception, never reached.
+               Use "unknown" to let the user face the crash via logcat */
             name = UNKNOWN_STRING
             assets_path = UNKNOWN_STRING
+            cache_path = UNKNOWN_STRING
             library_path = UNKNOWN_STRING
             storage_path = UNKNOWN_STRING
         }
