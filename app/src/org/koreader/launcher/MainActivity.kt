@@ -132,9 +132,18 @@ class MainActivity : BaseActivity() {
         applyCustomTimeout(false)
     }
 
-    /* Called just before the activity is resumed by an intent */
+    /* Called just before the activity is resumed by an intent
+     *
+     * If the intent is action.MAIN then scheme will be null
+     * If the intent is action.VIEW then the scheme can be file or content.
+     *
+     * We only handle file schemes, as indicated in AndroidManifest.xml, so
+     * only file and null schemes will be logged.
+     */
+
     override fun onNewIntent(intent: Intent) {
-        Logger.d(TAG_MAIN, "onNewIntent()")
+        val scheme = intent.scheme
+        Logger.d(TAG_MAIN, "onNewIntent(): $scheme")
         super.onNewIntent(intent)
         setIntent(intent)
     }
