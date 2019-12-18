@@ -45,7 +45,7 @@ android {
         }
     }
 
-    flavorDimensions "abi", 'api'
+    flavorDimensions 'abi', 'api'
     productFlavors {
         x86 {
             ndk { abiFilters "x86" }
