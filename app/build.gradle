@@ -83,6 +83,9 @@ android {
         // WRITE_SETTINGS permission
         disable 'ProtectedPermissions'
 
+        // disable warnings on split manifest files.
+        disable 'GoogleAppIndexingWarning'
+
         // Some application flags cannot be used when targeting low level apis.
         // This applies to resizeableActivity and usesClearTextTraffic, both available on API level 23 or higher.
         // And requestLegacyExternalStorage, available on API 29
