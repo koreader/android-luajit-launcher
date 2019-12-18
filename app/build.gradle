@@ -32,10 +32,16 @@ android {
 
     sourceSets {
         main {
-            manifest.srcFile('AndroidManifest.xml')
+            manifest.srcFile('manifest/main/AndroidManifest.xml')
             java.srcDirs = ['src']
             res.srcDirs = ['res']
             assets.srcDirs = [ '../assets' ]
+        }
+        latest {
+            manifest.srcFile('manifest/latest/AndroidManifest.xml')
+        }
+        stable {
+            manifest.srcFile('manifest/stable/AndroidManifest.xml')
         }
     }
 
@@ -51,7 +57,7 @@ android {
         }
         latest {
             dimension = 'api'
-            targetSdkVersion 29
+            targetSdkVersion latestSdk
             buildConfigField 'boolean', 'legacy_storage', 'false'
         }
         stable {

@@ -21,6 +21,7 @@ allprojects {
 ext {
     minSdk = 14
     targetSdk = 28
+    latestSdk = 29
 }
 
 
