@@ -231,7 +231,8 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
     /* device */
     override fun getEinkPlatform(): String {
         return if (DeviceInfo.EINK_FREESCALE) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN)
+                || (DeviceInfo.EINK == DeviceInfo.EinkDevice.CREMA)) {
                 "freescale"
             } else {
                 "freescale-legacy"
