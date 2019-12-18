@@ -262,15 +262,27 @@ class MainActivity : BaseActivity() {
             intent.type = "*/*"
             val filter = arrayOf(
                 "application/epub+zip",
+                "application/fb2",
+                "application/fb3",
                 "application/msword",
                 "application/pdf",
+                "application/rtf",
+                "application/tcr",
+                "application/vnd.amazon.mobi8-ebook",
+                "application/vnd.ms-htmlhelp",
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                "application/vnd.palm",
                 "application/x-cbz",
                 "application/x-chm",
                 "application/x-fb2",
+                "application/x-fb3",
                 "application/x-mobipocket-ebook",
+                "application/xhtml+xml",
+                "application/zip",
                 "image/djvu",
                 "image/vnd.djvu",
                 "image/x-djvu",
+                "text/html",
                 "text/plain"
             )
             intent.putExtra(Intent.EXTRA_MIME_TYPES, filter)
