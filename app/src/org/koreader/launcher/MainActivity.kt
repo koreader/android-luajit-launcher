@@ -260,6 +260,20 @@ class MainActivity : BaseActivity() {
             val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
             intent.addCategory(Intent.CATEGORY_OPENABLE)
             intent.type = "*/*"
+            val filter = arrayOf(
+                "application/epub+zip",
+                "application/msword",
+                "application/pdf",
+                "application/x-cbz",
+                "application/x-chm",
+                "application/x-fb2",
+                "application/x-mobipocket-ebook",
+                "image/djvu",
+                "image/vnd.djvu",
+                "image/x-djvu",
+                "text/plain"
+            )
+            intent.putExtra(Intent.EXTRA_MIME_TYPES, filter)
             try {
                 startActivityForResult(intent, STORAGE_ACCESS_FRAMEWORK)
                 1
