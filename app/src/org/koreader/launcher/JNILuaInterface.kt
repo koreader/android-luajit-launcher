@@ -12,10 +12,13 @@ internal interface JNILuaInterface {
     fun einkUpdate(mode: Int, delay: Long, x: Int, y: Int, width: Int, height: Int)
     fun extractAssets(): Int
     fun getBatteryLevel(): Int
+    fun getCachePath(): String
     fun getClipboardText(): String
     fun getEinkPlatform(): String
     fun getExternalPath(): String
+    fun getFilePathFromIntent(): String?
     fun getFlavor(): String
+    fun getLastImportedFilePath(): String?
     fun getName(): String
     fun getNetworkInfo(): String
     fun getProduct(): String
@@ -29,6 +32,7 @@ internal interface JNILuaInterface {
     fun getVersion(): String
     fun hasClipboardText(): Int
     fun hasExternalStoragePermission(): Int
+    fun importFileFromSAF(): Int
     fun isCharging(): Int
     fun isDebuggable(): Int
     fun isEink(): Int

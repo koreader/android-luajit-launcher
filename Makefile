@@ -1,14 +1,24 @@
 ifdef ANDROID_ARCH
 	ifeq ($(ANDROID_ARCH), x86)
 		ANDROID_FULL_ARCH?=$(ANDROID_ARCH)
-		GRADLE_TASK?=assembleX86
+		ARCH?=X86
+		ARCH_VERSION?=2
 	endif
 endif
 
+ifdef SCOPED
+	ifeq ($(SCOPED), 1)
+		API?=Latest
+	endif
+endif
 
 # Default is build for arm
 ANDROID_FULL_ARCH?=armeabi-v7a
-GRADLE_TASK?=assembleArm
+ARCH?=Arm
+ARCH_VERSION?=1
+API?=Stable
+
+GRADLE_TASK?=assemble$(ARCH)$(API)
 
 # find the path where the SDK is installed
 ifdef SDK
@@ -39,7 +49,7 @@ endif
 
 # override android:versionCode="integer"
 ifdef ANDROID_VERSION
-	VERSION?=$(ANDROID_VERSION)
+	VERSION?=$(ARCH_VERSION)$(ANDROID_VERSION)
 endif
 
 # support different app names
