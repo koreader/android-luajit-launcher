@@ -26,6 +26,7 @@
             android:screenOrientation="sensorPortrait"
             android:resizeableActivity="false"
             android:launchMode="singleInstance"
+            android:configChanges="keyboard|keyboardHidden"
             android:theme="@style/SplashScreen">
             <!--add android:requestLegacyExternalStorage="true" when bumping targetApi to 29+
 
