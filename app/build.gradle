@@ -1,16 +1,13 @@
 apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 
 android {
-    compileSdkVersion rootProject.ext.targetSdk
-
     defaultConfig {
         applicationId "org.koreader.launcher"
-
         minSdkVersion rootProject.ext.minSdk
         targetSdkVersion rootProject.ext.targetSdk
-
+        compileSdkVersion rootProject.ext.targetSdk
         versionCode versCode as Integer
         versionName versName
     }
@@ -32,14 +29,20 @@ android {
 
     sourceSets {
         main {
-            manifest.srcFile('AndroidManifest.xml')
+            manifest.srcFile('manifest/base.xml')
             java.srcDirs = ['src']
             res.srcDirs = ['res']
             assets.srcDirs = [ '../assets' ]
         }
+        full {
+            manifest.srcFile('manifest/full.xml')
+        }
+        jailed {
+            manifest.srcFile('manifest/jailed.xml')
+        }
     }
 
-    flavorDimensions "abi"
+    flavorDimensions 'abi', 'api'
     productFlavors {
         x86 {
             ndk { abiFilters "x86" }
@@ -48,6 +51,17 @@ android {
         arm {
             ndk { abiFilters "armeabi-v7a" }
             dimension = 'abi'
+        }
+        jailed {
+            dimension = 'api'
+            minSdkVersion safSdk
+            targetSdkVersion latestSdk
+            compileSdkVersion latestSdk
+            buildConfigField 'boolean', 'legacy_storage', 'false'
+        }
+        full {
+            dimension = 'api'
+            buildConfigField 'boolean', 'legacy_storage', 'true'
         }
     }
 

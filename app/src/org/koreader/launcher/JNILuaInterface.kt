@@ -15,7 +15,9 @@ internal interface JNILuaInterface {
     fun getClipboardText(): String
     fun getEinkPlatform(): String
     fun getExternalPath(): String
+    fun getFilePathFromIntent(): String?
     fun getFlavor(): String
+    fun getLastImportedPath(): String?
     fun getName(): String
     fun getNetworkInfo(): String
     fun getProduct(): String
@@ -29,12 +31,14 @@ internal interface JNILuaInterface {
     fun getVersion(): String
     fun hasClipboardText(): Int
     fun hasExternalStoragePermission(): Int
+    fun safFilePicker(path: String?): Int
     fun isCharging(): Int
     fun isDebuggable(): Int
     fun isEink(): Int
     fun isEinkFull(): Int
     fun isFullscreen(): Int
     fun isPackageEnabled(pkg: String): Int
+    fun isPathInsideSandbox(path: String?): Int
     fun isWifiEnabled(): Int
     fun needsWakelocks(): Int
     fun openLink(url: String): Int

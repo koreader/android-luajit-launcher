@@ -1372,21 +1372,12 @@ local function run(android_app_state)
 
     android.getIntent = function()
         return JNI:context(android.app.activity.vm, function(JNI)
-            local uri = JNI:callObjectMethod(
-                JNI:callObjectMethod(
-                    android.app.activity.clazz,
-                    "getIntent",
-                    "()Landroid/content/Intent;"
-                ),
-                "getData",
-                "()Landroid/net/Uri;"
+            local path = JNI:callObjectMethod(
+                android.app.activity.clazz,
+                "getFilePathFromIntent",
+                "()Ljava/lang/String;"
             )
-            if uri ~= nil then
-                local path = JNI:callObjectMethod(
-                    uri,
-                    "getPath",
-                    "()Ljava/lang/String;"
-                )
+            if path ~= nil then
                 return JNI:to_string(path)
             end
         end)
@@ -1400,6 +1391,48 @@ local function run(android_app_state)
                 "()Ljava/lang/String;"
             )
             return JNI:to_string(external_path)
+        end)
+    end
+
+    android.importFile = function(path)
+        return JNI:context(android.app.activity.vm, function(JNI)
+            local import_path = JNI.env[0].NewStringUTF(JNI.env, path)
+            local ok = JNI:callIntMethod(
+                android.app.activity.clazz,
+                "safFilePicker",
+                "(Ljava/lang/String;)I",
+                import_path
+            ) == 1
+            JNI.env[0].DeleteLocalRef(JNI.env, import_path)
+            return ok
+        end)
+    end
+
+    android.getLastImportedPath = function()
+        return JNI:context(android.app.activity.vm, function(JNI)
+            -- get last imported file path
+            local path = JNI:callObjectMethod(
+                android.app.activity.clazz,
+                "getLastImportedPath",
+                "()Ljava/lang/String;"
+            )
+            if path ~= nil then
+                return JNI:to_string(path)
+            end
+        end)
+    end
+
+    android.isPathInsideSandbox = function(path)
+        return JNI:context(android.app.activity.vm, function(JNI)
+            local import_path = JNI.env[0].NewStringUTF(JNI.env, path)
+            local ok = JNI:callIntMethod(
+                android.app.activity.clazz,
+                "isPathInsideSandbox",
+                "(Ljava/lang/String;)I",
+                import_path
+            ) == 1
+            JNI.env[0].DeleteLocalRef(JNI.env, import_path)
+            return ok
         end)
     end
 

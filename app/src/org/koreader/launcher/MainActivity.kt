@@ -1,7 +1,9 @@
 package org.koreader.launcher
 
+import android.annotation.TargetApi
 import java.util.Locale
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -25,6 +27,7 @@ import androidx.core.content.ContextCompat
  * It handles custom timeout based on activity state too.
  */
 
+@Suppress("ConstantConditionIf")
 class MainActivity : BaseActivity() {
 
     // EPD driver for this device
@@ -46,6 +49,8 @@ class MainActivity : BaseActivity() {
     private var systemTimeout: Int = 0
     private var appTimeout: Int = 0
 
+    private var lastImportedPath: String? = null
+
     companion object {
         private const val HAPTIC_OVERRIDE = 2
         private const val TAG_MAIN = "MainActivity"
@@ -55,6 +60,7 @@ class MainActivity : BaseActivity() {
         private const val SCREEN_ON_ENABLED = -1
         private const val SCREEN_ON_DISABLED = 0
         private const val WRITE_STORAGE = 1
+        private const val STORAGE_ACCESS_FRAMEWORK = 2
     }
 
     // Dumb surface used on Tolinos and other ntx boards to refresh the e-ink screen
@@ -102,7 +108,7 @@ class MainActivity : BaseActivity() {
             decorView.setOnSystemUiVisibilityChangeListener { setFullscreenLayout() }
         }
 
-        if (MainApp.legacy_storage) {
+        if (MainApp.LEGACY_STORAGE) {
             requestExternalStoragePermission()
         }
 
@@ -127,9 +133,18 @@ class MainActivity : BaseActivity() {
         applyCustomTimeout(false)
     }
 
-    /* Called just before the activity is resumed by an intent */
+    /* Called just before the activity is resumed by an intent
+     *
+     * If the intent is action.MAIN then scheme will be null
+     * If the intent is action.VIEW then the scheme can be file or content.
+     *
+     * We only handle file schemes, as indicated in AndroidManifest.xml, so
+     * only file and null schemes will be logged.
+     */
+
     override fun onNewIntent(intent: Intent) {
-        Logger.d(TAG_MAIN, "onNewIntent()")
+        val scheme = intent.scheme
+        Logger.d(TAG_MAIN, "onNewIntent(): $scheme")
         super.onNewIntent(intent)
         setIntent(intent)
     }
@@ -152,6 +167,39 @@ class MainActivity : BaseActivity() {
                 Logger.w(TAG_MAIN, msg)
             }
         }
+    }
+
+    /* Called on activity result, available from KitKat onwards */
+    @TargetApi(19)
+    override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
+        if (requestCode == STORAGE_ACCESS_FRAMEWORK && resultCode == Activity.RESULT_OK) {
+            lastImportedPath ?: return
+            resultData?.let {
+                val clipData = it.clipData
+                if (clipData != null) {
+                    for (i in 0 until clipData.itemCount) {
+                        val path = clipData.getItemAt(i)
+                        FileUtils.saveAsFile(this@MainActivity, path.uri, lastImportedPath)
+                    }
+                } else FileUtils.saveAsFile(this@MainActivity, resultData.data, lastImportedPath)
+            }
+        }
+    }
+
+    override fun getFilePathFromIntent(): String? {
+        return FileUtils.getPathFromFileUri(intent.data)
+    }
+
+    override fun getLastImportedPath(): String? {
+        val current = lastImportedPath
+        lastImportedPath = null
+        return current
+    }
+
+    override fun isPathInsideSandbox(path: String?): Int {
+        return path?.let {
+            if (it.startsWith(MainApp.storage_path)) 1 else 0
+            } ?: 0
     }
 
     /* Called when the activity is going to be destroyed */
@@ -217,11 +265,72 @@ class MainActivity : BaseActivity() {
     }
 
     override fun hasExternalStoragePermission(): Int {
-        return if (MainApp.legacy_storage) {
+        return if (MainApp.LEGACY_STORAGE) {
             if (ContextCompat.checkSelfPermission(this@MainActivity,
                 android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
                 1 else 0
         } else 1
+    }
+
+    override fun safFilePicker(path: String?): Int {
+        lastImportedPath = path
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+            intent.addCategory(Intent.CATEGORY_OPENABLE)
+            intent.type = "*/*"
+            val filter = arrayOf(
+                "application/epub+zip",
+                "application/fb2",
+                "application/fb3",
+                "application/msword",
+                "application/oxps",
+                "application/pdf",
+                "application/rtf",
+                "application/tcr",
+                "application/vnd.amazon.mobi8-ebook",
+                "application/vnd.comicbook+tar",
+                "application/vnd.comicbook+zip",
+                "application/vnd.ms-htmlhelp",
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                "application/vnd.palm",
+                "application/x-cbz",
+                "application/x-chm",
+                "application/x-fb2",
+                "application/x-fb3",
+                "application/x-mobipocket-ebook",
+                "application/x-tar",
+                "application/xhtml+xml",
+                "application/xml",
+                "application/zip",
+                "image/djvu",
+                "image/gif",
+                "image/jp2",
+                "image/jpeg",
+                "image/jxr",
+                "image/png",
+                "image/svg+xml",
+                "image/tiff",
+                "image/vnd.djvu",
+                "image/vnd.ms-photo",
+                "image/x-djvu",
+                "image/x-portable-arbitrarymap",
+                "image/x-portable-bitmap",
+                "text/html",
+                "text/plain"
+            )
+            intent.putExtra(Intent.EXTRA_MIME_TYPES, filter)
+            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+            lastImportedPath?.let {
+                try {
+                    startActivityForResult(intent, STORAGE_ACCESS_FRAMEWORK)
+                    1
+                } catch (e: Exception) {
+                    0
+                }
+            } ?: 0
+        } else {
+            0
+        }
     }
 
     override fun performHapticFeedback(constant: Int) {

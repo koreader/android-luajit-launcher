@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Jailed version, without filesystem access.
+     It requires a minimum api of 19 and a target api >= 29
+
+     It uses legacy filesystem permissions if the user update from
+     a non jailed version.
+
+     New installations will be jailed.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application android:requestLegacyExternalStorage="true">
+    </application>
+</manifest>

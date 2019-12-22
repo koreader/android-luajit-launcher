@@ -20,7 +20,9 @@ allprojects {
 
 ext {
     minSdk = 14
+    safSdk = 19
     targetSdk = 28
+    latestSdk = 29
 }
 
 
