@@ -89,6 +89,7 @@ public abstract class RK30xxEPDController
         }
     }
 
+    @SuppressWarnings("ConstantConditions")
     public static boolean isInA2(View view)
     {
         try {

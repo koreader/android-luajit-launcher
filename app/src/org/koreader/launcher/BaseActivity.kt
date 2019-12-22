@@ -220,8 +220,7 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
     override fun setClipboardText(text: String) {
         runOnUiThread {
             try {
-                val clip = ClipData.newPlainText("KOReader_clipboard", text)
-                clipboard.setPrimaryClip(clip)
+                clipboard.setPrimaryClip(ClipData.newPlainText("KOReader_clipboard", text))
             } catch (e: Exception) {
                 Logger.w(TAG, e.toString())
             }
