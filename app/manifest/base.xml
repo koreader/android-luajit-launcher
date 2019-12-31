@@ -35,6 +35,7 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:scheme="file" />
+                <data android:scheme="content" />
                 <data android:mimeType="application/epub+zip" />
                 <data android:mimeType="application/fb2" />
                 <data android:mimeType="application/fb3" />

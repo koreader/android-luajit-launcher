@@ -9,7 +9,10 @@ import java.util.Locale
 import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
+import android.os.Build
+import android.os.ParcelFileDescriptor
 import android.provider.MediaStore
+import android.system.Os
 
 internal object FileUtils {
     const val TAG = "FileUtils"
@@ -36,11 +39,43 @@ internal object FileUtils {
      * @return a string containing the full path of the file.
      */
 
-    fun getPathFromFileUri(uri: Uri?): String? {
+    fun getPathFromUri(context: Context, uri: Uri?): String? {
         return uri?.let { contentUri ->
             if (ContentResolver.SCHEME_FILE == contentUri.scheme) {
                 contentUri.path?.let { filePath -> File(filePath) }?.absolutePath
+            } else if (ContentResolver.SCHEME_CONTENT == contentUri.scheme) {
+                uri.authority?.let { domain ->
+                    Logger.v(TAG, "trying to resolve a file path from content delivered by $domain")
+                }
+                val fd = context.contentResolver.openFileDescriptor(contentUri, "r")
+                getFileDescriptorPath(fd)
             } else null
+        }
+    }
+
+    /**
+     * tries to get the absolute path of a file from a content provider. It works with most
+     * applications that use a fileProvider to deliver files to other applications.
+     * If the data in the uri is not a file this will fail
+     *
+     * @param pfd - parcelable file descriptor from contentResolver.openFileDescriptor
+     * @return absolute path to file or null
+     */
+
+    private fun getFileDescriptorPath(pfd: ParcelFileDescriptor?): String? {
+        return pfd?.let { parcel ->
+            try {
+                val file = File("/proc/self/fd/" + parcel.fd)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    Os.readlink(file.absolutePath)
+                } else {
+                    file.canonicalPath
+                }
+            } catch (e: IOException) {
+                null
+            } catch (e: Exception) {
+                null
+            }
         }
     }
 

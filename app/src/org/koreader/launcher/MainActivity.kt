@@ -187,7 +187,7 @@ class MainActivity : BaseActivity() {
     }
 
     override fun getFilePathFromIntent(): String? {
-        return FileUtils.getPathFromFileUri(intent.data)
+        return FileUtils.getPathFromUri(this@MainActivity, intent.data)
     }
 
     override fun getLastImportedPath(): String? {
