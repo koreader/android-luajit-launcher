@@ -34,15 +34,15 @@ android {
             res.srcDirs = ['res']
             assets.srcDirs = [ '../assets' ]
         }
-        full {
+        fullStorage {
             manifest.srcFile('manifest/full.xml')
         }
-        jailed {
+        jailedStorage {
             manifest.srcFile('manifest/jailed.xml')
         }
     }
 
-    flavorDimensions 'abi', 'api'
+    flavorDimensions 'abi', 'storageModel'
     productFlavors {
         x86 {
             ndk { abiFilters "x86" }
@@ -52,16 +52,16 @@ android {
             ndk { abiFilters "armeabi-v7a" }
             dimension = 'abi'
         }
-        jailed {
-            dimension = 'api'
+        fullStorage {
+            dimension = 'storageModel'
+            buildConfigField 'boolean', 'legacy_storage', 'true'
+        }
+        jailedStorage {
+            dimension = 'storageModel'
             minSdkVersion safSdk
             targetSdkVersion latestSdk
             compileSdkVersion latestSdk
             buildConfigField 'boolean', 'legacy_storage', 'false'
-        }
-        full {
-            dimension = 'api'
-            buildConfigField 'boolean', 'legacy_storage', 'true'
         }
     }
 

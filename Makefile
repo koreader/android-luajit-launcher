@@ -8,7 +8,7 @@ endif
 
 ifdef JAILED
 	ifeq ($(JAILED), 1)
-		STORAGE_MODEL=Jailed
+		STORAGE_MODEL=JailedStorage
 	endif
 endif
 
@@ -16,7 +16,7 @@ endif
 ANDROID_FULL_ARCH?=armeabi-v7a
 ARCH?=Arm
 ARCH_VERSION?=1
-STORAGE_MODEL?=Full
+STORAGE_MODEL?=FullStorage
 
 GRADLE_TASK?=assemble$(ARCH)$(STORAGE_MODEL)
 
