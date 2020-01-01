@@ -137,9 +137,6 @@ class MainActivity : BaseActivity() {
      *
      * If the intent is action.MAIN then scheme will be null
      * If the intent is action.VIEW then the scheme can be file or content.
-     *
-     * We only handle file schemes, as indicated in AndroidManifest.xml, so
-     * only file and null schemes will be logged.
      */
 
     override fun onNewIntent(intent: Intent) {
