@@ -1888,15 +1888,15 @@ local function run(android_app_state)
         return JNI:context(android.app.activity.vm, function(JNI)
             local uri_string = JNI.env[0].NewStringUTF(JNI.env, url)
             local download_name = JNI.env[0].NewStringUTF(JNI.env, name)
-            local is_downloaded = JNI:callIntMethod(
+            local ret = JNI:callIntMethod(
                 android.app.activity.clazz,
                 "download",
                 "(Ljava/lang/String;Ljava/lang/String;)I",
                 uri_string, download_name
-            ) == 1
+            )
             JNI.env[0].DeleteLocalRef(JNI.env, uri_string)
             JNI.env[0].DeleteLocalRef(JNI.env, download_name)
-            return is_downloaded
+            return ret
         end)
     end
 
