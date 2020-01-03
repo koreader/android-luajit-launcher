@@ -286,6 +286,8 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
     }
 
     /* network */
+
+    @Suppress("DEPRECATION")
     override fun download(url: String, name: String): Int {
         val manager: DownloadManager? = applicationContext.getSystemService(
             Context.DOWNLOAD_SERVICE) as? DownloadManager
@@ -324,6 +326,7 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
         return if (wifi?.isWifiEnabled == true) 1 else 0
     }
 
+    @Suppress("DEPRECATION")
     override fun setWifiEnabled(enabled: Boolean) {
         val wifi: WifiManager? = applicationContext.getSystemService(
             Context.WIFI_SERVICE) as? WifiManager
@@ -459,6 +462,12 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
     }
 
     /* network */
+
+    /* Formatter.formatIpAddress is deprecated in API15 because
+       it does not support IPv6. Is still handy to format ip and
+       gateway addresses given by most LAN routers */
+
+    @Suppress("DEPRECATION")
     private fun formatIp(number: Int): String {
         return if (number > 0) {
             Formatter.formatIpAddress(number)
