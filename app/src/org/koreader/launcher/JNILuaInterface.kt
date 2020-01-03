@@ -49,6 +49,7 @@ internal interface JNILuaInterface {
     fun setScreenBrightness(brightness: Int)
     fun setScreenOffTimeout(timeout: Int)
     fun setWifiEnabled(enabled: Boolean)
+    fun startEPDTestActivity()
     fun showToast(message: String)
     fun showToast(message: String, longTimeout: Boolean)
 }

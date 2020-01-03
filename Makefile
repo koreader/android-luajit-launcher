@@ -111,13 +111,6 @@ release: update build-luajit
 		flavor: $(FLAVOR), version: $(NAME), release $(VERSION)"
 	@echo "WARNING: You'll need to sign this application to be able to install it"
 
-test: update
-	@echo "Building tests/eink"
-	./gradlew tests:einkTest:assemble --warning-mode all
-	mkdir -p bin/
-	find tests/einkTest/build/outputs/apk/ -type f -name '*.apk' -exec mv -v {} bin/ \;
-	@echo "WARNING: You'll need to sign this application to be able to install it"
-
 example: update clean build-luajit
 	@echo "Building HelloWorld example"
 	@echo "#define LOGGER_NAME \"HelloFromLua\"" > jni/logger.h

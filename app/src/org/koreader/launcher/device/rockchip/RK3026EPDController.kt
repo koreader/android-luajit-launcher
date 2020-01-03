@@ -11,6 +11,6 @@ class RK3026EPDController : RK30xxEPDController(), EPDController {
                             mode: Int, delay: Long,
                             x: Int, y: Int, width: Int, height: Int, epdMode: String?)
     {
-        requestEpdMode(targetView, epdMode, true)
+        requestEpdMode(targetView, epdMode!!, true)
     }
 }

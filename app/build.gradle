@@ -85,6 +85,8 @@ android {
         // This applies to resizeableActivity and usesClearTextTraffic, both available on API level 23 or higher.
         // And requestLegacyExternalStorage, available on API 29
         disable 'UnusedAttribute'
+
+        disable 'SetTextI18n'
     }
 
     aaptOptions {
