@@ -56,6 +56,7 @@ class MainApp : android.app.Application() {
             library_path = ai.nativeLibraryDir
             assets_path = filesDir.absolutePath
 
+            @Suppress("DEPRECATION")
             storage_path = if (LEGACY_STORAGE) {
                 // deprecated in API 29
                 Environment.getExternalStorageDirectory().absolutePath
