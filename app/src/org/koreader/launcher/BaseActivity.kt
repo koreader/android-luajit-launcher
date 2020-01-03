@@ -274,16 +274,15 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
         return if (startActivityIfSafe(intent)) 0 else 1
     }
 
-    override fun dictLookup(text: String, action: String) {
-        dictLookup(text, null, action)
-    }
-
-    override fun dictLookup(text: String, pkg: String?, action: String) {
-        val intent = Intent(IntentUtils.getByAction(text, pkg, action))
-        if (!startActivityIfSafe(intent)) {
-            Logger.e(TAG,
-                    "dictionary lookup: can't find a package able to resolve action $action")
-        }
+    override fun dictLookup(text: String?, action: String?, nullablePackage: String?) {
+       text?.let { lookupText ->
+            action?.let { lookupAction ->
+                val lookupIntent = Intent(IntentUtils.getByAction(lookupText, lookupAction, nullablePackage))
+                if (!startActivityIfSafe(lookupIntent)) {
+                    Logger.e(TAG, "invalid lookup: can't find a package able to resolve $action")
+                }
+            } ?: Logger.e(TAG, "invalid lookup: no action")
+        } ?: Logger.e(TAG, "invalid lookup: no text")
     }
 
     /* network */

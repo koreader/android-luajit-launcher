@@ -10,13 +10,13 @@ internal object IntentUtils {
      * get intent by action type, used to do dict lookups on 3rd party apps.
      *
      * @param text to search
-     * @param pkg that receives the query - null to show the app picker
      * @param action associated to the package
+     * @param package that receives the query - null to show the app picker
      *
      * @return a Intent based on package/action ready to do a text lookup
      */
 
-    fun getByAction(text: String, pkg: String?, action: String): Intent {
+    fun getByAction(text: String, action: String, pkg: String?): Intent {
         var intent = Intent()
         when (action) {
             // generic actions used by a lot of apps
