@@ -1782,6 +1782,16 @@ local function run(android_app_state)
         end
     end
 
+    android.einkTest = function()
+        JNI:context(android.app.activity.vm, function(JNI)
+            JNI:callVoidMethod(
+                android.app.activity.clazz,
+                "startEPDTestActivity",
+                "()V"
+            )
+        end)
+    end
+
     --- Android permission check.
     -- @treturn bool hasWriteSettingsPermission
     android.canWriteSettings = function()

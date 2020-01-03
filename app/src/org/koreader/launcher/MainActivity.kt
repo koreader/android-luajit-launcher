@@ -377,6 +377,11 @@ class MainActivity : BaseActivity() {
         }
     }
 
+    override fun startEPDTestActivity() {
+        val intent = Intent(this@MainActivity, EPDTestActivity::class.java)
+        startActivity(intent)
+    }
+
     /*---------------------------------------------------------------
      *                       private methods                        *
      *--------------------------------------------------------------*/
