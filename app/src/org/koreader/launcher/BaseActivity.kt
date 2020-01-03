@@ -302,8 +302,16 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
         request.allowScanningByMediaScanner()
         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
         request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, name)
-        manager?.enqueue(request)
-        return 0
+
+        /* Try to download the request. This *should* not fail, but it fails
+           on some AOSP devices that don't need to pass google CTS. */
+        try {
+            manager?.enqueue(request)
+            return 0
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return -1
+        }
     }
 
     override fun getNetworkInfo(): String {
