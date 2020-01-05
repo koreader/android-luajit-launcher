@@ -43,7 +43,7 @@ internal object IntentUtils {
     }
 
     // Intent.ACTION_SEND
-    private fun getSendIntent(text: String, pkg: String? = null): Intent {
+    fun getSendIntent(text: String, pkg: String? = null): Intent {
         val intent = Intent(Intent.ACTION_SEND)
         intent.putExtra(Intent.EXTRA_TEXT, text)
         intent.type = "text/plain"

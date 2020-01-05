@@ -1948,6 +1948,19 @@ local function run(android_app_state)
         end)
     end
 
+    android.sendText = function(text)
+        JNI:context(android.app.activity.vm, function(JNI)
+            local text = JNI.env[0].NewStringUTF(JNI.env, text)
+            JNI:callVoidMethod(
+                android.app.activity.clazz,
+                "sendText",
+                "(Ljava/lang/String;)V",
+                text
+            )
+            JNI.env[0].DeleteLocalRef(JNI.env, text)
+        end)
+    end
+
     android.notification = function(message, is_long)
         return JNI:context(android.app.activity.vm, function(JNI)
             local text = JNI.env[0].NewStringUTF(JNI.env, message)

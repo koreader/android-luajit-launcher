@@ -285,6 +285,12 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
         } ?: Logger.e(TAG, "invalid lookup: no text")
     }
 
+    override fun sendText(text: String?) {
+        text?.let {
+            startActivityIfSafe(IntentUtils.getSendIntent(it, null))
+        }
+    }
+
     /* network */
 
     @Suppress("DEPRECATION")
