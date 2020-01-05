@@ -43,6 +43,7 @@ internal interface JNILuaInterface {
     fun openLink(url: String): Int
     fun performHapticFeedback(constant: Int)
     fun requestWriteSystemSettings()
+    fun sendText(text: String?)
     fun setFullscreen(enabled: Boolean)
     fun setClipboardText(text: String)
     fun setHapticOverride(enabled: Boolean)
