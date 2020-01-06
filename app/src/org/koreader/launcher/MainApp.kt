@@ -6,6 +6,7 @@ import android.app.ActivityManager
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.os.Environment
+import android.os.StrictMode
 import android.util.Log
 
 @Suppress("ConstantConditionIf")
@@ -32,6 +33,14 @@ class MainApp : android.app.Application() {
         super.onCreate()
         getAppInfo()
         Log.i(name, "Application started\n" + formatAppInfo())
+
+        if (debuggable) {
+            Log.d(name, "StrictMode will detect all potential violations and log them")
+            val threadPolicy = StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build()
+            val vmPolicy = StrictMode.VmPolicy.Builder().detectAll().penaltyLog().build()
+            StrictMode.setThreadPolicy(threadPolicy)
+            StrictMode.setVmPolicy(vmPolicy)
+        }
     }
 
     /* app info into a String */
