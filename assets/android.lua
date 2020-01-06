@@ -1237,6 +1237,11 @@ local android = {
 function android.LOG(level, message)
     ffi.C.__android_log_print(level, android.log_name, "%s", message)
 end
+
+function android.LOGVV(tag, message)
+    ffi.C.__android_log_print(ffi.C.ANDROID_LOG_VERBOSE, tag, "%s", message)
+end
+
 function android.LOGV(message)
     android.LOG(ffi.C.ANDROID_LOG_VERBOSE, message)
 end
