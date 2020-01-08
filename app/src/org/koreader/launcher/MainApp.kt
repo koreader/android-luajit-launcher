@@ -89,7 +89,6 @@ class MainApp : android.app.Application() {
             if (ai.flags and ApplicationInfo.FLAG_LARGE_HEAP != 0) large_heap = true
 
             managed_heap = getManagedMemory(am)
-
         } catch (e: Exception) {
             /* early exception, never reached.
                Use "unknown" to let the user face the crash via logcat */
