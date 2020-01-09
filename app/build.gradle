@@ -5,9 +5,9 @@ apply plugin: 'kotlin-android-extensions'
 android {
     defaultConfig {
         applicationId "org.koreader.launcher"
-        minSdkVersion rootProject.ext.minSdk
-        targetSdkVersion rootProject.ext.targetSdk
-        compileSdkVersion rootProject.ext.targetSdk
+        minSdkVersion minSdk
+        targetSdkVersion targetSdk
+        compileSdkVersion targetSdk
         versionCode versCode as Integer
         versionName versName
     }
@@ -75,7 +75,7 @@ android {
         checkReleaseBuilds true
         abortOnError false
 
-        // reflection
+        // reflection (used for EPD updates)
         disable 'PrivateApi'
 
         // WRITE_SETTINGS permission
@@ -86,6 +86,7 @@ android {
         // And requestLegacyExternalStorage, available on API 29
         disable 'UnusedAttribute'
 
+        // EPDTestActivity has strings hardcoded in english
         disable 'SetTextI18n'
     }
 
@@ -100,13 +101,17 @@ android {
     }
 }
 
-dependencies {
-    implementation 'androidx.core:core-ktx:1.1.0'
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.1'
+repositories {
+    google()
+    jcenter()
+    mavenCentral()
 }
 
-repositories {
-    mavenCentral()
+dependencies {
+    implementation "androidx.core:core-ktx:$androidx_core_version"
+    implementation "androidx.legacy:legacy-support-v4:$androidx_supportv4_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_plugin_version"
+
+    // add Leak Canary on debug variants.
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.1'
 }
