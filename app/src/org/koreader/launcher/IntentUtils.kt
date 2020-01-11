@@ -1,19 +1,55 @@
 package org.koreader.launcher
 
+import java.util.Locale
+
 import android.app.SearchManager
 import android.content.Intent
+import android.content.Context
+import android.content.ContentResolver
+import android.net.Uri
 import android.os.Build
+import android.webkit.MimeTypeMap
+
 
 internal object IntentUtils {
+
+    /**
+     * get intent, with action send and the type derived from its uri
+     *
+     * @param context
+     * @param uri
+     *
+     * @return an Intent with ACTION_SEND and specific mimetype
+     */
+
+    fun getSendIntentFromUri(context: Context, uri: Uri): Intent? {
+        val mimetype: String? = when {
+            uri.scheme.equals(ContentResolver.SCHEME_CONTENT) -> {
+                val resolver = context.contentResolver
+                resolver.getType(uri)
+            }
+            uri.scheme.equals(ContentResolver.SCHEME_FILE) -> {
+                val extension = MimeTypeMap.getFileExtensionFromUrl(uri.toString())
+                MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension.toLowerCase(Locale.US))
+            }
+            else -> null
+        }
+
+        return Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_STREAM, uri)
+            type = mimetype.let { it } ?: "*/*"
+        }
+    }
 
     /**
      * get intent by action type, used to do dict lookups on 3rd party apps.
      *
      * @param text to search
      * @param action associated to the package
-     * @param package that receives the query - null to show the app picker
+     * @param pkg that receives the query - null to show the app picker
      *
-     * @return a Intent based on package/action ready to do a text lookup
+     * @return an Intent based on package/action ready to do a text lookup
      */
 
     fun getByAction(text: String, action: String, pkg: String?): Intent {

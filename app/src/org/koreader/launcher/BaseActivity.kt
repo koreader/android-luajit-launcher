@@ -285,6 +285,22 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
         } ?: Logger.e(TAG, "invalid lookup: no text")
     }
 
+    override fun sendFile(path: String?, title: String?) {
+        val chooserTitle = title ?: "share file"
+
+        path?.let {
+            val file = File(it)
+            if (!file.canRead()) {
+                Logger.e(TAG, "invalid file: $it")
+                return
+            }
+            val uri = Uri.fromFile(file)
+            val sendFileIntent = IntentUtils.getSendIntentFromUri(this@BaseActivity, uri)
+            val chooser = Intent.createChooser(sendFileIntent, chooserTitle)
+            startActivityIfSafe(chooser)
+        }
+    }
+
     override fun sendText(text: String?) {
         text?.let {
             startActivityIfSafe(IntentUtils.getSendIntent(it, null))

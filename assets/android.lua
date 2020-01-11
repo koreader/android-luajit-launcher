@@ -1953,6 +1953,21 @@ local function run(android_app_state)
         end)
     end
 
+    android.sendFile = function(path, title)
+        JNI:context(android.app.activity.vm, function(JNI)
+            local path = JNI.env[0].NewStringUTF(JNI.env, path)
+            local title = JNI.env[0].NewStringUTF(JNI.env, title)
+            JNI:callVoidMethod(
+                android.app.activity.clazz,
+                "sendFile",
+                "(Ljava/lang/String;Ljava/lang/String;)V",
+                path, title
+            )
+            JNI.env[0].DeleteLocalRef(JNI.env, path)
+            JNI.env[0].DeleteLocalRef(JNI.env, title)
+        end)
+    end
+
     android.sendText = function(text)
         JNI:context(android.app.activity.vm, function(JNI)
             local text = JNI.env[0].NewStringUTF(JNI.env, text)

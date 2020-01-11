@@ -40,6 +40,9 @@ class MainApp : android.app.Application() {
             val vmPolicy = StrictMode.VmPolicy.Builder().detectAll().penaltyLog().build()
             StrictMode.setThreadPolicy(threadPolicy)
             StrictMode.setVmPolicy(vmPolicy)
+        } else {
+            /* workaround for sending files outside process boundaries on API24+ */
+            StrictMode.setVmPolicy(StrictMode.VmPolicy.LAX)
         }
     }
 
