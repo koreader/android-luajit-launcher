@@ -1,9 +1,9 @@
-package org.koreader.launcher
+package org.koreader.launcher.interfaces
 
 /* Declares methods that are exposed to lua via JNI
  * See https://github.com/koreader/android-luajit-launcher/blob/master/assets/android.lua */
 
-internal interface JNILuaInterface {
+interface JNILuaInterface {
     fun canWriteSystemSettings(): Int
     fun dictLookup(text: String?, action: String?, nullablePackage: String?)
     fun download(url: String, name: String): Int
@@ -36,6 +36,7 @@ internal interface JNILuaInterface {
     fun isEink(): Int
     fun isEinkFull(): Int
     fun isFullscreen(): Int
+    fun isServiceAvailable(): Int
     fun isPackageEnabled(pkg: String): Int
     fun isPathInsideSandbox(path: String?): Int
     fun isWifiEnabled(): Int

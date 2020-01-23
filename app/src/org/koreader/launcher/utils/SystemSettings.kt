@@ -1,4 +1,4 @@
-package org.koreader.launcher
+package org.koreader.launcher.utils
 
 import android.content.Context
 import android.content.Intent

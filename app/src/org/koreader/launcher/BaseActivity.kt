@@ -23,8 +23,16 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 
+import org.koreader.launcher.device.DeviceInfo
+import org.koreader.launcher.interfaces.JNILuaInterface
+import org.koreader.launcher.utils.AssetsUtils
+import org.koreader.launcher.utils.IntentUtils
+import org.koreader.launcher.utils.Logger
+import org.koreader.launcher.utils.ScreenUtils
+import org.koreader.launcher.utils.SystemSettings
+
 /* BaseActivity.java - convenience wrapper on top of NativeActivity that
- * implements most of the kotlin/java methods exposed to lua. */
+ * implements most of the kotlin functions exposed to lua. */
 
 abstract class BaseActivity : NativeActivity(), JNILuaInterface,
     ActivityCompat.OnRequestPermissionsResultCallback{
@@ -311,12 +319,12 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
 
         /* Try to download the request. This *should* not fail, but it fails
            on some AOSP devices that don't need to pass google CTS. */
-        try {
+        return try {
             manager?.enqueue(request)
-            return 0
+            0
         } catch (e: Exception) {
             e.printStackTrace()
-            return -1
+            -1
         }
     }
 

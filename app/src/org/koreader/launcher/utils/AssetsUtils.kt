@@ -1,4 +1,4 @@
-package org.koreader.launcher
+package org.koreader.launcher.utils
 
 import java.io.BufferedReader
 import java.io.File

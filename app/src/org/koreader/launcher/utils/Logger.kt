@@ -1,6 +1,9 @@
-package org.koreader.launcher
+package org.koreader.launcher.utils
 
 import android.util.Log
+
+import org.koreader.launcher.MainApp
+import org.koreader.launcher.BuildConfig
 
 /* wrapper on top of android.util.Log;
  *

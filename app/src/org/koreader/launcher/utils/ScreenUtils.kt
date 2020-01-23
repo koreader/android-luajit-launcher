@@ -1,4 +1,6 @@
-package org.koreader.launcher
+package org.koreader.launcher.utils
+
+import java.util.concurrent.CountDownLatch
 
 import android.app.Activity
 import android.graphics.Point
@@ -6,8 +8,6 @@ import android.graphics.Rect
 import android.os.Build
 import android.util.DisplayMetrics
 import android.view.WindowManager
-
-import java.util.concurrent.CountDownLatch
 
 internal object ScreenUtils {
     private const val TAG = "ScreenUtils"

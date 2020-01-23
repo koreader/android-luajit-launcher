@@ -1,4 +1,4 @@
-package org.koreader.launcher
+package org.koreader.launcher.utils
 
 import android.app.SearchManager
 import android.content.Intent
@@ -11,7 +11,7 @@ internal object IntentUtils {
      *
      * @param text to search
      * @param action associated to the package
-     * @param package that receives the query - null to show the app picker
+     * @param pkg - package that receives the query - null to show the app picker
      *
      * @return a Intent based on package/action ready to do a text lookup
      */

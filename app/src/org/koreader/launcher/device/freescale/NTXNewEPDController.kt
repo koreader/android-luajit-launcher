@@ -2,9 +2,9 @@
 
 package org.koreader.launcher.device.freescale
 
-import org.koreader.launcher.EPDController
+import org.koreader.launcher.interfaces.EPDInterface
 
-class NTXNewEPDController : NTXEPDController(), EPDController {
+class NTXNewEPDController : NTXEPDController(), EPDInterface {
     override fun setEpdMode(targetView: android.view.View,
                             mode: Int, delay: Long,
                             x: Int, y: Int, width: Int, height: Int, epdMode: String?)
