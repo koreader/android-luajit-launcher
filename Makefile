@@ -121,6 +121,20 @@ example: update clean build-luajit
 	mkdir -p bin/
 	find app/build/outputs/apk/ -type f -name '*.apk' -exec mv -v {} bin/ \;
 
+service: update
+	@echo "Building service release apk"
+	./gradlew service:AssembleDebug --warning-mode all
+	mkdir -p bin/
+	find service/build/outputs/apk/ -type f -name '*.apk' -exec mv -v {} bin/ \;
+	@echo "Service was built, type: release (unsigned)"
+
+service-test: update
+	@echo "Building service-test release apk"
+	./gradlew service-test:AssembleRelease --warning-mode all
+	mkdir -p bin/
+	find service-test/build/outputs/apk -type f -name '*.apk' -exec mv -v {} bin/ \;
+	@echo "Service-test was built, type: release (unsigned)"
+
 clean:
 	@echo "Cleaning binaries, assets and LuaJIT build"
 	rm -rf assets/module/ bin/ jni/luajit/build
