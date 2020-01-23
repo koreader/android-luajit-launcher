@@ -1,0 +1,44 @@
+apply plugin: 'com.android.application'
+
+android {
+    defaultConfig {
+        applicationId 'org.koreader.service'
+        minSdkVersion minSdk
+        targetSdkVersion safSdk
+        compileSdkVersion targetSdk
+        versionCode 1
+        versionName "0.1"
+    }
+    sourceSets {
+        main {
+            manifest.srcFile('manifest/service.xml')
+            aidl.srcDirs = ['../aidl']
+            java.srcDirs = ['src']
+            res.srcDirs = ['res']
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+
+    lintOptions {
+        disable 'ExportedService'
+        disable 'ExpiredTargetSdkVersion'
+        disable 'GoogleAppIndexingWarning'
+        disable 'UnsafeProtectedBroadcastReceiver'
+    }
+}
+
+dependencies {
+    // add Leak Canary on debug variants.
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.1'
+}
+
+repositories {
+    google()
+    jcenter()
+    mavenCentral()
+}

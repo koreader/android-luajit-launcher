@@ -1,0 +1,38 @@
+apply plugin: 'com.android.application'
+
+android {
+    defaultConfig {
+        applicationId "org.koreader.test"
+        minSdkVersion 15
+        targetSdkVersion targetSdk
+        compileSdkVersion targetSdk
+        versionCode 1
+        versionName "0.1"
+    }
+
+    sourceSets {
+        main {
+            manifest.srcFile('manifest/test_activity.xml')
+            aidl.srcDirs = ['../aidl']
+            java.srcDirs = ['src']
+            res.srcDirs = ['res']
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+}
+
+repositories {
+    google()
+    jcenter()
+    mavenCentral()
+}
+
+dependencies {
+    implementation "androidx.appcompat:appcompat:$androidx_core_version"
+    implementation "androidx.constraintlayout:constraintlayout:$androidx_constraintlayout_version"
+}
