@@ -30,9 +30,11 @@ android {
     sourceSets {
         main {
             manifest.srcFile('manifest/base.xml')
+            aidl.srcDirs = ['../aidl']
+            assets.srcDirs = [ '../assets' ]
             java.srcDirs = ['src']
             res.srcDirs = ['res']
-            assets.srcDirs = [ '../assets' ]
+
         }
         fullStorage {
             manifest.srcFile('manifest/full.xml')

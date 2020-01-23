@@ -1821,6 +1821,17 @@ local function run(android_app_state)
         end)
     end
 
+    android.isServiceAvailable = function()
+        android.DEBUG("checking service availability")
+        return JNI:context(android.app.activity.vm, function(JNI)
+            return JNI:callIntMethod(
+                android.app.activity.clazz,
+                "isServiceAvailable",
+                "()I"
+            ) == 1
+        end)
+    end
+
     android.getClipboardText = function()
         return JNI:context(android.app.activity.vm, function(JNI)
             local text = JNI:callObjectMethod(

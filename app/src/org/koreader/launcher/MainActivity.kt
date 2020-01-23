@@ -1,8 +1,8 @@
 package org.koreader.launcher
 
-import android.annotation.TargetApi
 import java.util.Locale
 
+import android.annotation.TargetApi
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -10,6 +10,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.os.RemoteException
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.View
@@ -18,13 +19,19 @@ import android.view.WindowManager
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 
+import org.koreader.launcher.device.EPDFactory
+import org.koreader.launcher.utils.FileUtils
+import org.koreader.launcher.utils.Logger
+import org.koreader.launcher.utils.SystemSettings
+
 /* MainActivity.java
  *
- * Implements e-ink updates
- * Implements WRITE_EXTERNAL_STORAGE/WRITE_SETTINGS permissions
+ * WRITE_EXTERNAL_STORAGE/WRITE_SETTINGS permissions
+ * SERVICE_COMMUNICATION
+ * custom timeouts
+ * e-ink updates
  *
  * Takes care of most activity callbacks that are view-aware.
- * It handles custom timeout based on activity state too.
  */
 
 @Suppress("ConstantConditionIf")
@@ -82,6 +89,14 @@ class MainActivity : BaseActivity() {
         }
     }
 
+    /*
+        Communication with the service, which lives on a different apk.
+        The service works as a opt-in extension and should be disabled by default,
+        but we need to keep track of its availability, even if we decide to ignore further communication.
+     */
+
+    private var extension: ServiceExtension? = null
+
     /*---------------------------------------------------------------
      *                        activity callbacks                    *
      *--------------------------------------------------------------*/
@@ -90,6 +105,7 @@ class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         Logger.d(TAG_MAIN, "onCreate()")
         super.onCreate(savedInstanceState)
+        extension = ServiceExtension(this)
         if ("freescale" == getEinkPlatform()) {
             Logger.v(TAG_MAIN, "onNativeSurfaceViewImpl()")
             view = NativeSurfaceView(this)
@@ -124,6 +140,7 @@ class MainActivity : BaseActivity() {
             val handler = Handler()
             handler.postDelayed({ setFullscreenLayout() }, 500)
         }
+        extension?.bind()
     }
 
     /* Called when another activity is taking focus. */
@@ -131,6 +148,7 @@ class MainActivity : BaseActivity() {
         Logger.d(TAG_MAIN, "onPause()")
         super.onPause()
         applyCustomTimeout(false)
+        extension?.unbind()
     }
 
     /* Called just before the activity is resumed by an intent
@@ -263,6 +281,14 @@ class MainActivity : BaseActivity() {
     override fun getSystemTimeout(): Int {
         // return last known value
         return systemTimeout
+    }
+
+    override fun isServiceAvailable(): Int {
+        return try {
+            extension?.enabled() ?: 0
+        } catch (re: RemoteException) {
+            0
+        }
     }
 
     override fun hasExternalStoragePermission(): Int {
