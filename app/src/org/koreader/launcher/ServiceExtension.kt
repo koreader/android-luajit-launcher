@@ -15,7 +15,7 @@ import org.koreader.launcher.utils.Logger
 private const val ID = "org.koreader.service"
 private const val TAG = "IPC Service"
 
-class ServiceExtension(): ServiceInterface {
+class ServiceExtension: ServiceInterface {
     private val intent = Intent().apply {
         action = ID
         setPackage(ID)
