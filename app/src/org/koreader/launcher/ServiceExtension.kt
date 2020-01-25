@@ -46,7 +46,7 @@ class ServiceExtension: ServiceInterface {
     }
 
     override fun enabled(): Int {
-        return if(isReady()) 1 else 0
+        return if (isReady()) 1 else 0
     }
 
     override fun status(): String {
