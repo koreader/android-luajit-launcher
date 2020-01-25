@@ -105,7 +105,6 @@ class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         Logger.d(TAG_MAIN, "onCreate()")
         super.onCreate(savedInstanceState)
-        extension = ServiceExtension(this)
         if ("freescale" == getEinkPlatform()) {
             Logger.v(TAG_MAIN, "onNativeSurfaceViewImpl()")
             view = NativeSurfaceView(this)
@@ -129,6 +128,9 @@ class MainActivity : BaseActivity() {
         }
 
         systemTimeout = SystemSettings.getSystemScreenOffTimeout(this)
+
+        extension = ServiceExtension()
+        extension?.bind(this@MainActivity)
     }
 
     /* Called when the activity has become visible. */
@@ -140,7 +142,6 @@ class MainActivity : BaseActivity() {
             val handler = Handler()
             handler.postDelayed({ setFullscreenLayout() }, 500)
         }
-        extension?.bind()
     }
 
     /* Called when another activity is taking focus. */
@@ -148,7 +149,7 @@ class MainActivity : BaseActivity() {
         Logger.d(TAG_MAIN, "onPause()")
         super.onPause()
         applyCustomTimeout(false)
-        extension?.unbind()
+        extension?.unbind(this@MainActivity)
     }
 
     /* Called just before the activity is resumed by an intent

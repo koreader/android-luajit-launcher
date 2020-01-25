@@ -15,9 +15,11 @@ import org.koreader.launcher.utils.Logger
 private const val ID = "org.koreader.service"
 private const val TAG = "IPC Service"
 
-class ServiceExtension(context: Context): ServiceInterface {
-    private var context = context.applicationContext
-    private var launched = false
+class ServiceExtension(): ServiceInterface {
+    private val intent = Intent().apply {
+        action = ID
+        setPackage(ID)
+    }
 
     private var remoteService: IService? = null
     private val conn: ServiceConnection = object : ServiceConnection {
@@ -31,21 +33,14 @@ class ServiceExtension(context: Context): ServiceInterface {
         }
     }
 
-    private val intent = Intent().apply {
-        action = ID
-        setPackage(ID)
-    }
-
-    override fun bind() {
-        Logger.d(TAG, "onBind()")
-        if (!launched) {
-            Logger.i(TAG, "onBind(): starting service")
+    override fun bind(context: Context) {
+        try {
             context.bindService(intent, conn, Service.BIND_AUTO_CREATE)
-            launched = true
+        } catch (e: SecurityException) {
+            e.printStackTrace()
         }
     }
-
-    override fun unbind() {
+    override fun unbind(context: Context) {
         Logger.d(TAG, "onUnbind()")
         context.unbindService(conn)
     }

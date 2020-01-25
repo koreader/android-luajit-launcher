@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="name">KO Service</string>
+    <string name="permissionId">Overlay</string>
+    <string name="permissionInfo">Fullscreen overlay, with dim and warmth controls</string>
 </resources>

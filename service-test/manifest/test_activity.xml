@@ -4,7 +4,7 @@
     package="org.koreader.dimclient"
     tools:ignore="GoogleAppIndexingWarning">
 
-    <permission android:name="org.koreader.service.EXTENSION" />
+    <permission android:name="org.koreader.permission.OVERLAY" />
 
     <application
         android:allowBackup="true"

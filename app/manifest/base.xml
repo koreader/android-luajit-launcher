@@ -10,7 +10,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
 
-    <permission android:name="org.koreader.service.EXTENSION" />
+    <permission android:name="org.koreader.permission.OVERLAY" />
 
     <application
         android:name=".MainApp"

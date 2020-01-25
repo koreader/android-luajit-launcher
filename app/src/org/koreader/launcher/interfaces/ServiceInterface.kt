@@ -1,11 +1,13 @@
 package org.koreader.launcher.interfaces
 
+import android.content.Context
+
 /* Declares methods that are described in aidl and implemented elsewhere */
 
 interface ServiceInterface {
-    /* local, to bind/unbind */
-    fun bind()
-    fun unbind()
+    /* local, to (un)bind */
+    fun bind(context: Context)
+    fun unbind(context: Context)
 
     /* from aidl */
     fun enabled(): Int

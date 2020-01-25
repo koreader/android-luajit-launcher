@@ -5,16 +5,30 @@
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
-    <application android:label="@string/name" android:icon="@mipmap/icon" android:allowBackup="false" >
+    <permission
+        android:name="org.koreader.permission.OVERLAY"
+        android:label="@string/permissionId"
+        android:description="@string/permissionInfo"
+        android:protectionLevel="signature" />
 
-        <receiver android:name="org.koreader.service.BootReceiver" android:exported="false">
-            <intent-filter><action android:name="android.intent.action.BOOT_COMPLETED"/></intent-filter>
+    <application
+        android:label="@string/name"
+        android:icon="@mipmap/icon"
+        android:allowBackup="false" >
+
+        <receiver
+            android:name="org.koreader.service.BootReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
         </receiver>
 
         <service android:name="org.koreader.service.Service"
-            android:exported="true"
-            android:permission="org.koreader.service.EXTENSION" >
-            <intent-filter><action android:name="org.koreader.service"/></intent-filter>
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="org.koreader.service"/>
+            </intent-filter>
         </service>
 
     </application>

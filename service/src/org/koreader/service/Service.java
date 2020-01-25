@@ -12,6 +12,8 @@ import android.os.IBinder;
 */
 
 public class Service extends android.app.Service {
+
+    // Public methods
     private Api binder;
 
     @Override
