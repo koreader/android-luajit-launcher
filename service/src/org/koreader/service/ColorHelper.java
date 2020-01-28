@@ -5,8 +5,8 @@ import android.annotation.SuppressLint;
 import java.util.HashMap;
 
 class ColorHelper {
-    private final static float NULL_ALPHA = 0.0f;
-    private final static int NULL_COLOR = 0x00000000;
+    final static float NULL_ALPHA = 0.0f;
+    final static int NULL_COLOR = 0x00000000;
     private final HashMap<Integer, Integer> warmthSteps;
     private final HashMap<Integer, Float> dimSteps;
 

@@ -37,10 +37,21 @@ class Overlay {
         windowManager.addView(dimView, getOverlayLayout());
         windowManager.addView(warmthView, getOverlayLayout());
 
+        resume();
+    }
+
+    void resume() {
         setDimAlpha(mDimAlpha);
         setDimBackground(mDimColor);
         setWarmthBackground(mWarmthColor);
         setWarmthAlpha(mWarmthAlpha);
+    }
+
+    void pause() {
+        setDimAlpha(ColorHelper.NULL_ALPHA);
+        setDimBackground(ColorHelper.NULL_COLOR);
+        setWarmthBackground(ColorHelper.NULL_COLOR);
+        setWarmthAlpha(ColorHelper.NULL_ALPHA);
     }
 
     void destroyOverlay() {

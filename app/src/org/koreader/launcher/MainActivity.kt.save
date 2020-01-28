@@ -285,15 +285,11 @@ class MainActivity : BaseActivity() {
     }
 
     override fun isServiceAvailable(): Int {
-        return extension?.enabled() ?: 0
-    }
-
-    override fun setScreenDim(dimLevel: Int) {
-        extension?.setDim(dimLevel)
-
-    }
-    override fun setScreenWarmth(warmthLevel: Int) {
-        extension?.setWarmth(warmthLevel)
+        return try {
+            extension?.enabled() ?: 0
+        } catch (re: RemoteException) {
+            0
+        }
     }
 
     override fun hasExternalStoragePermission(): Int {

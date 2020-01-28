@@ -70,13 +70,7 @@ class ServiceExtension: ServiceInterface {
 
     override fun setWarmthAlpha(alpha: Float) {
         if (!isReady()) return
-        remoteService?.let {
-            try {
-                it.setWarmthAlpha(alpha)
-            } catch (re: RemoteException) {
-                re.printStackTrace()
-            }
-        }
+        remoteService?.setWarmthAlpha(alpha)
     }
 
     private fun isReady(): Boolean {

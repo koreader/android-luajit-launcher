@@ -112,20 +112,35 @@ public class MainActivity extends Activity {
     public void onPause() {
         Log.d(TAG, "onPause()");
         super.onPause();
-        unbindService(conn);
+        if (remoteService != null) {
+            try {
+                remoteService.pause();
+            } catch (RemoteException re) {
+                re.printStackTrace();
+            }
+        }
+
     }
 
     @Override
     public void onResume() {
         Log.d(TAG, "onResume()");
         super.onResume();
+        if (remoteService != null) {
+            try {
+                remoteService.resume();
+            } catch (RemoteException re) {
+                re.printStackTrace();
+            }
+        }
         printConnectionDelayed(1000);
     }
 
     @Override
     public  void onDestroy() {
-        super.onDestroy();
+        unbindService(conn);
         Log.d(TAG, "onDestroy()");
+        super.onDestroy();
     }
 
     private void printConnectionDelayed(long millis) {

@@ -41,6 +41,12 @@ class Api extends IService.Stub {
     }
 
     @Override
+    public void resume() { overlay.resume(); }
+
+    @Override
+    public void pause() { overlay.pause(); }
+
+    @Override
     public void setDim(final int level) {
         runOnUiThread(new Runnable() {
             @Override

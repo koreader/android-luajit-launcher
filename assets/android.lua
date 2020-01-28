@@ -1668,6 +1668,31 @@ local function run(android_app_state)
         end)
     end
 
+    android.setScreenDim = function(dimLevel)
+        android.DEBUG("set screen warmth "..dimLevel)
+        JNI:context(android.app.activity.vm, function(JNI)
+            JNI:callVoidMethod(
+                android.app.activity.clazz,
+                "setScreenDim",
+                "(I)V",
+                ffi.new('int32_t', dimLevel)
+            )
+        end)
+    end
+
+    android.setScreenWarmth = function(warmthLevel)
+        android.DEBUG("set screen warmth "..warmthLevel)
+        JNI:context(android.app.activity.vm, function(JNI)
+            JNI:callVoidMethod(
+                android.app.activity.clazz,
+                "setScreenWarmth",
+                "(I)V",
+                ffi.new('int32_t', warmthLevel)
+            )
+        end)
+    end
+
+
     android.getBatteryLevel = function()
         return JNI:context(android.app.activity.vm, function(JNI)
             return JNI:callIntMethod(
