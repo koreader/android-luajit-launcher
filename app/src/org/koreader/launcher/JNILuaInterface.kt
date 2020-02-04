@@ -38,9 +38,9 @@ internal interface JNILuaInterface {
     fun isFullscreen(): Int
     fun isPackageEnabled(pkg: String): Int
     fun isPathInsideSandbox(path: String?): Int
-    fun isWifiEnabled(): Int
     fun needsWakelocks(): Int
     fun openLink(url: String): Int
+    fun openWifiSettings()
     fun performHapticFeedback(constant: Int)
     fun requestWriteSystemSettings()
     fun sendText(text: String?)
@@ -49,7 +49,6 @@ internal interface JNILuaInterface {
     fun setHapticOverride(enabled: Boolean)
     fun setScreenBrightness(brightness: Int)
     fun setScreenOffTimeout(timeout: Int)
-    fun setWifiEnabled(enabled: Boolean)
     fun startEPDTestActivity()
     fun showToast(message: String)
     fun showToast(message: String, longTimeout: Boolean)

@@ -10,9 +10,11 @@ import android.app.DownloadManager
 import android.app.NativeActivity
 import android.content.*
 import android.content.pm.PackageManager
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.net.Uri
-import android.net.wifi.WifiManager
 import android.os.*
+import android.provider.Settings
 import android.text.format.Formatter
 import android.view.Gravity
 import android.view.SurfaceHolder
@@ -38,6 +40,13 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
 
     companion object {
         private const val TAG = "BaseActivity"
+        private const val ACTIVE_NETWORK_NONE = 0
+        private const val ACTIVE_NETWORK_WIFI = 1
+        private const val ACTIVE_NETWORK_MOBILE = 2
+        private const val ACTIVE_NETWORK_ETHERNET = 3
+        private const val ACTIVE_NETWORK_BLUETOOTH = 4
+        private const val ACTIVE_NETWORK_VPN = 5
+
         private val BATTERY_FILTER = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
         private val PRODUCT = DeviceInfo.PRODUCT
         private val RUNTIME_VERSION = Build.VERSION.RELEASE
@@ -320,31 +329,78 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
         }
     }
 
-    override fun getNetworkInfo(): String {
-        val wifi: WifiManager? = applicationContext.getSystemService(
-            Context.WIFI_SERVICE) as? WifiManager
-        return if (wifi != null) {
-            val wi = wifi.connectionInfo
-            val dhcp = wifi.dhcpInfo
-            val ip = wi.ipAddress
-            val gw = dhcp.gateway
-            val ipAddress = formatIp(ip)
-            val gwAddress = formatIp(gw)
-            String.format(Locale.US, "%s;%s;%s", wi.ssid, ipAddress, gwAddress)
-        } else ""
-    }
-
-    override fun isWifiEnabled(): Int {
-        val wifi: WifiManager? = applicationContext.getSystemService(
-            Context.WIFI_SERVICE) as? WifiManager
-        return if (wifi?.isWifiEnabled == true) 1 else 0
-    }
-
     @Suppress("DEPRECATION")
-    override fun setWifiEnabled(enabled: Boolean) {
-        val wifi: WifiManager? = applicationContext.getSystemService(
-            Context.WIFI_SERVICE) as? WifiManager
-        wifi?.isWifiEnabled = enabled
+    override fun getNetworkInfo(): String {
+        val connectivityManager = this.getSystemService(Context.CONNECTIVITY_SERVICE)
+            as ConnectivityManager
+
+        var connectionType: Int = ACTIVE_NETWORK_NONE
+        val connected: Boolean =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                connectivityManager.activeNetwork?.let { net ->
+                    connectivityManager.getNetworkCapabilities(net)?.let {
+                        when {
+                            it.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> {
+                                connectionType = ACTIVE_NETWORK_WIFI
+                                true
+                            }
+                            it.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> {
+                                connectionType = ACTIVE_NETWORK_MOBILE
+                                true
+                            }
+                            it.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> {
+                                connectionType = ACTIVE_NETWORK_ETHERNET
+                                true
+                            }
+                            it.hasTransport(NetworkCapabilities.TRANSPORT_BLUETOOTH) -> {
+                                connectionType = ACTIVE_NETWORK_BLUETOOTH
+                                true
+                            }
+                            it.hasTransport(NetworkCapabilities.TRANSPORT_VPN) -> {
+                                connectionType = ACTIVE_NETWORK_VPN
+                                true
+                            }
+                            else -> false
+                        }
+                    } ?: false
+                } ?: false
+            } else {
+                connectivityManager.run {
+                    connectivityManager.activeNetworkInfo?.run {
+                        when (type) {
+                            ConnectivityManager.TYPE_WIFI -> {
+                                connectionType = ACTIVE_NETWORK_WIFI
+                                true
+                            }
+                            ConnectivityManager.TYPE_MOBILE -> {
+                                connectionType = ACTIVE_NETWORK_MOBILE
+                                true
+                            }
+                            ConnectivityManager.TYPE_ETHERNET -> {
+                                connectionType = ACTIVE_NETWORK_ETHERNET
+                                true
+                            }
+                            ConnectivityManager.TYPE_BLUETOOTH -> {
+                                connectionType = ACTIVE_NETWORK_BLUETOOTH
+                                true
+                            }
+                            ConnectivityManager.TYPE_VPN -> {
+                                connectionType = ACTIVE_NETWORK_VPN
+                                true
+                            }
+                            else -> false
+                        }
+                    }
+                } ?: false
+            }
+        return String.format(Locale.US, "%d;%d", if (connected) 1 else 0, connectionType)
+    }
+
+    override fun openWifiSettings() {
+        val intent = Intent().apply {
+            action = Settings.ACTION_WIFI_SETTINGS
+        }
+        startActivityIfSafe(intent)
     }
 
     /* package manager */
@@ -472,21 +528,6 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
                 }
                 holder.unlockCanvasAndPost(canvas)
             }
-        }
-    }
-
-    /* network */
-
-    /* Formatter.formatIpAddress is deprecated in API15 because
-       it does not support IPv6. Is still handy to format ip and
-       gateway addresses given by most LAN routers */
-
-    @Suppress("DEPRECATION")
-    private fun formatIp(number: Int): String {
-        return if (number > 0) {
-            Formatter.formatIpAddress(number)
-        } else {
-            number.toString()
         }
     }
 

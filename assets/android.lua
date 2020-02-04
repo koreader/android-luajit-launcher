@@ -334,6 +334,15 @@ enum {
     AHAPTIC_TEXT_HANDLE_MOVE = 9,
 };
 
+enum {
+    ANETWORK_NONE = 0,
+    ANETWORK_WIFI = 1,
+    ANETWORK_MOBILE = 2,
+    ANETWORK_ETHERNET = 3,
+    ANETWORK_BLUETOOTH = 4,
+    ANETWORK_VPN = 5,
+};
+
 int32_t AInputEvent_getType(const AInputEvent* event);
 int32_t AInputEvent_getDeviceId(const AInputEvent* event);
 int32_t AInputEvent_getSource(const AInputEvent* event);
@@ -1863,28 +1872,17 @@ local function run(android_app_state)
                 "getNetworkInfo",
                 "()Ljava/lang/String;"
             )
-            return string.match(JNI:to_string(network_info), "(.*);(.*);(.*)")
+            return string.match(JNI:to_string(network_info), "(.*);(.*)")
         end)
     end
 
-    android.isWifiEnabled = function()
-        return JNI:context(android.app.activity.vm, function(JNI)
-            return JNI:callIntMethod(
-                android.app.activity.clazz,
-                "isWifiEnabled",
-                "()I"
-            ) == 1
-        end)
-    end
-
-    android.setWifiEnabled = function(wifiEnabled)
-        android.DEBUG("setting wifi to: " .. tostring(wifiEnabled))
+    android.openWifiSettings = function()
+        android.DEBUG("open android settings")
         JNI:context(android.app.activity.vm, function(JNI)
             JNI:callVoidMethod(
                 android.app.activity.clazz,
-                "setWifiEnabled",
-                "(Z)V",
-                ffi.new("bool", wifiEnabled)
+                "openWifiSettings",
+                "()V"
             )
         end)
     end
