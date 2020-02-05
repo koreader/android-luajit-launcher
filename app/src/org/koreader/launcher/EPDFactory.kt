@@ -16,6 +16,7 @@ internal object EPDFactory {
                 DeviceInfo.EinkDevice.BOYUE_T61,
                 DeviceInfo.EinkDevice.BOYUE_T62,
                 DeviceInfo.EinkDevice.BOYUE_T80S,
+                DeviceInfo.EinkDevice.CREMA_0650L,
                 DeviceInfo.EinkDevice.ONYX_C67,
                 DeviceInfo.EinkDevice.ENERGY,
                 DeviceInfo.EinkDevice.INKBOOK -> {
