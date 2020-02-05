@@ -31,6 +31,7 @@ internal object DeviceInfo {
     private val BOYUE_K103: Boolean
     private val BOYUE_K78W: Boolean
     private val CREMA: Boolean
+    private val CREMA_0650L: Boolean
     private val ONYX_C67: Boolean
     private val ENERGY: Boolean
     private val INKBOOK: Boolean
@@ -55,6 +56,7 @@ internal object DeviceInfo {
         BOYUE_K103,
         BOYUE_K78W,
         CREMA,
+        CREMA_0650L,
         ONYX_C67,
         ENERGY,
         INKBOOK,
@@ -119,6 +121,10 @@ internal object DeviceInfo {
         // Crema Note (1010P)
         CREMA = BRAND.contentEquals("crema") && PRODUCT.contentEquals("note")
         deviceMap[EinkDevice.CREMA] = CREMA
+
+        // Crema Carta+
+        CREMA_0650L = BRAND.contentEquals("crema") && PRODUCT.contentEquals("keplerb")
+        deviceMap[EinkDevice.CREMA_0650L] = CREMA_0650L
 
         // Onyx C67
         ONYX_C67 = (MANUFACTURER.contentEquals("onyx")
@@ -191,6 +197,7 @@ internal object DeviceInfo {
                 BOYUE_T103D ||
                 BOYUE_K103 ||
                 BOYUE_K78W ||
+                CREMA_0650L ||
                 ENERGY ||
                 INKBOOK ||
                 ONYX_C67
