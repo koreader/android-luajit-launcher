@@ -1,11 +1,11 @@
-package org.koreader.launcher
+package org.koreader.launcher.utils
 
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.provider.Settings
 
-internal object SystemSettings {
+object SystemSettings {
     private const val TAG = "SystemSettings"
 
     fun canWrite(context: Context): Boolean {

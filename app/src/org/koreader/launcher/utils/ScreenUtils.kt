@@ -1,4 +1,4 @@
-package org.koreader.launcher
+package org.koreader.launcher.utils
 
 import android.app.Activity
 import android.graphics.Point
@@ -9,7 +9,7 @@ import android.view.WindowManager
 
 import java.util.concurrent.CountDownLatch
 
-internal object ScreenUtils {
+object ScreenUtils {
     private const val TAG = "ScreenUtils"
     private const val BRIGHTNESS_MAX = 255
 

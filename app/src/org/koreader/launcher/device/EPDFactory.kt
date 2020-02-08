@@ -1,16 +1,18 @@
 /* generic EPD Controller for Android devices,
  * based on https://github.com/unwmun/refreshU */
 
-package org.koreader.launcher
+package org.koreader.launcher.device
 
 import java.util.Locale
 
 import org.koreader.launcher.device.rockchip.RK3026EPDController
 import org.koreader.launcher.device.rockchip.RK3368EPDController
 import org.koreader.launcher.device.freescale.NTXNewEPDController
+import org.koreader.launcher.interfaces.EPDInterface
+import org.koreader.launcher.utils.Logger
 
-internal object EPDFactory {
-    val epdController: EPDController
+object EPDFactory {
+    val epdController: EPDInterface
         get() {
             return when (DeviceInfo.EINK) {
                 DeviceInfo.EinkDevice.BOYUE_T61,
@@ -47,7 +49,7 @@ internal object EPDFactory {
         Logger.i(String.format(Locale.US,
             "[EPDFactory]: Using %s EPD Controller", name))
     }
-    private class FakeEPDController : EPDController {
+    private class FakeEPDController : EPDInterface {
         override fun setEpdMode(targetView: android.view.View,
                                 mode: Int, delay: Long,
                                 x: Int, y: Int, width: Int, height: Int, epdMode: String?) {

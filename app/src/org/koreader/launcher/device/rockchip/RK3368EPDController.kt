@@ -3,9 +3,9 @@
 
 package org.koreader.launcher.device.rockchip
 
-import org.koreader.launcher.EPDController
+import org.koreader.launcher.interfaces.EPDInterface
 
-class RK3368EPDController : RK33xxEPDController(), EPDController {
+class RK3368EPDController : RK33xxEPDController(), EPDInterface {
     override fun setEpdMode(targetView: android.view.View,
                             mode: Int, delay: Long,
                             x: Int, y: Int, width: Int, height: Int, epdMode: String?)

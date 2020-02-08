@@ -1,4 +1,4 @@
-package org.koreader.launcher
+package org.koreader.launcher.utils
 
 import java.io.BufferedReader
 import java.io.File
@@ -15,7 +15,7 @@ import android.content.Context
 
 /* Utils to extract compressed assets from the asset loader */
 
-internal object AssetsUtils {
+object AssetsUtils {
     private const val TAG = "AssetsUtils"
     private const val BASE_BUFFER_SIZE = 1024
 
