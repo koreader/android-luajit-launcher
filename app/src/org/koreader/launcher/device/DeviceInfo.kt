@@ -4,12 +4,12 @@
  * Note: devices don't need to be declared here unless
  * they have known e-ink update routines and/or bug workarounds. */
 
-package org.koreader.launcher
+package org.koreader.launcher.device
 
 import android.os.Build
 import java.util.*
 
-internal object DeviceInfo {
+object DeviceInfo {
 
     val PRODUCT: String
     val EINK_FREESCALE: Boolean

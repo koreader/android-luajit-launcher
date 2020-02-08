@@ -1,4 +1,4 @@
-package org.koreader.launcher
+package org.koreader.launcher.utils
 
 import java.io.File
 import java.io.FileOutputStream
@@ -14,7 +14,9 @@ import android.os.ParcelFileDescriptor
 import android.provider.MediaStore
 import android.system.Os
 
-internal object FileUtils {
+import org.koreader.launcher.MainApp
+
+object FileUtils {
     const val TAG = "FileUtils"
 
     /**
@@ -41,15 +43,19 @@ internal object FileUtils {
 
     fun getPathFromUri(context: Context, uri: Uri?): String? {
         return uri?.let { contentUri ->
-            if (ContentResolver.SCHEME_FILE == contentUri.scheme) {
-                contentUri.path?.let { filePath -> File(filePath) }?.absolutePath
-            } else if (ContentResolver.SCHEME_CONTENT == contentUri.scheme) {
-                uri.authority?.let { domain ->
-                    Logger.v(TAG, "trying to resolve a file path from content delivered by $domain")
+            when {
+                ContentResolver.SCHEME_FILE == contentUri.scheme -> {
+                    contentUri.path?.let { filePath -> File(filePath) }?.absolutePath
                 }
-                val fd = context.contentResolver.openFileDescriptor(contentUri, "r")
-                getFileDescriptorPath(fd)
-            } else null
+                ContentResolver.SCHEME_CONTENT == contentUri.scheme -> {
+                    uri.authority?.let { domain ->
+                        Logger.v(TAG, "trying to resolve a file path from content delivered by $domain")
+                    }
+                    val fd = context.contentResolver.openFileDescriptor(contentUri, "r")
+                    getFileDescriptorPath(fd)
+                }
+                else -> null
+            }
         }
     }
 

@@ -1,6 +1,9 @@
-package org.koreader.launcher
+package org.koreader.launcher.utils
 
 import android.util.Log
+
+import org.koreader.launcher.BuildConfig
+import org.koreader.launcher.MainApp
 
 /* wrapper on top of android.util.Log;
  *
@@ -8,7 +11,7 @@ import android.util.Log
  * Discards DEBUG messages on release builds.
  */
 
-internal object Logger {
+object Logger {
     private enum class LogLevel { VERBOSE, DEBUG, INFO, WARNING, ERROR }
 
     fun e(message: String) {

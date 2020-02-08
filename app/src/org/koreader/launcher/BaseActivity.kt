@@ -15,7 +15,6 @@ import android.net.NetworkCapabilities
 import android.net.Uri
 import android.os.*
 import android.provider.Settings
-import android.text.format.Formatter
 import android.view.Gravity
 import android.view.SurfaceHolder
 import android.view.ViewGroup
@@ -24,6 +23,14 @@ import android.widget.Toast
 
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+
+import org.koreader.launcher.device.DeviceInfo
+import org.koreader.launcher.interfaces.JNILuaInterface
+import org.koreader.launcher.utils.AssetsUtils
+import org.koreader.launcher.utils.IntentUtils
+import org.koreader.launcher.utils.Logger
+import org.koreader.launcher.utils.ScreenUtils
+import org.koreader.launcher.utils.SystemSettings
 
 /* BaseActivity.java - convenience wrapper on top of NativeActivity that
  * implements most of the kotlin/java methods exposed to lua. */
@@ -144,13 +151,14 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
     override fun extractAssets(): Int {
         val output = filesDir.absolutePath
         val check = try {
+            // check if the app has zipped assets
             val zipFile = AssetsUtils.getZipFromAsset(this)
             if (zipFile != null) {
                 var ok = true
                 Logger.i("Check file in asset module: $zipFile")
                 // upgrade or downgrade files from zip
                 if (!AssetsUtils.isSameVersion(this, zipFile)) {
-                    showProgress() // spinning circle starts
+                    showProgress() // show progress dialog (animated dots)
                     val startTime = System.nanoTime()
                     Logger.i("Installing new package to $output")
                     val stream = assets.open("module/$zipFile")
@@ -158,7 +166,7 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
                     val endTime = System.nanoTime()
                     val elapsedTime = endTime - startTime
                     Logger.v("update installed in " + elapsedTime / 1000000000 + " seconds")
-                    dismissProgress() // spinning circle stops
+                    dismissProgress() // dismiss progress dialog
                 }
                 if (ok) 1 else 0
             } else {
@@ -320,12 +328,12 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
 
         /* Try to download the request. This *should* not fail, but it fails
            on some AOSP devices that don't need to pass google CTS. */
-        try {
+        return try {
             manager?.enqueue(request)
-            return 0
+            0
         } catch (e: Exception) {
             e.printStackTrace()
-            return -1
+            -1
         }
     }
 

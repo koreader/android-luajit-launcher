@@ -18,6 +18,11 @@ import android.view.WindowManager
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 
+import org.koreader.launcher.device.EPDFactory
+import org.koreader.launcher.utils.FileUtils
+import org.koreader.launcher.utils.Logger
+import org.koreader.launcher.utils.SystemSettings
+
 /* MainActivity.java
  *
  * Implements e-ink updates
