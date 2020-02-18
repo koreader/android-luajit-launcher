@@ -131,6 +131,7 @@ class MainActivity : BaseActivity() {
         Logger.d(TAG_MAIN, "onPause()")
         super.onPause()
         applyCustomTimeout(false)
+        setIntent(null)
     }
 
     /* Called just before the activity is resumed by an intent
