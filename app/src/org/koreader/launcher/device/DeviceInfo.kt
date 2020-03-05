@@ -24,6 +24,7 @@ object DeviceInfo {
     private val DEVICE: String
     private val BOYUE_T61: Boolean
     private val BOYUE_T62: Boolean
+    private val BOYUE_T65S: Boolean
     private val BOYUE_T80S: Boolean
     private val BOYUE_T80D: Boolean
     private val BOYUE_T78D: Boolean
@@ -49,6 +50,7 @@ object DeviceInfo {
         UNKNOWN,
         BOYUE_T61,
         BOYUE_T62,
+        BOYUE_T65S,
         BOYUE_T80S,
         BOYUE_T80D,
         BOYUE_T78D,
@@ -93,6 +95,10 @@ object DeviceInfo {
                 && (PRODUCT.startsWith("t61") || MODEL.contentEquals("rk30sdk"))
                 && DEVICE.startsWith("t61"))
         deviceMap[EinkDevice.BOYUE_T61] = BOYUE_T61
+
+        // Boyue/JDRead T65S
+        BOYUE_T65S = BRAND.contentEquals("boyue") && PRODUCT.contentEquals("t65s")
+        deviceMap[EinkDevice.BOYUE_T65S] = BOYUE_T65S
 
         // Boyue Likebook Plus
         BOYUE_T80S = IS_BOYUE && PRODUCT.contentEquals("t80s")
@@ -184,23 +190,24 @@ object DeviceInfo {
 
         // freescale epd driver
         EINK_FREESCALE =
+            BOYUE_T65S ||
             CREMA ||
-                TOLINO ||
-                NOOK_V520
+            TOLINO ||
+            NOOK_V520
 
         // rockchip epd driver
         EINK_ROCKCHIP =
             BOYUE_T61 ||
-                BOYUE_T62 ||
-                BOYUE_T78D ||
-                BOYUE_T80D ||
-                BOYUE_T103D ||
-                BOYUE_K103 ||
-                BOYUE_K78W ||
-                CREMA_0650L ||
-                ENERGY ||
-                INKBOOK ||
-                ONYX_C67
+            BOYUE_T62 ||
+            BOYUE_T78D ||
+            BOYUE_T80D ||
+            BOYUE_T103D ||
+            BOYUE_K103 ||
+            BOYUE_K78W ||
+            CREMA_0650L ||
+            ENERGY ||
+            INKBOOK ||
+            ONYX_C67
 
         // basic eink support
         EINK_SUPPORT = EINK_FREESCALE || EINK_ROCKCHIP
