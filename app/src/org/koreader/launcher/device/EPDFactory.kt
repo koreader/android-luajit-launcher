@@ -33,6 +33,7 @@ object EPDFactory {
                     logController("Rockchip RK3368")
                     RK3368EPDController()
                 }
+                DeviceInfo.EinkDevice.BOYUE_T65S,
                 DeviceInfo.EinkDevice.CREMA,
                 DeviceInfo.EinkDevice.TOLINO,
                 DeviceInfo.EinkDevice.NOOK_V520 -> {
