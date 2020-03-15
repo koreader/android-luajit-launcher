@@ -2,7 +2,6 @@ ifdef ANDROID_ARCH
 	ifeq ($(ANDROID_ARCH), x86)
 		ANDROID_FULL_ARCH?=$(ANDROID_ARCH)
 		ARCH?=X86
-		ARCH_VERSION?=2
 	endif
 endif
 
@@ -15,7 +14,6 @@ endif
 # Default is build for arm
 ANDROID_FULL_ARCH?=armeabi-v7a
 ARCH?=Arm
-ARCH_VERSION?=1
 STORAGE_MODEL?=FullStorage
 
 GRADLE_TASK?=assemble$(ARCH)$(STORAGE_MODEL)
@@ -49,7 +47,7 @@ endif
 
 # override android:versionCode="integer"
 ifdef ANDROID_VERSION
-	VERSION?=$(ARCH_VERSION)$(ANDROID_VERSION)
+	VERSION?=$(ANDROID_VERSION)
 endif
 
 # support different app names
