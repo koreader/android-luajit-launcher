@@ -157,7 +157,8 @@ object DeviceInfo {
 
         // Nook Glowlight 3 et al.
         NOOK_V520 = (MANUFACTURER.contentEquals("barnesandnoble") || MANUFACTURER.contentEquals("freescale"))
-                && (MODEL.contentEquals("bnrv510") || MODEL.contentEquals("bnrv520") || MODEL.contentEquals("bnrv700") || MODEL.startsWith("ereader"))
+                && (MODEL.contentEquals("bnrv510") || MODEL.contentEquals("bnrv520") || MODEL.contentEquals("bnrv700")
+                || MODEL.contentEquals("evk_mx6sl") || MODEL.startsWith("ereader"))
         deviceMap[EinkDevice.NOOK_V520] = NOOK_V520
 
         // Sony DPT-RP1
