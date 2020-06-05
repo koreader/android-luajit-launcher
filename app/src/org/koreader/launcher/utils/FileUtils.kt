@@ -69,7 +69,7 @@ object FileUtils {
      */
 
     private fun getFileDescriptorPath(pfd: ParcelFileDescriptor?): String? {
-        return pfd?.let { parcel ->
+        return pfd?.use { parcel ->
             try {
                 val file = File("/proc/self/fd/" + parcel.fd)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
