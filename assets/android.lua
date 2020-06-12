@@ -1593,6 +1593,17 @@ local function run(android_app_state)
         end)
     end
 
+    android.setIgnoreInput = function(enable)
+        JNI:context(android.app.activity.vm, function(JNI)
+            JNI:callVoidMethod(
+                android.app.activity.clazz,
+                "setIgnoreInput",
+                "(Z)V",
+                ffi.new("bool", enable)
+            )
+        end)
+    end
+
     -- properties that don't change during the execution of the program.
     android.prop = {}
 
