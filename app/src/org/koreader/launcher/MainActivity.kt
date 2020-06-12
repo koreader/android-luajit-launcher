@@ -223,6 +223,17 @@ class MainActivity : BaseActivity() {
         return if (SystemSettings.canWrite(this)) 1 else 0
     }
 
+    /* ignore input toggle */
+    override fun setIgnoreInput(enable: Boolean) {
+        runOnUiThread {
+            if (enable) {
+                window.addFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+            } else {
+                window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+            }
+        }
+    }
+
     // update the entire screen (rockchip)
     override fun einkUpdate(mode: Int) {
         val modeName = when (mode) {

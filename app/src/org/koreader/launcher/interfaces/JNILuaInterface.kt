@@ -47,6 +47,7 @@ interface JNILuaInterface {
     fun setFullscreen(enabled: Boolean)
     fun setClipboardText(text: String)
     fun setHapticOverride(enabled: Boolean)
+    fun setIgnoreInput(enabled: Boolean)
     fun setScreenBrightness(brightness: Int)
     fun setScreenOffTimeout(timeout: Int)
     fun startEPDTestActivity()
