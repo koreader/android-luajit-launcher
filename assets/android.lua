@@ -1514,6 +1514,7 @@ local function run(android_app_state)
     -- ignore some events
     android.input.ignore_touchscreen = false
     android.input.ignore_volume_keys = false
+    android.input.ignore_back_button = false
 
     android.getVolumeKeysIgnored = function()
         return android.input.ignore_volume_keys
@@ -1521,6 +1522,14 @@ local function run(android_app_state)
 
     android.setVolumeKeysIgnored = function(ignored)
         android.input.ignore_volume_keys = ignored
+    end
+
+    android.isBackButtonIgnored = function()
+        return android.input.ignore_back_button
+    end
+
+    android.setBackButtonIgnored = function(ignored)
+        android.input.ignore_back_button = ignored
     end
 
     android.isTouchscreenIgnored = function()
