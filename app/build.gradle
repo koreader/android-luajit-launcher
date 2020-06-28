@@ -40,9 +40,15 @@ android {
         jailedStorage {
             manifest.srcFile('manifest/jailed.xml')
         }
+        portrait {
+            manifest.srcFile('manifest/portrait.xml')
+        }
+        landscape {
+            manifest.srcFile('manifest/landscape.xml')
+        }
     }
 
-    flavorDimensions 'abi', 'storageModel'
+    flavorDimensions 'abi', 'storageModel', 'ui'
     productFlavors {
         x86 {
             ndk { abiFilters "x86" }
@@ -62,6 +68,13 @@ android {
             targetSdkVersion latestSdk
             compileSdkVersion latestSdk
             buildConfigField 'boolean', 'legacy_storage', 'false'
+        }
+        portrait {
+            dimension = 'ui'
+        }
+        landscape {
+            dimension = 'ui'
+            minSdkVersion tvSdk
         }
     }
 

@@ -11,12 +11,19 @@ ifdef JAILED
 	endif
 endif
 
+ifdef LANDSCAPE
+	ifeq ($(LANDSCAPE), 1)
+		UI=Landscape
+	endif
+endif
+
 # Default is build for arm
 ANDROID_FULL_ARCH?=armeabi-v7a
 ARCH?=Arm
 STORAGE_MODEL?=FullStorage
+UI?=Portrait
 
-GRADLE_TASK?=assemble$(ARCH)$(STORAGE_MODEL)
+GRADLE_TASK?=assemble$(ARCH)$(STORAGE_MODEL)$(UI)
 
 # find the path where the SDK is installed
 ifdef SDK

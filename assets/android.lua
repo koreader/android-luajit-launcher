@@ -1717,6 +1717,16 @@ local function run(android_app_state)
         end)
     end
 
+    android.isTv = function()
+        return JNI:context(android.app.activity.vm, function(JNI)
+            return JNI:callIntMethod(
+                android.app.activity.clazz,
+                "isTv",
+                "()I"
+            ) == 1
+        end)
+    end
+
     android.isFullscreen = function()
         return JNI:context(android.app.activity.vm, function(JNI)
             return JNI:callIntMethod(

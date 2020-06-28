@@ -5,6 +5,7 @@ buildscript {
     ext.androidx_supportv4_version = '1.0.0'
     ext.minSdk = 14
     ext.safSdk = 19
+    ext.tvSdk = 21
     ext.targetSdk = 28
     ext.latestSdk = 29
 

@@ -5,6 +5,8 @@ import java.io.File
 import android.app.ActivityManager
 import android.content.Context
 import android.content.pm.ApplicationInfo
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Environment
 import android.os.StrictMode
 import android.util.Log
@@ -18,6 +20,8 @@ class MainApp : android.app.Application() {
         lateinit var name: String
             private set
         lateinit var storage_path: String
+            private set
+        var isTv: Boolean = false
             private set
 
         private const val UNKNOWN_STRING = "Unknown"
@@ -87,6 +91,10 @@ class MainApp : android.app.Application() {
             if (ai.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0) debuggable = true
             if (ai.flags and ApplicationInfo.FLAG_SYSTEM == 1) is_system_app = true
             if (ai.flags and ApplicationInfo.FLAG_LARGE_HEAP != 0) large_heap = true
+
+            if ((Build.VERSION.SDK_INT >= 21) && pm.hasSystemFeature(PackageManager.FEATURE_LEANBACK)) {
+                isTv = true
+            }
 
             managed_heap = getManagedMemory(am)
         } catch (e: Exception) {

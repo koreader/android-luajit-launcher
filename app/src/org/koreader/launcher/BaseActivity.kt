@@ -462,6 +462,10 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
         return ScreenUtils.getStatusBarHeight(this)
     }
 
+    override fun isTv(): Int {
+        return if (MainApp.isTv) 1 else 0
+    }
+
     override fun isFullscreen(): Int {
         return if (Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR2 ||
             Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR1) {

@@ -95,7 +95,7 @@ class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         Logger.d(TAG_MAIN, "onCreate()")
         super.onCreate(savedInstanceState)
-        if ("freescale" == getEinkPlatform()) {
+        if ("freescale" == getEinkPlatform() || MainApp.isTv) {
             Logger.v(TAG_MAIN, "onNativeSurfaceViewImpl()")
             view = NativeSurfaceView(this)
             window.takeSurface(null)
