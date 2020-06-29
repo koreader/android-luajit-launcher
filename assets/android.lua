@@ -1340,9 +1340,9 @@ local function run(android_app_state)
     android.app = ffi.cast("struct android_app*", android_app_state)
 
     android.dir, android.nativeLibraryDir =
-        JNI:context(android.app.activity.vm, function(JNI)
-            local files_dir = JNI:callObjectMethod(
-                JNI:callObjectMethod(
+        JNI:context(android.app.activity.vm, function(jni)
+            local files_dir = jni:callObjectMethod(
+                jni:callObjectMethod(
                     android.app.activity.clazz,
                     "getFilesDir",
                     "()Ljava/io/File;"
@@ -1350,16 +1350,16 @@ local function run(android_app_state)
                 "getAbsolutePath",
                 "()Ljava/lang/String;"
             )
-            local app_info = JNI:getObjectField(
-                JNI:callObjectMethod(
-                    JNI:callObjectMethod(
+            local app_info = jni:getObjectField(
+                jni:callObjectMethod(
+                    jni:callObjectMethod(
                         android.app.activity.clazz,
                         "getPackageManager",
                         "()Landroid/content/pm/PackageManager;"
                     ),
                     "getPackageInfo",
                     "(Ljava/lang/String;I)Landroid/content/pm/PackageInfo;",
-                    JNI:callObjectMethod(
+                    jni:callObjectMethod(
                         android.app.activity.clazz,
                         "getPackageName",
                         "()Ljava/lang/String;"
@@ -1370,13 +1370,13 @@ local function run(android_app_state)
                 "Landroid/content/pm/ApplicationInfo;"
             )
             return
-                JNI:to_string(files_dir),
-                JNI:to_string(JNI:getObjectField(app_info, "nativeLibraryDir", "Ljava/lang/String;"))
+                jni:to_string(files_dir),
+                jni:to_string(jni:getObjectField(app_info, "nativeLibraryDir", "Ljava/lang/String;"))
         end)
 
     android.extractAssets = function()
-        return JNI:context(android.app.activity.vm, function(JNI)
-            return JNI:callIntMethod(
+        return JNI:context(android.app.activity.vm, function(jni)
+            return jni:callIntMethod(
                 android.app.activity.clazz,
                 "extractAssets",
                 "()I"
@@ -1385,67 +1385,67 @@ local function run(android_app_state)
     end
 
     android.getIntent = function()
-        return JNI:context(android.app.activity.vm, function(JNI)
-            local path = JNI:callObjectMethod(
+        return JNI:context(android.app.activity.vm, function(jni)
+            local path = jni:callObjectMethod(
                 android.app.activity.clazz,
                 "getFilePathFromIntent",
                 "()Ljava/lang/String;"
             )
             if path ~= nil then
-                return JNI:to_string(path)
+                return jni:to_string(path)
             end
         end)
     end
 
     android.getExternalStoragePath = function()
-        return JNI:context(android.app.activity.vm, function(JNI)
-            local external_path = JNI:callObjectMethod(
+        return JNI:context(android.app.activity.vm, function(jni)
+            local external_path = jni:callObjectMethod(
                 android.app.activity.clazz,
                 "getExternalPath",
                 "()Ljava/lang/String;"
             )
-            return JNI:to_string(external_path)
+            return jni:to_string(external_path)
         end)
     end
 
     android.importFile = function(path)
-        return JNI:context(android.app.activity.vm, function(JNI)
-            local import_path = JNI.env[0].NewStringUTF(JNI.env, path)
-            local ok = JNI:callIntMethod(
+        return JNI:context(android.app.activity.vm, function(jni)
+            local import_path = jni.env[0].NewStringUTF(jni.env, path)
+            local ok = jni:callIntMethod(
                 android.app.activity.clazz,
                 "safFilePicker",
                 "(Ljava/lang/String;)I",
                 import_path
             ) == 1
-            JNI.env[0].DeleteLocalRef(JNI.env, import_path)
+            jni.env[0].DeleteLocalRef(jni.env, import_path)
             return ok
         end)
     end
 
     android.getLastImportedPath = function()
-        return JNI:context(android.app.activity.vm, function(JNI)
+        return JNI:context(android.app.activity.vm, function(jni)
             -- get last imported file path
-            local path = JNI:callObjectMethod(
+            local path = jni:callObjectMethod(
                 android.app.activity.clazz,
                 "getLastImportedPath",
                 "()Ljava/lang/String;"
             )
             if path ~= nil then
-                return JNI:to_string(path)
+                return jni:to_string(path)
             end
         end)
     end
 
     android.isPathInsideSandbox = function(path)
-        return JNI:context(android.app.activity.vm, function(JNI)
-            local import_path = JNI.env[0].NewStringUTF(JNI.env, path)
-            local ok = JNI:callIntMethod(
+        return JNI:context(android.app.activity.vm, function(jni)
+            local import_path = jni.env[0].NewStringUTF(jni.env, path)
+            local ok = jni:callIntMethod(
                 android.app.activity.clazz,
                 "isPathInsideSandbox",
                 "(Ljava/lang/String;)I",
                 import_path
             ) == 1
-            JNI.env[0].DeleteLocalRef(JNI.env, import_path)
+            jni.env[0].DeleteLocalRef(jni.env, import_path)
             return ok
         end)
     end
@@ -1453,54 +1453,54 @@ local function run(android_app_state)
     --- Device identification.
     -- @treturn string product
     android.getProduct = function()
-        return JNI:context(android.app.activity.vm, function(JNI)
-            local product = JNI:callObjectMethod(
+        return JNI:context(android.app.activity.vm, function(jni)
+            local product = jni:callObjectMethod(
                 android.app.activity.clazz,
                 "getProduct",
                 "()Ljava/lang/String;"
             )
-            return JNI:to_string(product) or "unknown"
+            return jni:to_string(product) or "unknown"
         end)
     end
 
     android.getVersion =  function()
-        return JNI:context(android.app.activity.vm, function(JNI)
-            local version = JNI:callObjectMethod(
+        return JNI:context(android.app.activity.vm, function(jni)
+            local version = jni:callObjectMethod(
                 android.app.activity.clazz,
                 "getVersion",
                 "()Ljava/lang/String;"
             )
-            return JNI:to_string(version) or ""
+            return jni:to_string(version) or ""
         end)
     end
 
     --- Build identification.
     -- @treturn string flavor
     android.getFlavor = function()
-        return JNI:context(android.app.activity.vm, function(JNI)
-            local flavor = JNI:callObjectMethod(
+        return JNI:context(android.app.activity.vm, function(jni)
+            local flavor = jni:callObjectMethod(
                 android.app.activity.clazz,
                 "getFlavor",
                 "()Ljava/lang/String;"
             )
-            return JNI:to_string(flavor)
+            return jni:to_string(flavor)
         end)
     end
 
     android.getName = function()
-        return JNI:context(android.app.activity.vm, function(JNI)
-            local name = JNI:callObjectMethod(
+        return JNI:context(android.app.activity.vm, function(jni)
+            local name = jni:callObjectMethod(
                 android.app.activity.clazz,
                 "getName",
                 "()Ljava/lang/String;"
             )
-            return JNI:to_string(name)
+            return jni:to_string(name)
         end)
     end
 
     android.isDebuggable = function()
-        return JNI:context(android.app.activity.vm, function(JNI)
-            return JNI:callIntMethod(
+        return JNI:context(android.app.activity.vm, function(jni)
+            return jni:callIntMethod(
                 android.app.activity.clazz,
                 "isDebuggable",
                 "()I"
@@ -1547,8 +1547,8 @@ local function run(android_app_state)
     android.timeout.set = function(timeout)
         if type(timeout) == "number" then
             android.timeout.app = timeout
-            JNI:context(android.app.activity.vm, function(JNI)
-                JNI:callVoidMethod(
+            JNI:context(android.app.activity.vm, function(jni)
+                jni:callVoidMethod(
                     android.app.activity.clazz,
                     "setScreenOffTimeout",
                     "(I)V",
@@ -1561,8 +1561,8 @@ local function run(android_app_state)
     -- system settings
     android.settings = {}
     android.settings.canWrite = function()
-        return JNI:context(android.app.activity.vm, function(JNI)
-            return JNI:callIntMethod(
+        return JNI:context(android.app.activity.vm, function(jni)
+            return jni:callIntMethod(
                 android.app.activity.clazz,
                 "canWriteSystemSettings",
                 "()I"
@@ -1571,8 +1571,8 @@ local function run(android_app_state)
     end
 
     android.settings.requestWritePermission = function()
-        JNI:context(android.app.activity.vm, function(JNI)
-            JNI:callVoidMethod(
+        JNI:context(android.app.activity.vm, function(jni)
+            jni:callVoidMethod(
                 android.app.activity.clazz,
                 "requestWriteSystemSettings",
                 "()V"
@@ -1581,8 +1581,8 @@ local function run(android_app_state)
     end
 
     android.hapticFeedback = function(type)
-        JNI:context(android.app.activity.vm, function(JNI)
-            JNI:callVoidMethod(
+        JNI:context(android.app.activity.vm, function(jni)
+            jni:callVoidMethod(
                 android.app.activity.clazz,
                 "performHapticFeedback",
                 "(I)V",
@@ -1592,8 +1592,8 @@ local function run(android_app_state)
     end
 
     android.setHapticOverride = function(enable)
-        JNI:context(android.app.activity.vm, function(JNI)
-            JNI:callVoidMethod(
+        JNI:context(android.app.activity.vm, function(jni)
+            jni:callVoidMethod(
                 android.app.activity.clazz,
                 "setHapticOverride",
                 "(Z)V",
@@ -1603,8 +1603,8 @@ local function run(android_app_state)
     end
 
     android.setIgnoreInput = function(enable)
-        JNI:context(android.app.activity.vm, function(JNI)
-            JNI:callVoidMethod(
+        JNI:context(android.app.activity.vm, function(jni)
+            jni:callVoidMethod(
                 android.app.activity.clazz,
                 "setIgnoreInput",
                 "(Z)V",
@@ -1638,8 +1638,8 @@ local function run(android_app_state)
     --- Gets screen width.
     -- @treturn int screen width
     android.getScreenWidth = function()
-        return JNI:context(android.app.activity.vm, function(JNI)
-            return JNI:callIntMethod(
+        return JNI:context(android.app.activity.vm, function(jni)
+            return jni:callIntMethod(
                 android.app.activity.clazz,
                 "getScreenWidth",
                 "()I"
@@ -1650,8 +1650,8 @@ local function run(android_app_state)
     --- Gets screen height.
     -- @treturn int screen height
     android.getScreenHeight = function()
-        return JNI:context(android.app.activity.vm, function(JNI)
-            return JNI:callIntMethod(
+        return JNI:context(android.app.activity.vm, function(jni)
+            return jni:callIntMethod(
                 android.app.activity.clazz,
                 "getScreenHeight",
                 "()I"
@@ -1660,8 +1660,8 @@ local function run(android_app_state)
     end
 
     android.getScreenAvailableHeight = function()
-        return JNI:context(android.app.activity.vm, function(JNI)
-            return JNI:callIntMethod(
+        return JNI:context(android.app.activity.vm, function(jni)
+            return jni:callIntMethod(
                 android.app.activity.clazz,
                 "getScreenAvailableHeight",
                 "()I"
@@ -1674,8 +1674,8 @@ local function run(android_app_state)
     android.screen.height = android.getScreenHeight()
 
     android.getScreenBrightness = function()
-        return JNI:context(android.app.activity.vm, function(JNI)
-            return JNI:callIntMethod(
+        return JNI:context(android.app.activity.vm, function(jni)
+            return jni:callIntMethod(
                 android.app.activity.clazz,
                 "getScreenBrightness",
                 "()I"
@@ -1685,8 +1685,8 @@ local function run(android_app_state)
 
     android.setScreenBrightness = function(brightness)
         android.DEBUG("set screen brightness "..brightness)
-        JNI:context(android.app.activity.vm, function(JNI)
-            JNI:callVoidMethod(
+        JNI:context(android.app.activity.vm, function(jni)
+            jni:callVoidMethod(
                 android.app.activity.clazz,
                 "setScreenBrightness",
                 "(I)V",
@@ -1698,8 +1698,8 @@ local function run(android_app_state)
     end
 
     android.getBatteryLevel = function()
-        return JNI:context(android.app.activity.vm, function(JNI)
-            return JNI:callIntMethod(
+        return JNI:context(android.app.activity.vm, function(jni)
+            return jni:callIntMethod(
                 android.app.activity.clazz,
                 "getBatteryLevel",
                 "()I"
@@ -1708,8 +1708,8 @@ local function run(android_app_state)
     end
 
     android.isCharging = function()
-        return JNI:context(android.app.activity.vm, function(JNI)
-            return JNI:callIntMethod(
+        return JNI:context(android.app.activity.vm, function(jni)
+            return jni:callIntMethod(
                 android.app.activity.clazz,
                 "isCharging",
                 "()I"
@@ -1718,8 +1718,8 @@ local function run(android_app_state)
     end
 
     android.isFullscreen = function()
-        return JNI:context(android.app.activity.vm, function(JNI)
-            return JNI:callIntMethod(
+        return JNI:context(android.app.activity.vm, function(jni)
+            return jni:callIntMethod(
                 android.app.activity.clazz,
                 "isFullscreen",
                 "()I"
@@ -1729,8 +1729,8 @@ local function run(android_app_state)
 
     android.setFullscreen = function(fullscreen)
         android.DEBUG("setting fullscreen to " .. tostring(fullscreen))
-        JNI:context(android.app.activity.vm, function(JNI)
-            JNI:callVoidMethod(
+        JNI:context(android.app.activity.vm, function(jni)
+            jni:callVoidMethod(
                 android.app.activity.clazz,
                 "setFullscreen",
                 "(Z)V",
@@ -1740,25 +1740,25 @@ local function run(android_app_state)
     end
 
     android.isEink = function()
-        return JNI:context(android.app.activity.vm, function(JNI)
-            local is_supported = JNI:callIntMethod(
+        return JNI:context(android.app.activity.vm, function(jni)
+            local is_supported = jni:callIntMethod(
                 android.app.activity.clazz,
                 "isEink",
                 "()I"
             ) == 1
 
-            local platform = JNI:callObjectMethod(
+            local platform = jni:callObjectMethod(
                 android.app.activity.clazz,
                 "getEinkPlatform",
                 "()Ljava/lang/String;"
             )
-            return is_supported, JNI:to_string(platform)
+            return is_supported, jni:to_string(platform)
         end)
     end
 
     android.isEinkFull = function()
-        return JNI:context(android.app.activity.vm, function(JNI)
-            return JNI:callIntMethod(
+        return JNI:context(android.app.activity.vm, function(jni)
+            return jni:callIntMethod(
                 android.app.activity.clazz,
                 "isEinkFull",
                 "()I"
@@ -1767,8 +1767,8 @@ local function run(android_app_state)
     end
 
     android.needsWakelocks = function()
-        return JNI:context(android.app.activity.vm, function(JNI)
-            return JNI:callIntMethod(
+        return JNI:context(android.app.activity.vm, function(jni)
+            return jni:callIntMethod(
                 android.app.activity.clazz,
                 "needsWakelocks",
                 "()I"
@@ -1777,8 +1777,8 @@ local function run(android_app_state)
     end
 
     android.einkUpdate = function(mode)
-        JNI:context(android.app.activity.vm, function(JNI)
-            JNI:callVoidMethod(
+        JNI:context(android.app.activity.vm, function(jni)
+            jni:callVoidMethod(
                 android.app.activity.clazz,
                 "einkUpdate",
                 "(I)V",
@@ -1790,8 +1790,8 @@ local function run(android_app_state)
     android.einkUpdate = function(mode, delay, x, y, w, h)
         if not (delay and x and y and w and h) then
             -- basic support, only fullscreen refreshes
-            JNI:context(android.app.activity.vm, function(JNI)
-                JNI:callVoidMethod(
+            JNI:context(android.app.activity.vm, function(jni)
+                jni:callVoidMethod(
                     android.app.activity.clazz,
                     "einkUpdate",
                     "(I)V",
@@ -1800,8 +1800,8 @@ local function run(android_app_state)
             end)
         else
             -- full support
-            JNI:context(android.app.activity.vm, function(JNI)
-                JNI:callVoidMethod(
+            JNI:context(android.app.activity.vm, function(jni)
+                jni:callVoidMethod(
                     android.app.activity.clazz,
                     "einkUpdate",
                     "(IJIIII)V",
@@ -1817,8 +1817,8 @@ local function run(android_app_state)
     end
 
     android.einkTest = function()
-        JNI:context(android.app.activity.vm, function(JNI)
-            JNI:callVoidMethod(
+        JNI:context(android.app.activity.vm, function(jni)
+            jni:callVoidMethod(
                 android.app.activity.clazz,
                 "startEPDTestActivity",
                 "()V"
@@ -1830,8 +1830,8 @@ local function run(android_app_state)
     -- @treturn bool hasWriteSettingsPermission
     android.canWriteSettings = function()
         android.DEBUG("checking write settings permission")
-        return JNI:context(android.app.activity.vm, function(JNI)
-            return JNI:callIntMethod(
+        return JNI:context(android.app.activity.vm, function(jni)
+            return jni:callIntMethod(
                 android.app.activity.clazz,
                 "hasWriteSettingsPermission",
                 "()I"
@@ -1841,8 +1841,8 @@ local function run(android_app_state)
 
     android.canWriteStorage = function()
         android.DEBUG("checking write storage permission")
-        return JNI:context(android.app.activity.vm, function(JNI)
-            return JNI:callIntMethod(
+        return JNI:context(android.app.activity.vm, function(jni)
+            return jni:callIntMethod(
                 android.app.activity.clazz,
                 "hasExternalStoragePermission",
                 "()I"
@@ -1851,19 +1851,19 @@ local function run(android_app_state)
     end
 
     android.getClipboardText = function()
-        return JNI:context(android.app.activity.vm, function(JNI)
-            local text = JNI:callObjectMethod(
+        return JNI:context(android.app.activity.vm, function(jni)
+            local text = jni:callObjectMethod(
                 android.app.activity.clazz,
                 "getClipboardText",
                 "()Ljava/lang/String;"
             )
-            return JNI:to_string(text)
+            return jni:to_string(text)
         end)
     end
 
     android.hasClipboardText = function()
-        return JNI:context(android.app.activity.vm, function(JNI)
-            return JNI:callIntMethod(
+        return JNI:context(android.app.activity.vm, function(jni)
+            return jni:callIntMethod(
                 android.app.activity.clazz,
                 "hasClipboardText",
                 "()I"
@@ -1873,33 +1873,33 @@ local function run(android_app_state)
 
     android.setClipboardText = function(text)
         android.DEBUG("setting clipboard text to: " .. text)
-        JNI:context(android.app.activity.vm, function(JNI)
-            local clipboard_text = JNI.env[0].NewStringUTF(JNI.env, text)
-            JNI:callVoidMethod(
+        JNI:context(android.app.activity.vm, function(jni)
+            local clipboard_text = jni.env[0].NewStringUTF(jni.env, text)
+            jni:callVoidMethod(
                 android.app.activity.clazz,
                 "setClipboardText",
                 "(Ljava/lang/String;)V",
                 clipboard_text
             )
-            JNI.env[0].DeleteLocalRef(JNI.env, clipboard_text)
+            jni.env[0].DeleteLocalRef(jni.env, clipboard_text)
         end)
     end
 
     android.getNetworkInfo = function()
-        return JNI:context(android.app.activity.vm, function(JNI)
-            local network_info = JNI:callObjectMethod(
+        return JNI:context(android.app.activity.vm, function(jni)
+            local network_info = jni:callObjectMethod(
                 android.app.activity.clazz,
                 "getNetworkInfo",
                 "()Ljava/lang/String;"
             )
-            return string.match(JNI:to_string(network_info), "(.*);(.*)")
+            return string.match(jni:to_string(network_info), "(.*);(.*)")
         end)
     end
 
     android.openWifiSettings = function()
         android.DEBUG("open android settings")
-        JNI:context(android.app.activity.vm, function(JNI)
-            JNI:callVoidMethod(
+        JNI:context(android.app.activity.vm, function(jni)
+            jni:callVoidMethod(
                 android.app.activity.clazz,
                 "openWifiSettings",
                 "()V"
@@ -1908,87 +1908,87 @@ local function run(android_app_state)
     end
 
     android.download = function(url, name)
-        return JNI:context(android.app.activity.vm, function(JNI)
-            local uri_string = JNI.env[0].NewStringUTF(JNI.env, url)
-            local download_name = JNI.env[0].NewStringUTF(JNI.env, name)
-            local ret = JNI:callIntMethod(
+        return JNI:context(android.app.activity.vm, function(jni)
+            local uri_string = jni.env[0].NewStringUTF(jni.env, url)
+            local download_name = jni.env[0].NewStringUTF(jni.env, name)
+            local ret = jni:callIntMethod(
                 android.app.activity.clazz,
                 "download",
                 "(Ljava/lang/String;Ljava/lang/String;)I",
                 uri_string, download_name
             )
-            JNI.env[0].DeleteLocalRef(JNI.env, uri_string)
-            JNI.env[0].DeleteLocalRef(JNI.env, download_name)
+            jni.env[0].DeleteLocalRef(jni.env, uri_string)
+            jni.env[0].DeleteLocalRef(jni.env, download_name)
             return ret
         end)
     end
 
     android.openLink = function(link)
-        return JNI:context(android.app.activity.vm, function(JNI)
-            local uri_string = JNI.env[0].NewStringUTF(JNI.env, link)
-            local result = JNI:callIntMethod(
+        return JNI:context(android.app.activity.vm, function(jni)
+            local uri_string = jni.env[0].NewStringUTF(jni.env, link)
+            local result = jni:callIntMethod(
                 android.app.activity.clazz,
                 "openLink",
                 "(Ljava/lang/String;)I",
                 uri_string
             )
-            JNI.env[0].DeleteLocalRef(JNI.env, uri_string)
+            jni.env[0].DeleteLocalRef(jni.env, uri_string)
             return result
         end)
     end
 
     android.isPackageEnabled = function(package)
         if not package then return false end
-        return JNI:context(android.app.activity.vm, function(JNI)
-            local package = JNI.env[0].NewStringUTF(JNI.env, package)
-            local enabled = JNI:callIntMethod(
+        return JNI:context(android.app.activity.vm, function(jni)
+            local _package = jni.env[0].NewStringUTF(jni.env, package)
+            local enabled = jni:callIntMethod(
                 android.app.activity.clazz,
                 "isPackageEnabled",
                 "(Ljava/lang/String;)I",
-                package
+                _package
             ) == 1
-            JNI.env[0].DeleteLocalRef(JNI.env, package)
+            jni.env[0].DeleteLocalRef(jni.env, _package)
             return enabled
         end)
     end
 
     -- legacy call for frontend: text, package, action
     android.dictLookup = function(text, package, action)
-        JNI:context(android.app.activity.vm, function(JNI)
-            local text = JNI.env[0].NewStringUTF(JNI.env, text)
-            local action = JNI.env[0].NewStringUTF(JNI.env, action)
-            local package = JNI.env[0].NewStringUTF(JNI.env, package)
+        JNI:context(android.app.activity.vm, function(jni)
+            local _text = jni.env[0].NewStringUTF(jni.env, text)
+            local _action = jni.env[0].NewStringUTF(jni.env, action)
+            local _package = jni.env[0].NewStringUTF(jni.env, package)
             -- updated call: text, action, package
-            JNI:callVoidMethod(
+            jni:callVoidMethod(
                 android.app.activity.clazz,
                 "dictLookup",
                 "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
-                text, action, package
+                _text, _action, _package
             )
-            JNI.env[0].DeleteLocalRef(JNI.env, text)
-            JNI.env[0].DeleteLocalRef(JNI.env, action)
-            JNI.env[0].DeleteLocalRef(JNI.env, package)
+            jni.env[0].DeleteLocalRef(jni.env, _text)
+            jni.env[0].DeleteLocalRef(jni.env, _action)
+            jni.env[0].DeleteLocalRef(jni.env, _package)
         end)
     end
 
     android.sendText = function(text)
-        JNI:context(android.app.activity.vm, function(JNI)
-            local text = JNI.env[0].NewStringUTF(JNI.env, text)
-            JNI:callVoidMethod(
+        JNI:context(android.app.activity.vm, function(jni)
+            local _text = jni.env[0].NewStringUTF(jni.env, text)
+            jni:callVoidMethod(
                 android.app.activity.clazz,
                 "sendText",
                 "(Ljava/lang/String;)V",
-                text
+                _text
             )
-            JNI.env[0].DeleteLocalRef(JNI.env, text)
+            jni.env[0].DeleteLocalRef(jni.env, _text)
         end)
     end
 
     android.notification = function(message, is_long)
-        return JNI:context(android.app.activity.vm, function(JNI)
-            local text = JNI.env[0].NewStringUTF(JNI.env, message)
+        return JNI:context(android.app.activity.vm, function(jni)
+            local text = jni.env[0].NewStringUTF(jni.env, message)
             if is_long ~= nil then
-                JNI:callVoidMethod(
+                jni:callVoidMethod(
                     android.app.activity.clazz,
                     "showToast",
                     "(Ljava/lang/String;Z)V",
@@ -1996,20 +1996,20 @@ local function run(android_app_state)
                     ffi.new("bool", is_long)
                 )
             else
-                JNI:callVoidMethod(
+                jni:callVoidMethod(
                     android.app.activity.clazz,
                     "showToast",
                     "(Ljava/lang/String;)V",
                     text
                 )
             end
-            JNI.env[0].DeleteLocalRef(JNI.env, text)
+            jni.env[0].DeleteLocalRef(jni.env, text)
         end)
     end
 
     android.getStatusBarHeight = function()
-        return JNI:context(android.app.activity.vm, function(JNI)
-            return JNI:callIntMethod(
+        return JNI:context(android.app.activity.vm, function(jni)
+            return jni:callIntMethod(
                 android.app.activity.clazz,
                 "getStatusBarHeight",
                 "()I"
@@ -2017,17 +2017,17 @@ local function run(android_app_state)
         end)
     end
 
-    local function subprocess(JNI, argv)
-        local args_array = JNI.env[0].NewObjectArray(JNI.env, #argv,
-            JNI.env[0].FindClass(JNI.env, "java/lang/String"), nil)
+    local function subprocess(jni, argv)
+        local args_array = jni.env[0].NewObjectArray(jni.env, #argv,
+            jni.env[0].FindClass(jni.env, "java/lang/String"), nil)
         local args_list = {}
         for i = 1, #argv do
-            local arg = JNI.env[0].NewStringUTF(JNI.env, argv[i])
+            local arg = jni.env[0].NewStringUTF(jni.env, argv[i])
             table.insert(args_list, arg)
-            JNI.env[0].SetObjectArrayElement(JNI.env, args_array, i-1, arg)
+            jni.env[0].SetObjectArrayElement(jni.env, args_array, i-1, arg)
         end
-        local process = JNI:callObjectMethod(
-            JNI:callStaticObjectMethod(
+        local process = jni:callObjectMethod(
+            jni:callStaticObjectMethod(
                 "java/lang/Runtime",
                 "getRuntime",
                 "()Ljava/lang/Runtime;"
@@ -2037,21 +2037,21 @@ local function run(android_app_state)
             args_array
         )
         for _, arg in ipairs(args_list) do
-            JNI.env[0].DeleteLocalRef(JNI.env, arg)
+            jni.env[0].DeleteLocalRef(jni.env, arg)
         end
         return process
     end
 
     android.execute = function(...)
         local argv = {...}
-        return JNI:context(android.app.activity.vm, function(JNI)
-            local process = subprocess(JNI, argv)
-            local stdout = JNI:callObjectMethod(
+        return JNI:context(android.app.activity.vm, function(jni)
+            local process = subprocess(jni, argv)
+            local stdout = jni:callObjectMethod(
                 process,
                 "getInputStream",
                 "()Ljava/io/InputStream;"
             )
-            local stderr = JNI:callObjectMethod(
+            local stderr = jni:callObjectMethod(
                 process,
                 "getErrorStream",
                 "()Ljava/io/InputStream;"
@@ -2059,7 +2059,7 @@ local function run(android_app_state)
             local out = ""
             local err = ""
             while true do
-                local char = JNI:callIntMethod(stdout, "read", "()I")
+                local char = jni:callIntMethod(stdout, "read", "()I")
                 if char >= 0 then
                     out = out .. string.char(char)
                 else
@@ -2067,14 +2067,14 @@ local function run(android_app_state)
                 end
             end
             while true do
-                local char = JNI:callIntMethod(stderr, "read", "()I")
+                local char = jni:callIntMethod(stderr, "read", "()I")
                 if char >= 0 then
                     err = err .. string.char(char)
                 else
                     break
                 end
             end
-            local res = JNI:callIntMethod(process, "waitFor", "()I")
+            local res = jni:callIntMethod(process, "waitFor", "()I")
 
             if res > 0 then
                 android.LOGW(string.format("command %s returned %d", table.concat(argv, " "), res))
@@ -2082,33 +2082,33 @@ local function run(android_app_state)
                 android.LOGI(string.format("command %s returned %d", table.concat(argv, " "), res))
             end
             android.LOGV(string.format(" stdout: %s\n stderr: %s", out, err))
-            JNI.env[0].DeleteLocalRef(JNI.env, process)
-            JNI.env[0].DeleteLocalRef(JNI.env, stdout)
-            JNI.env[0].DeleteLocalRef(JNI.env, stderr)
+            jni.env[0].DeleteLocalRef(jni.env, process)
+            jni.env[0].DeleteLocalRef(jni.env, stdout)
+            jni.env[0].DeleteLocalRef(jni.env, stderr)
             return res
         end)
     end
 
     android.stdout = function(...)
         local argv = {...}
-        return JNI:context(android.app.activity.vm, function(JNI)
-            local process = subprocess(JNI, argv)
-            local stdout = JNI:callObjectMethod(
+        return JNI:context(android.app.activity.vm, function(jni)
+            local process = subprocess(jni, argv)
+            local stdout = jni:callObjectMethod(
                 process,
                 "getInputStream",
                 "()Ljava/io/InputStream;"
             )
             local out = ""
             while true do
-                local char = JNI:callIntMethod(stdout, "read", "()I")
+                local char = jni:callIntMethod(stdout, "read", "()I")
                 if char >= 0 then
                     out = out .. string.char(char)
                 else
                     break
                 end
             end
-            JNI.env[0].DeleteLocalRef(JNI.env, process)
-            JNI.env[0].DeleteLocalRef(JNI.env, stdout)
+            jni.env[0].DeleteLocalRef(jni.env, process)
+            jni.env[0].DeleteLocalRef(jni.env, stdout)
             return out
         end)
     end

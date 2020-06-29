@@ -4,15 +4,13 @@ local A = require("android")
 ffi.cdef[[
 int chdir(const char *path);
 char *getcwd(char *buf, size_t size);
-char *strerror(int errnum);
 ]]
 
 local function chdir(path)
     if ffi.C.chdir(path) == 0 then
         return true
     else
-        err_msg = "Unable to change working directory to '" ..path.."'"
-        return nil, ffi.string(ffi.C.strerror(ffi.errno()))
+        return nil, "Unable to change working directory to '" ..path.."'"
     end
 end
 
