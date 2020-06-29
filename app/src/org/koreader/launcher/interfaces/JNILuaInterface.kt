@@ -50,6 +50,7 @@ interface JNILuaInterface {
     fun setIgnoreInput(enabled: Boolean)
     fun setScreenBrightness(brightness: Int)
     fun setScreenOffTimeout(timeout: Int)
+    fun setScreenOrientation(orientation: Int)
     fun startEPDTestActivity()
     fun showToast(message: String)
     fun showToast(message: String, longTimeout: Boolean)

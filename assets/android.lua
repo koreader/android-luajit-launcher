@@ -343,6 +343,21 @@ enum {
     ANETWORK_VPN = 5,
 };
 
+enum {
+    ASCREEN_ORIENTATION_UNSPECIFIED = -1,
+    ASCREEN_ORIENTATION_LANDSCAPE = 0,
+    ASCREEN_ORIENTATION_PORTRAIT = 1,
+    ASCREEN_ORIENTATION_USER = 2,
+    ASCREEN_ORIENTATION_BEHIND = 3,
+    ASCREEN_ORIENTATION_SENSOR = 4,
+    ASCREEN_ORIENTATION_NOSENSOR = 5,
+    ASCREEN_ORIENTATION_SENSOR_LANDSCAPE = 6,
+    ASCREEN_ORIENTATION_SENSOR_PORTRAIT = 7,
+    ASCREEN_ORIENTATION_REVERSE_LANDSCAPE = 8,
+    ASCREEN_ORIENTATION_REVERSE_PORTRAIT = 9,
+    ASCREEN_ORIENTATION_FULL_SENSOR = 10,
+};
+
 int32_t AInputEvent_getType(const AInputEvent* event);
 int32_t AInputEvent_getDeviceId(const AInputEvent* event);
 int32_t AInputEvent_getSource(const AInputEvent* event);
@@ -1672,6 +1687,28 @@ local function run(android_app_state)
     android.screen = {}
     android.screen.width = android.getScreenWidth()
     android.screen.height = android.getScreenHeight()
+    android.screen.orientation = ffi.C.ASCREEN_ORIENTATION_SENSOR_PORTRAIT
+
+    android.orientation = {}
+    android.orientation.get = function()
+        return android.screen.orientation
+    end
+    android.orientation.set = function(new_orientation)
+        if new_orientation >= ffi.C.ASCREEN_ORIENTATION_UNSPECIFIED and
+                new_orientation <= ffi.C.ASCREEN_ORIENTATION_FULL_SENSOR then
+            JNI:context(android.app.activity.vm, function(jni)
+                jni:callVoidMethod(
+                    android.app.activity.clazz,
+                    "setScreenOrientation",
+                    "(I)V",
+                    ffi.new("int32_t", new_orientation)
+                )
+            end)
+            android.screen.orientation = new_orientation
+        else
+            android.LOGW("ignoring invalid orientation", new_orientation)
+        end
+    end
 
     android.getScreenBrightness = function()
         return JNI:context(android.app.activity.vm, function(jni)
