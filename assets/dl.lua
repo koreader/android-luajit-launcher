@@ -53,7 +53,7 @@ the library_path will not be used
 --]]
 function dl.dlopen(library, load_func)
     -- check if we already opened it:
-    if dl.loaded_libraries[library] then return loaded_libraries[library] end
+    if dl.loaded_libraries[library] then return dl.loaded_libraries[library] end
 
     load_func = load_func or sys_dlopen
 
