@@ -25,7 +25,7 @@
             android:screenOrientation="sensorPortrait"
             android:resizeableActivity="false"
             android:launchMode="singleInstance"
-            android:configChanges="keyboard|keyboardHidden"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
             android:theme="@style/SplashScreen">
             <meta-data android:name="android.app.lib_name" android:value="luajit" />
             <intent-filter>
