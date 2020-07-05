@@ -39,6 +39,7 @@ interface JNILuaInterface {
     fun isEink(): Int
     fun isEinkFull(): Int
     fun isFullscreen(): Int
+    fun isInMultiWindow(): Int
     fun isPackageEnabled(pkg: String): Int
     fun isPathInsideSandbox(path: String?): Int
     fun isTv(): Int

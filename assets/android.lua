@@ -1804,6 +1804,16 @@ local function run(android_app_state)
         end)
     end
 
+    android.isMultiWindow = function()
+        return JNI:context(android.app.activity.vm, function(jni)
+            return jni:callIntMethod(
+                android.app.activity.clazz,
+                "isInMultiWindow",
+                "()I"
+            ) == 1
+        end)
+    end
+
     android.isFullscreen = function()
         return JNI:context(android.app.activity.vm, function(jni)
             return jni:callIntMethod(

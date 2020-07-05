@@ -7,6 +7,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -34,6 +35,9 @@ class MainActivity : BaseActivity() {
 
     // EPD driver for this device
     private val epd = EPDFactory.epdController
+
+    // current configuration of the activity
+    private var multiwindow: Boolean = false
 
     // Some e-ink devices need to take control of the native window from the java side
     private var takesWindowOwnership: Boolean = false
@@ -149,6 +153,13 @@ class MainActivity : BaseActivity() {
         setIntent(intent)
     }
 
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        multiwindow = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            isInMultiWindowMode
+        } else false
+    }
+
     /* Called on permission result */
     override fun onRequestPermissionsResult(requestCode: Int, permissions:
         Array<String>, grantResults: IntArray) {
@@ -243,6 +254,10 @@ class MainActivity : BaseActivity() {
 
     override fun getPlatformName(): String {
         return MainApp.platform_type
+    }
+
+    override fun isInMultiWindow(): Int {
+        return if (multiwindow) 1 else 0
     }
 
     override fun canWriteSystemSettings(): Int {
