@@ -10,10 +10,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
-import android.view.SurfaceHolder
-import android.view.SurfaceView
-import android.view.View
-import android.view.WindowManager
+import android.view.*
 
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -136,7 +133,7 @@ class MainActivity : BaseActivity() {
         Logger.d(TAG_MAIN, "onPause()")
         super.onPause()
         applyCustomTimeout(false)
-        setIntent(null)
+        intent = null
     }
 
     /* Called just before the activity is resumed by an intent
@@ -218,6 +215,19 @@ class MainActivity : BaseActivity() {
     /*---------------------------------------------------------------
      *             override methods used by lua/JNI                *
      *--------------------------------------------------------------*/
+
+    override fun getScreenOrientation(): Int {
+        return when (windowManager.defaultDisplay.rotation) {
+            Surface.ROTATION_90 -> 1
+            Surface.ROTATION_180 -> 2
+            Surface.ROTATION_270 -> 3
+            else -> 0
+        }
+    }
+
+    override fun setScreenOrientation(orientation: Int) {
+        requestedOrientation = orientation
+    }
 
     override fun canWriteSystemSettings(): Int {
         return if (SystemSettings.canWrite(this)) 1 else 0

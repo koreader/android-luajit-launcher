@@ -22,6 +22,7 @@ interface JNILuaInterface {
     fun getProduct(): String
     fun getScreenBrightness(): Int
     fun getScreenOffTimeout(): Int
+    fun getScreenOrientation(): Int
     fun getScreenAvailableHeight(): Int
     fun getScreenHeight(): Int
     fun getScreenWidth(): Int

@@ -1690,8 +1690,17 @@ local function run(android_app_state)
     android.screen.orientation = ffi.C.ASCREEN_ORIENTATION_SENSOR_PORTRAIT
 
     android.orientation = {}
-    android.orientation.get = function()
+    android.orientation.mode = function()
         return android.screen.orientation
+    end
+    android.orientation.get = function()
+        return JNI:context(android.app.activity.vm, function(jni)
+            return jni:callIntMethod(
+                android.app.activity.clazz,
+                "getScreenOrientation",
+                "()I"
+            )
+        end)
     end
     android.orientation.set = function(new_orientation)
         if new_orientation >= ffi.C.ASCREEN_ORIENTATION_UNSPECIFIED and

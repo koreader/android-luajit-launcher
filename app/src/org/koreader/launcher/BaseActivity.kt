@@ -486,10 +486,6 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
         ScreenUtils.setScreenBrightness(this, brightness)
     }
 
-    override fun setScreenOrientation(orientation: Int) {
-        requestedOrientation = orientation
-    }
-
     /* widgets */
     override fun showToast(message: String) {
         showToast(message, false)
