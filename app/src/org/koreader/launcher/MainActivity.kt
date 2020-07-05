@@ -155,7 +155,7 @@ class MainActivity : BaseActivity() {
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        multiwindow = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        multiwindow = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             isInMultiWindowMode
         } else false
     }
