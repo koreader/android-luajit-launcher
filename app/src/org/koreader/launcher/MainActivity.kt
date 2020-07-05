@@ -229,6 +229,22 @@ class MainActivity : BaseActivity() {
         requestedOrientation = orientation
     }
 
+    override fun isTv(): Int {
+        return if (MainApp.platform_type == "android_tv") 1 else 0
+    }
+
+    override fun isChromeOS(): Int {
+        return if (MainApp.platform_type == "chrome") 1 else 0
+    }
+
+    override fun hasNativeRotation(): Int {
+        return if (MainApp.platform_type == "android") 1 else 0
+    }
+
+    override fun getPlatformName(): String {
+        return MainApp.platform_type
+    }
+
     override fun canWriteSystemSettings(): Int {
         return if (SystemSettings.canWrite(this)) 1 else 0
     }
