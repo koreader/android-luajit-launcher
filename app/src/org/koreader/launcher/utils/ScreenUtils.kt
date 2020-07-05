@@ -18,11 +18,29 @@ object ScreenUtils {
     }
 
     fun getScreenWidth(activity: Activity): Int {
-        return getScreenSize(activity).x
+        val kind: String
+        val pixels = if (isMultiWindow(activity)) {
+            kind = "Multi Window"
+            activity.window.decorView.width
+        } else {
+            kind = "Single Window"
+            getScreenSize(activity).x
+        }
+        Logger.v(kind, pixels.toString() + "px width")
+        return pixels
     }
 
     fun getScreenHeight(activity: Activity): Int {
-        return getScreenSize(activity).y
+        val kind: String
+        val pixels = if (isMultiWindow(activity)) {
+            kind = "Multi Window"
+            activity.window.decorView.height
+        } else {
+            kind = "Single Window"
+            getScreenSize(activity).y
+        }
+        Logger.v(kind, pixels.toString() + "px height")
+        return pixels
     }
 
     // DEPRECATED: returns 0 on API16+
@@ -76,7 +94,6 @@ object ScreenUtils {
     private fun getScreenSize(activity: Activity): Point {
         val size = Point()
         val display = activity.windowManager.defaultDisplay
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
             val metrics = DisplayMetrics()
             display.getRealMetrics(metrics)
@@ -94,5 +111,11 @@ object ScreenUtils {
         display.getMetrics(metrics)
         size.set(metrics.widthPixels, metrics.heightPixels)
         return size
+    }
+
+    private fun isMultiWindow(activity: Activity): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            activity.isInMultiWindowMode
+        } else false
     }
 }
