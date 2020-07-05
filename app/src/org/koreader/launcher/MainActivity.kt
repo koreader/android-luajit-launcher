@@ -234,9 +234,9 @@ class MainActivity : BaseActivity() {
     }
 
     /* ignore input toggle */
-    override fun setIgnoreInput(enable: Boolean) {
+    override fun setIgnoreInput(enabled: Boolean) {
         runOnUiThread {
-            if (enable) {
+            if (enabled) {
                 window.addFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
             } else {
                 window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
