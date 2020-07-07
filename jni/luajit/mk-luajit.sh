@@ -40,6 +40,8 @@ function check_NDK() {
     fi
 }
 
+## NOTE: Since https://github.com/koreader/koreader-base/pull/1133, we append -DLUAJIT_SECURITY_STRHASH=0 -DLUAJIT_SECURITY_STRID=0 to TARGET_CFLAGS on !Android platforms.
+##       Here, we leave it at the defaults, because we have much less control over the environment on Android, so, better be safe than sorry ;).
 case "$1" in
     clean)
         make -C luajit-2.0 clean
