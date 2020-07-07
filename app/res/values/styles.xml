@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <style name="FramelessDialog" parent="@android:style/Theme.Dialog">
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="FramelessDialog" parent="@android:style/Theme.Dialog" tools:keep="@style/FramelessDialog">
         <item name="android:windowFrame">@null</item>
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowIsFloating">true</item>
