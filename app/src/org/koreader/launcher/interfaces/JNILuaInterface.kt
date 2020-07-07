@@ -19,9 +19,11 @@ interface JNILuaInterface {
     fun getLastImportedPath(): String?
     fun getName(): String
     fun getNetworkInfo(): String
+    fun getPlatformName(): String
     fun getProduct(): String
     fun getScreenBrightness(): Int
     fun getScreenOffTimeout(): Int
+    fun getScreenOrientation(): Int
     fun getScreenAvailableHeight(): Int
     fun getScreenHeight(): Int
     fun getScreenWidth(): Int
@@ -30,6 +32,7 @@ interface JNILuaInterface {
     fun getVersion(): String
     fun hasClipboardText(): Int
     fun hasExternalStoragePermission(): Int
+    fun hasNativeRotation(): Int
     fun safFilePicker(path: String?): Int
     fun isCharging(): Int
     fun isDebuggable(): Int
@@ -38,6 +41,8 @@ interface JNILuaInterface {
     fun isFullscreen(): Int
     fun isPackageEnabled(pkg: String): Int
     fun isPathInsideSandbox(path: String?): Int
+    fun isTv(): Int
+    fun isChromeOS(): Int
     fun needsWakelocks(): Int
     fun openLink(url: String): Int
     fun openWifiSettings()

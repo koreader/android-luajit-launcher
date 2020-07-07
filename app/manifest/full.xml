@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--suppress AndroidDomInspection -->
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" >
     <application android:name=".MainApp" tools:replace="android:name">
-    <activity android:name=".MainActivity" tools:replace="android:name">
+        <activity android:name=".MainActivity" tools:replace="android:name">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />

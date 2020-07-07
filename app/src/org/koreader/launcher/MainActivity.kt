@@ -1,19 +1,15 @@
 package org.koreader.launcher
 
-import android.annotation.TargetApi
 import java.util.Locale
 
+import android.annotation.TargetApi
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.view.SurfaceHolder
-import android.view.SurfaceView
-import android.view.View
-import android.view.WindowManager
+import android.view.*
 
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -106,17 +102,9 @@ class MainActivity : BaseActivity() {
             /* native content without further processing */
             Logger.v(TAG_MAIN, "onNativeWindowImpl()")
         }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            setFullscreenLayout()
-            val decorView = window.decorView
-            decorView.setOnSystemUiVisibilityChangeListener { setFullscreenLayout() }
-        }
-
         if (MainApp.LEGACY_STORAGE) {
             requestExternalStoragePermission()
         }
-
         systemTimeout = SystemSettings.getSystemScreenOffTimeout(this)
     }
 
@@ -125,10 +113,6 @@ class MainActivity : BaseActivity() {
         Logger.d(TAG_MAIN, "onResume()")
         super.onResume()
         applyCustomTimeout(true)
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
-            val handler = Handler()
-            handler.postDelayed({ setFullscreenLayout() }, 500)
-        }
     }
 
     /* Called when another activity is taking focus. */
@@ -136,7 +120,7 @@ class MainActivity : BaseActivity() {
         Logger.d(TAG_MAIN, "onPause()")
         super.onPause()
         applyCustomTimeout(false)
-        setIntent(null)
+        intent = null
     }
 
     /* Called just before the activity is resumed by an intent
@@ -189,6 +173,11 @@ class MainActivity : BaseActivity() {
         }
     }
 
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus) setFullscreenLayout()
+    }
+
     override fun getFilePathFromIntent(): String? {
         return intent?.let {
             if (it.action == Intent.ACTION_VIEW) {
@@ -219,14 +208,45 @@ class MainActivity : BaseActivity() {
      *             override methods used by lua/JNI                *
      *--------------------------------------------------------------*/
 
+    override fun getScreenOrientation(): Int {
+        return when (windowManager.defaultDisplay.rotation) {
+            Surface.ROTATION_90 -> 1
+            Surface.ROTATION_180 -> 2
+            Surface.ROTATION_270 -> 3
+            else -> 0
+        }
+    }
+
+    override fun setScreenOrientation(orientation: Int) {
+        requestedOrientation = orientation
+    }
+
+    override fun isTv(): Int {
+        return if (MainApp.platform_type == "android_tv") 1 else 0
+    }
+
+    override fun isChromeOS(): Int {
+        return if (MainApp.platform_type == "chrome") 1 else 0
+    }
+
+    override fun hasNativeRotation(): Int {
+        return if (MainApp.platform_type == "android") {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) 1 else 0
+        } else 0
+    }
+
+    override fun getPlatformName(): String {
+        return MainApp.platform_type
+    }
+
     override fun canWriteSystemSettings(): Int {
         return if (SystemSettings.canWrite(this)) 1 else 0
     }
 
     /* ignore input toggle */
-    override fun setIgnoreInput(enable: Boolean) {
+    override fun setIgnoreInput(enabled: Boolean) {
         runOnUiThread {
-            if (enable) {
+            if (enabled) {
                 window.addFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
             } else {
                 window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
