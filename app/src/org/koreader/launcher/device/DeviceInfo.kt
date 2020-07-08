@@ -17,6 +17,7 @@ object DeviceInfo {
     val EINK_SUPPORT: Boolean
     val EINK_FULL_SUPPORT: Boolean
     val BUG_WAKELOCKS: Boolean
+    val BUG_SCREEN_ROTATION: Boolean
 
     private val MANUFACTURER: String
     private val BRAND: String
@@ -218,6 +219,9 @@ object DeviceInfo {
 
         // need wakelocks
         BUG_WAKELOCKS = BUG == BugDevice.SONY_RP1
+
+        // 4.4+ device without native surface rotation
+        BUG_SCREEN_ROTATION = BUG == BugDevice.EMULATOR
     }
 
     private fun getBuildField(fieldName: String): String {
