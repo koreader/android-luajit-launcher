@@ -14,6 +14,7 @@ import android.view.*
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 
+import org.koreader.launcher.device.DeviceInfo
 import org.koreader.launcher.device.EPDFactory
 import org.koreader.launcher.utils.FileUtils
 import org.koreader.launcher.utils.Logger
@@ -231,7 +232,9 @@ class MainActivity : BaseActivity() {
 
     override fun hasNativeRotation(): Int {
         return if (MainApp.platform_type == "android") {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) 1 else 0
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                if (!DeviceInfo.BUG_SCREEN_ROTATION) 1 else 0
+            } else 0
         } else 0
     }
 
