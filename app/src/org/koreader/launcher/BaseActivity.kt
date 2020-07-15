@@ -1,10 +1,5 @@
 package org.koreader.launcher
 
-import java.io.File
-import java.io.IOException
-import java.util.concurrent.CountDownLatch
-import java.util.Locale
-
 import android.app.Dialog
 import android.app.DownloadManager
 import android.app.NativeActivity
@@ -13,24 +8,28 @@ import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.Uri
-import android.os.*
+import android.os.BatteryManager
+import android.os.Build
+import android.os.Bundle
+import android.os.Environment
 import android.provider.Settings
 import android.view.Gravity
 import android.view.SurfaceHolder
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.Toast
-
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-
 import org.koreader.launcher.device.DeviceInfo
 import org.koreader.launcher.interfaces.JNILuaInterface
 import org.koreader.launcher.utils.AssetsUtils
 import org.koreader.launcher.utils.IntentUtils
 import org.koreader.launcher.utils.Logger
 import org.koreader.launcher.utils.ScreenUtils
-import org.koreader.launcher.utils.SystemSettings
+import java.io.File
+import java.io.IOException
+import java.util.*
+import java.util.concurrent.CountDownLatch
 
 /* BaseActivity.java - convenience wrapper on top of NativeActivity that
  * implements most of the kotlin/java methods exposed to lua. */
@@ -38,8 +37,6 @@ import org.koreader.launcher.utils.SystemSettings
 abstract class BaseActivity : NativeActivity(), JNILuaInterface,
     ActivityCompat.OnRequestPermissionsResultCallback{
 
-    private var brightness: Int = 0
-    private var customBrightness: Boolean = false
     private var fullscreen: Boolean = true // only used on API levels 16-18
     private var splashScreen: Boolean = true
     private var topInsetHeight: Int = 0 // only used on API 28+
@@ -433,14 +430,7 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
     }
 
     /* screen */
-    override fun getScreenBrightness(): Int {
-        return if (customBrightness) {
-            brightness
-        } else {
-            SystemSettings.getSystemBrightness(this)
-            //ScreenUtils.readSettingScreenBrightness(this)
-        }
-    }
+
 
     override fun getScreenAvailableHeight(): Int {
         return ScreenUtils.getScreenAvailableHeight(this)
@@ -480,10 +470,6 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
         } else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.JELLY_BEAN) {
             ScreenUtils.setFullscreenDeprecated(this, enabled)
         }
-    }
-
-    override fun setScreenBrightness(brightness: Int) {
-        ScreenUtils.setScreenBrightness(this, brightness)
     }
 
     /* widgets */

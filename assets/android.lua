@@ -1575,6 +1575,26 @@ local function run(android_app_state)
 
     -- system settings
     android.settings = {}
+    android.settings.dialog = function(title, intensity, warmth, okButton)
+        JNI:context(android.app.activity.vm, function(jni)
+            local t = jni.env[0].NewStringUTF(jni.env, title)
+            local i = jni.env[0].NewStringUTF(jni.env, intensity)
+            local w = jni.env[0].NewStringUTF(jni.env, warmth)
+            local o = jni.env[0].NewStringUTF(jni.env, okButton)
+            -- the VM crashes if we use jni:callVoidMethod here!!
+            jni:callIntMethod(
+                android.app.activity.clazz,
+                "showFrontlightDialog",
+                "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)I",
+                t, i, w, o
+            )
+            jni.env[0].DeleteLocalRef(jni.env, t)
+            jni.env[0].DeleteLocalRef(jni.env, i)
+            jni.env[0].DeleteLocalRef(jni.env, w)
+            jni.env[0].DeleteLocalRef(jni.env, o)
+        end)
+    end
+
     android.settings.canWrite = function()
         return JNI:context(android.app.activity.vm, function(jni)
             return jni:callIntMethod(

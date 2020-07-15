@@ -22,6 +22,7 @@ interface JNILuaInterface {
     fun getPlatformName(): String
     fun getProduct(): String
     fun getScreenBrightness(): Int
+    fun getScreenWarmth(): Int
     fun getScreenOffTimeout(): Int
     fun getScreenOrientation(): Int
     fun getScreenAvailableHeight(): Int
@@ -54,9 +55,11 @@ interface JNILuaInterface {
     fun setHapticOverride(enabled: Boolean)
     fun setIgnoreInput(enabled: Boolean)
     fun setScreenBrightness(brightness: Int)
+    fun setScreenWarmth(warmth: Int)
     fun setScreenOffTimeout(timeout: Int)
     fun setScreenOrientation(orientation: Int)
     fun startEPDTestActivity()
+    fun showFrontlightDialog(title: String, dim: String, warmth: String, okButton: String): Int
     fun showToast(message: String)
     fun showToast(message: String, longTimeout: Boolean)
 }

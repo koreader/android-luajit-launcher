@@ -1,24 +1,29 @@
 package org.koreader.launcher
 
-import java.util.Locale
-
 import android.annotation.TargetApi
 import android.app.Activity
-import android.content.Context
+import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.view.*
-
+import android.view.Gravity
+import android.view.Surface
+import android.view.View
+import android.view.WindowManager
+import android.widget.LinearLayout
+import android.widget.SeekBar
+import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-
 import org.koreader.launcher.device.DeviceInfo
 import org.koreader.launcher.device.EPDFactory
+import org.koreader.launcher.device.LightsFactory
+import org.koreader.launcher.surfaces.NativeSurfaceView
 import org.koreader.launcher.utils.FileUtils
 import org.koreader.launcher.utils.Logger
 import org.koreader.launcher.utils.SystemSettings
+import java.util.*
 
 /* MainActivity.java
  *
@@ -34,6 +39,12 @@ class MainActivity : BaseActivity() {
 
     // EPD driver for this device
     private val epd = EPDFactory.epdController
+
+    // Light controller for this device
+    private val lights = LightsFactory.lightsController
+
+    // Surface for this device
+    private var view: NativeSurfaceView? = null
 
     // Some e-ink devices need to take control of the native window from the java side
     private var takesWindowOwnership: Boolean = false
@@ -65,25 +76,6 @@ class MainActivity : BaseActivity() {
         private const val STORAGE_ACCESS_FRAMEWORK = 2
     }
 
-    // Dumb surface used on Tolinos and other ntx boards to refresh the e-ink screen
-    private var view: NativeSurfaceView? = null
-    private class NativeSurfaceView(context: Context): SurfaceView(context),
-        SurfaceHolder.Callback {
-        val tag = "NativeSurfaceView"
-        init { holder.addCallback(this) }
-        override fun surfaceCreated(holder: SurfaceHolder) {
-            Logger.v(tag, "surface created")
-            setWillNotDraw(false)
-        }
-        override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
-            Logger.v(tag, String.format(Locale.US,
-                "surface changed {\n  width:  %d\n  height: %d\n}", width, height))
-        }
-        override fun surfaceDestroyed(holder: SurfaceHolder) {
-            Logger.v(tag, "surface destroyed")
-        }
-    }
-
     /*---------------------------------------------------------------
      *                        activity callbacks                    *
      *--------------------------------------------------------------*/
@@ -92,7 +84,7 @@ class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         Logger.d(TAG_MAIN, "onCreate()")
         super.onCreate(savedInstanceState)
-        if ("freescale" == getEinkPlatform()) {
+        if (DeviceInfo.NEEDS_VIEW) {
             Logger.v(TAG_MAIN, "onNativeSurfaceViewImpl()")
             view = NativeSurfaceView(this)
             window.takeSurface(null)
@@ -208,6 +200,74 @@ class MainActivity : BaseActivity() {
     /*---------------------------------------------------------------
      *             override methods used by lua/JNI                *
      *--------------------------------------------------------------*/
+
+    override fun getScreenBrightness(): Int {
+        return lights.getBrightness(this@MainActivity)
+    }
+
+    override fun setScreenBrightness(brightness: Int) {
+        lights.setBrightness(this@MainActivity, brightness)
+    }
+
+    override fun getScreenWarmth(): Int {
+        return lights.getWarmth(this@MainActivity)
+    }
+
+    override fun setScreenWarmth(warmth: Int) {
+        lights.setWarmth(this@MainActivity, warmth)
+    }
+
+    override fun showFrontlightDialog(title: String, dim: String, warmth: String, okButton: String): Int {
+        val hasWarmth = lights.hasWarmth()
+        runOnUiThread {
+            val dimText = TextView(this)
+            val dimSeekBar = SeekBar(this)
+            dimText.text = dim
+            dimText.gravity = Gravity.CENTER_HORIZONTAL
+            dimText.textSize = 18f
+            dimSeekBar.max = lights.getMaxBrightness()
+            dimSeekBar.progress = lights.getBrightness(this)
+            dimSeekBar.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener {
+                override fun onStartTrackingTouch(p0: SeekBar?) {}
+                override fun onStopTrackingTouch(p0: SeekBar?) {}
+                override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
+                    lights.setBrightness(this@MainActivity, p1)
+                }
+            })
+            val linearLayout = LinearLayout(this)
+            linearLayout.orientation = LinearLayout.VERTICAL
+            linearLayout.addView(dimText)
+            linearLayout.addView(dimSeekBar)
+            if (hasWarmth) {
+                val warmthText = TextView(this)
+                val warmthSeekBar = SeekBar(this)
+                warmthText.text = warmth
+                warmthText.gravity = Gravity.CENTER_HORIZONTAL
+                warmthText.textSize = 18f
+                warmthSeekBar.max = lights.getMaxWarmth()
+                warmthSeekBar.progress = lights.getWarmth(this@MainActivity)
+                warmthSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+                    override fun onStartTrackingTouch(p0: SeekBar?) {}
+                    override fun onStopTrackingTouch(p0: SeekBar?) {}
+                    override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
+                        lights.setWarmth(this@MainActivity, p1)
+                    }
+                })
+                linearLayout.addView(warmthText)
+                linearLayout.addView(warmthSeekBar)
+            }
+
+            val builder = AlertDialog.Builder(this)
+            builder.setTitle(title)
+                .setCancelable(false)
+                .setPositiveButton(okButton) { _, _ -> {} }
+
+            val dialog: AlertDialog = builder.create()
+            dialog.setView(linearLayout)
+            dialog.show()
+        }
+        return 0
+    }
 
     override fun getScreenOrientation(): Int {
         return when (windowManager.defaultDisplay.rotation) {

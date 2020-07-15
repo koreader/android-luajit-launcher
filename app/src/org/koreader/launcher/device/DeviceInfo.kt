@@ -8,6 +8,7 @@ package org.koreader.launcher.device
 
 import android.os.Build
 import java.util.*
+import kotlin.collections.HashMap
 
 object DeviceInfo {
 
@@ -18,6 +19,8 @@ object DeviceInfo {
     val EINK_FULL_SUPPORT: Boolean
     val BUG_WAKELOCKS: Boolean
     val BUG_SCREEN_ROTATION: Boolean
+    val NEEDS_VIEW: Boolean
+    private val HAS_WARMTH: Boolean
 
     private val MANUFACTURER: String
     private val BRAND: String
@@ -38,6 +41,7 @@ object DeviceInfo {
     private val ENERGY: Boolean
     private val INKBOOK: Boolean
     private val TOLINO: Boolean
+    private val TOLINO_EPOS: Boolean
     private val NOOK_V520: Boolean
     private val SONY_RP1: Boolean
     private val EMULATOR_X86: Boolean
@@ -45,7 +49,9 @@ object DeviceInfo {
 
     // default values for generic devices.
     internal var EINK = EinkDevice.UNKNOWN
+    internal var WARMTH = WarmthDevice.NONE
     private var BUG = BugDevice.NONE
+
 
     enum class EinkDevice {
         UNKNOWN,
@@ -67,6 +73,11 @@ object DeviceInfo {
         NOOK_V520
     }
 
+    enum class WarmthDevice {
+        NONE,
+        TOLINO_EPOS
+    }
+
     enum class BugDevice {
         NONE,
         SONY_RP1,
@@ -84,6 +95,7 @@ object DeviceInfo {
         // --------------- device probe --------------- //
         val deviceMap = HashMap<EinkDevice, Boolean>()
         val bugMap = HashMap<BugDevice, Boolean>()
+        val warmthMap = HashMap<WarmthDevice, Boolean>()
 
         // Boyue T62, manufacturer uses both "boeye" and "boyue" ids.
         BOYUE_T62 = (IS_BOYUE
@@ -156,6 +168,11 @@ object DeviceInfo {
                 || DEVICE.contentEquals("ntx_6sl"))
         deviceMap[EinkDevice.TOLINO] = TOLINO
 
+        // Tolino Epos 2 also has warmth lights
+        TOLINO_EPOS = BRAND.contentEquals("rakutenkobo") && MODEL.contentEquals("tolino")
+            && DEVICE.contentEquals("ntx_6sl")
+        warmthMap[WarmthDevice.TOLINO_EPOS] = TOLINO_EPOS
+
         // Nook Glowlight 3 et al.
         NOOK_V520 = (MANUFACTURER.contentEquals("barnesandnoble") || MANUFACTURER.contentEquals("freescale"))
                 && (MODEL.contentEquals("bnrv510") || MODEL.contentEquals("bnrv520") || MODEL.contentEquals("bnrv700")
@@ -187,6 +204,16 @@ object DeviceInfo {
             val flag = bugMap[bug]
             if (flag != null && flag) {
                 BUG = bug
+            }
+        }
+
+        // fin devices with warmth lights
+        val warmthIter = warmthMap.keys.iterator()
+        while (warmthIter.hasNext()) {
+            val warmth = warmthIter.next()
+            val flag = warmthMap[warmth]
+            if (flag != null && flag) {
+                WARMTH = warmth
             }
         }
 
@@ -222,6 +249,12 @@ object DeviceInfo {
 
         // 4.4+ device without native surface rotation
         BUG_SCREEN_ROTATION = BUG == BugDevice.EMULATOR
+
+        // has warmth
+        HAS_WARMTH = WARMTH == WarmthDevice.TOLINO_EPOS
+
+        // needs a view
+        NEEDS_VIEW = ! EINK_SUPPORT || EINK_FREESCALE
     }
 
     private fun getBuildField(fieldName: String): String {
