@@ -34,7 +34,7 @@
             android:resizeableActivity="false"
             android:screenOrientation="nosensor"
             android:launchMode="singleInstance"
-            android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenSize" >
+            android:configChanges="colorMode|density|fontScale|keyboard|keyboardHidden|layoutDirection|locale|mcc|mnc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|touchscreen|uiMode" >
             <meta-data android:name="android.app.lib_name" android:value="luajit" />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
