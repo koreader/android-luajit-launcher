@@ -22,6 +22,11 @@ interface JNILuaInterface {
     fun getPlatformName(): String
     fun getProduct(): String
     fun getScreenBrightness(): Int
+    fun getScreenMinBrightness(): Int
+    fun getScreenMaxBrightness(): Int
+    fun getScreenWarmth(): Int
+    fun getScreenMinWarmth(): Int
+    fun getScreenMaxWarmth(): Int
     fun getScreenOffTimeout(): Int
     fun getScreenOrientation(): Int
     fun getScreenAvailableHeight(): Int
@@ -38,11 +43,13 @@ interface JNILuaInterface {
     fun isDebuggable(): Int
     fun isEink(): Int
     fun isEinkFull(): Int
+    fun isFrontlightDialogRunning(): Int
     fun isFullscreen(): Int
     fun isPackageEnabled(pkg: String): Int
     fun isPathInsideSandbox(path: String?): Int
     fun isTv(): Int
     fun isChromeOS(): Int
+    fun isWarmthDevice(): Int
     fun needsWakelocks(): Int
     fun openLink(url: String): Int
     fun openWifiSettings()
@@ -54,9 +61,11 @@ interface JNILuaInterface {
     fun setHapticOverride(enabled: Boolean)
     fun setIgnoreInput(enabled: Boolean)
     fun setScreenBrightness(brightness: Int)
+    fun setScreenWarmth(warmth: Int)
     fun setScreenOffTimeout(timeout: Int)
     fun setScreenOrientation(orientation: Int)
     fun startEPDTestActivity()
+    fun showFrontlightDialog(title: String, dim: String, warmth: String, okButton: String): Int
     fun showToast(message: String)
     fun showToast(message: String, longTimeout: Boolean)
 }

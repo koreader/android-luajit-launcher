@@ -11,7 +11,6 @@ import java.util.concurrent.CountDownLatch
 
 object ScreenUtils {
     private const val TAG = "ScreenUtils"
-    private const val BRIGHTNESS_MAX = 255
 
     fun getScreenAvailableHeight(activity: Activity): Int {
         return getScreenSizeWithConstraints(activity).y
@@ -36,19 +35,6 @@ object ScreenUtils {
     fun isFullscreenDeprecated(activity: Activity): Int {
         return if (activity.window.attributes.flags and
             WindowManager.LayoutParams.FLAG_FULLSCREEN != 0) 1 else 0
-    }
-
-    fun setScreenBrightness(activity: Activity, brightness: Int) {
-        val level = brightness * 1.0f / BRIGHTNESS_MAX
-        activity.runOnUiThread {
-            try {
-                val params = activity.window.attributes
-                params.screenBrightness = level
-                activity.window.attributes = params
-            } catch (e: Exception) {
-                Logger.w(TAG, e.toString())
-            }
-        }
     }
 
     fun setFullscreenDeprecated(activity: Activity, fullscreen: Boolean) {

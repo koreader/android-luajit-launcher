@@ -1,7 +1,7 @@
 /* generic EPD Controller for Android devices,
  * based on https://github.com/unwmun/refreshU */
 
-package org.koreader.launcher.device.rockchip
+package org.koreader.launcher.device.epd.rockchip
 
 import org.koreader.launcher.interfaces.EPDInterface
 

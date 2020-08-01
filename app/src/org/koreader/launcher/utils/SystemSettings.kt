@@ -18,16 +18,6 @@ object SystemSettings {
         return Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS)
     }
 
-    fun getSystemBrightness(context: Context): Int {
-        return try {
-            Settings.System.getInt(context.applicationContext.contentResolver,
-                Settings.System.SCREEN_BRIGHTNESS)
-        } catch (e: Exception) {
-            Logger.w(TAG, e.toString())
-            0
-        }
-    }
-
     fun getSystemScreenOffTimeout(context: Context): Int {
         return try {
             Settings.System.getInt(context.applicationContext.contentResolver,

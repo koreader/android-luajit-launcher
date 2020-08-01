@@ -18,7 +18,7 @@
  * val EPD_DITHER = 100
  */
 
-package org.koreader.launcher.device.rockchip
+package org.koreader.launcher.device.epd.rockchip
 
 import java.util.Locale
 import android.util.Log

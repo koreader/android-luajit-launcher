@@ -23,7 +23,7 @@
  * val EPD_POWEROFF = "EPD_POWEROFF"
  */
 
-package org.koreader.launcher.device.rockchip
+package org.koreader.launcher.device.epd.rockchip
 
 import android.util.Log
 import android.view.View

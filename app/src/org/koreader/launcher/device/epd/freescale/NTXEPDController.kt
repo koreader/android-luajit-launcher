@@ -26,7 +26,7 @@
  *	val EINK_WAVEFORM_MODE_INIT = 0;
  */
 
-package org.koreader.launcher.device.freescale
+package org.koreader.launcher.device.epd.freescale
 
 import java.util.Locale
 import android.util.Log

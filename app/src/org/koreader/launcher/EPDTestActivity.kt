@@ -9,9 +9,9 @@ import android.view.View
 import android.widget.TextView
 import android.widget.Button
 
-import org.koreader.launcher.device.freescale.NTXEPDController
-import org.koreader.launcher.device.rockchip.RK30xxEPDController
-import org.koreader.launcher.device.rockchip.RK33xxEPDController
+import org.koreader.launcher.device.epd.freescale.NTXEPDController
+import org.koreader.launcher.device.epd.rockchip.RK30xxEPDController
+import org.koreader.launcher.device.epd.rockchip.RK33xxEPDController
 
 /* A test activity for EPD routines. It can be called from lua using the android.einkTest() function
    If the device in question doesn't play nice with the main NativeActivity it can be called from

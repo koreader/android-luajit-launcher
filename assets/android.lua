@@ -1575,6 +1575,35 @@ local function run(android_app_state)
 
     -- system settings
     android.settings = {}
+    android.settings.dialog = function(title, intensity, warmth, okButton)
+        JNI:context(android.app.activity.vm, function(jni)
+            local t = jni.env[0].NewStringUTF(jni.env, title)
+            local i = jni.env[0].NewStringUTF(jni.env, intensity)
+            local w = jni.env[0].NewStringUTF(jni.env, warmth)
+            local o = jni.env[0].NewStringUTF(jni.env, okButton)
+            -- the VM crashes if we use jni:callVoidMethod here!!
+            jni:callIntMethod(
+                android.app.activity.clazz,
+                "showFrontlightDialog",
+                "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)I",
+                t, i, w, o
+            )
+            jni.env[0].DeleteLocalRef(jni.env, t)
+            jni.env[0].DeleteLocalRef(jni.env, i)
+            jni.env[0].DeleteLocalRef(jni.env, w)
+            jni.env[0].DeleteLocalRef(jni.env, o)
+        end)
+    end
+    android.isFrontlightDialogRunning = function()
+        return JNI:context(android.app.activity.vm, function(jni)
+            return jni:callIntMethod(
+                android.app.activity.clazz,
+                "isFrontlightDialogRunning",
+                "()I"
+            ) == 1
+        end)
+    end
+
     android.settings.canWrite = function()
         return JNI:context(android.app.activity.vm, function(jni)
             return jni:callIntMethod(
@@ -1729,6 +1758,26 @@ local function run(android_app_state)
         end)
     end
 
+    android.getScreenMinBrightness = function()
+        return JNI:context(android.app.activity.vm, function(jni)
+            return jni:callIntMethod(
+                android.app.activity.clazz,
+                "getScreenMinBrightness",
+                "()I"
+            )
+        end)
+    end
+
+    android.getScreenMaxBrightness = function()
+        return JNI:context(android.app.activity.vm, function(jni)
+            return jni:callIntMethod(
+                android.app.activity.clazz,
+                "getScreenMaxBrightness",
+                "()I"
+            )
+        end)
+    end
+
     android.setScreenBrightness = function(brightness)
         android.DEBUG("set screen brightness "..brightness)
         JNI:context(android.app.activity.vm, function(jni)
@@ -1740,6 +1789,58 @@ local function run(android_app_state)
                 -- Note that JNI won't covert lua number to int, we need to convert
                 -- it explictly.
             )
+        end)
+    end
+
+    android.getScreenWarmth = function()
+        return JNI:context(android.app.activity.vm, function(jni)
+            return jni:callIntMethod(
+                android.app.activity.clazz,
+                "getScreenWarmth",
+                "()I"
+            )
+        end)
+    end
+
+    android.getScreenMinWarmth = function()
+        return JNI:context(android.app.activity.vm, function(jni)
+            return jni:callIntMethod(
+                android.app.activity.clazz,
+                "getScreenMinWarmth",
+                "()I"
+            )
+        end)
+    end
+
+    android.getScreenMaxWarmth = function()
+        return JNI:context(android.app.activity.vm, function(jni)
+            return jni:callIntMethod(
+                android.app.activity.clazz,
+                "getScreenMaxWarmth",
+                "()I"
+            )
+        end)
+    end
+
+    android.setScreenWarmth = function(warmth)
+        android.DEBUG("set screen warmth "..warmth)
+        JNI:context(android.app.activity.vm, function(jni)
+            jni:callVoidMethod(
+                android.app.activity.clazz,
+                "setScreenWarmth",
+                "(I)V",
+                ffi.new('int32_t', warmth)
+            )
+        end)
+    end
+
+    android.isWarmthDevice = function()
+        return JNI:context(android.app.activity.vm, function(jni)
+            return jni:callIntMethod(
+                android.app.activity.clazz,
+                "isWarmthDevice",
+                "()I"
+            ) == 1
         end)
     end
 
