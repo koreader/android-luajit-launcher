@@ -1594,6 +1594,7 @@ local function run(android_app_state)
             jni.env[0].DeleteLocalRef(jni.env, o)
         end)
     end
+
     android.isFrontlightDialogRunning = function()
         return JNI:context(android.app.activity.vm, function(jni)
             return jni:callIntMethod(
