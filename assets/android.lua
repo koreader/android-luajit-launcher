@@ -344,6 +344,13 @@ enum {
 };
 
 enum {
+    ALIGHTS_DIALOG_CLOSED = -1,
+    ALIGHTS_DIALOG_OPENED = 0,
+    ALIGHTS_DIALOG_CANCEL = 1,
+    ALIGHTS_DIALOG_OK = 2,
+};
+
+enum {
     ASCREEN_ORIENTATION_UNSPECIFIED = -1,
     ASCREEN_ORIENTATION_LANDSCAPE = 0,
     ASCREEN_ORIENTATION_PORTRAIT = 1,
@@ -1573,37 +1580,42 @@ local function run(android_app_state)
         end
     end
 
-    -- system settings
-    android.settings = {}
-    android.settings.dialog = function(title, intensity, warmth, okButton)
+    -- light settings
+    android.lights = {}
+
+    android.lights.dialogState = function()
+        return JNI:context(android.app.activity.vm, function(jni)
+            return jni:callIntMethod(
+                android.app.activity.clazz,
+                "getLightDialogState",
+                "()I"
+            )
+        end)
+    end
+
+    android.lights.showDialog = function(title, intensity, warmth, okButton, cancelButton)
         JNI:context(android.app.activity.vm, function(jni)
             local t = jni.env[0].NewStringUTF(jni.env, title)
             local i = jni.env[0].NewStringUTF(jni.env, intensity)
             local w = jni.env[0].NewStringUTF(jni.env, warmth)
             local o = jni.env[0].NewStringUTF(jni.env, okButton)
+            local c = jni.env[0].NewStringUTF(jni.env, cancelButton)
             -- the VM crashes if we use jni:callVoidMethod here!!
             jni:callIntMethod(
                 android.app.activity.clazz,
                 "showFrontlightDialog",
-                "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)I",
-                t, i, w, o
+                "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)I",
+                t, i, w, o, c
             )
             jni.env[0].DeleteLocalRef(jni.env, t)
             jni.env[0].DeleteLocalRef(jni.env, i)
             jni.env[0].DeleteLocalRef(jni.env, w)
             jni.env[0].DeleteLocalRef(jni.env, o)
+            jni.env[0].DeleteLocalRef(jni.env, c)
         end)
     end
 
-    android.isFrontlightDialogRunning = function()
-        return JNI:context(android.app.activity.vm, function(jni)
-            return jni:callIntMethod(
-                android.app.activity.clazz,
-                "isFrontlightDialogRunning",
-                "()I"
-            ) == 1
-        end)
-    end
+    android.settings = {}
 
     android.settings.canWrite = function()
         return JNI:context(android.app.activity.vm, function(jni)

@@ -42,7 +42,7 @@ class MainActivity : BaseActivity() {
 
     // Light controller for this device
     private val lights = LightsFactory.lightsController
-    private var runningFrontlightDialog: Boolean = false
+    private var lightDialogState = LIGHT_DIALOG_CLOSED
 
     // Some e-ink devices need to take control of the native window from the java side
     private var takesWindowOwnership: Boolean = false
@@ -72,6 +72,10 @@ class MainActivity : BaseActivity() {
         private const val SCREEN_ON_DISABLED = 0
         private const val WRITE_STORAGE = 1
         private const val STORAGE_ACCESS_FRAMEWORK = 2
+        private const val LIGHT_DIALOG_CLOSED = -1
+        private const val LIGHT_DIALOG_OPENED = 0
+        private const val LIGHT_DIALOG_CANCEL = 1
+        private const val LIGHT_DIALOG_OK = 2
     }
 
     // Surface used on devices that need a view
@@ -254,13 +258,13 @@ class MainActivity : BaseActivity() {
         return if (lights.hasWarmth()) 1 else 0
     }
 
-    override fun isFrontlightDialogRunning(): Int {
-        return if (runningFrontlightDialog) 1 else 0
+    override fun getLightDialogState(): Int {
+        return lightDialogState
     }
 
-    override fun showFrontlightDialog(title: String, dim: String, warmth: String, okButton: String): Int {
+    override fun showFrontlightDialog(title: String, dim: String, warmth: String, okButton: String, cancelButton: String): Int {
         val hasWarmth = lights.hasWarmth()
-        setFrontlightDialogState(true)
+        setFrontlightDialogState(LIGHT_DIALOG_OPENED)
         runOnUiThread {
             val dimText = TextView(this@MainActivity)
             val dimSeekBar = SeekBar(this@MainActivity)
@@ -302,7 +306,12 @@ class MainActivity : BaseActivity() {
             val builder = AlertDialog.Builder(this@MainActivity)
             builder.setTitle(title)
                 .setCancelable(false)
-                .setPositiveButton(okButton) { dialog, which -> setFrontlightDialogState(false) }
+                .setPositiveButton(okButton) {
+                    _, _ -> setFrontlightDialogState(LIGHT_DIALOG_OK)
+                }
+                .setNegativeButton(cancelButton) {
+                    _, _ -> setFrontlightDialogState(LIGHT_DIALOG_CANCEL)
+                }
 
             val dialog: AlertDialog = builder.create()
             dialog.setView(linearLayout)
@@ -568,8 +577,8 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    private fun setFrontlightDialogState(state: Boolean) {
-        runningFrontlightDialog = state
+    private fun setFrontlightDialogState(state: Int) {
+        lightDialogState = state
     }
 
     /* keep screen awake toggle */
