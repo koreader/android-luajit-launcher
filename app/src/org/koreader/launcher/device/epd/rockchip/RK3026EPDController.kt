@@ -1,14 +1,16 @@
-/* Tested on Tolino Vision2/Shine3 and a Nook Glowlight 3. */
+/* generic EPD Controller for Android devices,
+ * based on https://github.com/unwmun/refreshU */
 
-package org.koreader.launcher.device.freescale
+package org.koreader.launcher.device.epd.rockchip
 
 import org.koreader.launcher.interfaces.EPDInterface
 
-class NTXNewEPDController : NTXEPDController(), EPDInterface {
+class RK3026EPDController : RK30xxEPDController(), EPDInterface {
+
     override fun setEpdMode(targetView: android.view.View,
                             mode: Int, delay: Long,
                             x: Int, y: Int, width: Int, height: Int, epdMode: String?)
     {
-        requestEpdMode(targetView, mode, delay, x, y, width, height)
+        requestEpdMode(targetView, epdMode!!, true)
     }
 }

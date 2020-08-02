@@ -2,15 +2,15 @@
  * based on https://github.com/unwmun/refreshU
  *
  * Note: devices don't need to be declared here unless
- * they have known e-ink update routines and/or bug workarounds. */
+ * they have known e-ink update routines, custom light settings  and/or bug workarounds. */
 
 package org.koreader.launcher.device
 
 import android.os.Build
-import java.util.*
+import java.util.Locale
+import kotlin.collections.HashMap
 
 object DeviceInfo {
-
     val PRODUCT: String
     val EINK_FREESCALE: Boolean
     val EINK_ROCKCHIP: Boolean
@@ -18,6 +18,7 @@ object DeviceInfo {
     val EINK_FULL_SUPPORT: Boolean
     val BUG_WAKELOCKS: Boolean
     val BUG_SCREEN_ROTATION: Boolean
+    val NEEDS_VIEW: Boolean
 
     private val MANUFACTURER: String
     private val BRAND: String
@@ -38,6 +39,7 @@ object DeviceInfo {
     private val ENERGY: Boolean
     private val INKBOOK: Boolean
     private val TOLINO: Boolean
+    private val TOLINO_EPOS: Boolean
     private val NOOK_V520: Boolean
     private val SONY_RP1: Boolean
     private val EMULATOR_X86: Boolean
@@ -45,6 +47,7 @@ object DeviceInfo {
 
     // default values for generic devices.
     internal var EINK = EinkDevice.UNKNOWN
+    internal var LIGHTS = LightsDevice.NONE
     private var BUG = BugDevice.NONE
 
     enum class EinkDevice {
@@ -67,6 +70,11 @@ object DeviceInfo {
         NOOK_V520
     }
 
+    enum class LightsDevice {
+        NONE,
+        TOLINO_EPOS
+    }
+
     enum class BugDevice {
         NONE,
         SONY_RP1,
@@ -84,6 +92,7 @@ object DeviceInfo {
         // --------------- device probe --------------- //
         val deviceMap = HashMap<EinkDevice, Boolean>()
         val bugMap = HashMap<BugDevice, Boolean>()
+        val lightsMap = HashMap<LightsDevice, Boolean>()
 
         // Boyue T62, manufacturer uses both "boeye" and "boyue" ids.
         BOYUE_T62 = (IS_BOYUE
@@ -156,6 +165,11 @@ object DeviceInfo {
                 || DEVICE.contentEquals("ntx_6sl"))
         deviceMap[EinkDevice.TOLINO] = TOLINO
 
+        // Tolino Epos 2 also has warmth lights
+        TOLINO_EPOS = BRAND.contentEquals("rakutenkobo") && MODEL.contentEquals("tolino")
+            && DEVICE.contentEquals("ntx_6sl")
+        lightsMap[LightsDevice.TOLINO_EPOS] = TOLINO_EPOS
+
         // Nook Glowlight 3 et al.
         NOOK_V520 = (MANUFACTURER.contentEquals("barnesandnoble") || MANUFACTURER.contentEquals("freescale"))
                 && (MODEL.contentEquals("bnrv510") || MODEL.contentEquals("bnrv520") || MODEL.contentEquals("bnrv700")
@@ -187,6 +201,16 @@ object DeviceInfo {
             val flag = bugMap[bug]
             if (flag != null && flag) {
                 BUG = bug
+            }
+        }
+
+        // find devices with custom lights
+        val lightsIter = lightsMap.keys.iterator()
+        while (lightsIter.hasNext()) {
+            val lights = lightsIter.next()
+            val flag = lightsMap[lights]
+            if (flag != null && flag) {
+                LIGHTS = lights
             }
         }
 
@@ -222,6 +246,9 @@ object DeviceInfo {
 
         // 4.4+ device without native surface rotation
         BUG_SCREEN_ROTATION = BUG == BugDevice.EMULATOR
+
+        // needs a view
+        NEEDS_VIEW = ! EINK_SUPPORT || EINK_FREESCALE
     }
 
     private fun getBuildField(fieldName: String): String {

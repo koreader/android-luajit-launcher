@@ -30,7 +30,6 @@ import org.koreader.launcher.utils.AssetsUtils
 import org.koreader.launcher.utils.IntentUtils
 import org.koreader.launcher.utils.Logger
 import org.koreader.launcher.utils.ScreenUtils
-import org.koreader.launcher.utils.SystemSettings
 
 /* BaseActivity.java - convenience wrapper on top of NativeActivity that
  * implements most of the kotlin/java methods exposed to lua. */
@@ -38,8 +37,6 @@ import org.koreader.launcher.utils.SystemSettings
 abstract class BaseActivity : NativeActivity(), JNILuaInterface,
     ActivityCompat.OnRequestPermissionsResultCallback{
 
-    private var brightness: Int = 0
-    private var customBrightness: Boolean = false
     private var fullscreen: Boolean = true // only used on API levels 16-18
     private var splashScreen: Boolean = true
     private var topInsetHeight: Int = 0 // only used on API 28+
@@ -433,15 +430,6 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
     }
 
     /* screen */
-    override fun getScreenBrightness(): Int {
-        return if (customBrightness) {
-            brightness
-        } else {
-            SystemSettings.getSystemBrightness(this)
-            //ScreenUtils.readSettingScreenBrightness(this)
-        }
-    }
-
     override fun getScreenAvailableHeight(): Int {
         return ScreenUtils.getScreenAvailableHeight(this)
     }
@@ -480,10 +468,6 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
         } else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.JELLY_BEAN) {
             ScreenUtils.setFullscreenDeprecated(this, enabled)
         }
-    }
-
-    override fun setScreenBrightness(brightness: Int) {
-        ScreenUtils.setScreenBrightness(this, brightness)
     }
 
     /* widgets */
