@@ -1,9 +1,6 @@
 package org.koreader.launcher.utils
 
-import java.io.File
-import java.io.FileOutputStream
-import java.io.InputStream
-import java.io.IOException
+import java.io.*
 import java.util.Locale
 
 import android.content.ContentResolver
@@ -51,8 +48,13 @@ object FileUtils {
                     uri.authority?.let { domain ->
                         Logger.v(TAG, "trying to resolve a file path from content delivered by $domain")
                     }
-                    val fd = context.contentResolver.openFileDescriptor(contentUri, "r")
-                    getFileDescriptorPath(fd)
+                    try {
+                        val fd = context.contentResolver.openFileDescriptor(contentUri, "r")
+                        getFileDescriptorPath(fd)
+                    } catch (e: FileNotFoundException) {
+                        e.printStackTrace()
+                        null
+                    }
                 }
                 else -> null
             }
