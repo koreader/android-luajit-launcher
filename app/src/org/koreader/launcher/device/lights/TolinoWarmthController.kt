@@ -30,7 +30,7 @@ class TolinoWarmthController : LightInterface {
                 if (File(COLOR_FILE_VISION4HD).exists()) {
                     COLOR_FILE = COLOR_FILE_VISION4HD
                 }
-                else if (File(COLOR_FILE_EPOS2).exists()) {
+                else { // if (File(COLOR_FILE_EPOS2).exists())
                     COLOR_FILE = COLOR_FILE_EPOS2
                 }
                 Logger.v(TAG, "using $COLOR_FILE")
