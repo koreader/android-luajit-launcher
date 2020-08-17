@@ -22,10 +22,10 @@ class TolinoWarmthController : LightInterface {
         private const val MIN = 0
         private const val COLOR_FILE_EPOS2 = "/sys/class/backlight/tlc5947_bl/color"
         private const val COLOR_FILE_VISION4HD = "/sys/class/backlight/lm3630a_led/color"
-	private val COLOR_FILE = if (File(COLOR_FILE_VISION4HD).exists())
-	    COLOR_FILE_VISION4HD
-	else 
-	    COLOR_FILE_EPOS2
+        private val COLOR_FILE = if (File(COLOR_FILE_VISION4HD).exists())
+            COLOR_FILE_VISION4HD
+        else
+            COLOR_FILE_EPOS2
     }
 
     override fun hasFallback(): Boolean {
