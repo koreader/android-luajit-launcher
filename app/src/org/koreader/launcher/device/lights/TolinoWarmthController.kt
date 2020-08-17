@@ -22,7 +22,7 @@ class TolinoWarmthController : LightInterface {
         private const val MIN = 0
         private const val COLOR_FILE_EPOS2 = "/sys/class/backlight/tlc5947_bl/color"
         private const val COLOR_FILE_VISION4HD = "/sys/class/backlight/lm3630a_led/color"
-        private var COLOR_FILE = "" // gets initialized before first write access
+        private lateinit var COLOR_FILE : String // gets initialized before first write access
     }
 
     override fun hasFallback(): Boolean {
@@ -78,18 +78,18 @@ class TolinoWarmthController : LightInterface {
         }
 
         // on the first call, we check on which Tolino we are running
-        if (COLOR_FILE=="") { 
+        if (COLOR_FILE == "") {
             if (File(COLOR_FILE_VISION4HD).exists()) {
-                COLOR_FILE=COLOR_FILE_VISION4HD
+                COLOR_FILE = COLOR_FILE_VISION4HD
             }
             else if (File(COLOR_FILE_EPOS2).exists()) {
-                COLOR_FILE=COLOR_FILE_EPOS2
+                COLOR_FILE = COLOR_FILE_EPOS2
             }
             Logger.v(TAG, "using $COLOR_FILE")
         }
 
         val colorFile = File(COLOR_FILE)
-        Logger.v(TAG, "Setting warmth to $warmth")        
+        Logger.v(TAG, "Setting warmth to $warmth")
         try {
             if (!colorFile.canWrite()) {
                 Runtime.getRuntime().exec("su -c chmod 666 $COLOR_FILE")
