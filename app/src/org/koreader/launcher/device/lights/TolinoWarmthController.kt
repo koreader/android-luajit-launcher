@@ -20,7 +20,12 @@ class TolinoWarmthController : LightInterface {
         private const val BRIGHTNESS_MAX = 255
         private const val WARMTH_MAX = 10
         private const val MIN = 0
-        private const val COLOR_FILE = "/sys/class/backlight/tlc5947_bl/color"
+        private const val COLOR_FILE_EPOS2 = "/sys/class/backlight/tlc5947_bl/color"
+        private const val COLOR_FILE_VISION4HD = "/sys/class/backlight/lm3630a_led/color"
+        private val COLOR_FILE = if (File(COLOR_FILE_VISION4HD).exists())
+            COLOR_FILE_VISION4HD
+        else
+            COLOR_FILE_EPOS2
     }
 
     override fun hasFallback(): Boolean {
@@ -74,15 +79,13 @@ class TolinoWarmthController : LightInterface {
             Logger.w(TAG, "warmth value of of range: $warmth")
             return
         }
+
         val colorFile = File(COLOR_FILE)
         Logger.v(TAG, "Setting warmth to $warmth")
         try {
-            colorFile.setLastModified(System.currentTimeMillis())
-        } catch (e: Exception) {
-            Runtime.getRuntime().exec("su -c chmod 666 $COLOR_FILE")
-        }
-
-        try {
+            if (!colorFile.canWrite()) {
+                Runtime.getRuntime().exec("su -c chmod 666 $COLOR_FILE")
+            }
             colorFile.writeText((WARMTH_MAX - warmth).toString())
         } catch (e: Exception) {
             Logger.w(TAG, "$e")

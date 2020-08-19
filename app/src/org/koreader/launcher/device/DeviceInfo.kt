@@ -165,7 +165,7 @@ object DeviceInfo {
                 || DEVICE.contentEquals("ntx_6sl"))
         deviceMap[EinkDevice.TOLINO] = TOLINO
 
-        // Tolino Epos 2 also has warmth lights
+        // Tolino Epos 2 and Tolino Vision 4 also have warmth lights
         TOLINO_EPOS = BRAND.contentEquals("rakutenkobo") && MODEL.contentEquals("tolino")
             && DEVICE.contentEquals("ntx_6sl")
         lightsMap[LightsDevice.TOLINO_EPOS] = TOLINO_EPOS
