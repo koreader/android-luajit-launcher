@@ -51,7 +51,7 @@ class GenericController : LightInterface {
     override fun setBrightness(activity: Activity, brightness: Int) {
         Logger.v(TAG, "Setting brightness to $brightness")
         if ((brightness < BRIGHTNESS_MIN || brightness > BRIGHTNESS_MAX) || (brightness < 0)) return
-        val level = if (brightness > 0) { 
+        val level = if (brightness > 0) {
                 (brightness - BRIGHTNESS_MIN) * 1.0f / (BRIGHTNESS_MAX - BRIGHTNESS_MIN)
             } else 0.0f
         activity.runOnUiThread {
