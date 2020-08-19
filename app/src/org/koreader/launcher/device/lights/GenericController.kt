@@ -53,7 +53,7 @@ class GenericController : LightInterface {
         if ((brightness < BRIGHTNESS_MIN || brightness > BRIGHTNESS_MAX) || (brightness < 0)) return
         val level = if (brightness > 0) { 
                 (brightness - BRIGHTNESS_MIN) * 1.0f / (BRIGHTNESS_MAX - BRIGHTNESS_MIN)
-            } else 0.0f 
+            } else 0.0f
         activity.runOnUiThread {
             try {
                 val params = activity.window.attributes
