@@ -12,7 +12,7 @@ class GenericController : LightInterface {
     companion object {
         private const val TAG = "lights"
         private const val BRIGHTNESS_MAX = 255
-        private const val BRIGHTNESS_MIN = 0
+        private const val BRIGHTNESS_MIN = 1 // zero would mean system-settings
     }
 
     override fun hasFallback(): Boolean {
@@ -28,7 +28,7 @@ class GenericController : LightInterface {
     }
 
     override fun getBrightness(activity: Activity): Int {
-        val brightness = (activity.window.attributes.screenBrightness * 255 / 1.0f).toInt()
+        val brightness = (activity.window.attributes.screenBrightness * (BRIGHTNESS_MAX - BRIGHTNESS_MIN) / 1.0f).toInt() + BRIGHTNESS_MIN
         return if (brightness < 0) {
              try {
                 Settings.System.getInt(activity.applicationContext.contentResolver,
@@ -45,10 +45,15 @@ class GenericController : LightInterface {
         return 0
     }
 
+    // brightness has to be between BRIGHTNESS_MIN and BRIGHTNESS_MAX or
+    // negative for system settings. 
+    // Values between 0 and BRIGHTNESS_MIN are gracefully ignored.
     override fun setBrightness(activity: Activity, brightness: Int) {
         Logger.v(TAG, "Setting brightness to $brightness")
-        if (brightness < BRIGHTNESS_MIN || brightness > BRIGHTNESS_MAX) return
-        val level = brightness * 1.0f / BRIGHTNESS_MAX
+        if ((brightness < BRIGHTNESS_MIN || brightness > BRIGHTNESS_MAX) || (brightness < 0)) return
+        val level = if (brightness > 0) {
+                (brightness - BRIGHTNESS_MIN) * 1.0f / (BRIGHTNESS_MAX - BRIGHTNESS_MIN)
+            } else 0.0f
         activity.runOnUiThread {
             try {
                 val params = activity.window.attributes
