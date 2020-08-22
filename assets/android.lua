@@ -1764,7 +1764,6 @@ local function run(android_app_state)
     end
 
     android.canChangeFrontlight = function()
-        android.DEBUG("calling jni canChangeFrontligh")
         return JNI:context(android.app.activity.vm, function(jni)
             return jni:callIntMethod(
                 android.app.activity.clazz,
