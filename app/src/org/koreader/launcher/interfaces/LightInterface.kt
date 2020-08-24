@@ -6,7 +6,6 @@ interface LightInterface {
     fun hasFallback(): Boolean
     fun hasWarmth(): Boolean
     fun needsPermission(): Boolean
-    fun canChangeFrontlight(activity: Activity): Int
     fun getBrightness(activity: Activity): Int
     fun getWarmth(activity: Activity): Int
     fun setBrightness(activity: Activity, brightness: Int)
@@ -15,4 +14,5 @@ interface LightInterface {
     fun getMaxWarmth(): Int
     fun getMinBrightness(): Int
     fun getMaxBrightness(): Int
+    fun toggleFrontlightSwitchOn(activity: Activity): Int
 }

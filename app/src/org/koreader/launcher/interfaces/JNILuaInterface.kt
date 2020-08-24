@@ -22,7 +22,6 @@ interface JNILuaInterface {
     fun getNetworkInfo(): String
     fun getPlatformName(): String
     fun getProduct(): String
-    fun canChangeFrontlight(): Int
     fun getScreenBrightness(): Int
     fun getScreenMinBrightness(): Int
     fun getScreenMaxBrightness(): Int
@@ -69,4 +68,5 @@ interface JNILuaInterface {
     fun showFrontlightDialog(title: String, dim: String, warmth: String, okButton: String, cancelButton: String): Int
     fun showToast(message: String)
     fun showToast(message: String, longTimeout: Boolean)
+    fun toggleFrontlightSwitchOn(): Int
 }
