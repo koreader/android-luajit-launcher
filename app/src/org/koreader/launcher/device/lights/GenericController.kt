@@ -27,7 +27,7 @@ class GenericController : LightInterface {
         return false
     }
 
-    override fun toggleFrontlightSwitchOn(activity: Activity): Int {
+    override fun enableFrontlightSwitch(activity: Activity): Int {
         return 1
     }
 
