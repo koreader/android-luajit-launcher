@@ -20,6 +20,7 @@ class TolinoWarmthController : LightInterface {
         private const val BRIGHTNESS_MAX = 255
         private const val WARMTH_MAX = 10
         private const val MIN = 0
+        private const val ACTUAL_BRIGHTNESS_FILE = "/sys/class/backlight/mxc_msp430_fl.0/actual_brightness" // always readable, same for Epos2 and Vision4
         private const val COLOR_FILE_EPOS2 = "/sys/class/backlight/tlc5947_bl/color"
         private const val COLOR_FILE_VISION4HD = "/sys/class/backlight/lm3630a_led/color"
         private val COLOR_FILE = if (File(COLOR_FILE_VISION4HD).exists())
@@ -38,6 +39,52 @@ class TolinoWarmthController : LightInterface {
 
     override fun needsPermission(): Boolean {
         return false
+    }
+
+    // try to toggle on frontlight switch on Tolinos, returns the former switch state
+    override fun enableFrontlightSwitch(activity: Activity): Int {
+        // ATTENTION: getBrightness, setBrightness use the Android range 0..255
+        // in the brightness files the used range is 0..100
+        val startBrightness = getBrightness(activity)
+
+        val actualBrightnessFile = File(ACTUAL_BRIGHTNESS_FILE)
+        val startBrightnessFromFile = try {
+            actualBrightnessFile.readText().trim().toInt()
+        } catch (e: Exception) {
+            Logger.w(TAG, "$e")
+            -1
+        }
+
+        // change the brightness through android. Be aware one step in Android is less than one step in the file
+        if (startBrightness > BRIGHTNESS_MAX/2)
+            setBrightness(activity, startBrightness - (BRIGHTNESS_MAX/100+1).toInt())
+        else
+            setBrightness(activity, startBrightness + (BRIGHTNESS_MAX/100+1).toInt())
+
+        // we have to wait until the android changes seep through to the file,
+        // 50ms is to less, 60ms seems to work, so use 80 to have some safety
+        Thread.sleep(80)
+
+        val actualBrightnessFromFile = try {
+            actualBrightnessFile.readText().trim().toInt()
+        } catch (e: Exception) {
+            Logger.w(TAG, "$e")
+            -1
+        }
+
+        setBrightness(activity, startBrightness)
+
+        if (startBrightnessFromFile == actualBrightnessFromFile) {
+            return try { // try to send keyevent to system to turn on frontlight, needs extended permissions
+                Runtime.getRuntime().exec("su -c input keyevent KEYCODE_BUTTON_A && echo OK")
+                1
+            } catch (e: Exception) {
+                Logger.w("Exception in enableFrontlightSwitch", e.toString());
+                0
+            }
+        }
+
+        return 1
     }
 
     override fun getBrightness(activity: Activity): Int {

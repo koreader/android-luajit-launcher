@@ -27,6 +27,10 @@ class GenericController : LightInterface {
         return false
     }
 
+    override fun enableFrontlightSwitch(activity: Activity): Int {
+        return 1
+    }
+
     override fun getBrightness(activity: Activity): Int {
         val brightness = (activity.window.attributes.screenBrightness * (BRIGHTNESS_MAX - BRIGHTNESS_MIN) / 1.0f).toInt() + BRIGHTNESS_MIN
         return if (brightness < 0) {

@@ -1735,6 +1735,7 @@ local function run(android_app_state)
     android.orientation.mode = function()
         return android.screen.orientation
     end
+
     android.orientation.get = function()
         return JNI:context(android.app.activity.vm, function(jni)
             return jni:callIntMethod(
@@ -1744,6 +1745,7 @@ local function run(android_app_state)
             )
         end)
     end
+
     android.orientation.set = function(new_orientation)
         if new_orientation >= ffi.C.ASCREEN_ORIENTATION_UNSPECIFIED and
                 new_orientation <= ffi.C.ASCREEN_ORIENTATION_FULL_SENSOR then
@@ -1759,6 +1761,16 @@ local function run(android_app_state)
         else
             android.LOGW("ignoring invalid orientation", new_orientation)
         end
+    end
+
+    android.enableFrontlightSwitch = function()
+        return JNI:context(android.app.activity.vm, function(jni)
+            return jni:callIntMethod(
+                android.app.activity.clazz,
+                "enableFrontlightSwitch",
+                "()I"
+            ) == 1
+        end)
     end
 
     android.getScreenBrightness = function()
