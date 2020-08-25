@@ -45,7 +45,6 @@ class OnyxWarmthController : LightInterface {
     override fun getWarmth(activity: Activity): Int {
         val colorFile = File(WARMTH_FILE)
         return try {
-            // TODO: Set onyx value
             Settings.System.getInt(activity.applicationContext.contentResolver,
                 SETTINGS_WARM)
         } catch (e: Exception) {
@@ -76,7 +75,6 @@ class OnyxWarmthController : LightInterface {
             return
         }
         val warmthFile = File(WARMTH_FILE)
-        // TODO: Add anroid settings!!
         Logger.v(TAG, "Setting warmth to $warmth")
         try {
             Settings.System.putInt(activity.applicationContext.contentResolver,
@@ -102,7 +100,6 @@ class OnyxWarmthController : LightInterface {
     override fun getMaxBrightness(): Int {
         return BRIGHTNESS_MAX
     }
-
 
     override fun enableFrontlightSwitch(activity: Activity): Int {
         return MIN
