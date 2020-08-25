@@ -5,6 +5,7 @@ import java.util.Locale
 
 import org.koreader.launcher.device.lights.GenericController
 import org.koreader.launcher.device.lights.TolinoWarmthController
+import org.koreader.launcher.device.lights.OnyxWarmthController
 import org.koreader.launcher.utils.Logger
 
 object LightsFactory {
@@ -14,6 +15,10 @@ object LightsFactory {
                 DeviceInfo.LightsDevice.TOLINO_EPOS -> {
                     logController("Tolino")
                     TolinoWarmthController()
+                }
+                DeviceInfo.LightsDevice.ONYX_NOVA2 -> {
+                    logController("ONYX_NOVA2")
+                    OnyxWarmthController()
                 }
                 else -> {
                     logController("Generic")
