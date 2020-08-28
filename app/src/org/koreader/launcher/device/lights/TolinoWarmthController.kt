@@ -41,8 +41,7 @@ class TolinoWarmthController : LightInterface {
         return false
     }
 
-    // try to toggle on frontlight switch on Tolinos, returns the former switch state
-    override fun enableFrontlightSwitch(activity: Activity): Int {
+    override fun getFrontlightSwitch(activity: Activity): Int {
         // ATTENTION: getBrightness, setBrightness use the Android range 0..255
         // in the brightness files the used range is 0..100
         val startBrightness = getBrightness(activity)
@@ -74,14 +73,22 @@ class TolinoWarmthController : LightInterface {
 
         setBrightness(activity, startBrightness)
 
-        if (startBrightnessFromFile == actualBrightnessFromFile) {
-            return try { // try to send keyevent to system to turn on frontlight, needs extended permissions
-                Runtime.getRuntime().exec("su -c input keyevent KEYCODE_BUTTON_A && echo OK")
-                1
+        if (actualBrightnessFromFile == startBrightnessFromFile)
+            return 0 // switch is off
+        else
+            return 1 // switch is on
+}
+
+    // try to toggle on frontlight switch on Tolinos, returns the former switch state
+    override fun enableFrontlightSwitch(activity: Activity): Int {
+
+        if (getFrontlightSwitch(activity) == 0) {
+            try { // try to send keyevent to system to turn on frontlight, needs extended permissions
+                Runtime.getRuntime().exec("su -c input keyevent KEYCODE_BUTTON_A");
             } catch (e: Exception) {
                 Logger.w("Exception in enableFrontlightSwitch", e.toString());
-                0
             }
+            return 0 // former switch state
         }
 
         return 1

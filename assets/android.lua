@@ -1763,6 +1763,16 @@ local function run(android_app_state)
         end
     end
 
+    android.getFrontlightSwitch = function()
+        return JNI:context(android.app.activity.vm, function(jni)
+            return jni:callIntMethod(
+                android.app.activity.clazz,
+                "getFrontlightSwitch",
+                "()I"
+            ) == 1
+        end)
+    end
+
     android.enableFrontlightSwitch = function()
         return JNI:context(android.app.activity.vm, function(jni)
             return jni:callIntMethod(
