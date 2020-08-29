@@ -3,7 +3,6 @@ package org.koreader.launcher.device.lights
 import java.io.File
 
 import android.app.Activity
-import android.provider.Settings
 import android.util.Log
 
 import org.koreader.launcher.interfaces.LightInterface
