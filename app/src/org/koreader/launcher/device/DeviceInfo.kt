@@ -65,7 +65,6 @@ object DeviceInfo {
         CREMA,
         CREMA_0650L,
         ONYX_C67,
-        ONYX_NOVA2,
         ENERGY,
         INKBOOK,
         TOLINO,
