@@ -44,6 +44,12 @@ class TolinoWarmthController : LightInterface {
     override fun getFrontlightSwitchState(activity: Activity): Int {
         // ATTENTION: getBrightness, setBrightness use the Android range 0..255
         // in the brightness files the used range is 0..100
+
+        // As we don`t know, if the frontlightSwitch was pressed just before this method
+        // was called, we have to wait until the android changes seep through to the file,
+        // 50ms is to less, 60ms seems to work, so use 80 to have some safety
+        Thread.sleep(80)
+
         val startBrightness = getBrightness(activity)
 
         val actualBrightnessFile = File(ACTUAL_BRIGHTNESS_FILE)
@@ -55,10 +61,12 @@ class TolinoWarmthController : LightInterface {
         }
 
         // change the brightness through android. Be aware one step in Android is less than one step in the file
+        var actualBrightness = startBrightness
         if (startBrightness > BRIGHTNESS_MAX/2)
-            setBrightness(activity, startBrightness - (BRIGHTNESS_MAX/100+1).toInt())
+            actualBrightness -= (BRIGHTNESS_MAX/100+1).toInt()
         else
-            setBrightness(activity, startBrightness + (BRIGHTNESS_MAX/100+1).toInt())
+            actualBrightness +=  (BRIGHTNESS_MAX/100+1).toInt()
+        setBrightness(activity, actualBrightness)
 
         // we have to wait until the android changes seep through to the file,
         // 50ms is to less, 60ms seems to work, so use 80 to have some safety
@@ -68,7 +76,6 @@ class TolinoWarmthController : LightInterface {
             actualBrightnessFile.readText().trim().toInt()
         } catch (e: Exception) {
             Logger.w(TAG, "$e")
-            -1
         }
 
         setBrightness(activity, startBrightness)
@@ -78,7 +85,7 @@ class TolinoWarmthController : LightInterface {
             return 0 // switch is off
         }
         else {
-            Logger.w(TAG, "frontlight Switch off")
+            Logger.w(TAG, "frontlight Switch on")
             return 1 // switch is on
         }
 }
