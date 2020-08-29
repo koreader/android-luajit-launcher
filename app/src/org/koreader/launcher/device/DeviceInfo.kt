@@ -36,6 +36,7 @@ object DeviceInfo {
     private val CREMA: Boolean
     private val CREMA_0650L: Boolean
     private val ONYX_C67: Boolean
+    private val ONYX_NOVA2: Boolean
     private val ENERGY: Boolean
     private val INKBOOK: Boolean
     private val TOLINO: Boolean
@@ -72,7 +73,8 @@ object DeviceInfo {
 
     enum class LightsDevice {
         NONE,
-        TOLINO_EPOS
+        TOLINO_EPOS,
+        ONYX_NOVA2
     }
 
     enum class BugDevice {
@@ -141,6 +143,12 @@ object DeviceInfo {
         // Crema Carta+
         CREMA_0650L = BRAND.contentEquals("crema") && PRODUCT.contentEquals("keplerb")
         deviceMap[EinkDevice.CREMA_0650L] = CREMA_0650L
+
+        // Onyx NOVA 2
+        ONYX_NOVA2 = (MANUFACTURER.contentEquals("onyx")
+                && PRODUCT.contentEquals("nova2")
+                && DEVICE.contentEquals("nova2"))
+        lightsMap[LightsDevice.ONYX_NOVA2] = ONYX_NOVA2
 
         // Onyx C67
         ONYX_C67 = (MANUFACTURER.contentEquals("onyx")
