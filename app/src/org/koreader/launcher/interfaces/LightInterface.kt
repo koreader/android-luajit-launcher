@@ -14,6 +14,6 @@ interface LightInterface {
     fun getMaxWarmth(): Int
     fun getMinBrightness(): Int
     fun getMaxBrightness(): Int
-    fun getFrontlightSwitch(activity: Activity): Int
+    fun getFrontlightSwitchState(activity: Activity): Int
     fun enableFrontlightSwitch(activity: Activity): Int
 }

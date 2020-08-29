@@ -222,8 +222,8 @@ class MainActivity : BaseActivity() {
      *             override methods used by lua/JNI                *
      *--------------------------------------------------------------*/
 
-    override fun getFrontlightSwitch(): Int {
-        return lights.getFrontlightSwitch(this@MainActivity)
+    override fun getFrontlightSwitchState(): Int {
+        return lights.getFrontlightSwitchState(this@MainActivity)
     }
 
     override fun enableFrontlightSwitch(): Int {
