@@ -2,6 +2,7 @@
 <!--suppress AndroidDomInspection -->
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="org.koreader.launcher" >
 
     <!-- only used in Google Play, to filter the app on unsupported devices -->
@@ -16,7 +17,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
 
-    <application
+    <application tools:replace="android:allowBackup"
         android:name=".MainApp"
         android:icon="@drawable/icon"
         android:banner="@drawable/banner"

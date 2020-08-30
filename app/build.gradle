@@ -112,6 +112,9 @@ dependencies {
     implementation "androidx.legacy:legacy-support-v4:$androidx_supportv4_version"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_plugin_version"
 
+    // OnyxSDK
+    implementation('com.onyx.android.sdk:onyxsdk-base:1.5.4')
+
     // add Leak Canary on debug variants.
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.1'
 }
