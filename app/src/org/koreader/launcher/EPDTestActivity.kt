@@ -9,6 +9,7 @@ import android.view.View
 import android.widget.TextView
 import android.widget.Button
 
+import org.koreader.launcher.device.epd.onyx.OnyxEPDController
 import org.koreader.launcher.device.epd.freescale.NTXEPDController
 import org.koreader.launcher.device.epd.rockchip.RK30xxEPDController
 import org.koreader.launcher.device.epd.rockchip.RK33xxEPDController
@@ -86,13 +87,14 @@ class EPDTestActivity : Activity() {
                 if (RK33xxEPDController.requestEpdMode("EPD_FULL")) success = true
             } else if (test == NTXTEST) {
                 // get screen width and height
-                val display = windowManager.defaultDisplay
-                val size = Point()
-                display.getSize(size)
-                val width = size.x
-                val height = size.y
-                info.append("tolino: ")
-                if (NTXEPDController.requestEpdMode(v, 34, 50, 0, 0, width, height)) success = true
+                // val display = windowManager.defaultDisplay
+                // val size = Point()
+                // display.getSize(size)
+                // val width = size.x
+                // val height = size.y
+                // info.append("tolino: ")
+                // if (NTXEPDController.requestEpdMode(v, 34, 50, 0, 0, width, height)) success = true
+                OnyxEPDController().setEpdMode(v, 34, 50, 0, 0, 0, 0, "")
             }
         } catch (e: Exception) {
             e.printStackTrace()
