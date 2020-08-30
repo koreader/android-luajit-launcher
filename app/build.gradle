@@ -50,6 +50,7 @@ android {
         }
         arm {
             ndk { abiFilters "armeabi-v7a" }
+            minSdkVersion safSdk
             dimension = 'abi'
         }
         fullStorage {
