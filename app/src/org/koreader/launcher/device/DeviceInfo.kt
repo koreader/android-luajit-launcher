@@ -14,6 +14,7 @@ object DeviceInfo {
     val PRODUCT: String
     val EINK_FREESCALE: Boolean
     val EINK_ROCKCHIP: Boolean
+    val EINK_QCOM: Boolean
     val EINK_SUPPORT: Boolean
     val EINK_FULL_SUPPORT: Boolean
     val BUG_WAKELOCKS: Boolean
@@ -65,6 +66,7 @@ object DeviceInfo {
         CREMA,
         CREMA_0650L,
         ONYX_C67,
+        ONYX_NOVA2,
         ENERGY,
         INKBOOK,
         TOLINO,
@@ -149,6 +151,7 @@ object DeviceInfo {
                 && PRODUCT.contentEquals("nova2")
                 && DEVICE.contentEquals("nova2"))
         lightsMap[LightsDevice.ONYX_NOVA2] = ONYX_NOVA2
+        deviceMap[EinkDevice.ONYX_NOVA2] = ONYX_NOVA2
 
         // Onyx C67
         ONYX_C67 = (MANUFACTURER.contentEquals("onyx")
@@ -243,11 +246,13 @@ object DeviceInfo {
             INKBOOK ||
             ONYX_C67
 
+        EINK_QCOM = ONYX_NOVA2
+
         // basic eink support
-        EINK_SUPPORT = EINK_FREESCALE || EINK_ROCKCHIP
+        EINK_SUPPORT = EINK_FREESCALE || EINK_ROCKCHIP || EINK_QCOM
 
         // full eink support
-        EINK_FULL_SUPPORT = CREMA || TOLINO
+        EINK_FULL_SUPPORT = CREMA || TOLINO || ONYX_NOVA2
 
         // need wakelocks
         BUG_WAKELOCKS = BUG == BugDevice.SONY_RP1
@@ -256,7 +261,7 @@ object DeviceInfo {
         BUG_SCREEN_ROTATION = BUG == BugDevice.EMULATOR
 
         // needs a surfaceView to do epd updates
-        NEEDS_VIEW = EINK_FREESCALE
+        NEEDS_VIEW = EINK_FREESCALE || EINK_QCOM
     }
 
     private fun getBuildField(fieldName: String): String {
