@@ -65,6 +65,7 @@ object DeviceInfo {
         CREMA,
         CREMA_0650L,
         ONYX_C67,
+        ONYX_NOVA2,
         ENERGY,
         INKBOOK,
         TOLINO,
@@ -149,6 +150,7 @@ object DeviceInfo {
                 && PRODUCT.contentEquals("nova2")
                 && DEVICE.contentEquals("nova2"))
         lightsMap[LightsDevice.ONYX_NOVA2] = ONYX_NOVA2
+        deviceMap[EinkDevice.ONYX_NOVA2] = ONYX_NOVA2
 
         // Onyx C67
         ONYX_C67 = (MANUFACTURER.contentEquals("onyx")
