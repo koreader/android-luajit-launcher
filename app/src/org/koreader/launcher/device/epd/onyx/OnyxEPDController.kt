@@ -29,6 +29,9 @@
 
 package org.koreader.launcher.device.epd.onyx
 
+import android.util.Log
+import android.view.View
+
 import com.onyx.android.sdk.api.device.epd.EpdController
 import com.onyx.android.sdk.api.device.epd.UpdateMode
 
@@ -39,6 +42,7 @@ class OnyxEPDController : EPDInterface {
                             mode: Int, delay: Long,
                             x: Int, y: Int, width: Int, height: Int, epdMode: String?)
     {
-        EpdController.repaintEveryThing(UpdateMode.GC);
+        EpdController.repaintEveryThing(UpdateMode.GC)
+        Log.i("epd", "Refresh requested!")
     }
 }
