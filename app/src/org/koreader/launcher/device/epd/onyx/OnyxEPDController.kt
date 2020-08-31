@@ -42,7 +42,18 @@ class OnyxEPDController : EPDInterface {
                             mode: Int, delay: Long,
                             x: Int, y: Int, width: Int, height: Int, epdMode: String?)
     {
-        EpdController.repaintEveryThing(UpdateMode.GC)
+        val updateMode = when(mode){
+            1 -> UpdateMode.DU
+            2 -> UpdateMode.GC
+            3 -> UpdateMode.GC4
+            4 -> UpdateMode.GC
+            5 -> UpdateMode.ANIMATION_QUALITY
+            else -> UpdateMode.GC
+        }
+        EpdController.enableScreenUpdate(targetView, true)
+        // EpdController.repaintEveryThing(UpdateMode.GC)
+        EpdController.refreshScreenRegion(targetView, x, y, x + width, y + height, updateMode)
+        EpdController.enableScreenUpdate(targetView, false)
         Log.i("epd", "Refresh requested!")
     }
 }
