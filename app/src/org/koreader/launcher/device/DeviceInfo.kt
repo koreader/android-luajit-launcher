@@ -250,7 +250,7 @@ object DeviceInfo {
         EINK_SUPPORT = EINK_FREESCALE || EINK_ROCKCHIP
 
         // full eink support
-        EINK_FULL_SUPPORT = CREMA || TOLINO
+        EINK_FULL_SUPPORT = CREMA || TOLINO || ONYX_NOVA2
 
         // need wakelocks
         BUG_WAKELOCKS = BUG == BugDevice.SONY_RP1
