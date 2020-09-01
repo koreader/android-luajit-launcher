@@ -29,6 +29,8 @@
 
 package org.koreader.launcher.device.epd.onyx
 
+import java.lang.Thread
+
 import android.util.Log
 import android.view.View
 
@@ -48,12 +50,23 @@ class OnyxEPDController : EPDInterface {
             3 -> UpdateMode.GC4
             4 -> UpdateMode.GC
             5 -> UpdateMode.ANIMATION_QUALITY
+            7 -> UpdateMode.ANIMATION_QUALITY
             else -> UpdateMode.GC
         }
-        EpdController.enableScreenUpdate(targetView, true)
-        // EpdController.repaintEveryThing(UpdateMode.GC)
-        EpdController.refreshScreenRegion(targetView, x, y, x + width, y + height, updateMode)
-        EpdController.enableScreenUpdate(targetView, false)
-        Log.i("epd", "Refresh requested!")
+        object : Thread(){
+            override fun run(){
+                EpdController.enableScreenUpdate(targetView, true)
+                Thread.sleep(delay + 100)
+                EpdController.refreshScreenRegion(targetView, x, y, x + width, y + height, updateMode)
+                Thread.sleep(100)
+                EpdController.enableScreenUpdate(targetView, false)
+//                 object : Thread(){
+//                     override fun run(){
+//                         Thread.sleep(1000)
+//                         EpdController.enableScreenUpdate(targetView, true)
+//                     }
+//                 }.start()
+            }
+        }.start()
     }
 }
