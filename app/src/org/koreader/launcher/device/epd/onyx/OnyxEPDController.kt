@@ -55,17 +55,9 @@ class OnyxEPDController : EPDInterface {
         }
         object : Thread(){
             override fun run(){
-                EpdController.enableScreenUpdate(targetView, true)
-                Thread.sleep(delay + 100)
+                EpdController.resetUpdListSize()
+                Thread.sleep(delay)
                 EpdController.refreshScreenRegion(targetView, x, y, x + width, y + height, updateMode)
-                Thread.sleep(100)
-                EpdController.enableScreenUpdate(targetView, false)
-//                 object : Thread(){
-//                     override fun run(){
-//                         Thread.sleep(1000)
-//                         EpdController.enableScreenUpdate(targetView, true)
-//                     }
-//                 }.start()
             }
         }.start()
     }
