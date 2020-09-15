@@ -50,14 +50,16 @@ class OnyxEPDController : EPDInterface {
             3 -> UpdateMode.GC4
             4 -> UpdateMode.GC
             5 -> UpdateMode.ANIMATION_QUALITY
-            7 -> UpdateMode.ANIMATION_QUALITY
+            7 -> UpdateMode.DU_QUALITY
             else -> UpdateMode.GC
         }
         object : Thread(){
             override fun run(){
-                EpdController.resetUpdListSize()
+                EpdController.enableScreenUpdate(targetView, true)
                 Thread.sleep(delay)
                 EpdController.refreshScreenRegion(targetView, x, y, x + width, y + height, updateMode)
+                EpdController.setUpdListSize(0)
+                EpdController.enableScreenUpdate(targetView, false)
             }
         }.start()
     }
