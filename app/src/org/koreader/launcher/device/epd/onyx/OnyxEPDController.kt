@@ -1,4 +1,3 @@
-
 /* generic EPD Controller for Android,
  *
  * interface for newer ntx devices, like Nooks and Tolinos.
@@ -36,7 +35,8 @@ import android.view.View
 
 import com.onyx.android.sdk.api.device.epd.EpdController
 import com.onyx.android.sdk.api.device.epd.UpdateMode
-
+import com.onyx.android.sdk.api.device.epd.UpdateScheme
+import com.onyx.android.sdk.device.SDMDevice
 import org.koreader.launcher.interfaces.EPDInterface
 
 class OnyxEPDController : EPDInterface {
@@ -44,23 +44,13 @@ class OnyxEPDController : EPDInterface {
                             mode: Int, delay: Long,
                             x: Int, y: Int, width: Int, height: Int, epdMode: String?)
     {
-        val updateMode = when(mode){
-            1 -> UpdateMode.DU
-            2 -> UpdateMode.GC
-            3 -> UpdateMode.GC4
-            4 -> UpdateMode.GC
-            5 -> UpdateMode.ANIMATION_QUALITY
-            7 -> UpdateMode.DU_QUALITY
-            else -> UpdateMode.GC
-        }
-        object : Thread(){
-            override fun run(){
-                EpdController.enableScreenUpdate(targetView, true)
-                Thread.sleep(delay)
-                EpdController.refreshScreenRegion(targetView, x, y, x + width, y + height, updateMode)
-                EpdController.setUpdListSize(0)
-                EpdController.enableScreenUpdate(targetView, false)
-            }
-        }.start()
+        EpdController.setSystemUpdateModeAndScheme(UpdateMode.None, UpdateScheme.None, 0)
+        Class.forName("android.view.View").getMethod("refreshScreen",
+            Integer.TYPE,
+            Integer.TYPE,
+            Integer.TYPE,
+            Integer.TYPE,
+            Integer.TYPE
+            ).invoke(targetView, x, y, width, height, 6)
     }
 }
