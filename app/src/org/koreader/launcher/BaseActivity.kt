@@ -381,7 +381,6 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
                         when (type) {
                             ConnectivityManager.TYPE_WIFI -> {
                                 connectionType = ACTIVE_NETWORK_WIFI
-                                Logger.i("Has network WIFI")
                                 true
                             }
                             ConnectivityManager.TYPE_MOBILE -> {
@@ -398,7 +397,13 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
                             }
                             ConnectivityManager.TYPE_VPN -> {
                                 connectionType = ACTIVE_NETWORK_VPN
-                                Logger.i("Has network VPN")
+                                // Untested
+                                for (connection in connectivityManager.getAllNetworksInfo()){
+                                    if (connection.type == ConnectivityManager.TYPE_WIFI){
+                                        connectionType = ACTIVE_NETWORK_WIFI
+                                        break
+                                    }
+                                }
                                 true
                             }
                             else -> false
