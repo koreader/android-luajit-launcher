@@ -93,7 +93,7 @@ prepare: update
 debug: update build-luajit
 	@echo "Building $(APPNAME) debug APK: Version $(NAME), release $(VERSION), flavor $(FLAVOR)"
 	./gradlew -PversName=$(NAME) -PversCode=$(VERSION) -PprojectName=$(APPNAME) \
-		-PprojectFlavor=$(FLAVOR) app:$(GRADLE_TASK)Debug --warning-mode all
+		-PprojectFlavor=$(FLAVOR) app:$(GRADLE_TASK)Debug
 	mkdir -p bin/
 	find app/build/outputs/apk/ -type f -name '*.apk' -exec mv -v {} bin/ \;
 	@echo "Application $(APPNAME) was built, type: debug (signed), \
@@ -102,7 +102,7 @@ debug: update build-luajit
 release: update build-luajit
 	@echo "Building $(APPNAME) release APK: Version $(NAME), release $(VERSION), flavor $(FLAVOR)"
 	./gradlew -PversName=$(NAME) -PversCode=$(VERSION) -PprojectName=$(APPNAME) \
-		-PprojectFlavor=$(FLAVOR) app:$(GRADLE_TASK)Release --warning-mode all
+		-PprojectFlavor=$(FLAVOR) app:$(GRADLE_TASK)Release
 	mkdir -p bin/
 	find app/build/outputs/apk/ -type f -name '*.apk' -exec mv -v {} bin/ \;
 	@echo "Application $(APPNAME) was built, type: release (unsigned), \
@@ -115,7 +115,7 @@ example: update clean build-luajit
 	mkdir -p assets/module/
 	cp -pv examples/helloWorld/*.lua assets/module/
 	./gradlew -PversName=1.0 -PversCode=1 -PprojectName=HelloFromLua \
-		app:$(GRADLE_TASK)Debug --warning-mode all
+		app:$(GRADLE_TASK)Debug
 	mkdir -p bin/
 	find app/build/outputs/apk/ -type f -name '*.apk' -exec mv -v {} bin/ \;
 
