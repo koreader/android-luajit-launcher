@@ -1729,39 +1729,33 @@ local function run(android_app_state)
     android.screen = {}
     android.screen.width = android.getScreenWidth()
     android.screen.height = android.getScreenHeight()
-    android.screen.orientation = ffi.C.ASCREEN_ORIENTATION_SENSOR_PORTRAIT
 
-    android.orientation = {}
-    android.orientation.mode = function()
-        return android.screen.orientation
-    end
-
-    android.orientation.get = function()
-        return JNI:context(android.app.activity.vm, function(jni)
-            return jni:callIntMethod(
-                android.app.activity.clazz,
-                "getScreenOrientation",
-                "()I"
-            )
-        end)
-    end
-
-    android.orientation.set = function(new_orientation)
-        if new_orientation >= ffi.C.ASCREEN_ORIENTATION_UNSPECIFIED and
-                new_orientation <= ffi.C.ASCREEN_ORIENTATION_FULL_SENSOR then
-            JNI:context(android.app.activity.vm, function(jni)
-                jni:callVoidMethod(
+    android.orientation = {
+        get = function()
+            return JNI:context(android.app.activity.vm, function(jni)
+                return jni:callIntMethod(
                     android.app.activity.clazz,
-                    "setScreenOrientation",
-                    "(I)V",
-                    ffi.new("int32_t", new_orientation)
+                    "getScreenOrientation",
+                    "()I"
                 )
             end)
-            android.screen.orientation = new_orientation
-        else
-            android.LOGW("ignoring invalid orientation", new_orientation)
-        end
-    end
+        end,
+        set = function(new_orientation)
+            if new_orientation >= ffi.C.ASCREEN_ORIENTATION_UNSPECIFIED and
+                new_orientation <= ffi.C.ASCREEN_ORIENTATION_FULL_SENSOR then
+                JNI:context(android.app.activity.vm, function(jni)
+                    jni:callVoidMethod(
+                        android.app.activity.clazz,
+                        "setScreenOrientation",
+                        "(I)V",
+                        ffi.new("int32_t", new_orientation)
+                    )
+                end)
+            else
+                android.LOGW("ignoring invalid orientation", new_orientation)
+            end
+        end,
+    }
 
     android.enableFrontlightSwitch = function()
         return JNI:context(android.app.activity.vm, function(jni)
