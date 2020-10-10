@@ -119,6 +119,9 @@ example: update clean build-luajit
 	mkdir -p bin/
 	find app/build/outputs/apk/ -type f -name '*.apk' -exec mv -v {} bin/ \;
 
+lint:
+	./gradlew lintX86FullStorageRelease
+
 clean:
 	@echo "Cleaning binaries, assets and LuaJIT build"
 	rm -rf assets/module/ bin/ jni/luajit/build
