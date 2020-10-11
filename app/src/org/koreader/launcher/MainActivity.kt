@@ -65,11 +65,6 @@ class MainActivity : BaseActivity() {
 
     companion object {
         private const val TAG_MAIN = "MainActivity"
-        private const val TAG_WINDOW_MANAGER = "WindowManager"
-        private const val TIMEOUT_MIN = 2 * 60 * 1000
-        private const val TIMEOUT_MAX = 45 * 60 * 1000
-        private const val SCREEN_ON_ENABLED = -1
-        private const val SCREEN_ON_DISABLED = 0
 
         private const val LIGHT_DIALOG_CLOSED = -1
         private const val LIGHT_DIALOG_OPENED = 0
@@ -538,6 +533,9 @@ class MainActivity : BaseActivity() {
     }
 
     override fun setScreenOffTimeout(timeout: Int) {
+        val SCREEN_ON_ENABLED = -1
+        val SCREEN_ON_DISABLED = 0
+
         when {
             timeout > SCREEN_ON_DISABLED -> {
                 // custom timeout
@@ -641,14 +639,14 @@ class MainActivity : BaseActivity() {
     /* keep screen awake toggle */
     private fun setScreenOn(enable: Boolean) {
         if (enable != isScreenAlwaysOn) {
-            Logger.d(TAG_WINDOW_MANAGER, "screen on: switching to $enable")
+            Logger.d(TAG_MAIN, "screen on: switching to $enable")
             isScreenAlwaysOn = enable
             runOnUiThread {
                 if (enable) {
-                    Logger.d(TAG_WINDOW_MANAGER, "add FLAG_KEEP_SCREEN_ON")
+                    Logger.d(TAG_MAIN, "add FLAG_KEEP_SCREEN_ON")
                     window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
                 } else {
-                    Logger.d(TAG_WINDOW_MANAGER, "clear FLAG_KEEP_SCREEN_ON")
+                    Logger.d(TAG_MAIN, "clear FLAG_KEEP_SCREEN_ON")
                     window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
                 }
             }
@@ -687,6 +685,9 @@ class MainActivity : BaseActivity() {
     }
 
     private fun safeTimeout(timeout: Int): Int {
+        val TIMEOUT_MIN = 2 * 60 * 1000
+        val TIMEOUT_MAX = 45 * 60 * 1000
+
         return when {
             timeout < TIMEOUT_MIN -> TIMEOUT_MIN
             timeout > TIMEOUT_MAX -> TIMEOUT_MAX
