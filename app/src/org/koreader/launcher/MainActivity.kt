@@ -75,7 +75,6 @@ class MainActivity : BaseActivity() {
         private const val PERMISSION_STORAGE_WRITE_ID = 1
 
         private const val ACTION_SAF_FILEPICKER = 2
-
     }
 
     // Surface used on devices that need a view
