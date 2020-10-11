@@ -48,6 +48,9 @@ class MainActivity : BaseActivity() {
     // Some e-ink devices need to take control of the native window from the java side
     private var takesWindowOwnership: Boolean = false
 
+    // Hardware orientation for this device (matches android logo)
+    private var screenIsLandscape: Boolean = false
+
     // Use this setting to avoid screen dimming
     private var isScreenAlwaysOn: Boolean = false
 
@@ -118,6 +121,7 @@ class MainActivity : BaseActivity() {
             /* native content without further processing */
             Logger.v(TAG_MAIN, "onNativeWindowImpl()")
         }
+        screenIsLandscape = isHwLandscape()
         checkMandatoryPermissions()
         systemTimeout = SystemSettings.getSystemScreenOffTimeout(this)
     }
@@ -318,17 +322,67 @@ class MainActivity : BaseActivity() {
         return 0
     }
 
+   /* Native orientation is available for Android 4.4+ devices.
+      Supported devices can also be blacklisted in DeviceInfo if the behaviour is buggy.
+
+      FIXME: It is actually disabled on 9.0+ devices with a notch.
+
+        we need to set viewports for non portrait modes
+
+        - on landscape: notch, 0, height, width - notch
+        - on reverse landscape: 0, 0, height, width - notch
+        - on reverse portrait: 0, 0, height - notch, width
+
+        + adjust touch too?¿?
+   */
+
+    override fun hasNativeRotation(): Int {
+        return if (MainApp.platform_type == "android") {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                // FIXME: hw rotation is disabled in devices with a Notch.
+                if ((topInsetHeight > 0) || (DeviceInfo.BUG_SCREEN_ROTATION)) 0 else 1
+            } else 0
+        } else 0
+    }
+
     override fun getScreenOrientation(): Int {
+        // constants from https://github.com/koreader/koreader-base/blob/master/ffi/framebuffer.lua
+        val PORTRAIT = 0
+        val LANDSCAPE = 1
+        val REVERSE_PORTRAIT = 2
+        val REVERSE_LANDSCAPE = 3
+
         return when (windowManager.defaultDisplay.rotation) {
-            Surface.ROTATION_90 -> 1
-            Surface.ROTATION_180 -> 2
-            Surface.ROTATION_270 -> 3
-            else -> 0
+            Surface.ROTATION_90 -> if (screenIsLandscape) PORTRAIT else REVERSE_LANDSCAPE
+            Surface.ROTATION_180 -> if (screenIsLandscape) REVERSE_LANDSCAPE else REVERSE_PORTRAIT
+            Surface.ROTATION_270 -> if (screenIsLandscape) REVERSE_PORTRAIT else LANDSCAPE
+            else -> if (screenIsLandscape) LANDSCAPE else PORTRAIT
         }
     }
 
     override fun setScreenOrientation(orientation: Int) {
-        requestedOrientation = orientation
+        // constants from https://developer.android.com/reference/android/content/res/Configuration
+        val LANDSCAPE = 0
+        val PORTRAIT = 1
+        val REVERSE_LANDSCAPE = 8
+        val REVERSE_PORTRAIT = 9
+
+        val new_orientation = if (screenIsLandscape) {
+            when (orientation) {
+                LANDSCAPE -> PORTRAIT
+                PORTRAIT -> LANDSCAPE
+                REVERSE_LANDSCAPE -> REVERSE_PORTRAIT
+                REVERSE_PORTRAIT -> REVERSE_LANDSCAPE
+                else -> orientation
+            }
+        } else {
+            when (orientation) {
+                LANDSCAPE -> REVERSE_LANDSCAPE
+                REVERSE_LANDSCAPE -> LANDSCAPE
+                else -> orientation
+            }
+        }
+        requestedOrientation = new_orientation
     }
 
     override fun isTv(): Int {
@@ -337,14 +391,6 @@ class MainActivity : BaseActivity() {
 
     override fun isChromeOS(): Int {
         return if (MainApp.platform_type == "chrome") 1 else 0
-    }
-
-    override fun hasNativeRotation(): Int {
-        return if (MainApp.platform_type == "android") {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                if (!DeviceInfo.BUG_SCREEN_ROTATION) 1 else 0
-            } else 0
-        } else 0
     }
 
     override fun getPlatformName(): String {
@@ -526,6 +572,12 @@ class MainActivity : BaseActivity() {
     /*---------------------------------------------------------------
      *                       private methods                        *
      *--------------------------------------------------------------*/
+
+    @Suppress("DEPRECATION")
+    private fun isHwLandscape(): Boolean {
+        val display = windowManager.defaultDisplay
+        return display.width > display.height
+    }
 
     private fun hapticFeedback(constant: Int, force: Boolean, view: View) {
         runOnUiThread {

@@ -37,9 +37,10 @@ import org.koreader.launcher.utils.ScreenUtils
 abstract class BaseActivity : NativeActivity(), JNILuaInterface,
     ActivityCompat.OnRequestPermissionsResultCallback{
 
+    var topInsetHeight: Int = 0 // only used on API 28+
+
     private var fullscreen: Boolean = true // only used on API levels 16-18
     private var splashScreen: Boolean = true
-    private var topInsetHeight: Int = 0 // only used on API 28+
     private lateinit var clipboard: ClipboardManager
 
     companion object {
