@@ -2,6 +2,7 @@ package org.koreader.launcher
 
 import java.util.Locale
 
+import android.Manifest
 import android.annotation.TargetApi
 import android.app.Activity
 import android.app.AlertDialog
@@ -70,12 +71,17 @@ class MainActivity : BaseActivity() {
         private const val TIMEOUT_MAX = 45 * 60 * 1000
         private const val SCREEN_ON_ENABLED = -1
         private const val SCREEN_ON_DISABLED = 0
-        private const val WRITE_STORAGE = 1
-        private const val STORAGE_ACCESS_FRAMEWORK = 2
+
         private const val LIGHT_DIALOG_CLOSED = -1
         private const val LIGHT_DIALOG_OPENED = 0
         private const val LIGHT_DIALOG_CANCEL = 1
         private const val LIGHT_DIALOG_OK = 2
+
+        private const val PERMISSION_STORAGE_WRITE = Manifest.permission.WRITE_EXTERNAL_STORAGE
+        private const val PERMISSION_STORAGE_WRITE_ID = 1
+
+        private const val ACTION_SAF_FILEPICKER = 2
+
     }
 
     // Surface used on devices that need a view
@@ -116,9 +122,7 @@ class MainActivity : BaseActivity() {
             /* native content without further processing */
             Logger.v(TAG_MAIN, "onNativeWindowImpl()")
         }
-        if (MainApp.LEGACY_STORAGE) {
-            requestExternalStoragePermission()
-        }
+        checkMandatoryPermissions()
         systemTimeout = SystemSettings.getSystemScreenOffTimeout(this)
     }
 
@@ -155,25 +159,19 @@ class MainActivity : BaseActivity() {
         Array<String>, grantResults: IntArray) {
         Logger.d(TAG_MAIN, "onRequestPermissionResult()")
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (ActivityCompat.checkSelfPermission(this,
-                        permissions[0]) == PackageManager.PERMISSION_GRANTED) {
+        if (hasPermissionGranted(permissions[0])) {
             Logger.v(TAG_MAIN, String.format(Locale.US,
                     "Permission granted for request code: %d", requestCode))
         } else {
-            val msg = String.format(Locale.US,
-                    "Permission rejected for request code %d", requestCode)
-            if (requestCode == WRITE_STORAGE) {
-                Logger.e(TAG_MAIN, msg)
-            } else {
-                Logger.w(TAG_MAIN, msg)
-            }
+            Logger.e(TAG_MAIN, String.format(Locale.US,
+                    "Permission rejected for request code: %d", requestCode))
         }
     }
 
     /* Called on activity result, available from KitKat onwards */
     @TargetApi(19)
     override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
-        if (requestCode == STORAGE_ACCESS_FRAMEWORK && resultCode == Activity.RESULT_OK) {
+        if (requestCode == ACTION_SAF_FILEPICKER && resultCode == Activity.RESULT_OK) {
             lastImportedPath ?: return
             resultData?.let {
                 val clipData = it.clipData
@@ -421,11 +419,7 @@ class MainActivity : BaseActivity() {
     }
 
     override fun hasExternalStoragePermission(): Int {
-        return if (MainApp.LEGACY_STORAGE) {
-            if (ContextCompat.checkSelfPermission(this@MainActivity,
-                android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
-                1 else 0
-        } else 1
+        return if (hasStoragePermission()) 1 else 0
     }
 
     override fun safFilePicker(path: String?): Int {
@@ -478,7 +472,7 @@ class MainActivity : BaseActivity() {
             intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
             lastImportedPath?.let {
                 try {
-                    startActivityForResult(intent, STORAGE_ACCESS_FRAMEWORK)
+                    startActivityForResult(intent, ACTION_SAF_FILEPICKER)
                     1
                 } catch (e: Exception) {
                     0
@@ -551,15 +545,30 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    /* request WRITE_EXTERNAL_STORAGE permission.
-     * see https://developer.android.com/guide/topics/permissions/overview.html#normal-dangerous
-     */
-    private fun requestExternalStoragePermission() {
-        if (hasExternalStoragePermission() == 0) {
-            Logger.i(TAG_MAIN, "Requesting WRITE_EXTERNAL_STORAGE permission")
-            ActivityCompat.requestPermissions(this,
-                    arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                    WRITE_STORAGE)
+    private fun hasPermissionGranted(perm: String): Boolean {
+        val state = ContextCompat.checkSelfPermission(this@MainActivity, perm)
+        return (state == PackageManager.PERMISSION_GRANTED)
+    }
+
+    private fun requestPermissions(perm: String, code: Int) {
+        ActivityCompat.requestPermissions(this@MainActivity, arrayOf(perm), code)
+    }
+
+    private fun hasStoragePermission(): Boolean {
+        val perm = PERMISSION_STORAGE_WRITE
+        return hasPermissionGranted(perm)
+    }
+
+    private fun requestStoragePermission() {
+        val perm = PERMISSION_STORAGE_WRITE
+        val code = PERMISSION_STORAGE_WRITE_ID
+        Logger.i(TAG_MAIN, "Requesting $perm permission")
+        requestPermissions(perm, code)
+    }
+
+    private fun checkMandatoryPermissions() {
+        if (!hasStoragePermission()) {
+            requestStoragePermission()
         }
     }
 
