@@ -54,9 +54,6 @@ class MainActivity : BaseActivity() {
     // Use this setting to override screen off timeout system setting
     private var isCustomTimeout: Boolean = false
 
-    // Use this setting to ignore system settings and always rumble when requested
-    private var isHapticOverride: Boolean = false
-
     // When custom timeouts are used these are the current timeouts for activity and system
     private var systemTimeout: Int = 0
     private var appTimeout: Int = 0
@@ -64,7 +61,6 @@ class MainActivity : BaseActivity() {
     private var lastImportedPath: String? = null
 
     companion object {
-        private const val HAPTIC_OVERRIDE = 2
         private const val TAG_MAIN = "MainActivity"
         private const val TAG_WINDOW_MANAGER = "WindowManager"
         private const val TIMEOUT_MIN = 2 * 60 * 1000
@@ -483,20 +479,16 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    override fun performHapticFeedback(constant: Int) {
+    override fun performHapticFeedback(constant: Int, force: Int) {
         if (!takesWindowOwnership) {
             val rootView = window.decorView.findViewById<View>(android.R.id.content)
-            hapticFeedback(constant, rootView)
+            hapticFeedback(constant, if (force > 0) true else false, rootView)
         }
     }
 
     override fun requestWriteSystemSettings() {
         val intent = SystemSettings.getWriteSettingsIntent()
         startActivity(intent)
-    }
-
-    override fun setHapticOverride(enabled: Boolean) {
-        isHapticOverride = enabled
     }
 
     override fun setScreenOffTimeout(timeout: Int) {
@@ -535,10 +527,10 @@ class MainActivity : BaseActivity() {
      *                       private methods                        *
      *--------------------------------------------------------------*/
 
-    private fun hapticFeedback(constant: Int, view: View) {
+    private fun hapticFeedback(constant: Int, force: Boolean, view: View) {
         runOnUiThread {
-            if (isHapticOverride) {
-                view.performHapticFeedback(constant, HAPTIC_OVERRIDE)
+            if (force) {
+                view.performHapticFeedback(constant, 2)
             } else {
                 view.performHapticFeedback(constant)
             }
