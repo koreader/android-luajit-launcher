@@ -11,12 +11,9 @@ import android.os.Environment
 import android.os.StrictMode
 import android.util.Log
 
-@Suppress("ConstantConditionIf")
 class MainApp : android.app.Application() {
 
     companion object {
-        const val LEGACY_STORAGE = BuildConfig.legacy_storage
-
         lateinit var name: String
             private set
         lateinit var storage_path: String
@@ -57,7 +54,6 @@ class MainApp : android.app.Application() {
             .append(if (large_heap) "(large)" else "(normal)")
         sb.append("\n  Flags: ")
         sb.append(if (is_system_app) "system" else "user")
-        sb.append(if (LEGACY_STORAGE) ", legacy" else ", scoped").append(" storage")
         sb.append(if (debuggable) ", debuggable" else ".")
         sb.append("\n  Paths {")
             .append("\n    Assets: ").append(assets_path)
@@ -80,13 +76,7 @@ class MainApp : android.app.Application() {
             assets_path = filesDir.absolutePath
 
             @Suppress("DEPRECATION")
-            storage_path = if (LEGACY_STORAGE) {
-                // deprecated in API 29
-                Environment.getExternalStorageDirectory().absolutePath
-            } else {
-                val writableFolder: File? = applicationContext.getExternalFilesDir(null)
-                writableFolder?.absolutePath ?: UNKNOWN_STRING
-            }
+            storage_path = Environment.getExternalStorageDirectory().absolutePath
 
             if (ai.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0) debuggable = true
             if (ai.flags and ApplicationInfo.FLAG_SYSTEM == 1) is_system_app = true
