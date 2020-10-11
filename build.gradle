@@ -4,9 +4,7 @@ buildscript {
     ext.androidx_core_version = '1.3.0'
     ext.androidx_supportv4_version = '1.0.0'
     ext.minSdk = 14
-    ext.safSdk = 19
     ext.targetSdk = 28
-    ext.latestSdk = 29
 
     repositories {
         google()

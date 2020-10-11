@@ -37,9 +37,6 @@ android {
         fullStorage {
             manifest.srcFile('manifest/full.xml')
         }
-        jailedStorage {
-            manifest.srcFile('manifest/jailed.xml')
-        }
     }
 
     flavorDimensions 'abi', 'storageModel'
@@ -54,14 +51,9 @@ android {
         }
         fullStorage {
             dimension = 'storageModel'
-            buildConfigField 'boolean', 'legacy_storage', 'true'
         }
         jailedStorage {
             dimension = 'storageModel'
-            minSdkVersion safSdk
-            targetSdkVersion latestSdk
-            compileSdkVersion latestSdk
-            buildConfigField 'boolean', 'legacy_storage', 'false'
         }
     }
 
