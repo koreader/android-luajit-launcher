@@ -1637,26 +1637,23 @@ local function run(android_app_state)
         end)
     end
 
+    android.hapticOverride = false
+
     android.hapticFeedback = function(type)
+        local force = android.hapticOverride and 1 or 0
         JNI:context(android.app.activity.vm, function(jni)
             jni:callVoidMethod(
                 android.app.activity.clazz,
                 "performHapticFeedback",
-                "(I)V",
-                ffi.new('int32_t', type)
+                "(II)V",
+                ffi.new('int32_t', type),
+                ffi.new('int32_t', force)
             )
         end)
     end
 
     android.setHapticOverride = function(enable)
-        JNI:context(android.app.activity.vm, function(jni)
-            jni:callVoidMethod(
-                android.app.activity.clazz,
-                "setHapticOverride",
-                "(Z)V",
-                ffi.new("bool", enable)
-            )
-        end)
+        android.hapticOverride = enable or false
     end
 
     android.setIgnoreInput = function(enable)

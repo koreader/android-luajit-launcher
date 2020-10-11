@@ -53,12 +53,11 @@ interface JNILuaInterface {
     fun needsWakelocks(): Int
     fun openLink(url: String): Int
     fun openWifiSettings()
-    fun performHapticFeedback(constant: Int)
+    fun performHapticFeedback(constant: Int, force: Int)
     fun requestWriteSystemSettings()
     fun sendText(text: String?)
     fun setFullscreen(enabled: Boolean)
     fun setClipboardText(text: String)
-    fun setHapticOverride(enabled: Boolean)
     fun setIgnoreInput(enabled: Boolean)
     fun setScreenBrightness(brightness: Int)
     fun setScreenWarmth(warmth: Int)
