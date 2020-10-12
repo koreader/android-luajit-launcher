@@ -1646,8 +1646,8 @@ local function run(android_app_state)
                 android.app.activity.clazz,
                 "performHapticFeedback",
                 "(II)V",
-                ffi.new('int32_t', type),
-                ffi.new('int32_t', force)
+                ffi.new("int32_t", type),
+                ffi.new("int32_t", force)
             )
         end)
     end
