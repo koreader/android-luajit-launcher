@@ -2,29 +2,25 @@ package org.koreader.launcher
 
 import java.util.Locale
 
-import android.Manifest
 import android.annotation.TargetApi
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.view.*
 import android.widget.LinearLayout
 import android.widget.SeekBar
 import android.widget.TextView
-
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 
 import org.koreader.launcher.device.DeviceInfo
 import org.koreader.launcher.device.EPDFactory
 import org.koreader.launcher.device.LightsFactory
 import org.koreader.launcher.utils.FileUtils
 import org.koreader.launcher.utils.Logger
-import org.koreader.launcher.utils.SystemSettings
+import org.koreader.launcher.utils.Permissions
 
 /* MainActivity.java
  *
@@ -69,13 +65,27 @@ class MainActivity : BaseActivity() {
     companion object {
         private const val TAG_MAIN = "MainActivity"
 
+        // constants from https://developer.android.com/reference/android/content/res/Configuration
+        private const val ANDROID_LANDSCAPE = 0
+        private const val ANDROID_PORTRAIT = 1
+        private const val ANDROID_REVERSE_LANDSCAPE = 8
+        private const val ANDROID_REVERSE_PORTRAIT = 9
+
+        // constants from https://github.com/koreader/koreader-base/blob/master/ffi/framebuffer.lua
+        private const val LINUX_PORTRAIT = 0
+        private const val LINUX_LANDSCAPE = 1
+        private const val LINUX_REVERSE_PORTRAIT = 2
+        private const val LINUX_REVERSE_LANDSCAPE = 3
+
         private const val LIGHT_DIALOG_CLOSED = -1
         private const val LIGHT_DIALOG_OPENED = 0
         private const val LIGHT_DIALOG_CANCEL = 1
         private const val LIGHT_DIALOG_OK = 2
 
-        private const val PERMISSION_STORAGE_WRITE = Manifest.permission.WRITE_EXTERNAL_STORAGE
-        private const val PERMISSION_STORAGE_WRITE_ID = 1
+        private const val SCREEN_ON_ENABLED = -1
+        private const val SCREEN_ON_DISABLED = 0
+        private const val TIMEOUT_MIN = 2 * 60 * 1000
+        private const val TIMEOUT_MAX = 45 * 60 * 1000
 
         private const val ACTION_SAF_FILEPICKER = 2
     }
@@ -107,10 +117,10 @@ class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         Logger.v(TAG_MAIN, "onCreate()")
 
-        if (hasStoragePermission()) {
+        if (Permissions.hasStoragePermission(this@MainActivity)) {
             initialized = true
         } else {
-            requestStoragePermission()
+            Permissions.requestStoragePermission(this@MainActivity)
         }
 
         super.onCreate(savedInstanceState)
@@ -126,7 +136,7 @@ class MainActivity : BaseActivity() {
             Logger.v(TAG_MAIN, "onNativeWindowImpl()")
         }
         screenIsLandscape = isHwLandscape()
-        systemTimeout = SystemSettings.getSystemScreenOffTimeout(this)
+        systemTimeout = getSystemScreenOffTimeout()
     }
 
     /* Called when the activity has become visible. */
@@ -162,7 +172,7 @@ class MainActivity : BaseActivity() {
         Array<String>, grantResults: IntArray) {
         Logger.d(TAG_MAIN, "onRequestPermissionResult()")
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (hasPermissionGranted(permissions[0])) {
+        if (Permissions.hasPermissionGranted(this@MainActivity, permissions[0])) {
             Logger.v(TAG_MAIN, String.format(Locale.US,
                     "Permission granted for request code: %d", requestCode))
             runLuaJIT()
@@ -361,43 +371,31 @@ class MainActivity : BaseActivity() {
     }
 
     override fun getScreenOrientation(): Int {
-        // constants from https://github.com/koreader/koreader-base/blob/master/ffi/framebuffer.lua
-        val PORTRAIT = 0
-        val LANDSCAPE = 1
-        val REVERSE_PORTRAIT = 2
-        val REVERSE_LANDSCAPE = 3
-
         return when (windowManager.defaultDisplay.rotation) {
-            Surface.ROTATION_90 -> if (screenIsLandscape) PORTRAIT else REVERSE_LANDSCAPE
-            Surface.ROTATION_180 -> if (screenIsLandscape) REVERSE_LANDSCAPE else REVERSE_PORTRAIT
-            Surface.ROTATION_270 -> if (screenIsLandscape) REVERSE_PORTRAIT else LANDSCAPE
-            else -> if (screenIsLandscape) LANDSCAPE else PORTRAIT
+            Surface.ROTATION_90 -> if (screenIsLandscape) LINUX_PORTRAIT else LINUX_REVERSE_LANDSCAPE
+            Surface.ROTATION_180 -> if (screenIsLandscape) LINUX_REVERSE_LANDSCAPE else LINUX_REVERSE_PORTRAIT
+            Surface.ROTATION_270 -> if (screenIsLandscape) LINUX_REVERSE_PORTRAIT else LINUX_LANDSCAPE
+            else -> if (screenIsLandscape) LINUX_LANDSCAPE else LINUX_PORTRAIT
         }
     }
 
     override fun setScreenOrientation(orientation: Int) {
-        // constants from https://developer.android.com/reference/android/content/res/Configuration
-        val LANDSCAPE = 0
-        val PORTRAIT = 1
-        val REVERSE_LANDSCAPE = 8
-        val REVERSE_PORTRAIT = 9
-
-        val new_orientation = if (screenIsLandscape) {
+        val newOrientation = if (screenIsLandscape) {
             when (orientation) {
-                LANDSCAPE -> PORTRAIT
-                PORTRAIT -> LANDSCAPE
-                REVERSE_LANDSCAPE -> REVERSE_PORTRAIT
-                REVERSE_PORTRAIT -> REVERSE_LANDSCAPE
+                ANDROID_LANDSCAPE -> ANDROID_PORTRAIT
+                ANDROID_PORTRAIT -> ANDROID_LANDSCAPE
+                ANDROID_REVERSE_LANDSCAPE -> ANDROID_REVERSE_PORTRAIT
+                ANDROID_REVERSE_PORTRAIT -> ANDROID_REVERSE_LANDSCAPE
                 else -> orientation
             }
         } else {
             when (orientation) {
-                LANDSCAPE -> REVERSE_LANDSCAPE
-                REVERSE_LANDSCAPE -> LANDSCAPE
+                ANDROID_LANDSCAPE -> ANDROID_REVERSE_LANDSCAPE
+                ANDROID_REVERSE_LANDSCAPE -> ANDROID_LANDSCAPE
                 else -> orientation
             }
         }
-        requestedOrientation = new_orientation
+        requestedOrientation = newOrientation
     }
 
     override fun isTv(): Int {
@@ -413,7 +411,7 @@ class MainActivity : BaseActivity() {
     }
 
     override fun canWriteSystemSettings(): Int {
-        return if (SystemSettings.canWrite(this)) 1 else 0
+        return if (Permissions.hasWriteSettingsPermission(this@MainActivity)) 1 else 0
     }
 
     /* ignore input toggle */
@@ -466,8 +464,7 @@ class MainActivity : BaseActivity() {
     }
 
     override fun getScreenOffTimeout(): Int {
-        // return current setting
-        return SystemSettings.getSystemScreenOffTimeout(this)
+        return getSystemScreenOffTimeout()
     }
 
     override fun getSystemTimeout(): Int {
@@ -476,7 +473,7 @@ class MainActivity : BaseActivity() {
     }
 
     override fun hasExternalStoragePermission(): Int {
-        return if (hasStoragePermission()) 1 else 0
+        return if (Permissions.hasStoragePermission(this@MainActivity)) 1 else 0
     }
 
     override fun safFilePicker(path: String?): Int {
@@ -548,13 +545,11 @@ class MainActivity : BaseActivity() {
     }
 
     override fun requestWriteSystemSettings() {
-        val intent = SystemSettings.getWriteSettingsIntent()
-        startActivity(intent)
+        Permissions.requestWriteSettingsPermission(this@MainActivity)
     }
 
     override fun setScreenOffTimeout(timeout: Int) {
-        val SCREEN_ON_ENABLED = -1
-        val SCREEN_ON_DISABLED = 0
+
 
         when {
             timeout > SCREEN_ON_DISABLED -> {
@@ -563,9 +558,9 @@ class MainActivity : BaseActivity() {
                 appTimeout = safeTimeout(timeout)
                 val mins = toMin(appTimeout)
                 setScreenOn(false)
-                Logger.d("SystemSettings",
+                Logger.d(TAG_MAIN,
                     "applying activity custom timeout: $mins minutes")
-                SystemSettings.setSystemScreenOffTimeout(this, appTimeout)
+                setSystemScreenOffTimeout(appTimeout)
             }
             timeout == SCREEN_ON_ENABLED -> {
                 // always on
@@ -605,27 +600,6 @@ class MainActivity : BaseActivity() {
                 view.performHapticFeedback(constant)
             }
         }
-    }
-
-    private fun hasPermissionGranted(perm: String): Boolean {
-        val state = ContextCompat.checkSelfPermission(this@MainActivity, perm)
-        return (state == PackageManager.PERMISSION_GRANTED)
-    }
-
-    private fun requestPermissions(perm: String, code: Int) {
-        ActivityCompat.requestPermissions(this@MainActivity, arrayOf(perm), code)
-    }
-
-    private fun hasStoragePermission(): Boolean {
-        val perm = PERMISSION_STORAGE_WRITE
-        return hasPermissionGranted(perm)
-    }
-
-    private fun requestStoragePermission() {
-        val perm = PERMISSION_STORAGE_WRITE
-        val code = PERMISSION_STORAGE_WRITE_ID
-        Logger.i(TAG_MAIN, "Requesting $perm permission")
-        requestPermissions(perm, code)
     }
 
     /* set a fullscreen layout */
@@ -670,7 +644,7 @@ class MainActivity : BaseActivity() {
     /* toggle system/activity timeouts based on activity state */
     private fun applyCustomTimeout(enable: Boolean) {
         if (enable)
-            systemTimeout = SystemSettings.getSystemScreenOffTimeout(this)
+            systemTimeout = getSystemScreenOffTimeout()
 
         var message = ""
         val resumed = ((enable && isCustomTimeout) && (appTimeout > 0))
@@ -680,13 +654,13 @@ class MainActivity : BaseActivity() {
             resumed -> {
                 setScreenOn(false)
                 message = "applying activity custom timeout"
-                SystemSettings.setSystemScreenOffTimeout(this, safeTimeout(appTimeout))
+                setSystemScreenOffTimeout(safeTimeout(appTimeout))
                 appTimeout
             }
 
             paused -> {
                 message = "restoring system timeout"
-                SystemSettings.setSystemScreenOffTimeout(this, systemTimeout)
+                setSystemScreenOffTimeout(systemTimeout)
                 systemTimeout
             }
 
@@ -694,14 +668,11 @@ class MainActivity : BaseActivity() {
         }
         if (newTimeout != null) {
             val mins = toMin(newTimeout)
-            Logger.d("SystemSettings", "$message: $mins minutes")
+            Logger.d(TAG_MAIN, "$message: $mins minutes")
         }
     }
 
     private fun safeTimeout(timeout: Int): Int {
-        val TIMEOUT_MIN = 2 * 60 * 1000
-        val TIMEOUT_MAX = 45 * 60 * 1000
-
         return when {
             timeout < TIMEOUT_MIN -> TIMEOUT_MIN
             timeout > TIMEOUT_MAX -> TIMEOUT_MAX
@@ -720,7 +691,7 @@ class MainActivity : BaseActivity() {
             if (isError) {
                 finish()
             } else {
-                requestStoragePermission()
+                Permissions.requestStoragePermission(this@MainActivity)
             }
         }
         builder.create().show()
@@ -729,5 +700,25 @@ class MainActivity : BaseActivity() {
     private fun runLuaJIT() {
         initialized = true
         onWindowFocusChanged(true)
+    }
+
+    private fun getSystemScreenOffTimeout(): Int {
+        return try {
+            Settings.System.getInt(applicationContext.contentResolver,
+                Settings.System.SCREEN_OFF_TIMEOUT)
+        } catch (e: Exception) {
+            Logger.w(TAG_MAIN, "$e")
+            0
+        }
+    }
+
+    private fun setSystemScreenOffTimeout(timeout: Int) {
+        if (timeout <= 0) return
+        try {
+            Settings.System.putInt(applicationContext.contentResolver,
+                Settings.System.SCREEN_OFF_TIMEOUT, timeout)
+        } catch (e: Exception) {
+            Logger.w(TAG_MAIN, "$e")
+        }
     }
 }
