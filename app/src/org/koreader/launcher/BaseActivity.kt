@@ -90,7 +90,7 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
     }
 
     private inner class Box<T> {
-        internal var value: T? = null
+        var value: T? = null
     }
 
     /*---------------------------------------------------------------
@@ -235,7 +235,7 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
     override fun setClipboardText(text: String) {
         runOnUiThread {
             try {
-                clipboard.setPrimaryClip(ClipData.newPlainText("KOReader_clipboard", text))
+                clipboard.primaryClip = ClipData.newPlainText("KOReader_clipboard", text)
             } catch (e: Exception) {
                 Logger.w(TAG, e.toString())
             }

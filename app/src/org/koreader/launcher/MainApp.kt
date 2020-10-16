@@ -1,7 +1,5 @@
 package org.koreader.launcher
 
-import java.io.File
-
 import android.app.ActivityManager
 import android.content.Context
 import android.content.pm.ApplicationInfo

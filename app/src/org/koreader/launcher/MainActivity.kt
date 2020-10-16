@@ -543,7 +543,7 @@ class MainActivity : BaseActivity() {
     override fun performHapticFeedback(constant: Int, force: Int) {
         if (!takesWindowOwnership) {
             val rootView = window.decorView.findViewById<View>(android.R.id.content)
-            hapticFeedback(constant, if (force > 0) true else false, rootView)
+            hapticFeedback(constant, force > 0, rootView)
         }
     }
 
@@ -626,12 +626,6 @@ class MainActivity : BaseActivity() {
         val code = PERMISSION_STORAGE_WRITE_ID
         Logger.i(TAG_MAIN, "Requesting $perm permission")
         requestPermissions(perm, code)
-    }
-
-    private fun checkMandatoryPermissions() {
-        if (!hasStoragePermission()) {
-            requestStoragePermission()
-        }
     }
 
     /* set a fullscreen layout */
@@ -722,13 +716,13 @@ class MainActivity : BaseActivity() {
     private fun showPermissionDialog(message: String, isError: Boolean) {
         val builder = AlertDialog.Builder(this@MainActivity)
         val title = resources.getString(if (isError) R.string.error else R.string.warning)
-        builder.setTitle(title).setMessage(message).setPositiveButton("OK", { _, _ ->
+        builder.setTitle(title).setMessage(message).setPositiveButton("OK") { _, _ ->
             if (isError) {
                 finish()
             } else {
                 requestStoragePermission()
             }
-        })
+        }
         builder.create().show()
     }
 
