@@ -105,5 +105,5 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_plugin_version"
 
     // add Leak Canary on debug variants.
-    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.1'
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.5'
 }
