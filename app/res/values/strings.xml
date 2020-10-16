@@ -1,3 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="error">Error</string>
+    <string name="error_assets">Error extracting assets. Please reinstall the application.</string>
+    <string name="error_manage_storage">Android 11: please allow the app to manage all files.</string>
+    <string name="error_storage_permission">Insufficient permissions</string>
+    <string name="warning">Warning</string>
+    <string name="warning_storage_permission">The app needs storage permissions to work.</string>
 </resources>

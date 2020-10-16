@@ -38,6 +38,9 @@ import org.koreader.launcher.utils.SystemSettings
 @Suppress("ConstantConditionIf")
 class MainActivity : BaseActivity() {
 
+    private var initialized: Boolean = false
+    private var permissionCounter: Int = 0
+
     // EPD driver for this device
     private val epd = EPDFactory.epdController
 
@@ -102,7 +105,14 @@ class MainActivity : BaseActivity() {
 
     /* Called when the activity is first created. */
     override fun onCreate(savedInstanceState: Bundle?) {
-        Logger.d(TAG_MAIN, "onCreate()")
+        Logger.v(TAG_MAIN, "onCreate()")
+
+        if (hasStoragePermission()) {
+            initialized = true
+        } else {
+            requestStoragePermission()
+        }
+
         super.onCreate(savedInstanceState)
         if (DeviceInfo.NEEDS_VIEW) {
             Logger.v(TAG_MAIN, "onNativeSurfaceViewImpl()")
@@ -116,7 +126,6 @@ class MainActivity : BaseActivity() {
             Logger.v(TAG_MAIN, "onNativeWindowImpl()")
         }
         screenIsLandscape = isHwLandscape()
-        checkMandatoryPermissions()
         systemTimeout = SystemSettings.getSystemScreenOffTimeout(this)
     }
 
@@ -156,9 +165,19 @@ class MainActivity : BaseActivity() {
         if (hasPermissionGranted(permissions[0])) {
             Logger.v(TAG_MAIN, String.format(Locale.US,
                     "Permission granted for request code: %d", requestCode))
+            runLuaJIT()
         } else {
             Logger.e(TAG_MAIN, String.format(Locale.US,
                     "Permission rejected for request code: %d", requestCode))
+
+            if (permissionCounter < 1) {
+                permissionCounter++
+                val msg = resources.getString(R.string.warning_storage_permission)
+                showPermissionDialog(msg, false)
+            } else {
+                val msg = resources.getString(R.string.error_storage_permission)
+                showPermissionDialog(msg, true)
+            }
         }
     }
 
@@ -180,8 +199,10 @@ class MainActivity : BaseActivity() {
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
-        super.onWindowFocusChanged(hasFocus)
-        if (hasFocus) setFullscreenLayout()
+        if (initialized) {
+            super.onWindowFocusChanged(hasFocus)
+            if (hasFocus) setFullscreenLayout()
+        }
     }
 
     override fun getFilePathFromIntent(): String? {
@@ -696,5 +717,23 @@ class MainActivity : BaseActivity() {
 
     private fun toMin(milliseconds: Int): Int {
         return if (milliseconds > 0) milliseconds / (1000 * 60) else 0
+    }
+
+    private fun showPermissionDialog(message: String, isError: Boolean) {
+        val builder = AlertDialog.Builder(this@MainActivity)
+        val title = resources.getString(if (isError) R.string.error else R.string.warning)
+        builder.setTitle(title).setMessage(message).setPositiveButton("OK", { _, _ ->
+            if (isError) {
+                finish()
+            } else {
+                requestStoragePermission()
+            }
+        })
+        builder.create().show()
+    }
+
+    private fun runLuaJIT() {
+        initialized = true
+        onWindowFocusChanged(true)
     }
 }
