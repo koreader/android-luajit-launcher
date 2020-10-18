@@ -101,9 +101,10 @@ repositories {
 
 dependencies {
     implementation "androidx.core:core-ktx:$androidx_core_version"
+    implementation "androidx.appcompat:appcompat:$androidx_appcompat_version"
     implementation "androidx.legacy:legacy-support-v4:$androidx_supportv4_version"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_plugin_version"
 
     // add Leak Canary on debug variants.
-    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.1'
+    debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakcanary_version"
 }

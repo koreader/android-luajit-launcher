@@ -9,7 +9,6 @@ local ffi = require("ffi")
 ffi.cdef[[
     void *mmap(void *addr, size_t length, int prot, int flags, int fd, size_t offset);
     int munmap(void *addr, size_t length);
-    unsigned int sleep(unsigned int seconds);
 ]]
 
 -- reservation enough mmap slots for mcode allocation
@@ -2355,13 +2354,8 @@ local function run(android_app_state)
         return android.dl.dlopen(library, ffi_load)
     end
 
-    -- Do not extract assets if we don't have write permissions on external storage.
     if not android.canWriteStorage() then
-        android.notification("Insufficient permissions", true)
-        ffi.C.sleep(1) -- to show notification
-        android.lib.ANativeActivity_finish(android.app.activity)
-        ffi.C.sleep(1) -- to do onPause -> onStop -> onDestroy.
-        error("Write permission required to extract resources")
+        error("insufficient permissions")
     end
 
     local installed = android.extractAssets()
