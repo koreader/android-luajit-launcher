@@ -16,7 +16,7 @@ class OnyxEPDController : EPDInterface {
                             mode: Int, delay: Long,
                             x: Int, y: Int, width: Int, height: Int, epdMode: String?)
     {
-        // EpdController.setSystemUpdateModeAndScheme(UpdateMode.None, UpdateScheme.None, 0)
+        EpdController.setSystemUpdateModeAndScheme(UpdateMode.None, UpdateScheme.None, 0)
         object: Thread(){
             override fun run(){
                 Thread.sleep(delay)
