@@ -261,7 +261,7 @@ object DeviceInfo {
         BUG_SCREEN_ROTATION = BUG == BugDevice.EMULATOR
 
         // needs a view
-        NEEDS_VIEW = ! EINK_SUPPORT || EINK_FREESCALE || EINK_QCOM
+        NEEDS_VIEW = ! EINK_SUPPORT || EINK_FREESCALE
     }
 
     private fun getBuildField(fieldName: String): String {
