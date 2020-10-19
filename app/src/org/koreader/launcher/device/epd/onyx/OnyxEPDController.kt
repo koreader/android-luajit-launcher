@@ -12,12 +12,19 @@ import com.onyx.android.sdk.device.SDMDevice
 import org.koreader.launcher.interfaces.EPDInterface
 
 class OnyxEPDController : EPDInterface {
+    fun preventSystemRefresh(){
+        Class.forName("android.view.View").getMethod("setWaveformAndScheme",
+            Integer.TYPE,
+            Integer.TYPE,
+            Integer.TYPE).invoke(null, 5, 1, 0)
+    }
+
     override fun setEpdMode(targetView: android.view.View,
                             mode: Int, delay: Long,
                             x: Int, y: Int, width: Int, height: Int, epdMode: String?)
     {
-//        EpdController.setSystemUpdateModeAndScheme(UpdateMode.None, UpdateScheme.None, 0)
-        Class.forName("android.view.View").getMethod("setWaveformAndScheme", Integer.TYPE, Integer.TYPE, Integer.TYPE).invoke(targetView, 5, 1, 0)
+
+        preventSystemRefresh()
         object: Thread(){
             override fun run(){
                 Thread.sleep(delay)
