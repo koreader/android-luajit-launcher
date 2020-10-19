@@ -26,6 +26,7 @@ class QualcommEPDController : EPDInterface {
                             mode: Int, delay: Long,
                             x: Int, y: Int, width: Int, height: Int, epdMode: String?)
     {
+        preventSystemRefresh()
         object: Thread(){
             override fun run(){
                 Thread.sleep(delay)
