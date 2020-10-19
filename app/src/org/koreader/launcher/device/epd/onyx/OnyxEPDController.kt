@@ -5,10 +5,6 @@ import java.lang.Thread
 import android.util.Log
 import android.view.View
 
-import com.onyx.android.sdk.api.device.epd.EpdController
-import com.onyx.android.sdk.api.device.epd.UpdateMode
-import com.onyx.android.sdk.api.device.epd.UpdateScheme
-import com.onyx.android.sdk.device.SDMDevice
 import org.koreader.launcher.interfaces.EPDInterface
 
 class OnyxEPDController : EPDInterface {
