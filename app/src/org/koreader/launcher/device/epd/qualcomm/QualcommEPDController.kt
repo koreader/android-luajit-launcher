@@ -1,4 +1,4 @@
-package org.koreader.launcher.device.epd.onyx
+package org.koreader.launcher.device.epd.qualcomm
 
 import java.lang.Thread
 
@@ -7,7 +7,7 @@ import android.view.View
 
 import org.koreader.launcher.interfaces.EPDInterface
 
-class OnyxEPDController : EPDInterface {
+class QualcommEPDController : EPDInterface {
     fun preventSystemRefresh(){
         Class.forName("android.view.View").getMethod("setWaveformAndScheme",
             Integer.TYPE,

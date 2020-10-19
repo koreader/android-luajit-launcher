@@ -8,7 +8,7 @@ import java.util.Locale
 import org.koreader.launcher.device.epd.rockchip.RK3026EPDController
 import org.koreader.launcher.device.epd.rockchip.RK3368EPDController
 import org.koreader.launcher.device.epd.freescale.NTXNewEPDController
-import org.koreader.launcher.device.epd.onyx.OnyxEPDController
+import org.koreader.launcher.device.epd.qualcomm.QualcommEPDController
 import org.koreader.launcher.interfaces.EPDInterface
 import org.koreader.launcher.utils.Logger
 
@@ -42,8 +42,8 @@ object EPDFactory {
                     NTXNewEPDController()
                 }
                 DeviceInfo.EinkDevice.ONYX_NOVA2 -> {
-                    logController("Onyx Boox Nova 2")
-                    OnyxEPDController()
+                    logController("QualcommEPDController")
+                    QualcommEPDController()
                 }
                 else -> {
                     FakeEPDController()
