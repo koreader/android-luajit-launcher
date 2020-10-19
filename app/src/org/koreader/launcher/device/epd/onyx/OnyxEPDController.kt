@@ -17,7 +17,7 @@ class OnyxEPDController : EPDInterface {
                             x: Int, y: Int, width: Int, height: Int, epdMode: String?)
     {
         EpdController.setSystemUpdateModeAndScheme(UpdateMode.None, UpdateScheme.None, 0)
-        object: Thread(){
+        /* object: Thread(){
             override fun run(){
                 Thread.sleep(50)
                 Class.forName("android.view.View").getMethod("refreshScreen",
@@ -28,6 +28,14 @@ class OnyxEPDController : EPDInterface {
                     Integer.TYPE
                     ).invoke(targetView, x, y, width, height, 6)
             }
-        }.start()
+        }.start() */
+
+        Class.forName("android.view.View").getMethod("refreshScreen",
+            Integer.TYPE,
+            Integer.TYPE,
+            Integer.TYPE,
+            Integer.TYPE,
+            Integer.TYPE
+            ).invoke(targetView, x, y, width, height, 2)
     }
 }
