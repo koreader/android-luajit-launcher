@@ -16,7 +16,8 @@ class OnyxEPDController : EPDInterface {
                             mode: Int, delay: Long,
                             x: Int, y: Int, width: Int, height: Int, epdMode: String?)
     {
-        EpdController.setSystemUpdateModeAndScheme(UpdateMode.None, UpdateScheme.None, 0)
+//        EpdController.setSystemUpdateModeAndScheme(UpdateMode.None, UpdateScheme.None, 0)
+        Class.forName("android.view.View").getMethod("setWaveformAndScheme", Integer.TYPE, Integer.TYPE, Integer.TYPE).invoke(targetView, 5, 1, 0)
         object: Thread(){
             override fun run(){
                 Thread.sleep(delay)
