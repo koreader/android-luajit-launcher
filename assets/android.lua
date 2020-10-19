@@ -1965,7 +1965,7 @@ local function run(android_app_state)
                 "getEinkPlatform",
                 "()Ljava/lang/String;"
             )
-            return is_supported, "qualcomm" --jni:to_string(platform)
+            return is_supported, jni:to_string(platform)
         end)
     end
 
