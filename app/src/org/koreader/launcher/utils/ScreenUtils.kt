@@ -9,6 +9,7 @@ import android.view.WindowManager
 
 import java.util.concurrent.CountDownLatch
 
+@Suppress("DEPRECATION")
 object ScreenUtils {
     private const val TAG = "ScreenUtils"
 

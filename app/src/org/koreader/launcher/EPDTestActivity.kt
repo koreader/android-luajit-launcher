@@ -72,6 +72,7 @@ class EPDTestActivity : Activity() {
         shareButton.setOnClickListener { shareText(info.text.toString()) }
     }
 
+    @Suppress("DEPRECATION")
     private fun runEinkTest(test: Int) {
         var success = false
         info.append(String.format(Locale.US, "run test #%d -> ", test))
