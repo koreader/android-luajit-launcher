@@ -23,14 +23,14 @@ class OnyxEPDController : EPDInterface {
         preventSystemRefresh()
         object: Thread(){
             override fun run(){
-                Thread.sleep(100 + delay) // delay by 100 ms to wait for page to "update"
+                Thread.sleep(delay)
                 Class.forName("android.view.View").getMethod("refreshScreen",
                     Integer.TYPE,
                     Integer.TYPE,
                     Integer.TYPE,
                     Integer.TYPE,
                     Integer.TYPE
-                    ).invoke(targetView, x, y, width, height, 98)
+                    ).invoke(targetView, x, y, width, height, 6)
             }
         }.start()
     }
