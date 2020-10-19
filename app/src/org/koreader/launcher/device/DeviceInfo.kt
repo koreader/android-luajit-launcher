@@ -229,8 +229,7 @@ object DeviceInfo {
             BOYUE_T65S ||
             CREMA ||
             TOLINO ||
-            NOOK_V520 ||
-            ONYX_NOVA2
+            NOOK_V520
 
         // rockchip epd driver
         EINK_ROCKCHIP =
