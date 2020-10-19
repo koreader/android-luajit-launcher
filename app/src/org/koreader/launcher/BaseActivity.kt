@@ -252,8 +252,8 @@ abstract class BaseActivity : NativeActivity(), JNILuaInterface,
             }
         } else if (DeviceInfo.EINK_ROCKCHIP) {
             "rockchip"
-        } else if (DeviceInfo.ONYX_NOVA2) {
-            "onyx"
+        } else if (DeviceInfo.EINK_QCOM) {
+            "qualcomm"
         }else {
             "none"
         }

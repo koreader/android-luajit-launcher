@@ -14,6 +14,7 @@ object DeviceInfo {
     val PRODUCT: String
     val EINK_FREESCALE: Boolean
     val EINK_ROCKCHIP: Boolean
+    val EINK_QCOM: Boolean
     val EINK_SUPPORT: Boolean
     val EINK_FULL_SUPPORT: Boolean
     val BUG_WAKELOCKS: Boolean
@@ -244,6 +245,8 @@ object DeviceInfo {
             ENERGY ||
             INKBOOK ||
             ONYX_C67
+
+        EINK_QCOM = ONYX_NOVA2
 
         // basic eink support
         EINK_SUPPORT = EINK_FREESCALE || EINK_ROCKCHIP
