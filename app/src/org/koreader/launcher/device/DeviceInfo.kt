@@ -249,7 +249,7 @@ object DeviceInfo {
         EINK_QCOM = ONYX_NOVA2
 
         // basic eink support
-        EINK_SUPPORT = EINK_FREESCALE || EINK_ROCKCHIP
+        EINK_SUPPORT = EINK_FREESCALE || EINK_ROCKCHIP || EINK_QCOM
 
         // full eink support
         EINK_FULL_SUPPORT = CREMA || TOLINO || ONYX_NOVA2
@@ -261,7 +261,7 @@ object DeviceInfo {
         BUG_SCREEN_ROTATION = BUG == BugDevice.EMULATOR
 
         // needs a view
-        NEEDS_VIEW = ! EINK_SUPPORT || EINK_FREESCALE
+        NEEDS_VIEW = ! EINK_SUPPORT || EINK_FREESCALE || EINK_QCOM
     }
 
     private fun getBuildField(fieldName: String): String {
