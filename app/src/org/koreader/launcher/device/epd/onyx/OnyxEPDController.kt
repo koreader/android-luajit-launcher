@@ -30,7 +30,7 @@ class OnyxEPDController : EPDInterface {
                     Integer.TYPE,
                     Integer.TYPE,
                     Integer.TYPE
-                    ).invoke(targetView, x, y, width, height, 6)
+                    ).invoke(targetView, x, y, width, height, mode)
             }
         }.start()
     }
