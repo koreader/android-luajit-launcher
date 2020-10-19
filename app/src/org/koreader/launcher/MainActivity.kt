@@ -126,7 +126,6 @@ class MainActivity : BaseActivity() {
     override fun onResume() {
         Logger.d(TAG_MAIN, "onResume()")
         super.onResume()
-        epd.onResume()
         applyCustomTimeout(true)
     }
 
@@ -134,7 +133,6 @@ class MainActivity : BaseActivity() {
     override fun onPause() {
         Logger.d(TAG_MAIN, "onPause()")
         super.onPause()
-        epd.onPause()
         applyCustomTimeout(false)
         intent = null
     }

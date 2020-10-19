@@ -18,10 +18,6 @@ class QualcommEPDController : EPDInterface {
             Integer.TYPE).invoke(null, 5, 1, 0)
     }
 
-    override fun onResume(){
-        preventSystemRefresh()
-    }
-
     override fun setEpdMode(targetView: android.view.View,
                             mode: Int, delay: Long,
                             x: Int, y: Int, width: Int, height: Int, epdMode: String?)
