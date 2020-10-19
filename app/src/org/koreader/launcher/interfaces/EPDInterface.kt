@@ -4,8 +4,6 @@
 package org.koreader.launcher.interfaces
 
 interface EPDInterface {
-    fun onPause(){}
-    fun onResume(){}
     fun setEpdMode(targetView: android.view.View,
                    mode: Int, delay: Long,
                    x: Int, y: Int, width: Int, height: Int, epdMode: String?)
