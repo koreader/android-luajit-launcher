@@ -27,7 +27,7 @@ class OnyxEPDController : EPDInterface {
         preventSystemRefresh()
         object: Thread(){
             override fun run(){
-                Thread.sleep(delay)
+                Thread.sleep(100 + delay) // delay by 100 ms to wait for page to "update"
                 Class.forName("android.view.View").getMethod("refreshScreen",
                     Integer.TYPE,
                     Integer.TYPE,
