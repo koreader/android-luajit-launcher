@@ -77,6 +77,24 @@
 
         <TextView
             android:layout_width="fill_parent"
+            android:layout_height="12dp" />
+
+        <TextView
+            android:id="@+id/qualcommText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/qualcommButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="qualcomm/onyx update"
+            android:textSize="28sp" />
+
+        <TextView
+            android:layout_width="fill_parent"
             android:layout_height="18dp" />
 
         <TextView
