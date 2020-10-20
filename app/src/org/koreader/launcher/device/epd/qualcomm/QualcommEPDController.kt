@@ -2,7 +2,6 @@ package org.koreader.launcher.device.epd.qualcomm
 
 import java.lang.Thread
 import java.util.Locale
-import java.lang.reflect.Method
 
 import android.view.View
 import android.util.Log
@@ -24,7 +23,7 @@ abstract class QualcommEPDController : EPDInterface {
                     Integer.TYPE,
                     Integer.TYPE).invoke(null, 5, 1, 0)
                 true
-            }catch(e: Exception){
+            } catch (e: Exception) {
                 Log.e(TAG, e.toString())
                 false
             }
@@ -49,18 +48,18 @@ abstract class QualcommEPDController : EPDInterface {
                 object: Thread(){
                     override fun run(){
                         Thread.sleep(delay)
-                        try{
+                        try {
                             refreshScreen.invoke(targetView, x, y, width, height, mode)
                             Log.i(TAG, String.format(Locale.US,
                                 "requested eink refresh, type: %d x:%d y:%d w:%d h:%d",
                                 mode, x, y, width, height))
-                        }catch(e: Exception){
+                        } catch(e: Exception) {
                             Log.e(TAG, e.toString())
                         }
                     }
                 }.start()
                 true
-            }catch(e: Exception){
+            } catch(e: Exception) {
                 false
             }
         }
