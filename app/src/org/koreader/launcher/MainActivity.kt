@@ -154,16 +154,16 @@ class MainActivity : NativeActivity(), JNILuaInterface,
 
     /* Called when the activity has become visible. */
     override fun onResume() {
-        Logger.d(TAG_MAIN, "onResume()")
         super.onResume()
-        timeout.apply(this@MainActivity, true)
+        device.onResume()
+        timeout.onResume(this@MainActivity)
     }
 
     /* Called when another activity is taking focus. */
     override fun onPause() {
-        Logger.d(TAG_MAIN, "onPause()")
         super.onPause()
-        timeout.apply(this@MainActivity, false)
+        device.onPause()
+        timeout.onPause(this@MainActivity)
         intent = null
     }
 
@@ -337,7 +337,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     }
 
     override fun getExternalPath(): String {
-        return MainApp.storage_path
+        return device.externalStorage
     }
 
     override fun getFilePathFromIntent(): String? {
@@ -371,7 +371,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     }
 
     override fun getPlatformName(): String {
-        return MainApp.platform_type
+        return device.platform
     }
 
     override fun getProduct(): String {
@@ -447,7 +447,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     }
 
     override fun hasNativeRotation(): Int {
-        return if (MainApp.platform_type == "android") {
+        return if (device.platform == "android") {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 // FIXME: hw rotation is disabled in devices with a Notch.
                 if ((topInsetHeight > 0) || (device.bugRotation)) 0 else 1
@@ -460,7 +460,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     }
 
     override fun isChromeOS(): Int {
-        return if (MainApp.platform_type == "chrome") 1 else 0
+        return if (device.isChromeOS) 1 else 0
     }
 
     override fun isDebuggable(): Int {
@@ -499,12 +499,12 @@ class MainActivity : NativeActivity(), JNILuaInterface,
 
     override fun isPathInsideSandbox(path: String?): Int {
         return path?.let {
-            if (it.startsWith(MainApp.storage_path)) 1 else 0
+            if (it.startsWith(device.externalStorage)) 1 else 0
         } ?: 0
     }
 
     override fun isTv(): Int {
-        return if (MainApp.platform_type == "android_tv") 1 else 0
+        return if (device.isTv) 1 else 0
     }
 
     override fun isWarmthDevice(): Int {

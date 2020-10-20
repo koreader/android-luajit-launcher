@@ -12,6 +12,7 @@ import android.widget.LinearLayout
 import android.widget.SeekBar
 import android.widget.TextView
 
+import org.koreader.launcher.MainApp
 import org.koreader.launcher.device.DeviceInfo
 import org.koreader.launcher.device.EPDFactory
 import org.koreader.launcher.device.LightsFactory
@@ -23,8 +24,9 @@ class DeviceHelper(activity: Activity) {
     val hasEinkSupport = DeviceInfo.EINK_SUPPORT
     val hasFullEinkSupport = DeviceInfo.EINK_FULL_SUPPORT
     val needsWakelocks = DeviceInfo.BUG_WAKELOCKS
-    val needsView = DeviceInfo.NEEDS_VIEW
     val bugRotation = DeviceInfo.BUG_SCREEN_ROTATION
+    val externalStorage = MainApp.storage_path
+    val platform = MainApp.platform_type
 
     val einkPlatform: String = if (DeviceInfo.EINK_FREESCALE) {
         if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN)
@@ -37,6 +39,14 @@ class DeviceHelper(activity: Activity) {
         "rockchip"
     } else {
         "none"
+    }
+    val isTv = (platform == "android_tv")
+    val isChromeOS = (platform == "chrome")
+
+    val needsView: Boolean = if (DeviceInfo.NEEDS_VIEW) {
+        true
+    } else {
+        (isTv || isChromeOS)
     }
 
     // EPD driver for this device
@@ -74,6 +84,16 @@ class DeviceHelper(activity: Activity) {
 
         Logger.v(TAG, String.format(Locale.US,
             "native orientation: %s", if (this.screenIsLandscape) "landscape" else "portrait"))
+    }
+
+    fun onResume() {
+        Logger.v(TAG, "device onResume")
+        epd.resume()
+    }
+
+    fun onPause() {
+        Logger.v(TAG, "device onPause")
+        epd.pause()
     }
 
     /* Eink */

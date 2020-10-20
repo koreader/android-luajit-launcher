@@ -34,7 +34,17 @@ class TimeoutHelper(activity: Activity) {
             "system timeout: %s", toMin(this.systemTimeout)))
     }
 
-    fun apply(activity: Activity, resumed: Boolean) {
+    fun onResume(activity: Activity) {
+        Logger.v(TAG, "timeout onResume")
+        apply(activity, true)
+    }
+
+    fun onPause(activity: Activity) {
+        Logger.v(TAG, "timeout onPause")
+        apply(activity, false)
+    }
+
+    private fun apply(activity: Activity, resumed: Boolean) {
         if (resumed) {
             systemTimeout = getSystemScreenOffTimeout(activity)
             Logger.v(TAG, String.format(Locale.US,
