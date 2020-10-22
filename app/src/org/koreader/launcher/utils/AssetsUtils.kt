@@ -84,7 +84,6 @@ object AssetsUtils {
                 false
             }
         } catch (e: Exception) {
-            Logger.w(TAG, "$e")
             Logger.i("Found new package revision $newVersion")
             return false
         }
