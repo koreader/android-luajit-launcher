@@ -1626,13 +1626,20 @@ local function run(android_app_state)
         end)
     end
 
-    android.settings.requestWritePermission = function()
+    android.settings.requestWritePermission = function(rationale, okButton, cancelButton)
         JNI:context(android.app.activity.vm, function(jni)
+            local t = jni.env[0].NewStringUTF(jni.env, rationale)
+            local o = jni.env[0].NewStringUTF(jni.env, okButton)
+            local c = jni.env[0].NewStringUTF(jni.env, cancelButton)
             jni:callVoidMethod(
                 android.app.activity.clazz,
                 "requestWriteSystemSettings",
-                "()V"
+                "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
+                t, o, c
             )
+            jni.env[0].DeleteLocalRef(jni.env, t)
+            jni.env[0].DeleteLocalRef(jni.env, o)
+            jni.env[0].DeleteLocalRef(jni.env, c)
         end)
     end
 

@@ -48,13 +48,12 @@ interface JNILuaInterface {
     fun isPackageEnabled(pkg: String): Int
     fun isPathInsideSandbox(path: String?): Int
     fun isTv(): Int
-
     fun isWarmthDevice(): Int
     fun needsWakelocks(): Int
     fun openLink(url: String): Int
     fun openWifiSettings()
     fun performHapticFeedback(constant: Int, force: Int)
-    fun requestWriteSystemSettings()
+    fun requestWriteSystemSettings(rationale: String, okButton: String, cancelButton: String)
     fun safFilePicker(path: String?): Int
     fun sendText(text: String?)
     fun setFullscreen(enabled: Boolean)

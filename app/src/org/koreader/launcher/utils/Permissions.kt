@@ -30,10 +30,9 @@ object Permissions {
         requestPermission(activity, perm, STORAGE_WRITE_ID)
     }
 
-    fun requestWriteSettingsPermission(activity: Activity) {
+    fun requestWriteSettingsPermission(activity: Activity, rationale: String, okButton: String, cancelButton: String) {
         if (Build.VERSION.SDK_INT >= 23) {
-            val perm = Settings.ACTION_MANAGE_WRITE_SETTINGS
-            requestSpecialPermission(activity, perm, null)
+            requestSpecialPermission(activity, Settings.ACTION_MANAGE_WRITE_SETTINGS, rationale, okButton, cancelButton)
         }
     }
 
@@ -46,18 +45,21 @@ object Permissions {
         ActivityCompat.requestPermissions(activity, arrayOf(perm), code)
     }
 
-    private fun requestSpecialPermission(activity: Activity, perm: String, rationale: String?) {
-        if (rationale != null) {
+    private fun requestSpecialPermission(activity: Activity, perm: String, rationale: String, okButton: String?, cancelButton: String?) {
+        activity.runOnUiThread {
+            val ok = okButton ?: "OK"
             val builder = AlertDialog.Builder(activity)
                 .setMessage(rationale)
                 .setCancelable(false)
-                .setPositiveButton("OK") { _, _ ->
+                .setPositiveButton(ok) { _, _ ->
                     activity.startActivity(Intent(perm))
                     activity.finish()
                 }
+
+            if (cancelButton != null) {
+                builder.setNegativeButton(cancelButton) { _, _ -> }
+            }
             builder.create().show()
-        } else {
-            activity.startActivity(Intent(perm))
         }
     }
 }

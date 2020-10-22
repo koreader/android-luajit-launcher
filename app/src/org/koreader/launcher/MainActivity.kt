@@ -537,8 +537,8 @@ class MainActivity : NativeActivity(), JNILuaInterface,
         }
     }
 
-    override fun requestWriteSystemSettings() {
-        Permissions.requestWriteSettingsPermission(this@MainActivity)
+    override fun requestWriteSystemSettings(rationale: String, okButton: String, cancelButton: String) {
+        Permissions.requestWriteSettingsPermission(this@MainActivity, rationale, okButton, cancelButton)
     }
 
     override fun safFilePicker(path: String?): Int {
