@@ -12,11 +12,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
 
-#ifndef _ANDROID_NATIVE_APP_GLUE_H
-#define _ANDROID_NATIVE_APP_GLUE_H
+#pragma once
 
 #include <poll.h>
 #include <pthread.h>
@@ -332,9 +330,14 @@ void android_app_pre_exec_cmd(struct android_app* android_app, int8_t cmd);
 void android_app_post_exec_cmd(struct android_app* android_app, int8_t cmd);
 
 /**
- * Dummy function you can call to ensure glue code isn't stripped.
+ * Dummy function that used to be used to prevent the linker from stripping app
+ * glue code. No longer necessary, since __attribute__((visibility("default")))
+ * does this for us.
  */
-void app_dummy(void);
+__attribute__((
+    deprecated("Calls to app_dummy are no longer necessary. See "
+               "https://github.com/android-ndk/ndk/issues/381."))) void
+app_dummy();
 
 /**
  * This is the function that application code must implement, representing
@@ -345,5 +348,3 @@ extern void android_main(struct android_app* app);
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* _ANDROID_NATIVE_APP_GLUE_H */
