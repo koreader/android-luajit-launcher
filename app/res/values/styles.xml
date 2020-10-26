@@ -11,7 +11,7 @@
         <item name="android:backgroundDimEnabled">false</item>
         <item name="android:background">@android:color/transparent</item>
     </style>
-    <style name="Fullscreen" parent="@android:style/Theme.Holo.Light">
+    <style name="Fullscreen" parent="@style/Theme.AppCompat.Light">
         <item name="android:windowActionBar">false</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowFullscreen">true</item>

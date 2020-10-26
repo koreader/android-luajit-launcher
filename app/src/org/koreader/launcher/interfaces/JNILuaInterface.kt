@@ -4,6 +4,7 @@ package org.koreader.launcher.interfaces
  * See https://github.com/koreader/android-luajit-launcher/blob/master/assets/android.lua */
 
 interface JNILuaInterface {
+    fun canIgnoreBatteryOptimizations(): Int
     fun canWriteSystemSettings(): Int
     fun dictLookup(text: String?, action: String?, nullablePackage: String?)
     fun download(url: String, name: String): Int
@@ -22,16 +23,16 @@ interface JNILuaInterface {
     fun getNetworkInfo(): String
     fun getPlatformName(): String
     fun getProduct(): String
+    fun getScreenAvailableHeight(): Int
     fun getScreenBrightness(): Int
-    fun getScreenMinBrightness(): Int
+    fun getScreenHeight(): Int
     fun getScreenMaxBrightness(): Int
-    fun getScreenWarmth(): Int
-    fun getScreenMinWarmth(): Int
+    fun getScreenMinBrightness(): Int
     fun getScreenMaxWarmth(): Int
+    fun getScreenMinWarmth(): Int
     fun getScreenOffTimeout(): Int
     fun getScreenOrientation(): Int
-    fun getScreenAvailableHeight(): Int
-    fun getScreenHeight(): Int
+    fun getScreenWarmth(): Int
     fun getScreenWidth(): Int
     fun getStatusBarHeight(): Int
     fun getSystemTimeout(): Int
@@ -39,8 +40,8 @@ interface JNILuaInterface {
     fun hasClipboardText(): Int
     fun hasExternalStoragePermission(): Int
     fun hasNativeRotation(): Int
-    fun safFilePicker(path: String?): Int
     fun isCharging(): Int
+    fun isChromeOS(): Int
     fun isDebuggable(): Int
     fun isEink(): Int
     fun isEinkFull(): Int
@@ -48,20 +49,21 @@ interface JNILuaInterface {
     fun isPackageEnabled(pkg: String): Int
     fun isPathInsideSandbox(path: String?): Int
     fun isTv(): Int
-    fun isChromeOS(): Int
     fun isWarmthDevice(): Int
     fun needsWakelocks(): Int
     fun openLink(url: String): Int
     fun openWifiSettings()
     fun performHapticFeedback(constant: Int, force: Int)
-    fun requestWriteSystemSettings()
+    fun requestIgnoreBatteryOptimizations(rationale: String, okButton: String, cancelButton: String)
+    fun requestWriteSystemSettings(rationale: String, okButton: String, cancelButton: String)
+    fun safFilePicker(path: String?): Int
     fun sendText(text: String?)
     fun setFullscreen(enabled: Boolean)
     fun setClipboardText(text: String)
     fun setIgnoreInput(enabled: Boolean)
     fun setScreenBrightness(brightness: Int)
     fun setScreenWarmth(warmth: Int)
-    fun setScreenOffTimeout(timeout: Int)
+    fun setScreenOffTimeout(ms: Int)
     fun setScreenOrientation(orientation: Int)
     fun startEPDTestActivity()
     fun showFrontlightDialog(title: String, dim: String, warmth: String, okButton: String, cancelButton: String): Int

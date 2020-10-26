@@ -51,6 +51,8 @@ object EPDFactory {
             "[EPDFactory]: Using %s EPD Controller", name))
     }
     private class FakeEPDController : EPDInterface {
+        override fun resume() {}
+        override fun pause() {}
         override fun setEpdMode(targetView: android.view.View,
                                 mode: Int, delay: Long,
                                 x: Int, y: Int, width: Int, height: Int, epdMode: String?) {

@@ -1,8 +1,10 @@
 buildscript {
     ext.gradle_plugin_version = '3.4.2'
     ext.kotlin_plugin_version = '1.3.72'
-    ext.androidx_core_version = '1.3.0'
+    ext.androidx_core_version = '1.3.2'
+    ext.androidx_appcompat_version = '1.2.0'
     ext.androidx_supportv4_version = '1.0.0'
+    ext.leakcanary_version = '2.5'
     ext.minSdk = 14
     ext.targetSdk = 28
 
