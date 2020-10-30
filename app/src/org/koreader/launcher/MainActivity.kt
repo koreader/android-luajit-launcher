@@ -557,6 +557,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
             intent.type = "*/*"
             intent.putExtra(Intent.EXTRA_MIME_TYPES, getSupportedMimetypes())
             intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
             lastImportedPath?.let {
                 try {
                     startActivityForResult(intent, ACTION_SAF_FILEPICKER)
@@ -639,6 +640,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
 
     override fun startEPDTestActivity() {
         val intent = Intent(this@MainActivity, EPDTestActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
         startActivity(intent)
     }
 
@@ -748,6 +750,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     @SuppressLint("QueryPermissionsNeeded")
     private fun startActivityIfSafe(intent: Intent?): Boolean {
         if (intent == null) return false
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
         val intentStr = IntentUtils.intentToString(intent)
         try {
             val pm = packageManager

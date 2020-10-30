@@ -79,7 +79,6 @@ object IntentUtils {
     /* Android custom intents for some dict apps ------ */
     private fun getAard2Intent(text: String): Intent {
         val intent = Intent("aard2.lookup")
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
         intent.putExtra(SearchManager.QUERY, text)
         return intent
     }
