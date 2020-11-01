@@ -1,12 +1,10 @@
 package org.koreader.launcher.device.lights
 
-import java.io.File
-
 import android.app.Activity
 import android.provider.Settings
-
+import org.koreader.launcher.Logger
 import org.koreader.launcher.interfaces.LightInterface
-import org.koreader.launcher.utils.Logger
+import java.io.File
 
 /* Special controller for Tolino Epos/Epos2.
  * see https://github.com/koreader/koreader/pull/6332
@@ -57,9 +55,9 @@ class TolinoWarmthController : LightInterface {
 
         // change the brightness through android. Be aware one step in Android is less than one step in the file
         if (startBrightness > BRIGHTNESS_MAX/2)
-            setBrightness(activity, startBrightness - (BRIGHTNESS_MAX/100+1).toInt())
+            setBrightness(activity, startBrightness - (BRIGHTNESS_MAX/100+1))
         else
-            setBrightness(activity, startBrightness + (BRIGHTNESS_MAX/100+1).toInt())
+            setBrightness(activity, startBrightness + (BRIGHTNESS_MAX/100+1))
 
         // we have to wait until the android changes seep through to the file,
         // 50ms is to less, 60ms seems to work, so use 80 to have some safety
@@ -79,7 +77,7 @@ class TolinoWarmthController : LightInterface {
                 Runtime.getRuntime().exec("su -c input keyevent KEYCODE_BUTTON_A && echo OK")
                 1
             } catch (e: Exception) {
-                Logger.w("Exception in enableFrontlightSwitch", e.toString());
+                Logger.w("Exception in enableFrontlightSwitch", e.toString())
                 0
             }
         }

@@ -3,13 +3,12 @@
 
 package org.koreader.launcher.device
 
-import java.util.Locale
-
+import org.koreader.launcher.Logger
+import org.koreader.launcher.device.epd.freescale.NTXNewEPDController
 import org.koreader.launcher.device.epd.rockchip.RK3026EPDController
 import org.koreader.launcher.device.epd.rockchip.RK3368EPDController
-import org.koreader.launcher.device.epd.freescale.NTXNewEPDController
 import org.koreader.launcher.interfaces.EPDInterface
-import org.koreader.launcher.utils.Logger
+import java.util.*
 
 object EPDFactory {
     val epdController: EPDInterface
@@ -51,6 +50,8 @@ object EPDFactory {
             "[EPDFactory]: Using %s EPD Controller", name))
     }
     private class FakeEPDController : EPDInterface {
+        override fun resume() {}
+        override fun pause() {}
         override fun setEpdMode(targetView: android.view.View,
                                 mode: Int, delay: Long,
                                 x: Int, y: Int, width: Int, height: Int, epdMode: String?) {
