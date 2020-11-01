@@ -1,83 +1,52 @@
 package org.koreader.launcher
 
-import java.util.Locale
-
-import android.Manifest
+import android.annotation.SuppressLint
 import android.annotation.TargetApi
 import android.app.Activity
-import android.app.AlertDialog
+import android.app.Dialog
+import android.app.NativeActivity
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.BatteryManager
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.view.*
-import android.widget.LinearLayout
-import android.widget.SeekBar
-import android.widget.TextView
-
+import android.widget.ProgressBar
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import org.koreader.launcher.interfaces.JNILuaInterface
+import org.koreader.launcher.utils.*
+import java.io.IOException
+import java.util.*
 
-import org.koreader.launcher.device.DeviceInfo
-import org.koreader.launcher.device.EPDFactory
-import org.koreader.launcher.device.LightsFactory
-import org.koreader.launcher.utils.FileUtils
-import org.koreader.launcher.utils.Logger
-import org.koreader.launcher.utils.SystemSettings
+class MainActivity : NativeActivity(), JNILuaInterface,
+    ActivityCompat.OnRequestPermissionsResultCallback{
 
-/* MainActivity.java
- *
- * Implements e-ink updates
- * Implements WRITE_EXTERNAL_STORAGE/WRITE_SETTINGS permissions
- *
- * Takes care of most activity callbacks that are view-aware.
- * It handles custom timeout based on activity state too.
- */
+    private lateinit var clipboard: Clipboard
+    private lateinit var device: Device
+    private lateinit var timeout: Timeout
 
-@Suppress("ConstantConditionIf")
-class MainActivity : BaseActivity() {
-
-    // EPD driver for this device
-    private val epd = EPDFactory.epdController
-
-    // Light controller for this device
-    private val lights = LightsFactory.lightsController
-    private var lightDialogState = LIGHT_DIALOG_CLOSED
-
-    // Some e-ink devices need to take control of the native window from the java side
-    private var takesWindowOwnership: Boolean = false
-
-    // Hardware orientation for this device (matches android logo)
-    private var screenIsLandscape: Boolean = false
-
-    // Use this setting to avoid screen dimming
-    private var isScreenAlwaysOn: Boolean = false
-
-    // Use this setting to override screen off timeout system setting
-    private var isCustomTimeout: Boolean = false
-
-    // When custom timeouts are used these are the current timeouts for activity and system
-    private var systemTimeout: Int = 0
-    private var appTimeout: Int = 0
-
+    // Path of last file imported
     private var lastImportedPath: String? = null
 
-    companion object {
-        private const val TAG_MAIN = "MainActivity"
+    // Some devices need to take control of the native window
+    private var takesWindowOwnership: Boolean = false
 
-        private const val LIGHT_DIALOG_CLOSED = -1
-        private const val LIGHT_DIALOG_OPENED = 0
-        private const val LIGHT_DIALOG_CANCEL = 1
-        private const val LIGHT_DIALOG_OK = 2
+    // Device cutout - only used on API 28+
+    private var topInsetHeight: Int = 0
 
-        private const val PERMISSION_STORAGE_WRITE = Manifest.permission.WRITE_EXTERNAL_STORAGE
-        private const val PERMISSION_STORAGE_WRITE_ID = 1
+    // Fullscreen - only used on API levels 16-18
+    private var fullscreen: Boolean = true
 
-        private const val ACTION_SAF_FILEPICKER = 2
-    }
+    // Splashscreen is active
+    private var splashScreen: Boolean = true
 
-    // Surface used on devices that need a view
+    // surface used on devices that need a view
     private var view: NativeSurfaceView? = null
     private class NativeSurfaceView(context: Context): SurfaceView(context),
         SurfaceHolder.Callback {
@@ -96,51 +65,118 @@ class MainActivity : BaseActivity() {
         }
     }
 
+    /* dialog used while extracting assets from zip */
+    private var dialog: FramelessProgressDialog? = null
+    private class FramelessProgressDialog private constructor(context: Context):
+        Dialog(context, R.style.FramelessDialog) {
+        companion object {
+            fun show(context: Context, title: CharSequence): FramelessProgressDialog {
+                val dialog = FramelessProgressDialog(context)
+                dialog.setTitle(title)
+                dialog.setCancelable(false)
+                dialog.setOnCancelListener(null)
+                dialog.window?.setGravity(Gravity.BOTTOM)
+                val progressBar = ProgressBar(context)
+                try {
+                    ContextCompat.getDrawable(context, R.drawable.discrete_spinner)
+                        ?.let { spinDrawable -> progressBar.indeterminateDrawable = spinDrawable }
+                } catch (e: Exception) {
+                    Logger.w("Failed to set progress drawable:\n$e")
+                }
+                /* The next line will add the ProgressBar to the dialog. */
+                dialog.addContentView(progressBar, ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT)
+                )
+                dialog.show()
+                return dialog
+            }
+        }
+    }
+
+    companion object {
+        private const val TAG_MAIN = "MainActivity"
+        private const val ACTION_SAF_FILEPICKER = 2
+        private val BATTERY_FILTER = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
+        private val RUNTIME_VERSION = Build.VERSION.RELEASE
+    }
+
     /*---------------------------------------------------------------
      *                        activity callbacks                    *
      *--------------------------------------------------------------*/
 
     /* Called when the activity is first created. */
     override fun onCreate(savedInstanceState: Bundle?) {
-        Logger.d(TAG_MAIN, "onCreate()")
+        Logger.v(String.format(Locale.US,
+            "Launching %s %s", MainApp.name, MainApp.info))
+        clipboard = Clipboard(this@MainActivity)
+        device = Device(this@MainActivity)
+        timeout = Timeout()
         super.onCreate(savedInstanceState)
-        if (DeviceInfo.NEEDS_VIEW) {
-            Logger.v(TAG_MAIN, "onNativeSurfaceViewImpl()")
+        setTheme(R.style.Fullscreen)
+
+        // Window background must be black for vertical and horizontal lines to be visible
+        window.setBackgroundDrawableResource(android.R.color.black)
+
+        val surfaceKind: String = if (device.needsView) {
             view = NativeSurfaceView(this)
             window.takeSurface(null)
             view?.holder?.addCallback(this)
             setContentView(view)
             takesWindowOwnership = true
+            "SurfaceView"
         } else {
-            /* native content without further processing */
-            Logger.v(TAG_MAIN, "onNativeWindowImpl()")
+            "Native Content"
         }
-        screenIsLandscape = isHwLandscape()
-        checkMandatoryPermissions()
-        systemTimeout = SystemSettings.getSystemScreenOffTimeout(this)
+        Logger.v(TAG_MAIN, "surface: $surfaceKind")
+
+        if (!Permissions.hasStoragePermission(this@MainActivity)) {
+            Permissions.requestStoragePermission(this@MainActivity)
+        }
     }
 
     /* Called when the activity has become visible. */
     override fun onResume() {
-        Logger.d(TAG_MAIN, "onResume()")
         super.onResume()
-        applyCustomTimeout(true)
+        device.onResume()
+        timeout.onResume(this@MainActivity)
     }
 
     /* Called when another activity is taking focus. */
     override fun onPause() {
-        Logger.d(TAG_MAIN, "onPause()")
         super.onPause()
-        applyCustomTimeout(false)
+        device.onPause()
+        timeout.onPause(this@MainActivity)
         intent = null
     }
 
-    /* Called just before the activity is resumed by an intent
-     *
-     * If the intent is action.MAIN then scheme will be null
-     * If the intent is action.VIEW then the scheme can be file or content.
-     */
+    override fun surfaceCreated(holder: SurfaceHolder) {
+        super.surfaceCreated(holder)
+        drawSplashScreen(holder)
+    }
 
+    override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
+        super.surfaceChanged(holder, format, width, height)
+        drawSplashScreen(holder)
+    }
+
+    override fun onAttachedToWindow() {
+        Logger.d(TAG_MAIN, "onAttachedToWindow()")
+        super.onAttachedToWindow()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            val cut: DisplayCutout? = window.decorView.rootWindowInsets.displayCutout
+            if (cut != null) {
+                val cutPixels = cut.safeInsetTop
+                if (topInsetHeight != cutPixels) {
+                    Logger.v(TAG_MAIN,
+                        "top $cutPixels pixels are not available, reason: window inset")
+                    topInsetHeight = cutPixels
+                }
+            }
+        }
+    }
+
+    /* Called just before the activity is resumed by an intent */
     override fun onNewIntent(intent: Intent) {
         val scheme = intent.scheme
         Logger.d(TAG_MAIN, "onNewIntent(): $scheme")
@@ -153,8 +189,8 @@ class MainActivity : BaseActivity() {
         Array<String>, grantResults: IntArray) {
         Logger.d(TAG_MAIN, "onRequestPermissionResult()")
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (hasPermissionGranted(permissions[0])) {
-            Logger.v(TAG_MAIN, String.format(Locale.US,
+        if (Permissions.hasStoragePermission(this@MainActivity)) {
+            Logger.i(TAG_MAIN, String.format(Locale.US,
                     "Permission granted for request code: %d", requestCode))
         } else {
             Logger.e(TAG_MAIN, String.format(Locale.US,
@@ -166,22 +202,128 @@ class MainActivity : BaseActivity() {
     @TargetApi(19)
     override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
         if (requestCode == ACTION_SAF_FILEPICKER && resultCode == Activity.RESULT_OK) {
-            lastImportedPath ?: return
+            val importPath = lastImportedPath ?: return
             resultData?.let {
                 val clipData = it.clipData
                 if (clipData != null) {
                     for (i in 0 until clipData.itemCount) {
                         val path = clipData.getItemAt(i)
-                        FileUtils.saveAsFile(this@MainActivity, path.uri, lastImportedPath)
+                        FileUtils.saveAsFile(this@MainActivity, path.uri, importPath)
                     }
-                } else FileUtils.saveAsFile(this@MainActivity, resultData.data, lastImportedPath)
+                } else FileUtils.saveAsFile(this@MainActivity, resultData.data, importPath)
             }
         }
     }
 
+    /* Called when the activity focus changes */
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
         if (hasFocus) setFullscreenLayout()
+    }
+
+    /* Called when the activity is going to be destroyed */
+    public override fun onDestroy() {
+        Logger.v(TAG_MAIN, "onDestroy()")
+        super.onDestroy()
+    }
+
+    /*---------------------------------------------------------------
+     *             override methods used by lua/JNI                *
+     *--------------------------------------------------------------*/
+
+    override fun canIgnoreBatteryOptimizations(): Int {
+        return if (Permissions.isIgnoringBatteryOptimizations(this@MainActivity)) 1 else 0
+    }
+    override fun canWriteSystemSettings(): Int {
+        return if (Permissions.hasWriteSettingsPermission(this@MainActivity)) 1 else 0
+    }
+
+    override fun dictLookup(text: String?, action: String?, nullablePackage: String?) {
+        text?.let { lookupText ->
+            action?.let { lookupAction ->
+                val lookupIntent = Intent(IntentUtils.getByAction(lookupText, lookupAction, nullablePackage))
+                if (!startActivityIfSafe(lookupIntent)) {
+                    Logger.e(TAG_MAIN, "invalid lookup: can't find a package able to resolve $action")
+                }
+            } ?: Logger.e(TAG_MAIN, "invalid lookup: no action")
+        } ?: Logger.e(TAG_MAIN, "invalid lookup: no text")
+    }
+
+    override fun download(url: String, name: String): Int {
+        return NetworkUtils.download(this@MainActivity, url, name)
+    }
+
+    override fun einkUpdate(mode: Int) {
+        if (takesWindowOwnership) {
+            device.einkUpdate(view as View, mode)
+        } else {
+            val rootView = window.decorView.findViewById<View>(android.R.id.content)
+            device.einkUpdate(rootView, mode)
+        }
+    }
+
+    override fun einkUpdate(mode: Int, delay: Long, x: Int, y: Int, width: Int, height: Int) {
+        if (takesWindowOwnership) {
+            device.einkUpdate(view as View, mode, delay, x, y, width, height)
+        } else {
+            val rootView = window.decorView.findViewById<View>(android.R.id.content)
+            device.einkUpdate(rootView, mode, delay, x, y, width, height)
+        }
+    }
+
+    override fun enableFrontlightSwitch(): Int {
+        return device.enableFrontlightSwitch(this@MainActivity)
+    }
+
+    override fun extractAssets(): Int {
+        val output = filesDir.absolutePath
+        val check = try {
+            // check if the app has zipped assets
+            val zipFile = AssetsUtils.getZipFromAsset(this)
+            if (zipFile != null) {
+                var ok = true
+                Logger.i("Check file in asset module: $zipFile")
+                // upgrade or downgrade files from zip
+                if (!AssetsUtils.isSameVersion(this, zipFile)) {
+                    showProgress() // show progress dialog (animated dots)
+                    val startTime = System.nanoTime()
+                    Logger.i("Installing new package to $output")
+                    val stream = assets.open("module/$zipFile")
+                    ok = AssetsUtils.unzip(stream, output, true)
+                    val endTime = System.nanoTime()
+                    val elapsedTime = endTime - startTime
+                    Logger.v("update installed in " + elapsedTime / 1000000000 + " seconds")
+                    dismissProgress() // dismiss progress dialog
+                }
+                if (ok) 1 else 0
+            } else {
+                // check if the app has other, non-zipped, raw assets
+                Logger.i("Zip file not found, trying raw assets...")
+                if (AssetsUtils.copyRawAssets(this)) 1 else 0
+            }
+        } catch (e: IOException) {
+            Logger.e(TAG_MAIN, "error extracting assets:\n$e")
+            dismissProgress()
+            0
+        }
+        splashScreen = false
+        return check
+    }
+
+    override fun getBatteryLevel(): Int {
+        return getBatteryState(true)
+    }
+
+    override fun getClipboardText(): String {
+        return clipboard.getClipboardText(this@MainActivity)
+    }
+
+    override fun getEinkPlatform(): String {
+        return device.einkPlatform
+    }
+
+    override fun getExternalPath(): String {
+        return device.externalStorage
     }
 
     override fun getFilePathFromIntent(): String? {
@@ -192,270 +334,201 @@ class MainActivity : BaseActivity() {
         }
     }
 
+    override fun getFlavor(): String {
+        return resources.getString(R.string.app_flavor)
+    }
+
     override fun getLastImportedPath(): String? {
         val current = lastImportedPath
         lastImportedPath = null
         return current
     }
 
-    override fun isPathInsideSandbox(path: String?): Int {
-        return path?.let {
-            if (it.startsWith(MainApp.storage_path)) 1 else 0
-            } ?: 0
+    override fun getLightDialogState(): Int {
+        return device.getLightDialogState()
     }
 
-    /* Called when the activity is going to be destroyed */
-    public override fun onDestroy() {
-        Logger.d(TAG_MAIN, "onDestroy()")
-        super.onDestroy()
+    override fun getName(): String {
+        return resources.getString(R.string.app_name)
     }
 
-    /*---------------------------------------------------------------
-     *             override methods used by lua/JNI                *
-     *--------------------------------------------------------------*/
+    override fun getNetworkInfo(): String {
+        return NetworkUtils.getNetworkInfo(this@MainActivity)
+    }
 
-    override fun enableFrontlightSwitch(): Int {
-        return lights.enableFrontlightSwitch(this@MainActivity)
+    override fun getPlatformName(): String {
+        return device.platform
+    }
+
+    override fun getProduct(): String {
+        return device.product
+    }
+
+    override fun getScreenAvailableHeight(): Int {
+        return ScreenUtils.getScreenAvailableHeight(this)
     }
 
     override fun getScreenBrightness(): Int {
-        return lights.getBrightness(this@MainActivity)
+        return device.getScreenBrightness(this@MainActivity)
     }
 
-    override fun setScreenBrightness(brightness: Int) {
-        lights.setBrightness(this@MainActivity, brightness)
-    }
-
-    override fun getScreenMinBrightness(): Int {
-        return lights.getMinBrightness()
+    override fun getScreenHeight(): Int {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            ScreenUtils.getScreenHeight(this) - topInsetHeight
+        } else {
+            ScreenUtils.getScreenHeight(this)
+        }
     }
 
     override fun getScreenMaxBrightness(): Int {
-        return lights.getMaxBrightness()
+        return device.getScreenMaxBrightness()
     }
 
-    override fun getScreenWarmth(): Int {
-        return lights.getWarmth(this@MainActivity)
-    }
-
-    override fun setScreenWarmth(warmth: Int) {
-        lights.setWarmth(this@MainActivity, warmth)
-    }
-
-    override fun getScreenMinWarmth(): Int {
-        return lights.getMinWarmth()
+    override fun getScreenMinBrightness(): Int {
+        return device.getScreenMinBrightness()
     }
 
     override fun getScreenMaxWarmth(): Int {
-        return lights.getMaxWarmth()
+        return device.getScreenMaxWarmth()
     }
 
-    override fun isWarmthDevice(): Int {
-        return if (lights.hasWarmth()) 1 else 0
+    override fun getScreenMinWarmth(): Int {
+        return device.getScreenMinWarmth()
     }
 
-    override fun getLightDialogState(): Int {
-        return lightDialogState
+    override fun getScreenOffTimeout(): Int {
+        return timeout.getSystemScreenOffTimeout(this@MainActivity)
     }
 
-    override fun showFrontlightDialog(title: String, dim: String, warmth: String, okButton: String, cancelButton: String): Int {
-        val hasWarmth = lights.hasWarmth()
-        setFrontlightDialogState(LIGHT_DIALOG_OPENED)
-        runOnUiThread {
-            val dimText = TextView(this@MainActivity)
-            val dimSeekBar = SeekBar(this@MainActivity)
-            dimText.text = dim
-            dimText.gravity = Gravity.CENTER_HORIZONTAL
-            dimText.textSize = 18f
-            dimSeekBar.max = lights.getMaxBrightness()
-            dimSeekBar.progress = lights.getBrightness(this@MainActivity)
-            dimSeekBar.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener {
-                override fun onStartTrackingTouch(p0: SeekBar?) {}
-                override fun onStopTrackingTouch(p0: SeekBar?) {}
-                override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
-                    lights.setBrightness(this@MainActivity, p1)
-                }
-            })
-            val linearLayout = LinearLayout(this@MainActivity)
-            linearLayout.orientation = LinearLayout.VERTICAL
-            linearLayout.addView(dimText)
-            linearLayout.addView(dimSeekBar)
-            if (hasWarmth) {
-                val warmthText = TextView(this@MainActivity)
-                val warmthSeekBar = SeekBar(this@MainActivity)
-                warmthText.text = warmth
-                warmthText.gravity = Gravity.CENTER_HORIZONTAL
-                warmthText.textSize = 18f
-                warmthSeekBar.max = lights.getMaxWarmth()
-                warmthSeekBar.progress = lights.getWarmth(this@MainActivity)
-                warmthSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-                    override fun onStartTrackingTouch(p0: SeekBar?) {}
-                    override fun onStopTrackingTouch(p0: SeekBar?) {}
-                    override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
-                        lights.setWarmth(this@MainActivity, p1)
-                    }
-                })
-                linearLayout.addView(warmthText)
-                linearLayout.addView(warmthSeekBar)
-            }
-
-            val builder = AlertDialog.Builder(this@MainActivity)
-            builder.setTitle(title)
-                .setCancelable(false)
-                .setPositiveButton(okButton) {
-                    _, _ -> setFrontlightDialogState(LIGHT_DIALOG_OK)
-                }
-                .setNegativeButton(cancelButton) {
-                    _, _ -> setFrontlightDialogState(LIGHT_DIALOG_CANCEL)
-                }
-
-            val dialog: AlertDialog = builder.create()
-            dialog.setView(linearLayout)
-            dialog.show()
-        }
-        return 0
+    override fun getScreenOrientation(): Int {
+        return device.getScreenOrientation(this@MainActivity)
     }
 
-   /* Native orientation is available for Android 4.4+ devices.
-      Supported devices can also be blacklisted in DeviceInfo if the behaviour is buggy.
+    override fun getScreenWarmth(): Int {
+        return device.getScreenWarmth(this@MainActivity)
+    }
 
-      FIXME: It is actually disabled on 9.0+ devices with a notch.
+    override fun getScreenWidth(): Int {
+        return ScreenUtils.getScreenWidth(this)
+    }
 
-        we need to set viewports for non portrait modes
+    override fun getStatusBarHeight(): Int {
+        return ScreenUtils.getStatusBarHeight(this)
+    }
 
-        - on landscape: notch, 0, height, width - notch
-        - on reverse landscape: 0, 0, height, width - notch
-        - on reverse portrait: 0, 0, height - notch, width
+    override fun getSystemTimeout(): Int {
+        return timeout.getSystemTimeout()
+    }
 
-        + adjust touch too?¿?
-   */
+    override fun getVersion(): String {
+        return RUNTIME_VERSION
+    }
+
+    override fun hasClipboardText(): Int {
+        return clipboard.hasClipboardText()
+    }
+
+    override fun hasExternalStoragePermission(): Int {
+        return if (Permissions.hasStoragePermission(this@MainActivity)) 1 else 0
+    }
 
     override fun hasNativeRotation(): Int {
-        return if (MainApp.platform_type == "android") {
+        return if (device.platform == "android") {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 // FIXME: hw rotation is disabled in devices with a Notch.
-                if ((topInsetHeight > 0) || (DeviceInfo.BUG_SCREEN_ROTATION)) 0 else 1
+                if ((topInsetHeight > 0) || (device.bugRotation)) 0 else 1
             } else 0
         } else 0
     }
 
-    override fun getScreenOrientation(): Int {
-        // constants from https://github.com/koreader/koreader-base/blob/master/ffi/framebuffer.lua
-        val PORTRAIT = 0
-        val LANDSCAPE = 1
-        val REVERSE_PORTRAIT = 2
-        val REVERSE_LANDSCAPE = 3
-
-        return when (windowManager.defaultDisplay.rotation) {
-            Surface.ROTATION_90 -> if (screenIsLandscape) PORTRAIT else REVERSE_LANDSCAPE
-            Surface.ROTATION_180 -> if (screenIsLandscape) REVERSE_LANDSCAPE else REVERSE_PORTRAIT
-            Surface.ROTATION_270 -> if (screenIsLandscape) REVERSE_PORTRAIT else LANDSCAPE
-            else -> if (screenIsLandscape) LANDSCAPE else PORTRAIT
-        }
-    }
-
-    override fun setScreenOrientation(orientation: Int) {
-        // constants from https://developer.android.com/reference/android/content/res/Configuration
-        val LANDSCAPE = 0
-        val PORTRAIT = 1
-        val REVERSE_LANDSCAPE = 8
-        val REVERSE_PORTRAIT = 9
-
-        val new_orientation = if (screenIsLandscape) {
-            when (orientation) {
-                LANDSCAPE -> PORTRAIT
-                PORTRAIT -> LANDSCAPE
-                REVERSE_LANDSCAPE -> REVERSE_PORTRAIT
-                REVERSE_PORTRAIT -> REVERSE_LANDSCAPE
-                else -> orientation
-            }
-        } else {
-            when (orientation) {
-                LANDSCAPE -> REVERSE_LANDSCAPE
-                REVERSE_LANDSCAPE -> LANDSCAPE
-                else -> orientation
-            }
-        }
-        requestedOrientation = new_orientation
-    }
-
-    override fun isTv(): Int {
-        return if (MainApp.platform_type == "android_tv") 1 else 0
+    override fun isCharging(): Int {
+        return getBatteryState(false)
     }
 
     override fun isChromeOS(): Int {
-        return if (MainApp.platform_type == "chrome") 1 else 0
+        return if (device.isChromeOS) 1 else 0
     }
 
-    override fun getPlatformName(): String {
-        return MainApp.platform_type
+    override fun isDebuggable(): Int {
+        return if (MainApp.debuggable) 1 else 0
     }
 
-    override fun canWriteSystemSettings(): Int {
-        return if (SystemSettings.canWrite(this)) 1 else 0
+    override fun isEink(): Int {
+        return if (device.hasEinkSupport) 1 else 0
     }
 
-    /* ignore input toggle */
-    override fun setIgnoreInput(enabled: Boolean) {
-        runOnUiThread {
-            if (enabled) {
-                window.addFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
-            } else {
-                window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
-            }
+    override fun isEinkFull(): Int {
+        return if (device.hasFullEinkSupport) 1 else 0
+    }
+
+    override fun isFullscreen(): Int {
+        return if (Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR2 ||
+            Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            if (fullscreen) 1 else 0
+        } else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.JELLY_BEAN) {
+            ScreenUtils.isFullscreenDeprecated(this)
+        } else {
+            1
         }
     }
 
-    // update the entire screen (rockchip)
-    override fun einkUpdate(mode: Int) {
-        val modeName = when (mode) {
-            1 -> "EPD_FULL"
-            2 -> "EPD_PART"
-            3 -> "EPD_A2"
-            4 -> "EPD_AUTO"
-            else -> "invalid"
-        }
-
-        if (modeName != "invalid") {
-            Logger.v(TAG_MAIN, String.format(Locale.US,
-                "requesting epd update, type: %s", modeName))
-
-            if (takesWindowOwnership and (view != null)) {
-                epd.setEpdMode(view as View, 0, 0, 0, 0, 0, 0, modeName)
-            } else {
-                val rootView = window.decorView.findViewById<View>(android.R.id.content)
-                epd.setEpdMode(rootView, 0, 0, 0, 0, 0, 0, modeName)
-            }
+    override fun isPackageEnabled(pkg: String): Int {
+        return try {
+            val pm = packageManager
+            pm.getPackageInfo(pkg, PackageManager.GET_ACTIVITIES)
+            val enabled = pm.getApplicationInfo(pkg, 0).enabled
+            if (enabled) 1 else 0
+        } catch (e: PackageManager.NameNotFoundException) {
+            0
         }
     }
 
-    // update a region or the entire screen (freescale)
-    override fun einkUpdate(mode: Int, delay: Long, x: Int, y: Int, width: Int, height: Int) {
+    override fun isPathInsideSandbox(path: String?): Int {
+        return path?.let {
+            if (it.startsWith(device.externalStorage)) 1 else 0
+        } ?: 0
+    }
 
-        Logger.v(TAG_MAIN, String.format(Locale.US,
-                "requesting epd update, mode:%d, delay:%d, [x:%d, y:%d, w:%d, h:%d]",
-                mode, delay, x, y, width, height))
+    override fun isTv(): Int {
+        return if (device.isTv) 1 else 0
+    }
 
+    override fun isWarmthDevice(): Int {
+        return device.isWarmthDevice()
+    }
+
+    override fun needsWakelocks(): Int {
+        return if (device.needsWakelocks) 1 else 0
+    }
+
+    override fun openLink(url: String): Int {
+        val webpage = Uri.parse(url)
+        val intent = Intent(Intent.ACTION_VIEW, webpage)
+        return if (startActivityIfSafe(intent)) 0 else 1
+    }
+
+    override fun openWifiSettings() {
+        val intent = Intent().apply {
+            action = Settings.ACTION_WIFI_SETTINGS
+        }
+        startActivityIfSafe(intent)
+    }
+
+    override fun performHapticFeedback(constant: Int, force: Int) {
         if (takesWindowOwnership) {
-            epd.setEpdMode(view as View, mode, delay, x, y, width, height, null)
+            device.hapticFeedback(this@MainActivity, constant, force > 0, view as View)
         } else {
             val rootView = window.decorView.findViewById<View>(android.R.id.content)
-            epd.setEpdMode(rootView, mode, delay, x, y, width, height, null)
+            device.hapticFeedback(this@MainActivity, constant, force > 0, rootView)
         }
     }
 
-    override fun getScreenOffTimeout(): Int {
-        // return current setting
-        return SystemSettings.getSystemScreenOffTimeout(this)
+    override fun requestIgnoreBatteryOptimizations(rationale: String, okButton: String, cancelButton: String) {
+        Permissions.requestIgnoreBatteryOptimizations(this@MainActivity, rationale, okButton, cancelButton)
     }
 
-    override fun getSystemTimeout(): Int {
-        // return last known value
-        return systemTimeout
-    }
-
-    override fun hasExternalStoragePermission(): Int {
-        return if (hasStoragePermission()) 1 else 0
+    override fun requestWriteSystemSettings(rationale: String, okButton: String, cancelButton: String) {
+        Permissions.requestWriteSettingsPermission(this@MainActivity, rationale, okButton, cancelButton)
     }
 
     override fun safFilePicker(path: String?): Int {
@@ -464,48 +537,9 @@ class MainActivity : BaseActivity() {
             val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
             intent.addCategory(Intent.CATEGORY_OPENABLE)
             intent.type = "*/*"
-            val filter = arrayOf(
-                "application/epub+zip",
-                "application/fb2",
-                "application/fb3",
-                "application/msword",
-                "application/oxps",
-                "application/pdf",
-                "application/rtf",
-                "application/tcr",
-                "application/vnd.amazon.mobi8-ebook",
-                "application/vnd.comicbook+tar",
-                "application/vnd.comicbook+zip",
-                "application/vnd.ms-htmlhelp",
-                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                "application/vnd.palm",
-                "application/x-cbz",
-                "application/x-chm",
-                "application/x-fb2",
-                "application/x-fb3",
-                "application/x-mobipocket-ebook",
-                "application/x-tar",
-                "application/xhtml+xml",
-                "application/xml",
-                "application/zip",
-                "image/djvu",
-                "image/gif",
-                "image/jp2",
-                "image/jpeg",
-                "image/jxr",
-                "image/png",
-                "image/svg+xml",
-                "image/tiff",
-                "image/vnd.djvu",
-                "image/vnd.ms-photo",
-                "image/x-djvu",
-                "image/x-portable-arbitrarymap",
-                "image/x-portable-bitmap",
-                "text/html",
-                "text/plain"
-            )
-            intent.putExtra(Intent.EXTRA_MIME_TYPES, filter)
+            intent.putExtra(Intent.EXTRA_MIME_TYPES, getSupportedMimetypes())
             intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
             lastImportedPath?.let {
                 try {
                     startActivityForResult(intent, ACTION_SAF_FILEPICKER)
@@ -519,50 +553,76 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    override fun performHapticFeedback(constant: Int, force: Int) {
-        if (!takesWindowOwnership) {
-            val rootView = window.decorView.findViewById<View>(android.R.id.content)
-            hapticFeedback(constant, if (force > 0) true else false, rootView)
+    override fun sendText(text: String?) {
+        text?.let {
+            startActivityIfSafe(IntentUtils.getSendIntent(it, null))
         }
     }
 
-    override fun requestWriteSystemSettings() {
-        val intent = SystemSettings.getWriteSettingsIntent()
-        startActivity(intent)
+    override fun setClipboardText(text: String) {
+        clipboard.setClipboardText(this@MainActivity, text)
     }
 
-    override fun setScreenOffTimeout(timeout: Int) {
-        val SCREEN_ON_ENABLED = -1
-        val SCREEN_ON_DISABLED = 0
+    override fun setFullscreen(enabled: Boolean) {
+        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR2 ||
+            Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            fullscreen = enabled
+        } else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.JELLY_BEAN) {
+            ScreenUtils.setFullscreenDeprecated(this, enabled)
+        }
+    }
 
-        when {
-            timeout > SCREEN_ON_DISABLED -> {
-                // custom timeout
-                isCustomTimeout = true
-                appTimeout = safeTimeout(timeout)
-                val mins = toMin(appTimeout)
-                setScreenOn(false)
-                Logger.d("SystemSettings",
-                    "applying activity custom timeout: $mins minutes")
-                SystemSettings.setSystemScreenOffTimeout(this, appTimeout)
+    override fun setIgnoreInput(enabled: Boolean) {
+        runOnUiThread {
+            if (enabled) {
+                window.addFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+            } else {
+                window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
             }
-            timeout == SCREEN_ON_ENABLED -> {
-                // always on
-                isCustomTimeout = false
-                appTimeout = 0
-                setScreenOn(true)
-            }
-            else -> {
-                // default
-                appTimeout = 0
-                isCustomTimeout = false
-                setScreenOn(false)
+        }
+    }
+
+    override fun setScreenBrightness(brightness: Int) {
+        device.setScreenBrightness(this@MainActivity, brightness)
+    }
+
+    override fun setScreenOffTimeout(ms: Int) {
+        timeout.setTimeout(this@MainActivity, ms)
+    }
+
+    override fun setScreenOrientation(orientation: Int) {
+        device.setScreenOrientation(this@MainActivity, orientation)
+    }
+
+    override fun setScreenWarmth(warmth: Int) {
+        device.setScreenWarmth(this@MainActivity, warmth)
+    }
+
+    override fun showFrontlightDialog(title: String, dim: String, warmth: String, okButton: String, cancelButton: String): Int {
+        return device.showDialog(this@MainActivity, title, dim, warmth, okButton, cancelButton)
+    }
+
+    override fun showToast(message: String) {
+        showToast(message, false)
+    }
+
+    override fun showToast(message: String, longTimeout: Boolean) {
+        runOnUiThread {
+            if (longTimeout) {
+                val toast = Toast.makeText(this@MainActivity,
+                    message, Toast.LENGTH_LONG)
+                toast.show()
+            } else {
+                val toast = Toast.makeText(this@MainActivity,
+                    message, Toast.LENGTH_SHORT)
+                toast.show()
             }
         }
     }
 
     override fun startEPDTestActivity() {
         val intent = Intent(this@MainActivity, EPDTestActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
         startActivity(intent)
     }
 
@@ -570,50 +630,88 @@ class MainActivity : BaseActivity() {
      *                       private methods                        *
      *--------------------------------------------------------------*/
 
-    @Suppress("DEPRECATION")
-    private fun isHwLandscape(): Boolean {
-        val display = windowManager.defaultDisplay
-        return display.width > display.height
-    }
-
-    private fun hapticFeedback(constant: Int, force: Boolean, view: View) {
-        runOnUiThread {
-            if (force) {
-                view.performHapticFeedback(constant, 2)
-            } else {
-                view.performHapticFeedback(constant)
+    private fun drawSplashScreen(holder: SurfaceHolder) {
+        if (splashScreen) {
+            /* draw splash screen to surface */
+            holder.lockCanvas()?.let { canvas ->
+                try {
+                    ContextCompat.getDrawable(this, R.drawable.splash_icon)?.let { splashDrawable ->
+                        splashDrawable.setBounds(0, 0, canvas.width, canvas.height)
+                        splashDrawable.draw(canvas)
+                    }
+                } catch (e: Exception) {
+                    Logger.w(TAG_MAIN, "Failed to draw splash screen:\n$e")
+                }
+                holder.unlockCanvasAndPost(canvas)
             }
         }
     }
 
-    private fun hasPermissionGranted(perm: String): Boolean {
-        val state = ContextCompat.checkSelfPermission(this@MainActivity, perm)
-        return (state == PackageManager.PERMISSION_GRANTED)
-    }
+    private fun getBatteryState(isPercent: Boolean): Int {
+        val intent = applicationContext.registerReceiver(null, BATTERY_FILTER)
+        if (intent != null) {
+            val level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0)
+            val scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, 100)
+            val plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1)
+            val percent = level * 100 / scale
 
-    private fun requestPermissions(perm: String, code: Int) {
-        ActivityCompat.requestPermissions(this@MainActivity, arrayOf(perm), code)
-    }
-
-    private fun hasStoragePermission(): Boolean {
-        val perm = PERMISSION_STORAGE_WRITE
-        return hasPermissionGranted(perm)
-    }
-
-    private fun requestStoragePermission() {
-        val perm = PERMISSION_STORAGE_WRITE
-        val code = PERMISSION_STORAGE_WRITE_ID
-        Logger.i(TAG_MAIN, "Requesting $perm permission")
-        requestPermissions(perm, code)
-    }
-
-    private fun checkMandatoryPermissions() {
-        if (!hasStoragePermission()) {
-            requestStoragePermission()
+            return if (isPercent) {
+                percent
+            } else if (plugged == BatteryManager.BATTERY_PLUGGED_AC ||
+                plugged == BatteryManager.BATTERY_PLUGGED_USB) {
+                if (percent != 100) 1 else 0
+            } else {
+                0
+            }
+        } else {
+            return 0
         }
     }
 
-    /* set a fullscreen layout */
+    private fun getSupportedMimetypes(): Array<String> {
+        return arrayOf(
+            "application/epub+zip",
+            "application/fb2",
+            "application/fb3",
+            "application/msword",
+            "application/oxps",
+            "application/pdf",
+            "application/rtf",
+            "application/tcr",
+            "application/vnd.amazon.mobi8-ebook",
+            "application/vnd.comicbook+tar",
+            "application/vnd.comicbook+zip",
+            "application/vnd.ms-htmlhelp",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "application/vnd.palm",
+            "application/x-cbz",
+            "application/x-chm",
+            "application/x-fb2",
+            "application/x-fb3",
+            "application/x-mobipocket-ebook",
+            "application/x-tar",
+            "application/xhtml+xml",
+            "application/xml",
+            "application/zip",
+            "image/djvu",
+            "image/gif",
+            "image/jp2",
+            "image/jpeg",
+            "image/jxr",
+            "image/png",
+            "image/svg+xml",
+            "image/tiff",
+            "image/vnd.djvu",
+            "image/vnd.ms-photo",
+            "image/x-djvu",
+            "image/x-portable-arbitrarymap",
+            "image/x-portable-bitmap",
+            "text/html",
+            "text/plain"
+        )
+    }
+
+    @Suppress("DEPRECATION")
     private fun setFullscreenLayout() {
         val decorView = window.decorView
         when {
@@ -631,70 +729,36 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    private fun setFrontlightDialogState(state: Int) {
-        lightDialogState = state
-    }
-
-    /* keep screen awake toggle */
-    private fun setScreenOn(enable: Boolean) {
-        if (enable != isScreenAlwaysOn) {
-            Logger.d(TAG_MAIN, "screen on: switching to $enable")
-            isScreenAlwaysOn = enable
-            runOnUiThread {
-                if (enable) {
-                    Logger.d(TAG_MAIN, "add FLAG_KEEP_SCREEN_ON")
-                    window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-                } else {
-                    Logger.d(TAG_MAIN, "clear FLAG_KEEP_SCREEN_ON")
-                    window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-                }
+    @SuppressLint("QueryPermissionsNeeded")
+    private fun startActivityIfSafe(intent: Intent?): Boolean {
+        if (intent == null) return false
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
+        val intentStr = IntentUtils.intentToString(intent)
+        try {
+            val pm = packageManager
+            val act = pm.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY)
+            if (act.size > 0) {
+                Logger.d(TAG_MAIN, "starting activity with intent: $intentStr")
+                startActivity(intent)
+                return true
+            } else {
+                Logger.w(TAG_MAIN, "unable to find a package for $intentStr")
             }
+            return false
+        } catch (e: Exception) {
+            Logger.e(TAG_MAIN, "error opening $intentStr\nException: $e")
+            return false
         }
     }
 
-    /* toggle system/activity timeouts based on activity state */
-    private fun applyCustomTimeout(enable: Boolean) {
-        if (enable)
-            systemTimeout = SystemSettings.getSystemScreenOffTimeout(this)
-
-        var message = ""
-        val resumed = ((enable && isCustomTimeout) && (appTimeout > 0))
-        val paused = ((!enable && isCustomTimeout) && (systemTimeout > 0))
-
-        val newTimeout: Int? = when {
-            resumed -> {
-                setScreenOn(false)
-                message = "applying activity custom timeout"
-                SystemSettings.setSystemScreenOffTimeout(this, safeTimeout(appTimeout))
-                appTimeout
-            }
-
-            paused -> {
-                message = "restoring system timeout"
-                SystemSettings.setSystemScreenOffTimeout(this, systemTimeout)
-                systemTimeout
-            }
-
-            else -> null
-        }
-        if (newTimeout != null) {
-            val mins = toMin(newTimeout)
-            Logger.d("SystemSettings", "$message: $mins minutes")
-        }
+    private fun showProgress() {
+        runOnUiThread {
+            dialog = FramelessProgressDialog.show(this@MainActivity, "") }
     }
 
-    private fun safeTimeout(timeout: Int): Int {
-        val TIMEOUT_MIN = 2 * 60 * 1000
-        val TIMEOUT_MAX = 45 * 60 * 1000
-
-        return when {
-            timeout < TIMEOUT_MIN -> TIMEOUT_MIN
-            timeout > TIMEOUT_MAX -> TIMEOUT_MAX
-            else -> timeout
+    private fun dismissProgress() {
+        runOnUiThread {
+            dialog?.dismiss()
         }
-    }
-
-    private fun toMin(milliseconds: Int): Int {
-        return if (milliseconds > 0) milliseconds / (1000 * 60) else 0
     }
 }

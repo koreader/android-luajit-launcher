@@ -7,7 +7,7 @@
 package org.koreader.launcher.device
 
 import android.os.Build
-import java.util.Locale
+import java.util.*
 import kotlin.collections.HashMap
 
 object DeviceInfo {
@@ -255,8 +255,8 @@ object DeviceInfo {
         // 4.4+ device without native surface rotation
         BUG_SCREEN_ROTATION = BUG == BugDevice.EMULATOR
 
-        // needs a view
-        NEEDS_VIEW = ! EINK_SUPPORT || EINK_FREESCALE
+        // needs a surfaceView to do epd updates
+        NEEDS_VIEW = EINK_FREESCALE
     }
 
     private fun getBuildField(fieldName: String): String {

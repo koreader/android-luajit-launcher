@@ -1,9 +1,6 @@
-package org.koreader.launcher.utils
+package org.koreader.launcher
 
 import android.util.Log
-
-import org.koreader.launcher.BuildConfig
-import org.koreader.launcher.MainApp
 
 /* wrapper on top of android.util.Log;
  *
@@ -12,6 +9,7 @@ import org.koreader.launcher.MainApp
  */
 
 object Logger {
+    private val Tag = MainApp.name
     private enum class LogLevel { VERBOSE, DEBUG, INFO, WARNING, ERROR }
 
     fun e(message: String) {
@@ -36,10 +34,10 @@ object Logger {
     }
 
     fun d(message: String) {
-        if (BuildConfig.DEBUG) doLog(formatMessage(null, message), LogLevel.DEBUG)
+        if (MainApp.debuggable) doLog(formatMessage(null, message), LogLevel.DEBUG)
     }
     fun d(tag: String, message: String) {
-        if (BuildConfig.DEBUG) doLog(formatMessage(tag, message), LogLevel.DEBUG)
+        if (MainApp.debuggable) doLog(formatMessage(tag, message), LogLevel.DEBUG)
     }
 
     fun v(message: String) {
@@ -57,11 +55,11 @@ object Logger {
     /* log using application name as the logger tag */
     private fun doLog(message: String, level: LogLevel) {
         when (level) {
-            LogLevel.ERROR -> Log.e(MainApp.name, message)
-            LogLevel.WARNING -> Log.w(MainApp.name, message)
-            LogLevel.INFO -> Log.i(MainApp.name, message)
-            LogLevel.DEBUG -> Log.d(MainApp.name, message)
-            LogLevel.VERBOSE -> Log.v(MainApp.name, message)
+            LogLevel.ERROR -> Log.e(Tag, message)
+            LogLevel.WARNING -> Log.w(Tag, message)
+            LogLevel.INFO -> Log.i(Tag, message)
+            LogLevel.DEBUG -> Log.d(Tag, message)
+            LogLevel.VERBOSE -> Log.v(Tag, message)
         }
     }
 }

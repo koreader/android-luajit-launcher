@@ -28,8 +28,8 @@
 
 package org.koreader.launcher.device.epd.freescale
 
-import java.util.Locale
 import android.util.Log
+import java.util.*
 
 abstract class NTXEPDController {
     companion object {

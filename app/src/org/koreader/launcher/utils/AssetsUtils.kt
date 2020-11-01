@@ -1,17 +1,11 @@
 package org.koreader.launcher.utils
 
-import java.io.BufferedReader
-import java.io.File
-import java.io.FileOutputStream
-import java.io.FileReader
-import java.io.IOException
-import java.io.InputStream
-import java.io.OutputStream
-import java.util.Locale
+import android.content.Context
+import org.koreader.launcher.Logger
+import java.io.*
+import java.util.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
-
-import android.content.Context
 
 /* Utils to extract compressed assets from the asset loader */
 
@@ -84,7 +78,6 @@ object AssetsUtils {
                 false
             }
         } catch (e: Exception) {
-            Logger.w(TAG, "$e")
             Logger.i("Found new package revision $newVersion")
             return false
         }

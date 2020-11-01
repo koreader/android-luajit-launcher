@@ -1,12 +1,10 @@
 package org.koreader.launcher.device.lights
 
-import java.io.File
-
 import android.app.Activity
 import android.util.Log
-
+import org.koreader.launcher.Logger
 import org.koreader.launcher.interfaces.LightInterface
-import org.koreader.launcher.utils.Logger
+import java.io.File
 
 class OnyxWarmthController : LightInterface {
     companion object {

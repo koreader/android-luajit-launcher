@@ -1,8 +1,5 @@
 package org.koreader.launcher.utils
 
-import java.io.*
-import java.util.Locale
-
 import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
@@ -10,8 +7,9 @@ import android.os.Build
 import android.os.ParcelFileDescriptor
 import android.provider.MediaStore
 import android.system.Os
-
-import org.koreader.launcher.MainApp
+import org.koreader.launcher.Logger
+import java.io.*
+import java.util.*
 
 object FileUtils {
     const val TAG = "FileUtils"
@@ -27,7 +25,7 @@ object FileUtils {
      * @return 1 if the file(s) were imported, 0 otherwise (IOError, invalid path, invalid uri..)
      */
 
-    fun saveAsFile(context: Context, uri: Uri?, path: String?): Int {
+    fun saveAsFile(context: Context, uri: Uri?, path: String): Int {
         return uri?.let { getFileFromContentUri(context, it, path)?.let { 1 } ?: 0 } ?: 0
     }
 
@@ -95,7 +93,7 @@ object FileUtils {
      * @return a file
      */
 
-    private fun getFileFromContentUri(context: Context, uri: Uri, path: String?): File? {
+    private fun getFileFromContentUri(context: Context, uri: Uri, path: String): File? {
 
         /* It is impossible to obtain a File from content schemes.
 
@@ -106,7 +104,6 @@ object FileUtils {
          4. return the file, which is a hard copy of the one streamed as content. */
 
         var file: File? = null
-        val importPath: String = path ?: MainApp.storage_path
         val nameColumn = arrayOf(MediaStore.MediaColumns.DISPLAY_NAME)
         val contentResolver = context.contentResolver
         val cursor = contentResolver.query(uri, nameColumn, null, null, null)
@@ -119,7 +116,7 @@ object FileUtils {
             if (uri.authority != null) {
                 try {
                     stream = context.contentResolver.openInputStream(uri)
-                    file = getFileFromInputStream(stream, importPath, name)
+                    file = getFileFromInputStream(stream, path, name)
                 } catch (e: IOException) {
                     Logger.e(TAG, "I/O error: $e")
                 } finally {

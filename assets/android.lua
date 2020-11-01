@@ -9,7 +9,6 @@ local ffi = require("ffi")
 ffi.cdef[[
     void *mmap(void *addr, size_t length, int prot, int flags, int fd, size_t offset);
     int munmap(void *addr, size_t length);
-    unsigned int sleep(unsigned int seconds);
 ]]
 
 -- reservation enough mmap slots for mcode allocation
@@ -1615,27 +1614,51 @@ local function run(android_app_state)
         end)
     end
 
-    android.settings = {}
-
-    android.settings.canWrite = function()
-        return JNI:context(android.app.activity.vm, function(jni)
-            return jni:callIntMethod(
-                android.app.activity.clazz,
-                "canWriteSystemSettings",
-                "()I"
-            ) == 1
-        end)
-    end
-
-    android.settings.requestWritePermission = function()
-        JNI:context(android.app.activity.vm, function(jni)
-            jni:callVoidMethod(
-                android.app.activity.clazz,
-                "requestWriteSystemSettings",
-                "()V"
-            )
-        end)
-    end
+    android.settings = {
+        hasPermission = function(permission)
+            if type(permission) ~= "string" then return end
+            if permission == "battery" then
+                permission = "canIgnoreBatteryOptimizations"
+            elseif permission == "settings" then
+                permission = "canWriteSystemSettings"
+            else
+                return false
+            end
+            return JNI:context(android.app.activity.vm, function(jni)
+                return jni:callIntMethod(
+                    android.app.activity.clazz,
+                    permission,
+                    "()I"
+                ) == 1
+            end)
+        end,
+        requestPermission = function(permission, rationale, okButton, cancelButton)
+            if type(permission) ~= "string" then return end
+            if permission == "battery" then
+                permission = "requestIgnoreBatteryOptimizations"
+            elseif permission == "settings" then
+                permission = "requestWriteSystemSettings"
+            else
+                permission = nil
+            end
+            if permission and rationale and okButton and cancelButton then
+                JNI:context(android.app.activity.vm, function(jni)
+                    local t = jni.env[0].NewStringUTF(jni.env, rationale)
+                    local o = jni.env[0].NewStringUTF(jni.env, okButton)
+                    local c = jni.env[0].NewStringUTF(jni.env, cancelButton)
+                    jni:callVoidMethod(
+                        android.app.activity.clazz,
+                        permission,
+                        "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
+                        t, o, c
+                    )
+                    jni.env[0].DeleteLocalRef(jni.env, t)
+                    jni.env[0].DeleteLocalRef(jni.env, o)
+                    jni.env[0].DeleteLocalRef(jni.env, c)
+                end)
+            end
+        end,
+    }
 
     android.hapticOverride = false
 
@@ -2355,13 +2378,8 @@ local function run(android_app_state)
         return android.dl.dlopen(library, ffi_load)
     end
 
-    -- Do not extract assets if we don't have write permissions on external storage.
     if not android.canWriteStorage() then
-        android.notification("Insufficient permissions", true)
-        ffi.C.sleep(1) -- to show notification
-        android.lib.ANativeActivity_finish(android.app.activity)
-        ffi.C.sleep(1) -- to do onPause -> onStop -> onDestroy.
-        error("Write permission required to extract resources")
+        error("insufficient permissions")
     end
 
     local installed = android.extractAssets()

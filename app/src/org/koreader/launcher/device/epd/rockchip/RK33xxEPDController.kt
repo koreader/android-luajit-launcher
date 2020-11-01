@@ -20,8 +20,8 @@
 
 package org.koreader.launcher.device.epd.rockchip
 
-import java.util.Locale
 import android.util.Log
+import java.util.*
 
 abstract class RK33xxEPDController {
     companion object {

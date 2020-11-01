@@ -2,9 +2,8 @@ package org.koreader.launcher.device.lights
 
 import android.app.Activity
 import android.provider.Settings
-
+import org.koreader.launcher.Logger
 import org.koreader.launcher.interfaces.LightInterface
-import org.koreader.launcher.utils.Logger
 
 /* handle frontlight within the activity, without affecting other activities */
 
@@ -50,7 +49,7 @@ class GenericController : LightInterface {
     }
 
     // brightness has to be between BRIGHTNESS_MIN and BRIGHTNESS_MAX or
-    // negative for system settings. 
+    // negative for system settings.
     // Values between 0 and BRIGHTNESS_MIN are gracefully ignored.
     override fun setBrightness(activity: Activity, brightness: Int) {
         Logger.v(TAG, "Setting brightness to $brightness")

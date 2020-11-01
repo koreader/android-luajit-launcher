@@ -3,8 +3,8 @@
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" >
-    <application android:name=".MainApp" tools:replace="android:name">
-        <activity android:name=".MainActivity" tools:replace="android:name">
+    <application android:name=".MainApp" tools:replace="android:name" tools:ignore="MissingClass">
+        <activity android:name=".MainActivity" tools:replace="android:name" tools:ignore="MissingClass">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
