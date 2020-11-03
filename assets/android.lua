@@ -1993,6 +1993,38 @@ local function run(android_app_state)
         end)
     end
 
+    android.getEinkConstants = function()
+        local isEink, platform = android.isEink()
+        if not isEink then return end
+        if platform == "rockchip" then
+            -- rockchip devices
+            local full, partial, fast, auto = 1, 2, 3, 4
+            return full, partial, auto, auto, fast
+        else
+            -- freescale/qualcomm
+            local mode_full, mode_partial = 32, 0
+            local wf_du, wf_gc16 = 1, 2
+            local delay_fast = 0
+            local fast, partial = wf_du + mode_partial, wf_gc16 + mode_partial
+            local full, full_ui, partial_ui, delay, delay_ui
+            if platform == "freescale" then
+                local wf_regal = 7
+                full = wf_gc16 + mode_full
+                full_ui = wf_regal + mode_full
+                partial_ui = wf_regal + mode_partial
+                delay, delay_ui = 0, 0
+            elseif platform == "qualcomm" then
+                local wf_regal = 6
+                local mode_wait = 64
+                full = wf_gc16 + mode_full + mode_wait
+                full_ui = wf_regal + mode_full
+                partial_ui = wf_gc16 + mode_partial
+                delay, delay_ui = 250, 100
+            end
+            return full, partial, full_ui, partial_ui, fast, delay, delay_ui, delay_fast
+        end
+    end
+
     android.needsWakelocks = function()
         return JNI:context(android.app.activity.vm, function(jni)
             return jni:callIntMethod(
