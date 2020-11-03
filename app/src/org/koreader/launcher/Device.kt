@@ -33,6 +33,8 @@ class Device(activity: Activity) {
         }
     } else if (DeviceInfo.EINK_ROCKCHIP) {
         "rockchip"
+    } else if (DeviceInfo.EINK_QCOM) {
+        "qualcomm"
     } else {
         "none"
     }
