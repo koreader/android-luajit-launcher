@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import org.koreader.launcher.device.epd.freescale.NTXEPDController
+import org.koreader.launcher.device.epd.qualcomm.QualcommEPDController
 import org.koreader.launcher.device.epd.rockchip.RK30xxEPDController
 import org.koreader.launcher.device.epd.rockchip.RK33xxEPDController
 import java.util.*
@@ -26,9 +27,11 @@ class EPDTestActivity : Activity() {
         val rk30xxDescription: TextView = findViewById(R.id.rk30xxText)
         val rk33xxDescription: TextView = findViewById(R.id.rk33xxText)
         val ntxNewDescription: TextView = findViewById(R.id.ntxNewText)
+        val qualcommDescription: TextView = findViewById(R.id.qualcommText)
         val rk30xxButton: Button = findViewById(R.id.rk30xxButton)
         val rk33xxButton: Button = findViewById(R.id.rk33xxButton)
         val ntxNewButton: Button = findViewById(R.id.ntxNewButton)
+        val qualcommButton: Button = findViewById(R.id.qualcommButton)
         val shareButton: Button = findViewById(R.id.shareButton)
 
         /* current device info */
@@ -66,6 +69,10 @@ class EPDTestActivity : Activity() {
         ntxNewDescription.text = "This button should work on modern Tolinos/Nooks and other ntx boards"
         ntxNewButton.setOnClickListener { runEinkTest(NTXTEST) }
 
+        /* qualcomm - At least Onyx Boox Nova 2 */
+        qualcommDescription.text = "This button should work on some Onyx Boox devices. At least qualcomm ones"
+        qualcommButton.setOnClickListener { runEinkTest(QUALCOMMTEST) }
+
         /* share button */
         shareButton.setOnClickListener { shareText(info.text.toString()) }
     }
@@ -82,15 +89,20 @@ class EPDTestActivity : Activity() {
             } else if (test == RK33xxTEST) {
                 info.append("rk33xx: ")
                 if (RK33xxEPDController.requestEpdMode("EPD_FULL")) success = true
-            } else if (test == NTXTEST) {
+            } else if (test == NTXTEST || test == QUALCOMMTEST) {
                 // get screen width and height
                 val display = windowManager.defaultDisplay
                 val size = Point()
                 display.getSize(size)
                 val width = size.x
                 val height = size.y
-                info.append("tolino: ")
-                if (NTXEPDController.requestEpdMode(v, 34, 50, 0, 0, width, height)) success = true
+                if (test == NTXTEST) {
+                    info.append("tolino: ")
+                    if (NTXEPDController.requestEpdMode(v, 34, 50, 0, 0, width, height)) success = true
+                } else if (test == QUALCOMMTEST) {
+                    info.append("qualcomm: ")
+                    if (QualcommEPDController.requestEpdMode(v, 98, 50, 0, 0, width, height)) success = true
+                }
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -113,6 +125,7 @@ class EPDTestActivity : Activity() {
         private const val RK30xxTEST = 1
         private const val RK33xxTEST = 2
         private const val NTXTEST = 3
+        private const val QUALCOMMTEST = 4
         private val MANUFACTURER = android.os.Build.MANUFACTURER
         private val BRAND = android.os.Build.BRAND
         private val MODEL = android.os.Build.MODEL
