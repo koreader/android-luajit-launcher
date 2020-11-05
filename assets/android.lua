@@ -1993,6 +1993,38 @@ local function run(android_app_state)
         end)
     end
 
+    android.getEinkConstants = function()
+        local isEink, platform = android.isEink()
+        if not isEink then return end
+        local full, partial, full_ui, partial_ui, fast, delay, delay_ui, delay_fast
+        if platform == "rockchip" then
+            -- rockchip devices are dumb and just support updates to the entire screen.
+            -- see https://github.com/koreader/android-luajit-launcher/blob/f2d946b3b49e728272df4cb56185a2fe57cdb4ff/app/src/org/koreader/launcher/Device.kt#L94-L101
+            full, partial, full_ui, partial_ui, fast = 1, 2, 4, 4, 3
+        else
+            -- freescale/qualcomm
+            local mode_full, mode_partial = 32, 0
+            local wf_du, wf_gc16 = 1, 2
+            delay_fast = 0
+            fast, partial = wf_du + mode_partial, wf_gc16 + mode_partial
+            if platform == "freescale" then
+                local wf_regal = 7
+                full = wf_gc16 + mode_full
+                full_ui = wf_regal + mode_full
+                partial_ui = wf_regal + mode_partial
+                delay, delay_ui = 0, 0
+            elseif platform == "qualcomm" then
+                local wf_regal = 6
+                local mode_wait = 64
+                full = wf_gc16 + mode_full + mode_wait
+                full_ui = wf_regal + mode_full
+                partial_ui = wf_gc16 + mode_partial
+                delay, delay_ui = 250, 100
+            end
+        end
+        return full, partial, full_ui, partial_ui, fast, delay, delay_ui, delay_fast
+    end
+
     android.needsWakelocks = function()
         return JNI:context(android.app.activity.vm, function(jni)
             return jni:callIntMethod(
@@ -2004,6 +2036,7 @@ local function run(android_app_state)
     end
 
     android.einkUpdate = function(mode)
+        if not mode then return end
         JNI:context(android.app.activity.vm, function(jni)
             jni:callVoidMethod(
                 android.app.activity.clazz,
@@ -2015,6 +2048,7 @@ local function run(android_app_state)
     end
 
     android.einkUpdate = function(mode, delay, x, y, w, h)
+        if not mode then return end
         if not (delay and x and y and w and h) then
             -- basic support, only fullscreen refreshes
             JNI:context(android.app.activity.vm, function(jni)
