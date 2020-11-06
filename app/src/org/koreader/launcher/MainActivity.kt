@@ -483,9 +483,10 @@ class MainActivity : NativeActivity(), JNILuaInterface,
         }
     }
 
+    @SuppressLint("SdCardPath")
     override fun isPathInsideSandbox(path: String?): Int {
         return path?.let {
-            if (it.startsWith(device.externalStorage)) 1 else 0
+            if (it.startsWith("/sdcard") or it.startsWith(device.externalStorage)) 1 else 0
         } ?: 0
     }
 
