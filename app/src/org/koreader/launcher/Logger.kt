@@ -8,6 +8,7 @@ import android.util.Log
  * Discards DEBUG messages on release builds.
  */
 
+@Suppress("ConstantConditionIf")
 object Logger {
     private val Tag = MainApp.name
     private enum class LogLevel { VERBOSE, DEBUG, INFO, WARNING, ERROR }

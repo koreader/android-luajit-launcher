@@ -7,9 +7,11 @@ import android.content.pm.PackageManager
 import android.os.Environment
 import android.os.StrictMode
 
+@Suppress("ConstantConditionIf")
 class MainApp : android.app.Application() {
     companion object {
-        val debuggable = BuildConfig.DEBUG
+        const val debuggable = BuildConfig.DEBUG
+        const val flavor = BuildConfig.FLAVOR_flavor
         private val runtime = android.os.Build.VERSION.SDK_INT
 
         lateinit var name: String

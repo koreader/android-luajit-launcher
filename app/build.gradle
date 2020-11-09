@@ -16,14 +16,12 @@ android {
         release {
             minifyEnabled false
             resValue "string", "app_name", projectName
-            resValue "string", "app_flavor", projectFlavor
         }
 
         debug {
             minifyEnabled false
             debuggable true
             resValue "string", "app_name", projectName
-            resValue "string", "app_flavor", projectFlavor
         }
     }
 
@@ -34,12 +32,16 @@ android {
             res.srcDirs = ['res']
             assets.srcDirs = [ '../assets' ]
         }
-        fullStorage {
-            manifest.srcFile('manifest/full.xml')
+        rocks {
+            manifest.srcFile('manifest/rocks.xml')
+            java.srcDirs = ['rocks']
+        }
+        fdroid {
+            java.srcDirs = ['fdroid']
         }
     }
 
-    flavorDimensions 'abi', 'storageModel'
+    flavorDimensions 'abi', 'flavor'
     productFlavors {
         x86 {
             ndk { abiFilters "x86" }
@@ -49,11 +51,11 @@ android {
             ndk { abiFilters "armeabi-v7a" }
             dimension = 'abi'
         }
-        fullStorage {
-            dimension = 'storageModel'
+        fdroid {
+            dimension = 'flavor'
         }
-        jailedStorage {
-            dimension = 'storageModel'
+        rocks {
+            dimension = 'flavor'
         }
     }
 

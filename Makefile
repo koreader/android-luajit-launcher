@@ -5,6 +5,12 @@ ifdef ANDROID_ARCH
 	endif
 endif
 
+ifdef ANDROID_FLAVOR
+	ifeq ($(ANDROID_FLAVOR), fdroid)
+		FLAVOR?=Fdroid
+	endif
+endif
+
 ifdef JAILED
 	ifeq ($(JAILED), 1)
 		STORAGE_MODEL=JailedStorage
@@ -14,9 +20,9 @@ endif
 # Default is build for arm
 ANDROID_FULL_ARCH?=armeabi-v7a
 ARCH?=Arm
-STORAGE_MODEL?=FullStorage
+FLAVOR?=Rocks
 
-GRADLE_TASK?=assemble$(ARCH)$(STORAGE_MODEL)
+GRADLE_TASK?=assemble$(ARCH)$(FLAVOR)
 
 # find the path where the SDK is installed
 ifdef SDK
@@ -55,16 +61,10 @@ ifdef ANDROID_APPNAME
 	APPNAME?=$(ANDROID_APPNAME)
 endif
 
-# support different build flavors
-ifdef ANDROID_FLAVOR
-	FLAVOR?=$(ANDROID_FLAVOR)
-endif
-
 # Defaults, overriding fallback values in gradle.properties
 NAME?=1.0
 VERSION?=1
 APPNAME?="luajit-launcher"
-FLAVOR?="rocks"
 
 update:
 	@echo "Updating sources"
@@ -92,8 +92,7 @@ prepare: update
 
 debug: update build-luajit
 	@echo "Building $(APPNAME) debug APK: Version $(NAME), release $(VERSION), flavor $(FLAVOR)"
-	./gradlew -PversName=$(NAME) -PversCode=$(VERSION) -PprojectName=$(APPNAME) \
-		-PprojectFlavor=$(FLAVOR) app:$(GRADLE_TASK)Debug
+	./gradlew -PversName=$(NAME) -PversCode=$(VERSION) -PprojectName=$(APPNAME) app:$(GRADLE_TASK)Debug
 	mkdir -p bin/
 	find app/build/outputs/apk/ -type f -name '*.apk' -exec mv -v {} bin/ \;
 	@echo "Application $(APPNAME) was built, type: debug (signed), \
@@ -101,8 +100,7 @@ debug: update build-luajit
 
 release: update build-luajit
 	@echo "Building $(APPNAME) release APK: Version $(NAME), release $(VERSION), flavor $(FLAVOR)"
-	./gradlew -PversName=$(NAME) -PversCode=$(VERSION) -PprojectName=$(APPNAME) \
-		-PprojectFlavor=$(FLAVOR) app:$(GRADLE_TASK)Release
+	./gradlew -PversName=$(NAME) -PversCode=$(VERSION) -PprojectName=$(APPNAME) app:$(GRADLE_TASK)Release
 	mkdir -p bin/
 	find app/build/outputs/apk/ -type f -name '*.apk' -exec mv -v {} bin/ \;
 	@echo "Application $(APPNAME) was built, type: release (unsigned), \
@@ -120,7 +118,7 @@ example: update clean build-luajit
 	find app/build/outputs/apk/ -type f -name '*.apk' -exec mv -v {} bin/ \;
 
 lint:
-	./gradlew lintX86FullStorageRelease
+	./gradlew lintX86RocksRelease
 
 clean:
 	@echo "Cleaning binaries, assets and LuaJIT build"

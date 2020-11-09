@@ -1,15 +1,10 @@
 package org.koreader.launcher.utils
 
 import android.app.Activity
-import android.app.DownloadManager
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.net.Uri
 import android.os.Build
-import android.os.Environment
-import org.koreader.launcher.Logger
-import java.io.File
 import java.util.*
 
 @Suppress("DEPRECATION")
@@ -20,32 +15,6 @@ object NetworkUtils {
     private const val ACTIVE_NETWORK_ETHERNET = 3
     private const val ACTIVE_NETWORK_BLUETOOTH = 4
     private const val ACTIVE_NETWORK_VPN = 5
-
-    fun download(activity: Activity, url: String, name: String): Int {
-        val manager: DownloadManager? = activity.applicationContext.getSystemService(
-            Context.DOWNLOAD_SERVICE) as? DownloadManager
-        val file = File(Environment.getExternalStoragePublicDirectory(
-            Environment.DIRECTORY_DOWNLOADS).toString() + "/" + name)
-
-        if (file.exists()) {
-            Logger.w("File already exists: skipping download")
-            return 1
-        }
-        val request = DownloadManager.Request(Uri.parse(url))
-        request.allowScanningByMediaScanner()
-        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, name)
-
-        /* Try to download the request. This *should* not fail, but it fails
-           on some AOSP devices that don't need to pass google CTS. */
-        return try {
-            manager?.enqueue(request)
-            0
-        } catch (e: Exception) {
-            e.printStackTrace()
-            -1
-        }
-    }
 
     fun getNetworkInfo(activity: Activity): String {
         val connectivityManager = activity.getSystemService(Context.CONNECTIVITY_SERVICE)
