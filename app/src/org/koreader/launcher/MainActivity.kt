@@ -250,7 +250,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     }
 
     override fun download(url: String, name: String): Int {
-        return NetworkUtils.download(this@MainActivity, url, name)
+        return ApkUpdater.download(this@MainActivity, url, name)
     }
 
     override fun einkUpdate(mode: Int) {
@@ -335,7 +335,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     }
 
     override fun getFlavor(): String {
-        return resources.getString(R.string.app_flavor)
+        return MainApp.flavor
     }
 
     override fun getLastImportedPath(): String? {
@@ -449,6 +449,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
         return if (device.isChromeOS) 1 else 0
     }
 
+    @Suppress("ConstantConditionIf")
     override fun isDebuggable(): Int {
         return if (MainApp.debuggable) 1 else 0
     }

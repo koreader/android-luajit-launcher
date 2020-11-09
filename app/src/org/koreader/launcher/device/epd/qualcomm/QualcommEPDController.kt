@@ -1,12 +1,9 @@
 package org.koreader.launcher.device.epd.qualcomm
 
-import java.lang.Thread
-import java.util.Locale
-
-import android.view.View
 import android.util.Log
-
+import android.view.View
 import org.koreader.launcher.interfaces.EPDInterface
+import java.util.*
 
 // More information including epd mode values
 // https://github.com/koreader/android-luajit-launcher/pull/250#issuecomment-711443457
@@ -14,7 +11,7 @@ abstract class QualcommEPDController : EPDInterface {
     companion object  {
         private const val TAG = "epd"
 
-        fun preventSystemRefresh() : Boolean{
+        private fun preventSystemRefresh() : Boolean{
             // Sets UpdateMode and UpdateScheme to None
             // this function is called EpdController.setSystemUpdateModeAndScheme in onyxsdk
             return try{
@@ -29,7 +26,7 @@ abstract class QualcommEPDController : EPDInterface {
             }
         }
 
-        fun requestEpdMode(targetView: android.view.View,
+        fun requestEpdMode(targetView: View,
                                 mode: Int, delay: Long,
                                 x: Int, y: Int, width: Int, height: Int) : Boolean
         {
@@ -39,7 +36,7 @@ abstract class QualcommEPDController : EPDInterface {
                 // Normal mode, or Regal mode works flawlessly otherwise
                 preventSystemRefresh()
                 // EpdController.refreshScreenRegion in onyxsdk
-                var refreshScreen = Class.forName("android.view.View").getMethod("refreshScreen",
+                val refreshScreen = Class.forName("android.view.View").getMethod("refreshScreen",
                                         Integer.TYPE,
                                         Integer.TYPE,
                                         Integer.TYPE,
@@ -47,7 +44,7 @@ abstract class QualcommEPDController : EPDInterface {
                                         Integer.TYPE)
                 object: Thread(){
                     override fun run(){
-                        Thread.sleep(delay)
+                        sleep(delay)
                         try {
                             refreshScreen.invoke(targetView, x, y, width, height, mode)
                             Log.i(TAG, String.format(Locale.US,

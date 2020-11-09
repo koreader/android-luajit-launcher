@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--suppress AndroidDomInspection -->
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
@@ -41,6 +40,48 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
                 <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="application/epub+zip" />
+                <data android:mimeType="application/fb2" />
+                <data android:mimeType="application/fb3" />
+                <data android:mimeType="application/msword" />
+                <data android:mimeType="application/oxps" />
+                <data android:mimeType="application/pdf" />
+                <data android:mimeType="application/rtf" />
+                <data android:mimeType="application/tcr" />
+                <data android:mimeType="application/vnd.amazon.mobi8-ebook" />
+                <data android:mimeType="application/vnd.comicbook+tar" />
+                <data android:mimeType="application/vnd.comicbook+zip" />
+                <data android:mimeType="application/vnd.ms-htmlhelp" />
+                <data android:mimeType="application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
+                <data android:mimeType="application/vnd.palm" />
+                <data android:mimeType="application/x-cbz" />
+                <data android:mimeType="application/x-chm" />
+                <data android:mimeType="application/x-fb2" />
+                <data android:mimeType="application/x-fb3" />
+                <data android:mimeType="application/x-mobipocket-ebook" />
+                <data android:mimeType="application/x-tar" />
+                <data android:mimeType="application/xhtml+xml" />
+                <data android:mimeType="application/xml" />
+                <data android:mimeType="application/zip" />
+                <data android:mimeType="image/djvu" />
+                <data android:mimeType="image/gif" />
+                <data android:mimeType="image/jp2" />
+                <data android:mimeType="image/jpeg" />
+                <data android:mimeType="image/jxr" />
+                <data android:mimeType="image/png" />
+                <data android:mimeType="image/svg+xml" />
+                <data android:mimeType="image/tiff" />
+                <data android:mimeType="image/vnd.djvu" />
+                <data android:mimeType="image/vnd.ms-photo" />
+                <data android:mimeType="image/x-djvu" />
+                <data android:mimeType="image/x-portable-arbitrarymap" />
+                <data android:mimeType="image/x-portable-bitmap" />
+                <data android:mimeType="text/html" />
+                <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
         <activity
