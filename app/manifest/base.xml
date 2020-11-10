@@ -19,17 +19,17 @@
 
     <application
         android:name=".MainApp"
-        android:icon="@drawable/icon"
-        android:banner="@drawable/banner"
-        android:label="@string/app_name"
+        android:icon="@mipmap/icon"
+        android:banner="@mipmap/banner"
+        android:label="${APP_NAME}"
         android:vmSafeMode="true"
         android:allowBackup="false"
         android:fullBackupContent="false"
-        android:usesCleartextTraffic="true">
+        android:usesCleartextTraffic="true"
+        tools:replace="android:label" >
         <meta-data android:name="android.max_aspect" android:value="3.1" />
         <activity
             android:name=".MainActivity"
-            android:label="@string/app_name"
             android:theme="@style/SplashScreen"
             android:resizeableActivity="false"
             android:screenOrientation="nosensor"
@@ -85,6 +85,7 @@
             </intent-filter>
         </activity>
         <activity
+            android:label="EPDTest"
             android:name=".EPDTestActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
