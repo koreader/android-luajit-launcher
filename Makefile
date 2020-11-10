@@ -11,18 +11,12 @@ ifdef ANDROID_FLAVOR
 	endif
 endif
 
-ifdef JAILED
-	ifeq ($(JAILED), 1)
-		STORAGE_MODEL=JailedStorage
-	endif
-endif
-
 # Default is build for arm
 ANDROID_FULL_ARCH?=armeabi-v7a
 ARCH?=Arm
 FLAVOR?=Rocks
-
-GRADLE_TASK?=assemble$(ARCH)$(FLAVOR)
+BUILD_TASK?=assemble$(ARCH)$(FLAVOR)
+LINT_TASK?=lint$(ARCH)$(FLAVOR)
 
 # find the path where the SDK is installed
 ifdef SDK
@@ -92,19 +86,17 @@ prepare: update
 
 debug: update build-luajit
 	@echo "Building $(APPNAME) debug APK: Version $(NAME), release $(VERSION), flavor $(FLAVOR)"
-	./gradlew -PversName=$(NAME) -PversCode=$(VERSION) -PprojectName=$(APPNAME) app:$(GRADLE_TASK)Debug
+	./gradlew -PversName=$(NAME) -PversCode=$(VERSION) -PprojectName=$(APPNAME) app:$(BUILD_TASK)Debug
 	mkdir -p bin/
 	find app/build/outputs/apk/ -type f -name '*.apk' -exec mv -v {} bin/ \;
-	@echo "Application $(APPNAME) was built, type: debug (signed), \
-		flavor: $(FLAVOR), version: $(NAME), release $(VERSION)"
+	@echo "Application $(APPNAME) was built, type: debug (signed), flavor: $(FLAVOR), version: $(NAME), release $(VERSION)"
 
 release: update build-luajit
 	@echo "Building $(APPNAME) release APK: Version $(NAME), release $(VERSION), flavor $(FLAVOR)"
-	./gradlew -PversName=$(NAME) -PversCode=$(VERSION) -PprojectName=$(APPNAME) app:$(GRADLE_TASK)Release
+	./gradlew -PversName=$(NAME) -PversCode=$(VERSION) -PprojectName=$(APPNAME) app:$(BUILD_TASK)Release
 	mkdir -p bin/
 	find app/build/outputs/apk/ -type f -name '*.apk' -exec mv -v {} bin/ \;
-	@echo "Application $(APPNAME) was built, type: release (unsigned), \
-		flavor: $(FLAVOR), version: $(NAME), release $(VERSION)"
+	@echo "Application $(APPNAME) was built, type: release (unsigned), flavor: $(FLAVOR), version: $(NAME), release $(VERSION)"
 	@echo "WARNING: You'll need to sign this application to be able to install it"
 
 example: update clean build-luajit
@@ -113,12 +105,12 @@ example: update clean build-luajit
 	mkdir -p assets/module/
 	cp -pv examples/helloWorld/*.lua assets/module/
 	./gradlew -PversName=1.0 -PversCode=1 -PprojectName=HelloFromLua \
-		app:$(GRADLE_TASK)Debug
+		app:$(BUILD_TASK)Debug
 	mkdir -p bin/
 	find app/build/outputs/apk/ -type f -name '*.apk' -exec mv -v {} bin/ \;
 
 lint:
-	./gradlew lintX86RocksRelease
+	./gradlew $(LINT_TASK)Release
 
 clean:
 	@echo "Cleaning binaries, assets and LuaJIT build"

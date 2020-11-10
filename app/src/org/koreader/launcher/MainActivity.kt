@@ -108,7 +108,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     /* Called when the activity is first created. */
     override fun onCreate(savedInstanceState: Bundle?) {
         Logger.v(String.format(Locale.US,
-            "Launching %s %s", MainApp.name, MainApp.info))
+            "Launching %s %s", BuildConfig.APP_NAME, MainApp.info))
         clipboard = Clipboard(this@MainActivity)
         device = Device(this@MainActivity)
         timeout = Timeout()
@@ -335,7 +335,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     }
 
     override fun getFlavor(): String {
-        return MainApp.flavor
+        return BuildConfig.FLAVOR_CHANNEL
     }
 
     override fun getLastImportedPath(): String? {
@@ -349,7 +349,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     }
 
     override fun getName(): String {
-        return resources.getString(R.string.app_name)
+        return BuildConfig.APP_NAME
     }
 
     override fun getNetworkInfo(): String {
@@ -451,7 +451,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
 
     @Suppress("ConstantConditionIf")
     override fun isDebuggable(): Int {
-        return if (MainApp.debuggable) 1 else 0
+        return if (BuildConfig.DEBUG) 1 else 0
     }
 
     override fun isEink(): Int {

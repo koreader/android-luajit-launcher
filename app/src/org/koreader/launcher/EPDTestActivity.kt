@@ -21,7 +21,7 @@ class EPDTestActivity : Activity() {
 
     public override fun onCreate(savedInstanceState: android.os.Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.main)
+        setContentView(R.layout.epdtest)
         info = findViewById(R.id.info)
         val readmeReport: TextView = findViewById(R.id.readmeReport)
         val rk30xxDescription: TextView = findViewById(R.id.rk30xxText)
