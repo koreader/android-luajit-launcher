@@ -21,8 +21,10 @@
 package org.koreader.launcher.device.epd.rockchip
 
 import android.util.Log
+import androidx.annotation.Keep
 import java.util.*
 
+@Keep
 abstract class RK33xxEPDController {
     companion object {
         private const val TAG = "epd"

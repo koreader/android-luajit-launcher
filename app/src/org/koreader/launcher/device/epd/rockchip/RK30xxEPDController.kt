@@ -27,10 +27,12 @@ package org.koreader.launcher.device.epd.rockchip
 
 import android.util.Log
 import android.view.View
+import androidx.annotation.Keep
 
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 
+@Keep
 abstract class RK30xxEPDController {
     companion object {
         private const val TAG = "epd"

@@ -6,6 +6,7 @@ import android.graphics.Point
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
+import androidx.annotation.Keep
 import org.koreader.launcher.device.epd.freescale.NTXEPDController
 import org.koreader.launcher.device.epd.qualcomm.QualcommEPDController
 import org.koreader.launcher.device.epd.rockchip.RK30xxEPDController
@@ -16,6 +17,7 @@ import java.util.*
    If the device in question doesn't play nice with the main NativeActivity it can be called from
    commandline using `adb shell am start -n org.koreader.launcher/.EPDTestActivity` */
 
+@Keep
 class EPDTestActivity : Activity() {
     private lateinit var info: TextView
 

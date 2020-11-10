@@ -9,11 +9,13 @@ import android.view.View
 import android.widget.LinearLayout
 import android.widget.SeekBar
 import android.widget.TextView
+import androidx.annotation.Keep
 import org.koreader.launcher.device.DeviceInfo
 import org.koreader.launcher.device.EPDFactory
 import org.koreader.launcher.device.LightsFactory
 import java.util.*
 
+@Keep
 class Device(activity: Activity) {
 
     val product = DeviceInfo.PRODUCT

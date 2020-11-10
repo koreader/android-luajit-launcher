@@ -1,6 +1,7 @@
 package org.koreader.launcher.utils
 
 import android.content.Context
+import androidx.annotation.Keep
 import org.koreader.launcher.Logger
 import java.io.*
 import java.util.*
@@ -9,6 +10,7 @@ import java.util.zip.ZipInputStream
 
 /* Utils to extract compressed assets from the asset loader */
 
+@Keep
 object AssetsUtils {
     private const val TAG = "AssetsUtils"
     private const val BASE_BUFFER_SIZE = 1024

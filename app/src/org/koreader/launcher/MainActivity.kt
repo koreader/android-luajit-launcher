@@ -17,6 +17,7 @@ import android.provider.Settings
 import android.view.*
 import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.annotation.Keep
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import org.koreader.launcher.interfaces.JNILuaInterface
@@ -24,6 +25,7 @@ import org.koreader.launcher.utils.*
 import java.io.IOException
 import java.util.*
 
+@Keep
 class MainActivity : NativeActivity(), JNILuaInterface,
     ActivityCompat.OnRequestPermissionsResultCallback{
 

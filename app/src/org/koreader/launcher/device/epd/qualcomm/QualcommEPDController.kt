@@ -2,11 +2,13 @@ package org.koreader.launcher.device.epd.qualcomm
 
 import android.util.Log
 import android.view.View
+import androidx.annotation.Keep
 import org.koreader.launcher.interfaces.EPDInterface
 import java.util.*
 
 // More information including epd mode values
 // https://github.com/koreader/android-luajit-launcher/pull/250#issuecomment-711443457
+@Keep
 abstract class QualcommEPDController : EPDInterface {
     companion object  {
         private const val TAG = "epd"

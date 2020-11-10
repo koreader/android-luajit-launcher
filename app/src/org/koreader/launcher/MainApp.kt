@@ -6,7 +6,9 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.os.Environment
 import android.os.StrictMode
+import androidx.annotation.Keep
 
+@Keep
 class MainApp : android.app.Application() {
     companion object {
         private val runtime = android.os.Build.VERSION.SDK_INT

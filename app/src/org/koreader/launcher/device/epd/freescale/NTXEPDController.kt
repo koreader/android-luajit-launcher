@@ -29,8 +29,10 @@
 package org.koreader.launcher.device.epd.freescale
 
 import android.util.Log
+import androidx.annotation.Keep
 import java.util.*
 
+@Keep
 abstract class NTXEPDController {
     companion object {
         private const val TAG = "epd"

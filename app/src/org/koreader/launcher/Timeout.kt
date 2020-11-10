@@ -3,8 +3,10 @@ package org.koreader.launcher
 import android.app.Activity
 import android.provider.Settings
 import android.view.WindowManager
+import androidx.annotation.Keep
 import java.util.*
 
+@Keep
 class Timeout {
     private var appTimeout: Int = 0
     private var systemTimeout: Int = 0

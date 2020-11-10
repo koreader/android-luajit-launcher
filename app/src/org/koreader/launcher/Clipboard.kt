@@ -4,8 +4,10 @@ import android.app.Activity
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import androidx.annotation.Keep
 import java.util.concurrent.CountDownLatch
 
+@Keep
 class Clipboard(activity: Activity) {
 
     private var clipboard: ClipboardManager = activity.applicationContext.getSystemService(Context.CLIPBOARD_SERVICE)

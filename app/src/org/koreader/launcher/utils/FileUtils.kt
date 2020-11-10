@@ -7,10 +7,12 @@ import android.os.Build
 import android.os.ParcelFileDescriptor
 import android.provider.MediaStore
 import android.system.Os
+import androidx.annotation.Keep
 import org.koreader.launcher.Logger
 import java.io.*
 import java.util.*
 
+@Keep
 object FileUtils {
     const val TAG = "FileUtils"
 

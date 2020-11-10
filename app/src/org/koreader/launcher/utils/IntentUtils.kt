@@ -3,7 +3,9 @@ package org.koreader.launcher.utils
 import android.app.SearchManager
 import android.content.Intent
 import android.os.Build
+import androidx.annotation.Keep
 
+@Keep
 object IntentUtils {
 
     /**

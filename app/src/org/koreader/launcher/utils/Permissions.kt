@@ -8,10 +8,12 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.PowerManager
 import android.provider.Settings
+import androidx.annotation.Keep
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 
+@Keep
 object Permissions {
     private const val STORAGE_WRITE_ID = 1001
 

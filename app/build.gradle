@@ -16,7 +16,7 @@ android {
         release {
             manifestPlaceholders.APP_NAME = projectName
             buildConfigField 'String', 'APP_NAME', '"' + projectName + '"'
-            minifyEnabled false
+            minifyEnabled true
         }
 
         debug {

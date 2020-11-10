@@ -5,8 +5,9 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
+import androidx.annotation.Keep
 import java.util.*
-
+@Keep
 @Suppress("DEPRECATION")
 object NetworkUtils {
     private const val ACTIVE_NETWORK_NONE = 0
