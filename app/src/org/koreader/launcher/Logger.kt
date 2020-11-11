@@ -8,7 +8,6 @@ import android.util.Log
  * Discards DEBUG messages on release builds.
  */
 
-@Suppress("ConstantConditionIf")
 object Logger {
     private enum class LogLevel { VERBOSE, DEBUG, INFO, WARNING, ERROR }
 
@@ -34,10 +33,12 @@ object Logger {
     }
 
     fun d(message: String) {
+        @Suppress("ConstantConditionIf")
         if (BuildConfig.DEBUG)
             doLog(formatMessage(null, message), LogLevel.DEBUG)
     }
     fun d(tag: String, message: String) {
+        @Suppress("ConstantConditionIf")
         if (BuildConfig.DEBUG)
             doLog(formatMessage(tag, message), LogLevel.DEBUG)
     }

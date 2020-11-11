@@ -1,5 +1,6 @@
 package org.koreader.launcher.utils
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.net.ConnectivityManager
@@ -16,6 +17,10 @@ object NetworkUtils {
     private const val ACTIVE_NETWORK_BLUETOOTH = 4
     private const val ACTIVE_NETWORK_VPN = 5
 
+
+    /* android studio says [Missing permissions required: permission.ACCESS_NETWORK_STATE]
+       but the permission is already declared in manifests/base.xml */
+    @SuppressLint("MissingPermission")
     fun getNetworkInfo(activity: Activity): String {
         val connectivityManager = activity.getSystemService(Context.CONNECTIVITY_SERVICE)
             as ConnectivityManager
