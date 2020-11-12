@@ -9,6 +9,7 @@ import android.view.WindowManager
 import org.koreader.launcher.Logger
 import java.util.concurrent.CountDownLatch
 
+@Suppress("DEPRECATION")
 object ScreenUtils {
     private const val TAG = "ScreenUtils"
 

@@ -16,6 +16,7 @@ import java.util.*
    If the device in question doesn't play nice with the main NativeActivity it can be called from
    commandline using `adb shell am start -n org.koreader.launcher/.EPDTestActivity` */
 
+@Suppress("DEPRECATION")
 class EPDTestActivity : Activity() {
     private lateinit var info: TextView
 
