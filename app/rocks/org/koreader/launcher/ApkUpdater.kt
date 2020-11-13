@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.Environment
 import java.io.File
 
+@Suppress("DEPRECATION")
 object ApkUpdater {
     fun download(activity: Activity, url: String, name: String): Int {
         val request = DownloadManager.Request(Uri.parse(url))

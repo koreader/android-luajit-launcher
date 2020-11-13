@@ -3,11 +3,12 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
+    compileSdkVersion targetSdk
+
     defaultConfig {
         applicationId "org.koreader.launcher"
         minSdkVersion minSdk
         targetSdkVersion targetSdk
-        compileSdkVersion targetSdk
         versionCode versCode as Integer
         versionName versName
     }

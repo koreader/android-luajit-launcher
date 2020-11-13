@@ -6,17 +6,23 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.Environment
 import android.os.PowerManager
 import android.provider.Settings
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import org.koreader.launcher.R
 
 object Permissions {
     private const val STORAGE_WRITE_ID = 1001
 
     fun hasStoragePermission(activity: Activity): Boolean {
-        return hasPermissionGranted(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        return if (Build.VERSION.SDK_INT >= 30) {
+            Environment.isExternalStorageManager()
+        } else {
+            hasPermissionGranted(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        }
     }
 
     fun hasWriteSettingsPermission(context: Context): Boolean {
@@ -33,8 +39,14 @@ object Permissions {
     }
 
     fun requestStoragePermission(activity: Activity) {
-        val perm = Manifest.permission.WRITE_EXTERNAL_STORAGE
-        requestPermission(activity, perm, STORAGE_WRITE_ID)
+        if (Build.VERSION.SDK_INT >= 30) {
+            val intent = Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
+            val rationale = activity.resources.getString(R.string.warning_manage_storage)
+            requestSpecialPermission(activity, intent, rationale, null, null)
+        } else {
+            val perm = Manifest.permission.WRITE_EXTERNAL_STORAGE
+            requestPermission(activity, perm, STORAGE_WRITE_ID)
+        }
     }
 
     fun requestWriteSettingsPermission(activity: Activity, rationale: String, okButton: String, cancelButton: String) {

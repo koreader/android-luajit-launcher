@@ -38,6 +38,7 @@ class MainApp : android.app.Application() {
             if (isSystemApp) "system" else "user"
         }
 
+        @Suppress("DEPRECATION")
         storage_path = Environment.getExternalStorageDirectory().absolutePath
         platform_type = if (pm.hasSystemFeature("org.chromium.arc.device_management")) {
             "chrome"

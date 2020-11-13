@@ -117,7 +117,4 @@ clean:
 	rm -rf assets/module/ bin/ jni/luajit/build
 	cd jni/luajit && \
 		./mk-luajit.sh clean
-
-mrproper: clean
-	@echo "Cleaning Gradle, this could fail if some tasks were never triggered before"
 	-./gradlew clean --continue

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="warning_manage_storage">Please allow the app to manage all files.</string>
+</resources>
