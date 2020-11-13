@@ -13,7 +13,7 @@ A good number of Android native API headers are readily presented via FFI alread
 
 For now - and probably ever, since Mike Pall recommends strongly to do so - the compilation of LuaJIT is not integrated into the Android build framework and has to be run separately.
 
-A wrapper script for building LuaJIT is provided.
+A wrapper script for building LuaJIT is provided. It **relies on NDK r15c**
 
 Have a look at KOReader's [llapp_main.lua](https://github.com/koreader/koreader/blob/master/platform/android/llapp_main.lua) file. You can use it as a starting point for your own app.
 
