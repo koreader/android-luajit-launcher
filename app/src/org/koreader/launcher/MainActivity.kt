@@ -29,6 +29,7 @@ import java.util.*
 class MainActivity : NativeActivity(), JNILuaInterface,
     ActivityCompat.OnRequestPermissionsResultCallback{
 
+    private lateinit var assets: Assets
     private lateinit var clipboard: Clipboard
     private lateinit var device: Device
     private lateinit var timeout: Timeout
@@ -111,6 +112,8 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     override fun onCreate(savedInstanceState: Bundle?) {
         Logger.v(String.format(Locale.US,
             "Launching %s %s", BuildConfig.APP_NAME, MainApp.info))
+
+        assets = Assets()
         clipboard = Clipboard(this)
         device = Device(this)
         timeout = Timeout()
@@ -281,27 +284,26 @@ class MainActivity : NativeActivity(), JNILuaInterface,
         val output = filesDir.absolutePath
         val check = try {
             // check if the app has zipped assets
-            val zipFile = AssetsUtils.getZipFromAsset(this)
-            if (zipFile != null) {
+            val payload = assets.getFromAsset(this)
+            if (payload != null) {
                 var ok = true
-                Logger.i("Check file in asset module: $zipFile")
+                Logger.i("Check file in asset module: $payload")
                 // upgrade or downgrade files from zip
-                if (!AssetsUtils.isSameVersion(this, zipFile)) {
+                if (!assets.isSameVersion(this, payload)) {
                     showProgress() // show progress dialog (animated dots)
                     val startTime = System.nanoTime()
                     Logger.i("Installing new package to $output")
-                    val stream = assets.open("module/$zipFile")
-                    ok = AssetsUtils.unzip(stream, output, true)
+                    ok = assets.uncompress(this, "module/$payload", output)
                     val endTime = System.nanoTime()
                     val elapsedTime = endTime - startTime
-                    Logger.v("update installed in " + elapsedTime / 1000000000 + " seconds")
+                    Logger.v("update installed in " + elapsedTime / 1000000 + " milliseconds")
                     dismissProgress() // dismiss progress dialog
                 }
                 if (ok) 1 else 0
             } else {
                 // check if the app has other, non-zipped, raw assets
                 Logger.i("Zip file not found, trying raw assets...")
-                if (AssetsUtils.copyRawAssets(this)) 1 else 0
+                if (assets.copyRawAssets(this)) 1 else 0
             }
         } catch (e: IOException) {
             Logger.e(TAG_MAIN, "error extracting assets:\n$e")

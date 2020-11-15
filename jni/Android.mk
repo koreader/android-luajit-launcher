@@ -25,6 +25,11 @@ LOCAL_PATH := $(BASE_PATH)
 include $(LOCAL_PATH)/luajit/Android.mk
 include $(CLEAR_VARS)
 
+# lib7z shared library
+LOCAL_PATH := $(BASE_PATH)
+include $(LOCAL_PATH)/lzma/Android.mk
+include $(CLEAR_VARS)
+
 # final shared library to load via the NativeActivity framework.
 LOCAL_PATH := $(BASE_PATH)
 LOCAL_MODULE := luajit
