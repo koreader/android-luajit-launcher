@@ -296,7 +296,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
                     ok = assets.uncompress(this, "module/$payload", output)
                     val endTime = System.nanoTime()
                     val elapsedTime = endTime - startTime
-                    Logger.v("update installed in " + elapsedTime / 1000000 + " milliseconds")
+                    showToast("update installed in " + elapsedTime / 1000000 + " milliseconds", true)
                     dismissProgress() // dismiss progress dialog
                 }
                 if (ok) 1 else 0
