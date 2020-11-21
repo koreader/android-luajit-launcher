@@ -299,7 +299,11 @@ class MainActivity : NativeActivity(), JNILuaInterface,
                     showToast("update installed in " + elapsedTime / 1000000 + " milliseconds", true)
                     dismissProgress() // dismiss progress dialog
                 }
-                if (ok) 1 else 0
+                if (!ok) {
+                    0
+                } else {
+                    if (assets.copyLibs(this)) 1 else 0
+                }
             } else {
                 // check if the app has other, non-zipped, raw assets
                 Logger.i("Zip file not found, trying raw assets...")

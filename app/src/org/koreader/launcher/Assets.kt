@@ -27,6 +27,37 @@ class Assets() {
         }
     }
 
+    fun copyLibs(context: Context): Boolean {
+        val assetManager = context.assets
+        val libsDir = File(context.filesDir.absolutePath + "/libs")
+        if (!libsDir.exists()) {
+            libsDir.mkdir()
+        }
+
+        val libsPath = libsDir.absolutePath
+        try {
+            val assets = assetManager.list("libs")
+            return if (assets != null) {
+                for (asset in assets) {
+                    val file = File(libsPath, asset)
+                    val input = assetManager.open("libs/$asset")
+                    val output = FileOutputStream(file)
+                    copyFile(input, output)
+                    input.close()
+                    output.flush()
+                    output.close()
+                }
+                true
+            } else {
+                Logger.i("No libraries to copy")
+                true
+            }
+        } catch (e: IOException) {
+            Logger.e(TAG, "error copying libraries: $e")
+            return false
+        }
+    }
+
     /* copy raw assets from the assets module */
     fun copyRawAssets(context: Context): Boolean {
         val assetManager = context.assets
