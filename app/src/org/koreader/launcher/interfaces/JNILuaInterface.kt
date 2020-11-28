@@ -15,6 +15,7 @@ interface JNILuaInterface {
     fun getClipboardText(): String
     fun getEinkPlatform(): String
     fun getExternalPath(): String
+    fun getExternalSdPath(): String
     fun getFilePathFromIntent(): String?
     fun getFlavor(): String
     fun getLastImportedPath(): String?
@@ -47,7 +48,7 @@ interface JNILuaInterface {
     fun isEinkFull(): Int
     fun isFullscreen(): Int
     fun isPackageEnabled(pkg: String): Int
-    fun isPathInsideSandbox(path: String?): Int
+    fun isPathInsideSandbox(path: String): Int
     fun isTv(): Int
     fun isWarmthDevice(): Int
     fun needsWakelocks(): Int

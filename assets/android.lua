@@ -1429,6 +1429,24 @@ local function run(android_app_state)
         end)
     end
 
+    android.getExternalSdPath = function()
+        return JNI:context(android.app.activity.vm, function(jni)
+                local ext_sd_path = jni:callObjectMethod(
+                    android.app.activity.clazz,
+                    "getExternalSdPath",
+                    "()Ljava/lang/String;"
+                )
+
+                local res = jni:to_string(ext_sd_path)
+
+                if res == "null" then
+                    return false
+                else
+                    return true, res
+                end
+            end)
+        end
+
     android.importFile = function(path)
         return JNI:context(android.app.activity.vm, function(jni)
             local import_path = jni.env[0].NewStringUTF(jni.env, path)
@@ -1458,6 +1476,7 @@ local function run(android_app_state)
     end
 
     android.isPathInsideSandbox = function(path)
+        if not path then return end
         return JNI:context(android.app.activity.vm, function(jni)
             local import_path = jni.env[0].NewStringUTF(jni.env, path)
             local ok = jni:callIntMethod(
