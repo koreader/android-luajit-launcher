@@ -4,9 +4,11 @@ import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
 import android.os.ParcelFileDescriptor
 import android.provider.MediaStore
 import android.system.Os
+import androidx.core.content.ContextCompat
 import org.koreader.launcher.Logger
 import java.io.*
 import java.util.*
@@ -56,6 +58,27 @@ object FileUtils {
                 }
                 else -> null
             }
+        }
+    }
+
+    /**
+     * gets the absolute path of an external sdcard if there's one inserted
+     *
+     * @param context
+     * @return absolute path or "null"
+     */
+
+    fun getExtSdcardPath(context: Context): String {
+        val ctx = context.applicationContext
+        val volumes: Array<out File> = ContextCompat.getExternalFilesDirs(ctx, null)
+        return if (Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED) {
+            try {
+                volumes[1].absolutePath.replace("/Android/data/${ctx.packageName}/files", "")
+            } catch (e: Exception) {
+                "null"
+            }
+        } else {
+            "null"
         }
     }
 

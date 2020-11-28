@@ -328,6 +328,10 @@ class MainActivity : NativeActivity(), JNILuaInterface,
         return device.externalStorage
     }
 
+    override fun getExternalSdPath(): String {
+        return FileUtils.getExtSdcardPath(this)
+    }
+
     override fun getFilePathFromIntent(): String? {
         return intent?.let {
             if (it.action == Intent.ACTION_VIEW) {
@@ -487,10 +491,12 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     }
 
     @SuppressLint("SdCardPath")
-    override fun isPathInsideSandbox(path: String?): Int {
-        return path?.let {
-            if (it.startsWith("/sdcard") or it.startsWith(device.externalStorage)) 1 else 0
-        } ?: 0
+    override fun isPathInsideSandbox(path: String): Int {
+        return when {
+            path.startsWith("/sdcard") -> 1
+            path.startsWith(device.externalStorage) -> 1
+            else -> 0
+        }
     }
 
     override fun isTv(): Int {
