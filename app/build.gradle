@@ -78,10 +78,6 @@ android {
         disable 'SetTextI18n'
     }
 
-    aaptOptions {
-        cruncherEnabled = false
-    }
-
     applicationVariants.all { variant ->
         variant.outputs.all {
             outputFileName = "NativeActivity.apk"
