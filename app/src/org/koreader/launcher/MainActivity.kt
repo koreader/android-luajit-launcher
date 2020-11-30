@@ -111,8 +111,8 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     override fun onCreate(savedInstanceState: Bundle?) {
         Logger.v(String.format(Locale.US,
             "Launching %s %s", BuildConfig.APP_NAME, MainApp.info))
-        clipboard = Clipboard(this@MainActivity)
-        device = Device(this@MainActivity)
+        clipboard = Clipboard(this)
+        device = Device(this)
         timeout = Timeout()
         super.onCreate(savedInstanceState)
         setTheme(R.style.Fullscreen)
@@ -132,8 +132,8 @@ class MainActivity : NativeActivity(), JNILuaInterface,
         }
         Logger.v(TAG_MAIN, "surface: $surfaceKind")
 
-        if (!Permissions.hasStoragePermission(this@MainActivity)) {
-            Permissions.requestStoragePermission(this@MainActivity)
+        if (!Permissions.hasStoragePermission(this)) {
+            Permissions.requestStoragePermission(this)
         }
     }
 
@@ -141,14 +141,14 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     override fun onResume() {
         super.onResume()
         device.onResume()
-        timeout.onResume(this@MainActivity)
+        timeout.onResume(this)
     }
 
     /* Called when another activity is taking focus. */
     override fun onPause() {
         super.onPause()
         device.onPause()
-        timeout.onPause(this@MainActivity)
+        timeout.onPause(this)
         intent = null
     }
 
@@ -191,7 +191,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
         Array<String>, grantResults: IntArray) {
         Logger.d(TAG_MAIN, "onRequestPermissionResult()")
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (Permissions.hasStoragePermission(this@MainActivity)) {
+        if (Permissions.hasStoragePermission(this)) {
             Logger.i(TAG_MAIN, String.format(Locale.US,
                     "Permission granted for request code: %d", requestCode))
         } else {
@@ -210,9 +210,9 @@ class MainActivity : NativeActivity(), JNILuaInterface,
                 if (clipData != null) {
                     for (i in 0 until clipData.itemCount) {
                         val path = clipData.getItemAt(i)
-                        FileUtils.saveAsFile(this@MainActivity, path.uri, importPath)
+                        FileUtils.saveAsFile(this, path.uri, importPath)
                     }
-                } else FileUtils.saveAsFile(this@MainActivity, resultData.data, importPath)
+                } else FileUtils.saveAsFile(this, resultData.data, importPath)
             }
         }
     }
@@ -234,10 +234,10 @@ class MainActivity : NativeActivity(), JNILuaInterface,
      *--------------------------------------------------------------*/
 
     override fun canIgnoreBatteryOptimizations(): Int {
-        return if (Permissions.isIgnoringBatteryOptimizations(this@MainActivity)) 1 else 0
+        return if (Permissions.isIgnoringBatteryOptimizations(this)) 1 else 0
     }
     override fun canWriteSystemSettings(): Int {
-        return if (Permissions.hasWriteSettingsPermission(this@MainActivity)) 1 else 0
+        return if (Permissions.hasWriteSettingsPermission(this)) 1 else 0
     }
 
     override fun dictLookup(text: String?, action: String?, nullablePackage: String?) {
@@ -252,7 +252,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     }
 
     override fun download(url: String, name: String): Int {
-        return ApkUpdater.download(this@MainActivity, url, name)
+        return ApkUpdater.download(this, url, name)
     }
 
     override fun einkUpdate(mode: Int) {
@@ -274,7 +274,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     }
 
     override fun enableFrontlightSwitch(): Int {
-        return device.enableFrontlightSwitch(this@MainActivity)
+        return device.enableFrontlightSwitch(this)
     }
 
     override fun extractAssets(): Int {
@@ -317,7 +317,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     }
 
     override fun getClipboardText(): String {
-        return clipboard.getClipboardText(this@MainActivity)
+        return clipboard.getClipboardText(this)
     }
 
     override fun getEinkPlatform(): String {
@@ -335,7 +335,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     override fun getFilePathFromIntent(): String? {
         return intent?.let {
             if (it.action == Intent.ACTION_VIEW) {
-                FileUtils.getPathFromUri(this@MainActivity, it.data)
+                FileUtils.getPathFromUri(this, it.data)
             } else null
         }
     }
@@ -359,7 +359,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     }
 
     override fun getNetworkInfo(): String {
-        return NetworkUtils.getNetworkInfo(this@MainActivity)
+        return NetworkUtils.getNetworkInfo(this)
     }
 
     override fun getPlatformName(): String {
@@ -375,7 +375,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     }
 
     override fun getScreenBrightness(): Int {
-        return device.getScreenBrightness(this@MainActivity)
+        return device.getScreenBrightness(this)
     }
 
     override fun getScreenHeight(): Int {
@@ -403,15 +403,15 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     }
 
     override fun getScreenOffTimeout(): Int {
-        return timeout.getSystemScreenOffTimeout(this@MainActivity)
+        return timeout.getSystemScreenOffTimeout(this)
     }
 
     override fun getScreenOrientation(): Int {
-        return device.getScreenOrientation(this@MainActivity)
+        return device.getScreenOrientation(this)
     }
 
     override fun getScreenWarmth(): Int {
-        return device.getScreenWarmth(this@MainActivity)
+        return device.getScreenWarmth(this)
     }
 
     override fun getScreenWidth(): Int {
@@ -435,7 +435,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     }
 
     override fun hasExternalStoragePermission(): Int {
-        return if (Permissions.hasStoragePermission(this@MainActivity)) 1 else 0
+        return if (Permissions.hasStoragePermission(this)) 1 else 0
     }
 
     override fun hasNativeRotation(): Int {
@@ -526,19 +526,19 @@ class MainActivity : NativeActivity(), JNILuaInterface,
 
     override fun performHapticFeedback(constant: Int, force: Int) {
         if (takesWindowOwnership) {
-            device.hapticFeedback(this@MainActivity, constant, force > 0, view as View)
+            device.hapticFeedback(this, constant, force > 0, view as View)
         } else {
             val rootView = window.decorView.findViewById<View>(android.R.id.content)
-            device.hapticFeedback(this@MainActivity, constant, force > 0, rootView)
+            device.hapticFeedback(this, constant, force > 0, rootView)
         }
     }
 
     override fun requestIgnoreBatteryOptimizations(rationale: String, okButton: String, cancelButton: String) {
-        Permissions.requestIgnoreBatteryOptimizations(this@MainActivity, rationale, okButton, cancelButton)
+        Permissions.requestIgnoreBatteryOptimizations(this, rationale, okButton, cancelButton)
     }
 
     override fun requestWriteSystemSettings(rationale: String, okButton: String, cancelButton: String) {
-        Permissions.requestWriteSettingsPermission(this@MainActivity, rationale, okButton, cancelButton)
+        Permissions.requestWriteSettingsPermission(this, rationale, okButton, cancelButton)
     }
 
     override fun safFilePicker(path: String?): Int {
@@ -570,7 +570,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     }
 
     override fun setClipboardText(text: String) {
-        clipboard.setClipboardText(this@MainActivity, text)
+        clipboard.setClipboardText(this, text)
     }
 
     override fun setFullscreen(enabled: Boolean) {
@@ -593,23 +593,23 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     }
 
     override fun setScreenBrightness(brightness: Int) {
-        device.setScreenBrightness(this@MainActivity, brightness)
+        device.setScreenBrightness(this, brightness)
     }
 
     override fun setScreenOffTimeout(ms: Int) {
-        timeout.setTimeout(this@MainActivity, ms)
+        timeout.setTimeout(this, ms)
     }
 
     override fun setScreenOrientation(orientation: Int) {
-        device.setScreenOrientation(this@MainActivity, orientation)
+        device.setScreenOrientation(this, orientation)
     }
 
     override fun setScreenWarmth(warmth: Int) {
-        device.setScreenWarmth(this@MainActivity, warmth)
+        device.setScreenWarmth(this, warmth)
     }
 
     override fun showFrontlightDialog(title: String, dim: String, warmth: String, okButton: String, cancelButton: String): Int {
-        return device.showDialog(this@MainActivity, title, dim, warmth, okButton, cancelButton)
+        return device.showDialog(this, title, dim, warmth, okButton, cancelButton)
     }
 
     override fun showToast(message: String) {
@@ -619,11 +619,11 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     override fun showToast(message: String, longTimeout: Boolean) {
         runOnUiThread {
             if (longTimeout) {
-                val toast = Toast.makeText(this@MainActivity,
+                val toast = Toast.makeText(this,
                     message, Toast.LENGTH_LONG)
                 toast.show()
             } else {
-                val toast = Toast.makeText(this@MainActivity,
+                val toast = Toast.makeText(this,
                     message, Toast.LENGTH_SHORT)
                 toast.show()
             }
@@ -631,7 +631,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     }
 
     override fun startEPDTestActivity() {
-        val intent = Intent(this@MainActivity, EPDTestActivity::class.java)
+        val intent = Intent(this, EPDTestActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
         startActivity(intent)
     }
@@ -763,7 +763,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
 
     private fun showProgress() {
         runOnUiThread {
-            dialog = FramelessProgressDialog.show(this@MainActivity, "") }
+            dialog = FramelessProgressDialog.show(this, "") }
     }
 
     private fun dismissProgress() {
