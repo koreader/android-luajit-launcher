@@ -3,7 +3,6 @@ package org.koreader.launcher
 import android.annotation.SuppressLint
 import android.annotation.TargetApi
 import android.app.Activity
-import android.app.Dialog
 import android.app.NativeActivity
 import android.content.Context
 import android.content.Intent
@@ -15,14 +14,12 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.view.*
-import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.annotation.Keep
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import org.koreader.launcher.interfaces.JNILuaInterface
 import org.koreader.launcher.utils.*
-import java.io.IOException
 import java.util.*
 
 @Keep
@@ -68,34 +65,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
         }
     }
 
-    /* dialog used while extracting assets from zip */
-    private var dialog: FramelessProgressDialog? = null
-    private class FramelessProgressDialog private constructor(context: Context):
-        Dialog(context, R.style.FramelessDialog) {
-        companion object {
-            fun show(context: Context, title: CharSequence): FramelessProgressDialog {
-                val dialog = FramelessProgressDialog(context)
-                dialog.setTitle(title)
-                dialog.setCancelable(false)
-                dialog.setOnCancelListener(null)
-                dialog.window?.setGravity(Gravity.BOTTOM)
-                val progressBar = ProgressBar(context)
-                try {
-                    ContextCompat.getDrawable(context, R.drawable.discrete_spinner)
-                        ?.let { spinDrawable -> progressBar.indeterminateDrawable = spinDrawable }
-                } catch (e: Exception) {
-                    Logger.w("Failed to set progress drawable:\n$e")
-                }
-                /* The next line will add the ProgressBar to the dialog. */
-                dialog.addContentView(progressBar, ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT)
-                )
-                dialog.show()
-                return dialog
-            }
-        }
-    }
+
 
     companion object {
         private const val TAG_MAIN = "MainActivity"
@@ -281,41 +251,9 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     }
 
     override fun extractAssets(): Int {
-        val output = filesDir.absolutePath
-        val check = try {
-            // check if the app has zipped assets
-            val payload = assets.getFromAsset(this)
-            if (payload != null) {
-                var ok = true
-                Logger.i("Check file in asset module: $payload")
-                // upgrade or downgrade files from zip
-                if (!assets.isSameVersion(this, payload)) {
-                    showProgress() // show progress dialog (animated dots)
-                    val startTime = System.nanoTime()
-                    Logger.i("Installing new package to $output")
-                    ok = assets.uncompress(this, "module/$payload", output)
-                    val endTime = System.nanoTime()
-                    val elapsedTime = endTime - startTime
-                    showToast("update installed in " + elapsedTime / 1000000 + " milliseconds", true)
-                    dismissProgress() // dismiss progress dialog
-                }
-                if (!ok) {
-                    0
-                } else {
-                    if (assets.copyLibs(this)) 1 else 0
-                }
-            } else {
-                // check if the app has other, non-zipped, raw assets
-                Logger.i("Zip file not found, trying raw assets...")
-                if (assets.copyRawAssets(this)) 1 else 0
-            }
-        } catch (e: IOException) {
-            Logger.e(TAG_MAIN, "error extracting assets:\n$e")
-            dismissProgress()
-            0
-        }
+        val ok = if (assets.extract(this)) 1 else 0
         splashScreen = false
-        return check
+        return ok
     }
 
     override fun getBatteryLevel(): Int {
@@ -764,17 +702,6 @@ class MainActivity : NativeActivity(), JNILuaInterface,
         } catch (e: Exception) {
             Logger.e(TAG_MAIN, "error opening $intentStr\nException: $e")
             return false
-        }
-    }
-
-    private fun showProgress() {
-        runOnUiThread {
-            dialog = FramelessProgressDialog.show(this, "") }
-    }
-
-    private fun dismissProgress() {
-        runOnUiThread {
-            dialog?.dismiss()
         }
     }
 }

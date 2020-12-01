@@ -1,11 +1,16 @@
 package org.koreader.launcher
 
 import android.app.Activity
+import android.app.Dialog
 import android.content.Context
 import android.content.res.AssetManager
+import android.view.Gravity
+import android.view.ViewGroup
+import android.widget.ProgressBar
+import androidx.core.content.ContextCompat
 import java.io.*
 
-class Assets() {
+class Assets {
     companion object {
         private const val TAG = "AssetsHelper"
         private const val CONTAINER = "7z"
@@ -16,9 +21,45 @@ class Assets() {
         System.loadLibrary(CONTAINER)
     }
 
+    fun extract(activity: Activity): Boolean {
+        val output = activity.filesDir.absolutePath
+        return try {
+            // check if the app has zipped assets
+            val payload = getFromAsset(activity)
+            if (payload != null) {
+                var ok = true
+                Logger.i("Check file in asset module: $payload")
+                // upgrade or downgrade files from zip
+                if (!isSameVersion(activity, payload)) {
+                    showProgress(activity) // show progress dialog (animated dots)
+                    val startTime = System.nanoTime()
+                    Logger.i("Installing new package to $output")
+                    ok = uncompress(activity, "module/$payload", output)
+                    val endTime = System.nanoTime()
+                    val elapsedTime = endTime - startTime
+                    Logger.i("update installed in ${elapsedTime/1000000} milliseconds")
+                    dismissProgress(activity) // dismiss progress dialog
+                }
+                if (!ok) {
+                    false
+                } else {
+                    copyLibs(activity)
+                }
+            } else {
+                // check if the app has other, non-zipped, raw assets
+                Logger.i("Zip file not found, trying raw assets...")
+                copyRawAssets(activity)
+            }
+        } catch (e: IOException) {
+            Logger.e(TAG, "error extracting assets:\n$e")
+            dismissProgress(activity)
+            false
+        }
+    }
+
     private external fun extract(assetManager: AssetManager, payload: String, output: String): Int
 
-    fun uncompress(activity: Activity, payload: String, output: String): Boolean {
+    private fun uncompress(activity: Activity, payload: String, output: String): Boolean {
         return try {
             (extract(activity.assets, payload, output) == 0)
         } catch (e: Exception) {
@@ -27,7 +68,7 @@ class Assets() {
         }
     }
 
-    fun copyLibs(context: Context): Boolean {
+    private fun copyLibs(context: Context): Boolean {
         val assetManager = context.assets
         val libsDir = File(context.filesDir.absolutePath + "/libs")
         if (!libsDir.exists()) {
@@ -59,7 +100,7 @@ class Assets() {
     }
 
     /* copy raw assets from the assets module */
-    fun copyRawAssets(context: Context): Boolean {
+    private fun copyRawAssets(context: Context): Boolean {
         val assetManager = context.assets
         val assetsDir = context.filesDir.absolutePath
         var entryPoint = false
@@ -88,7 +129,7 @@ class Assets() {
     }
 
     /* get the first compressed file inside the assets module */
-    fun getFromAsset(context: Context): String? {
+    private fun getFromAsset(context: Context): String? {
         val assetManager = context.assets
         try {
             val assets = assetManager.list("module")
@@ -107,7 +148,7 @@ class Assets() {
     }
 
     /* check if installed files have the same revision as assets */
-    fun isSameVersion(context: Context, file: String): Boolean {
+    private fun isSameVersion(context: Context, file: String): Boolean {
         val newVersion = getPackageRevision(file)
         try {
             val output = context.filesDir.absolutePath
@@ -147,6 +188,46 @@ class Assets() {
             }
         } catch (e: Exception) {
             Logger.e(TAG, "Error copying file: $e")
+        }
+    }
+
+    /* dialog used while extracting assets from zip */
+    private var dialog: FramelessProgressDialog? = null
+    private class FramelessProgressDialog private constructor(context: Context):
+        Dialog(context, R.style.FramelessDialog) {
+        companion object {
+            fun show(context: Context, title: CharSequence): FramelessProgressDialog {
+                val dialog = FramelessProgressDialog(context)
+                dialog.setTitle(title)
+                dialog.setCancelable(false)
+                dialog.setOnCancelListener(null)
+                dialog.window?.setGravity(Gravity.BOTTOM)
+                val progressBar = ProgressBar(context)
+                try {
+                    ContextCompat.getDrawable(context, R.drawable.discrete_spinner)
+                        ?.let { spinDrawable -> progressBar.indeterminateDrawable = spinDrawable }
+                } catch (e: Exception) {
+                    Logger.w("Failed to set progress drawable:\n$e")
+                }
+                /* The next line will add the ProgressBar to the dialog. */
+                dialog.addContentView(progressBar, ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT)
+                )
+                dialog.show()
+                return dialog
+            }
+        }
+    }
+
+    private fun showProgress(activity: Activity) {
+        activity.runOnUiThread {
+            dialog = FramelessProgressDialog.show(activity, "") }
+    }
+
+    private fun dismissProgress(activity: Activity) {
+        activity.runOnUiThread {
+            dialog?.dismiss()
         }
     }
 }
