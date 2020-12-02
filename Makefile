@@ -123,4 +123,6 @@ clean:
 	rm -rf assets/module/ bin/ jni/luajit/build
 	cd jni/luajit && \
 		./mk-luajit.sh clean
+
+mrproper: clean
 	-./gradlew clean --continue
