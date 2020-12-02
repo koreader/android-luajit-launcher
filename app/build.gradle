@@ -95,10 +95,6 @@ dependencies {
     implementation "androidx.core:core-ktx:$androidx_core_version"
     implementation "androidx.appcompat:appcompat:$androidx_appcompat_version"
     implementation "androidx.legacy:legacy-support-v4:$androidx_supportv4_version"
-
-    // blocked by the build system. New kotlin plugin requires a bump in gradle version,
-    // which requires available toolchains for armeabi-v7a, arm64-v8a, x86 and x86_64
-    //noinspection GradleDependency
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_plugin_version"
 
     // add Leak Canary on debug variants.

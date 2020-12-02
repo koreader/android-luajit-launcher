@@ -1,7 +1,7 @@
 diff --git a/src/Makefile b/src/Makefile
 index 702207c..50e1c23 100644
---- a/luajit-2.0/src/Makefile
-+++ b/luajit-2.0/src/Makefile
+--- a/luajit/src/Makefile
++++ b/luajit/src/Makefile
 @@ -211,7 +211,8 @@ TARGET_CC= $(STATIC_CC)
  TARGET_STCC= $(STATIC_CC)
  TARGET_DYNCC= $(DYNAMIC_CC)
