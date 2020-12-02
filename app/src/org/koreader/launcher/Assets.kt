@@ -14,7 +14,6 @@ class Assets {
     companion object {
         private const val TAG = "AssetsHelper"
         private const val CONTAINER = "7z"
-        private const val BUFFER_SIZE = 1024
     }
 
     init {
@@ -183,7 +182,7 @@ class Assets {
         try {
             input.use { source ->
                 output.use { target ->
-                    source.copyTo(target, BUFFER_SIZE)
+                    source.copyTo(target)
                 }
             }
         } catch (e: Exception) {
