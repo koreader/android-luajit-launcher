@@ -33,9 +33,9 @@ object ScreenUtils {
         return rectangle.top
     }
 
-    fun isFullscreenDeprecated(activity: Activity): Int {
-        return if (activity.window.attributes.flags and
-            WindowManager.LayoutParams.FLAG_FULLSCREEN != 0) 1 else 0
+    fun isFullscreenDeprecated(activity: Activity): Boolean {
+        return (activity.window.attributes.flags and
+            WindowManager.LayoutParams.FLAG_FULLSCREEN != 0)
     }
 
     fun setFullscreenDeprecated(activity: Activity, fullscreen: Boolean) {

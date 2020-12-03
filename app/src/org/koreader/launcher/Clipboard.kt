@@ -44,12 +44,12 @@ class Clipboard(activity: Activity) {
         return result.value ?: ""
     }
 
-    fun hasClipboardText(): Int {
+    fun hasClipboardText(): Boolean {
         val clipdata = clipboard.primaryClip
         return if (clipdata != null) {
             val number = clipdata.itemCount
-            if (number > 0) 1 else 0
-        } else 0
+            (number > 0)
+        } else false
     }
 
     fun setClipboardText(activity: Activity, text: String) {

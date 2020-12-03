@@ -206,11 +206,11 @@ class MainActivity : NativeActivity(), JNILuaInterface,
      *             override methods used by lua/JNI                *
      *--------------------------------------------------------------*/
 
-    override fun canIgnoreBatteryOptimizations(): Int {
-        return if (Permissions.isIgnoringBatteryOptimizations(this)) 1 else 0
+    override fun canIgnoreBatteryOptimizations(): Boolean {
+        return Permissions.isIgnoringBatteryOptimizations(this)
     }
-    override fun canWriteSystemSettings(): Int {
-        return if (Permissions.hasWriteSettingsPermission(this)) 1 else 0
+    override fun canWriteSystemSettings(): Boolean {
+        return Permissions.hasWriteSettingsPermission(this)
     }
 
     override fun dictLookup(text: String?, action: String?, nullablePackage: String?) {
@@ -246,12 +246,12 @@ class MainActivity : NativeActivity(), JNILuaInterface,
         }
     }
 
-    override fun enableFrontlightSwitch(): Int {
+    override fun enableFrontlightSwitch(): Boolean {
         return device.enableFrontlightSwitch(this)
     }
 
-    override fun extractAssets(): Int {
-        val ok = if (assets.extract(this)) 1 else 0
+    override fun extractAssets(): Boolean {
+        val ok = assets.extract(this)
         splashScreen = false
         return ok
     }
@@ -374,85 +374,85 @@ class MainActivity : NativeActivity(), JNILuaInterface,
         return RUNTIME_VERSION
     }
 
-    override fun hasClipboardText(): Int {
+    override fun hasClipboardText(): Boolean {
         return clipboard.hasClipboardText()
     }
 
-    override fun hasExternalStoragePermission(): Int {
-        return if (Permissions.hasStoragePermission(this)) 1 else 0
+    override fun hasExternalStoragePermission(): Boolean {
+        return Permissions.hasStoragePermission(this)
     }
 
-    override fun hasNativeRotation(): Int {
+    override fun hasNativeRotation(): Boolean {
         return if (device.platform == "android") {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 // FIXME: hw rotation is disabled in devices with a Notch.
-                if ((topInsetHeight > 0) || (device.bugRotation)) 0 else 1
-            } else 0
-        } else 0
+                !((topInsetHeight > 0) || (device.bugRotation))
+            } else false
+        } else false
     }
 
-    override fun isCharging(): Int {
-        return getBatteryState(false)
+    override fun isCharging(): Boolean {
+        return (getBatteryState(false) == 1)
     }
 
-    override fun isChromeOS(): Int {
-        return if (device.isChromeOS) 1 else 0
+    override fun isChromeOS(): Boolean {
+        return device.isChromeOS
     }
 
     @Suppress("ConstantConditionIf")
-    override fun isDebuggable(): Int {
-        return if (BuildConfig.DEBUG) 1 else 0
+    override fun isDebuggable(): Boolean {
+        return BuildConfig.DEBUG
     }
 
-    override fun isEink(): Int {
-        return if (device.hasEinkSupport) 1 else 0
+    override fun isEink(): Boolean {
+        return device.hasEinkSupport
     }
 
-    override fun isEinkFull(): Int {
-        return if (device.hasFullEinkSupport) 1 else 0
+    override fun isEinkFull(): Boolean {
+        return device.hasFullEinkSupport
     }
 
-    override fun isFullscreen(): Int {
+    override fun isFullscreen(): Boolean {
         return if (Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR2 ||
             Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            if (fullscreen) 1 else 0
+            fullscreen
         } else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.JELLY_BEAN) {
             ScreenUtils.isFullscreenDeprecated(this)
         } else {
-            1
+            false
         }
     }
 
-    override fun isPackageEnabled(pkg: String): Int {
+    override fun isPackageEnabled(pkg: String): Boolean {
         return try {
             val pm = packageManager
             pm.getPackageInfo(pkg, PackageManager.GET_ACTIVITIES)
             val enabled = pm.getApplicationInfo(pkg, 0).enabled
-            if (enabled) 1 else 0
+            enabled
         } catch (e: PackageManager.NameNotFoundException) {
-            0
+            false
         }
     }
 
     @SuppressLint("SdCardPath")
-    override fun isPathInsideSandbox(path: String): Int {
+    override fun isPathInsideSandbox(path: String): Boolean {
         return when {
-            path.startsWith("/sdcard") -> 1
-            path.startsWith(device.externalStorage) -> 1
-            else -> 0
+            path.startsWith("/sdcard") -> true
+            path.startsWith(device.externalStorage) -> true
+            else -> false
         }
     }
 
-    override fun isTv(): Int {
-        return if (device.isTv) 1 else 0
+    override fun isTv(): Boolean {
+        return device.isTv
     }
 
-    override fun isWarmthDevice(): Int {
+    override fun isWarmthDevice(): Boolean {
         return device.isWarmthDevice()
     }
 
-    override fun needsWakelocks(): Int {
-        return if (device.needsWakelocks) 1 else 0
+    override fun needsWakelocks(): Boolean {
+        return device.needsWakelocks
     }
 
     override fun openLink(url: String): Int {
@@ -485,7 +485,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
         Permissions.requestWriteSettingsPermission(this, rationale, okButton, cancelButton)
     }
 
-    override fun safFilePicker(path: String?): Int {
+    override fun safFilePicker(path: String?): Boolean {
         lastImportedPath = path
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
@@ -497,13 +497,13 @@ class MainActivity : NativeActivity(), JNILuaInterface,
             lastImportedPath?.let {
                 try {
                     startActivityForResult(intent, ACTION_SAF_FILEPICKER)
-                    1
+                    true
                 } catch (e: Exception) {
-                    0
+                    false
                 }
-            } ?: 0
+            } ?: false
         } else {
-            0
+            false
         }
     }
 
