@@ -4,13 +4,13 @@ package org.koreader.launcher.interfaces
  * See https://github.com/koreader/android-luajit-launcher/blob/master/assets/android.lua */
 
 interface JNILuaInterface {
-    fun canIgnoreBatteryOptimizations(): Int
-    fun canWriteSystemSettings(): Int
+    fun canIgnoreBatteryOptimizations(): Boolean
+    fun canWriteSystemSettings(): Boolean
     fun dictLookup(text: String?, action: String?, nullablePackage: String?)
     fun download(url: String, name: String): Int
     fun einkUpdate(mode: Int)
     fun einkUpdate(mode: Int, delay: Long, x: Int, y: Int, width: Int, height: Int)
-    fun extractAssets(): Int
+    fun extractAssets(): Boolean
     fun getBatteryLevel(): Int
     fun getClipboardText(): String
     fun getEinkPlatform(): String
@@ -38,26 +38,26 @@ interface JNILuaInterface {
     fun getStatusBarHeight(): Int
     fun getSystemTimeout(): Int
     fun getVersion(): String
-    fun hasClipboardText(): Int
-    fun hasExternalStoragePermission(): Int
-    fun hasNativeRotation(): Int
-    fun isCharging(): Int
-    fun isChromeOS(): Int
-    fun isDebuggable(): Int
-    fun isEink(): Int
-    fun isEinkFull(): Int
-    fun isFullscreen(): Int
-    fun isPackageEnabled(pkg: String): Int
-    fun isPathInsideSandbox(path: String): Int
-    fun isTv(): Int
-    fun isWarmthDevice(): Int
-    fun needsWakelocks(): Int
+    fun hasClipboardText(): Boolean
+    fun hasExternalStoragePermission(): Boolean
+    fun hasNativeRotation(): Boolean
+    fun isCharging(): Boolean
+    fun isChromeOS(): Boolean
+    fun isDebuggable(): Boolean
+    fun isEink(): Boolean
+    fun isEinkFull(): Boolean
+    fun isFullscreen(): Boolean
+    fun isPackageEnabled(pkg: String): Boolean
+    fun isPathInsideSandbox(path: String): Boolean
+    fun isTv(): Boolean
+    fun isWarmthDevice(): Boolean
+    fun needsWakelocks(): Boolean
     fun openLink(url: String): Int
     fun openWifiSettings()
     fun performHapticFeedback(constant: Int, force: Int)
     fun requestIgnoreBatteryOptimizations(rationale: String, okButton: String, cancelButton: String)
     fun requestWriteSystemSettings(rationale: String, okButton: String, cancelButton: String)
-    fun safFilePicker(path: String?): Int
+    fun safFilePicker(path: String?): Boolean
     fun sendText(text: String?)
     fun setFullscreen(enabled: Boolean)
     fun setClipboardText(text: String)
@@ -70,5 +70,5 @@ interface JNILuaInterface {
     fun showFrontlightDialog(title: String, dim: String, warmth: String, okButton: String, cancelButton: String): Int
     fun showToast(message: String)
     fun showToast(message: String, longTimeout: Boolean)
-    fun enableFrontlightSwitch(): Int
+    fun enableFrontlightSwitch(): Boolean
 }
