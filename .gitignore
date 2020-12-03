@@ -11,6 +11,7 @@ bin
 build
 app/.*
 app/build
+assets/libs
 assets/module
 jni/logger.h
 jni/luajit/build
