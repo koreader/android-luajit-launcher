@@ -1,7 +1,13 @@
 ifdef ANDROID_ARCH
-	ifeq ($(ANDROID_ARCH), x86)
+	ifeq ($(ANDROID_ARCH), arm64)
+		ANDROID_FULL_ARCH?=arm64-v8a
+		ARCH?=Arm64
+	else ifeq ($(ANDROID_ARCH), x86)
 		ANDROID_FULL_ARCH?=$(ANDROID_ARCH)
 		ARCH?=X86
+	else ifeq($(ANDROID_ARCH), x86_64)
+		ANDROID_FULL_ARCH?=$(ANDROID_ARCH)
+		ARCH?=X86_64
 	endif
 endif
 
@@ -117,4 +123,6 @@ clean:
 	rm -rf assets/module/ bin/ jni/luajit/build
 	cd jni/luajit && \
 		./mk-luajit.sh clean
+
+mrproper: clean
 	-./gradlew clean --continue
