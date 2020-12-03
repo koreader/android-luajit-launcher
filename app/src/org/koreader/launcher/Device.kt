@@ -119,8 +119,8 @@ class Device(activity: Activity) {
     }
 
     /* Lights */
-    fun enableFrontlightSwitch(activity: Activity): Int {
-        return lights.enableFrontlightSwitch(activity)
+    fun enableFrontlightSwitch(activity: Activity): Boolean {
+        return lights.enableFrontlightSwitch(activity) == 1
     }
 
     fun getLightDialogState(): Int {
@@ -151,8 +151,8 @@ class Device(activity: Activity) {
         return lights.getMaxWarmth()
     }
 
-    fun isWarmthDevice(): Int {
-        return if (lights.hasWarmth()) 1 else 0
+    fun isWarmthDevice(): Boolean {
+        return lights.hasWarmth()
     }
 
     fun setScreenWarmth(activity: Activity, warmth: Int) {

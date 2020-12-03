@@ -1196,7 +1196,7 @@ function JNI:callBooleanMethod(object, method, signature, ...)
     local clazz = self.env[0].GetObjectClass(self.env, object)
     local methodID = self.env[0].GetMethodID(self.env, clazz, method, signature)
     self.env[0].DeleteLocalRef(self.env, clazz)
-    return self.env[0].CallBooleanMethod(self.env, object, methodID, ...)
+    return self.env[0].CallBooleanMethod(self.env, object, methodID, ...) == ffi.C.JNI_TRUE
 end
 
 function JNI:callStaticBooleanMethod(class, method, signature, ...)
@@ -1204,7 +1204,7 @@ function JNI:callStaticBooleanMethod(class, method, signature, ...)
     local methodID = self.env[0].GetStaticMethodID(self.env, clazz, method, signature)
     local res = self.env[0].CallStaticBooleanMethod(self.env, clazz, methodID, ...)
     self.env[0].DeleteLocalRef(self.env, clazz)
-    return res
+    return res == ffi.C.JNI_TRUE
 end
 
 function JNI:callObjectMethod(object, method, signature, ...)
@@ -1397,11 +1397,11 @@ local function run(android_app_state)
 
     android.extractAssets = function()
         return JNI:context(android.app.activity.vm, function(jni)
-            return jni:callIntMethod(
+            return jni:callBooleanMethod(
                 android.app.activity.clazz,
                 "extractAssets",
-                "()I"
-            ) == 1
+                "()Z"
+            )
         end)
     end
 
@@ -1450,12 +1450,12 @@ local function run(android_app_state)
     android.importFile = function(path)
         return JNI:context(android.app.activity.vm, function(jni)
             local import_path = jni.env[0].NewStringUTF(jni.env, path)
-            local ok = jni:callIntMethod(
+            local ok = jni:callBooleanMethod(
                 android.app.activity.clazz,
                 "safFilePicker",
-                "(Ljava/lang/String;)I",
+                "(Ljava/lang/String;)Z",
                 import_path
-            ) == 1
+            )
             jni.env[0].DeleteLocalRef(jni.env, import_path)
             return ok
         end)
@@ -1479,12 +1479,12 @@ local function run(android_app_state)
         if not path then return end
         return JNI:context(android.app.activity.vm, function(jni)
             local import_path = jni.env[0].NewStringUTF(jni.env, path)
-            local ok = jni:callIntMethod(
+            local ok = jni:callBooleanMethod(
                 android.app.activity.clazz,
                 "isPathInsideSandbox",
-                "(Ljava/lang/String;)I",
+                "(Ljava/lang/String;)Z",
                 import_path
-            ) == 1
+            )
             jni.env[0].DeleteLocalRef(jni.env, import_path)
             return ok
         end)
@@ -1540,11 +1540,11 @@ local function run(android_app_state)
 
     android.isDebuggable = function()
         return JNI:context(android.app.activity.vm, function(jni)
-            return jni:callIntMethod(
+            return jni:callBooleanMethod(
                 android.app.activity.clazz,
                 "isDebuggable",
-                "()I"
-            ) == 1
+                "()Z"
+            )
         end)
     end
 
@@ -1644,11 +1644,11 @@ local function run(android_app_state)
                 return false
             end
             return JNI:context(android.app.activity.vm, function(jni)
-                return jni:callIntMethod(
+                return jni:callBooleanMethod(
                     android.app.activity.clazz,
                     permission,
-                    "()I"
-                ) == 1
+                    "()Z"
+                )
             end)
         end,
         requestPermission = function(permission, rationale, okButton, cancelButton)
@@ -1798,11 +1798,11 @@ local function run(android_app_state)
 
     android.enableFrontlightSwitch = function()
         return JNI:context(android.app.activity.vm, function(jni)
-            return jni:callIntMethod(
+            return jni:callBooleanMethod(
                 android.app.activity.clazz,
                 "enableFrontlightSwitch",
-                "()I"
-            ) == 1
+                "()Z"
+            )
         end)
     end
 
@@ -1894,11 +1894,11 @@ local function run(android_app_state)
 
     android.isWarmthDevice = function()
         return JNI:context(android.app.activity.vm, function(jni)
-            return jni:callIntMethod(
+            return jni:callBooleanMethod(
                 android.app.activity.clazz,
                 "isWarmthDevice",
-                "()I"
-            ) == 1
+                "()Z"
+            )
         end)
     end
 
@@ -1914,41 +1914,41 @@ local function run(android_app_state)
 
     android.isCharging = function()
         return JNI:context(android.app.activity.vm, function(jni)
-            return jni:callIntMethod(
+            return jni:callBooleanMethod(
                 android.app.activity.clazz,
                 "isCharging",
-                "()I"
-            ) == 1
+                "()Z"
+            )
         end)
     end
 
     android.isTv = function()
         return JNI:context(android.app.activity.vm, function(jni)
-            return jni:callIntMethod(
+            return jni:callBooleanMethod(
                 android.app.activity.clazz,
                 "isTv",
-                "()I"
-            ) == 1
+                "()Z"
+            )
         end)
     end
 
     android.isChromeOS = function()
         return JNI:context(android.app.activity.vm, function(jni)
-            return jni:callIntMethod(
+            return jni:callBooleanMethod(
                 android.app.activity.clazz,
                 "isChromeOS",
-                "()I"
-            ) == 1
+                "()Z"
+            )
         end)
     end
 
     android.hasNativeRotation = function()
         return JNI:context(android.app.activity.vm, function(jni)
-            return jni:callIntMethod(
+            return jni:callBooleanMethod(
                 android.app.activity.clazz,
                 "hasNativeRotation",
-                "()I"
-            ) == 1
+                "()Z"
+            )
         end)
     end
 
@@ -1965,11 +1965,11 @@ local function run(android_app_state)
 
     android.isFullscreen = function()
         return JNI:context(android.app.activity.vm, function(jni)
-            return jni:callIntMethod(
+            return jni:callBooleanMethod(
                 android.app.activity.clazz,
                 "isFullscreen",
-                "()I"
-            ) == 1
+                "()Z"
+            )
         end)
     end
 
@@ -1987,11 +1987,11 @@ local function run(android_app_state)
 
     android.isEink = function()
         return JNI:context(android.app.activity.vm, function(jni)
-            local is_supported = jni:callIntMethod(
+            local is_supported = jni:callBooleanMethod(
                 android.app.activity.clazz,
                 "isEink",
-                "()I"
-            ) == 1
+                "()Z"
+            )
 
             local platform = jni:callObjectMethod(
                 android.app.activity.clazz,
@@ -2004,11 +2004,11 @@ local function run(android_app_state)
 
     android.isEinkFull = function()
         return JNI:context(android.app.activity.vm, function(jni)
-            return jni:callIntMethod(
+            return jni:callBooleanMethod(
                 android.app.activity.clazz,
                 "isEinkFull",
-                "()I"
-            ) == 1
+                "()Z"
+            )
         end)
     end
 
@@ -2046,11 +2046,11 @@ local function run(android_app_state)
 
     android.needsWakelocks = function()
         return JNI:context(android.app.activity.vm, function(jni)
-            return jni:callIntMethod(
+            return jni:callBooleanMethod(
                 android.app.activity.clazz,
                 "needsWakelocks",
-                "()I"
-            ) == 1
+                "()Z"
+            )
         end)
     end
 
@@ -2111,22 +2111,22 @@ local function run(android_app_state)
     android.canWriteSettings = function()
         android.DEBUG("checking write settings permission")
         return JNI:context(android.app.activity.vm, function(jni)
-            return jni:callIntMethod(
+            return jni:callBooleanMethod(
                 android.app.activity.clazz,
                 "hasWriteSettingsPermission",
-                "()I"
-            ) == 1
+                "()Z"
+            )
         end)
     end
 
     android.canWriteStorage = function()
         android.DEBUG("checking write storage permission")
         return JNI:context(android.app.activity.vm, function(jni)
-            return jni:callIntMethod(
+            return jni:callBooleanMethod(
                 android.app.activity.clazz,
                 "hasExternalStoragePermission",
-                "()I"
-            ) == 1
+                "()Z"
+            )
         end)
     end
 
@@ -2143,11 +2143,11 @@ local function run(android_app_state)
 
     android.hasClipboardText = function()
         return JNI:context(android.app.activity.vm, function(jni)
-            return jni:callIntMethod(
+            return jni:callBooleanMethod(
                 android.app.activity.clazz,
                 "hasClipboardText",
-                "()I"
-            ) == 1
+                "()Z"
+            )
         end)
     end
 
@@ -2221,12 +2221,12 @@ local function run(android_app_state)
         if not package then return false end
         return JNI:context(android.app.activity.vm, function(jni)
             local _package = jni.env[0].NewStringUTF(jni.env, package)
-            local enabled = jni:callIntMethod(
+            local enabled = jni:callBooleanMethod(
                 android.app.activity.clazz,
                 "isPackageEnabled",
-                "(Ljava/lang/String;)I",
+                "(Ljava/lang/String;)Z",
                 _package
-            ) == 1
+            )
             jni.env[0].DeleteLocalRef(jni.env, _package)
             return enabled
         end)
