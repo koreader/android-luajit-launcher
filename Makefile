@@ -5,7 +5,7 @@ ifdef ANDROID_ARCH
 	else ifeq ($(ANDROID_ARCH), x86)
 		ANDROID_FULL_ARCH?=$(ANDROID_ARCH)
 		ARCH?=X86
-	else ifeq($(ANDROID_ARCH), x86_64)
+	else ifeq ($(ANDROID_ARCH), x86_64)
 		ANDROID_FULL_ARCH?=$(ANDROID_ARCH)
 		ARCH?=X86_64
 	endif
