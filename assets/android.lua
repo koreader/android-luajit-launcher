@@ -1196,7 +1196,7 @@ function JNI:callBooleanMethod(object, method, signature, ...)
     local clazz = self.env[0].GetObjectClass(self.env, object)
     local methodID = self.env[0].GetMethodID(self.env, clazz, method, signature)
     self.env[0].DeleteLocalRef(self.env, clazz)
-    return self.env[0].CallBooleanMethod(self.env, object, methodID, ...)
+    return self.env[0].CallBooleanMethod(self.env, object, methodID, ...) == ffi.C.JNI_TRUE
 end
 
 function JNI:callStaticBooleanMethod(class, method, signature, ...)
@@ -1204,7 +1204,7 @@ function JNI:callStaticBooleanMethod(class, method, signature, ...)
     local methodID = self.env[0].GetStaticMethodID(self.env, clazz, method, signature)
     local res = self.env[0].CallStaticBooleanMethod(self.env, clazz, methodID, ...)
     self.env[0].DeleteLocalRef(self.env, clazz)
-    return res
+    return res == ffi.C.JNI_TRUE
 end
 
 function JNI:callObjectMethod(object, method, signature, ...)
