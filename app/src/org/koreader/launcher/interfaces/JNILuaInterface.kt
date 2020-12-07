@@ -70,5 +70,6 @@ interface JNILuaInterface {
     fun showFrontlightDialog(title: String, dim: String, warmth: String, okButton: String, cancelButton: String): Int
     fun showToast(message: String)
     fun showToast(message: String, longTimeout: Boolean)
+    fun untar(filePath: String, outputPath: String): Int
     fun enableFrontlightSwitch(): Int
 }

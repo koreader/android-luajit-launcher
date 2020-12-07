@@ -580,6 +580,10 @@ class MainActivity : NativeActivity(), JNILuaInterface,
         startActivity(intent)
     }
 
+    override fun untar(filePath: String, outputPath: String): Int {
+        return if (ArchiveUtils.untar(filePath, outputPath)) 1 else 0
+    }
+
     /*---------------------------------------------------------------
      *                       private methods                        *
      *--------------------------------------------------------------*/
