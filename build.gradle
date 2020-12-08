@@ -5,8 +5,11 @@ buildscript {
     ext.androidx_appcompat_version = '1.2.0'
     ext.androidx_supportv4_version = '1.0.0'
     ext.leakcanary_version = '2.5'
+
     ext.minSdk = 14
-    ext.targetSdk = 30
+    ext.min64Sdk = 21
+    ext.targetSdk = 28
+    ext.compileSdk = 30
 
     repositories {
         google()
