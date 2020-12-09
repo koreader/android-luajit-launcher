@@ -27,11 +27,7 @@ class Timeout {
         apply(activity, false)
     }
 
-    fun getSystemTimeout(): Int {
-        return systemTimeout
-    }
-
-    fun getSystemScreenOffTimeout(activity: Activity): Int {
+    private fun getSystemScreenOffTimeout(activity: Activity): Int {
         return try {
             Settings.System.getInt(activity.applicationContext.contentResolver,
                 Settings.System.SCREEN_OFF_TIMEOUT)

@@ -346,10 +346,6 @@ class MainActivity : NativeActivity(), JNILuaInterface,
         return device.getScreenMinWarmth()
     }
 
-    override fun getScreenOffTimeout(): Int {
-        return timeout.getSystemScreenOffTimeout(this)
-    }
-
     override fun getScreenOrientation(): Int {
         return device.getScreenOrientation(this)
     }
@@ -364,10 +360,6 @@ class MainActivity : NativeActivity(), JNILuaInterface,
 
     override fun getStatusBarHeight(): Int {
         return ScreenUtils.getStatusBarHeight(this)
-    }
-
-    override fun getSystemTimeout(): Int {
-        return timeout.getSystemTimeout()
     }
 
     override fun getVersion(): String {
@@ -552,25 +544,15 @@ class MainActivity : NativeActivity(), JNILuaInterface,
         device.setScreenWarmth(this, warmth)
     }
 
-    override fun showFrontlightDialog(title: String, dim: String, warmth: String, okButton: String, cancelButton: String): Int {
-        return device.showDialog(this, title, dim, warmth, okButton, cancelButton)
-    }
-
-    override fun showToast(message: String) {
-        showToast(message, false)
+    override fun showFrontlightDialog(title: String, dim: String, warmth: String,
+                                      okButton: String, cancelButton: String) {
+        device.showDialog(this, title, dim, warmth, okButton, cancelButton)
     }
 
     override fun showToast(message: String, longTimeout: Boolean) {
+        val duration = if (longTimeout) Toast.LENGTH_LONG else Toast.LENGTH_SHORT
         runOnUiThread {
-            if (longTimeout) {
-                val toast = Toast.makeText(this,
-                    message, Toast.LENGTH_LONG)
-                toast.show()
-            } else {
-                val toast = Toast.makeText(this,
-                    message, Toast.LENGTH_SHORT)
-                toast.show()
-            }
+            Toast.makeText(this, message, duration).show()
         }
     }
 
