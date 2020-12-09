@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:shape="oval"
-    tools:keep="@drawable/discrete_spinner_node_b">
+    android:shape="oval">
   <solid android:color="@android:color/black"/>
   <stroke android:color="@android:color/white" android:width="1dp"/>
 </shape>
