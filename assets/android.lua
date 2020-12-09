@@ -1618,11 +1618,10 @@ local function run(android_app_state)
             local w = jni.env[0].NewStringUTF(jni.env, warmth)
             local o = jni.env[0].NewStringUTF(jni.env, okButton)
             local c = jni.env[0].NewStringUTF(jni.env, cancelButton)
-            -- the VM crashes if we use jni:callVoidMethod here!!
-            jni:callIntMethod(
+            jni:callVoidMethod(
                 android.app.activity.clazz,
                 "showFrontlightDialog",
-                "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)I",
+                "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
                 t, i, w, o, c
             )
             jni.env[0].DeleteLocalRef(jni.env, t)
@@ -2267,22 +2266,13 @@ local function run(android_app_state)
     android.notification = function(message, is_long)
         return JNI:context(android.app.activity.vm, function(jni)
             local text = jni.env[0].NewStringUTF(jni.env, message)
-            if is_long ~= nil then
-                jni:callVoidMethod(
-                    android.app.activity.clazz,
-                    "showToast",
-                    "(Ljava/lang/String;Z)V",
-                    text,
-                    ffi.new("bool", is_long)
-                )
-            else
-                jni:callVoidMethod(
-                    android.app.activity.clazz,
-                    "showToast",
-                    "(Ljava/lang/String;)V",
-                    text
-                )
-            end
+            jni:callVoidMethod(
+                android.app.activity.clazz,
+                "showToast",
+                "(Ljava/lang/String;Z)V",
+                text,
+                ffi.new("bool", is_long and true or false)
+            )
             jni.env[0].DeleteLocalRef(jni.env, text)
         end)
     end
