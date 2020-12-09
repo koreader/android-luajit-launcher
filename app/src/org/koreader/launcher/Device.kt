@@ -168,7 +168,7 @@ class Device(activity: Activity) {
         warmth: String,
         okButton: String,
         cancelButton: String
-    ): Int {
+    ) {
         val hasWarmth = lights.hasWarmth()
         setDialogState(LIGHT_DIALOG_OPENED)
         activity.runOnUiThread {
@@ -223,7 +223,6 @@ class Device(activity: Activity) {
             dialog.setView(linearLayout)
             dialog.show()
         }
-        return 0
     }
 
     /* Haptic feedback */

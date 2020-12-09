@@ -10,6 +10,7 @@ interface JNILuaInterface {
     fun download(url: String, name: String): Int
     fun einkUpdate(mode: Int)
     fun einkUpdate(mode: Int, delay: Long, x: Int, y: Int, width: Int, height: Int)
+    fun enableFrontlightSwitch(): Boolean
     fun extractAssets(): Boolean
     fun getBatteryLevel(): Int
     fun getClipboardText(): String
@@ -31,12 +32,10 @@ interface JNILuaInterface {
     fun getScreenMinBrightness(): Int
     fun getScreenMaxWarmth(): Int
     fun getScreenMinWarmth(): Int
-    fun getScreenOffTimeout(): Int
     fun getScreenOrientation(): Int
     fun getScreenWarmth(): Int
     fun getScreenWidth(): Int
     fun getStatusBarHeight(): Int
-    fun getSystemTimeout(): Int
     fun getVersion(): String
     fun hasClipboardText(): Boolean
     fun hasExternalStoragePermission(): Boolean
@@ -67,8 +66,7 @@ interface JNILuaInterface {
     fun setScreenOffTimeout(ms: Int)
     fun setScreenOrientation(orientation: Int)
     fun startEPDTestActivity()
-    fun showFrontlightDialog(title: String, dim: String, warmth: String, okButton: String, cancelButton: String): Int
-    fun showToast(message: String)
+    fun showFrontlightDialog(title: String, dim: String, warmth: String, okButton: String, cancelButton: String)
     fun showToast(message: String, longTimeout: Boolean)
-    fun enableFrontlightSwitch(): Boolean
+
 }
