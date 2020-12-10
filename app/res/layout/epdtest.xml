@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--suppress ALL -->
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
-    tools:ignore="HardcodedText, ContentDescription" >
+    android:fillViewport="true" >
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -19,7 +16,7 @@
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:textSize="26sp"
-            android:text="is my device supported?" />
+            android:text="@string/epdtest_title" />
 
         <TextView
             android:layout_width="fill_parent"
@@ -36,7 +33,7 @@
             android:id="@+id/rk30xxButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="rk30xx update"
+            android:text="@string/epdtest_rk30xx_button"
             android:textSize="28sp" />
 
         <TextView
@@ -54,7 +51,7 @@
             android:id="@+id/rk33xxButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="rk33xx update"
+            android:text="@string/epdtest_rk33xx_button"
             android:textSize="28sp" />
 
         <TextView
@@ -72,7 +69,7 @@
             android:id="@+id/ntxNewButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="freescale/ntx update"
+            android:text="@string/epdtest_ntx_button"
             android:textSize="28sp" />
 
         <TextView
@@ -90,7 +87,7 @@
             android:id="@+id/qualcommButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="qualcomm/onyx update"
+            android:text="@string/epdtest_qualcomm_button"
             android:textSize="28sp" />
 
         <TextView
@@ -110,6 +107,7 @@
 
         <ImageView
             android:src="@android:drawable/divider_horizontal_dark"
+            android:contentDescription="@string/epdtest_divisor"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:scaleType="fitXY"
@@ -130,7 +128,7 @@
             android:id="@+id/shareButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="share"
+            android:text="@string/epdtest_share_results"
             android:textSize="28sp" />
     </LinearLayout>
 </ScrollView>

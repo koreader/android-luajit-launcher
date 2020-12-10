@@ -1,4 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- used on API30+ when targetSdk is 30+ -->
     <string name="warning_manage_storage">Please allow the app to manage all files.</string>
+
+    <!-- strings used by EPDTestActivity -->
+    <string name="epdtest_title">is my device supported?</string>
+    <string name="epdtest_divisor" translatable="false"> </string>
+    <string name="epdtest_about">Did you see a flashing black to white eink update? Cool
+        Go to github.com/koreader/koreader/issues/4551 and share the following information with us </string>
+    <string name="epdtest_ntx">This button should work on modern Tolinos/Nooks and other ntx boards</string>
+    <string name="epdtest_ntx_button">freescale/ntx update</string>
+    <string name="epdtest_qualcomm">This button should work on some Onyx Boox devices. At least qualcomm ones</string>
+    <string name="epdtest_qualcomm_button">qualcomm/onyx update</string>
+    <string name="epdtest_rk30xx">This button should invoke a full refresh of Boyue T61/T62 clones.</string>
+    <string name="epdtest_rk30xx_button">rk30xx update</string>
+    <string name="epdtest_rk33xx">This button should work on boyue rk3368 clones.</string>
+    <string name="epdtest_rk33xx_button">rk33xx update</string>
+    <string name="epdtest_share_results">share results</string>
 </resources>

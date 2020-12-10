@@ -1,6 +1,5 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion compileSdk
@@ -54,7 +53,7 @@ android {
         x86_64 {
             ndk { abiFilters "x86_64" }
             dimension = 'ABI'
-            minSdkVersion = min64Sdk
+            minSdkVersion min64Sdk
         }
         arm {
             ndk { abiFilters "armeabi-v7a" }
@@ -63,7 +62,7 @@ android {
         arm64 {
             ndk { abiFilters "arm64-v8a" }
             dimension = 'ABI'
-            minSdkVersion = min64Sdk
+            minSdkVersion min64Sdk
         }
 
         fdroid {
@@ -78,15 +77,6 @@ android {
         ndkBuild {
             path file('../jni/Android.mk')
         }
-    }
-
-    lintOptions {
-        checkReleaseBuilds true
-        abortOnError false
-        disable 'PrivateApi'
-        disable 'ProtectedPermissions'
-        disable 'UnusedAttribute'
-        disable 'SetTextI18n'
     }
 
     applicationVariants.all { variant ->

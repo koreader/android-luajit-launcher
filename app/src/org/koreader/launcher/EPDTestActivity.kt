@@ -54,24 +54,22 @@ class EPDTestActivity : Activity() {
             platform?.let { info.append("Platform: $it\n") }
         }
 
-        readmeReport.text = "Did you see a flashing black to white eink update? Cool\n\n"
-        readmeReport.append("Go to github.com/koreader/koreader/issues/4551 ")
-        readmeReport.append("and share the following information with us")
+        readmeReport.text = resources.getString(R.string.epdtest_about)
 
         /* rockchip rk30xx */
-        rk30xxDescription.text = "This button should invoke a full refresh of Boyue T61/T62 clones."
+        rk30xxDescription.text = resources.getString(R.string.epdtest_rk30xx)
         rk30xxButton.setOnClickListener { runEinkTest(RK30xxTEST) }
 
         /* rockchip rk33xx */
-        rk33xxDescription.text = "This button should work on boyue rk3368 clones."
+        rk33xxDescription.text = resources.getString(R.string.epdtest_rk33xx)
         rk33xxButton.setOnClickListener { runEinkTest(RK33xxTEST) }
 
         /* freescale/ntx - Newer Tolino/Nook devices */
-        ntxNewDescription.text = "This button should work on modern Tolinos/Nooks and other ntx boards"
+        ntxNewDescription.text = resources.getString(R.string.epdtest_ntx)
         ntxNewButton.setOnClickListener { runEinkTest(NTXTEST) }
 
         /* qualcomm - At least Onyx Boox Nova 2 */
-        qualcommDescription.text = "This button should work on some Onyx Boox devices. At least qualcomm ones"
+        qualcommDescription.text = resources.getString(R.string.epdtest_qualcomm)
         qualcommButton.setOnClickListener { runEinkTest(QUALCOMMTEST) }
 
         /* share button */

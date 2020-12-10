@@ -120,7 +120,7 @@ class TolinoWarmthController : LightInterface {
     }
 
     override fun setWarmth(activity: Activity, warmth: Int) {
-        if (warmth < MIN || warmth > BRIGHTNESS_MAX) {
+        if (warmth < MIN || warmth > WARMTH_MAX) {
             Logger.w(TAG, "warmth value of of range: $warmth")
             return
         }
