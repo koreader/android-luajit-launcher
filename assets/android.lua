@@ -2287,6 +2287,23 @@ local function run(android_app_state)
         end)
     end
 
+    android.untar = function(file, output)
+        if not file or not output then return false end
+        return JNI:context(android.app.activity.vm, function(jni)
+            local i = jni.env[0].NewStringUTF(jni.env, file)
+            local o = jni.env[0].NewStringUTF(jni.env, output)
+            local ok = jni:callBooleanMethod(
+                android.app.activity.clazz,
+                "untar",
+                "(Ljava/lang/String;Ljava/lang/String;)Z",
+                i, o
+            )
+            jni.env[0].DeleteLocalRef(jni.env, i)
+            jni.env[0].DeleteLocalRef(jni.env, o)
+            return ok
+        end)
+    end
+
     local function subprocess(jni, argv)
         local args_array = jni.env[0].NewObjectArray(jni.env, #argv,
             jni.env[0].FindClass(jni.env, "java/lang/String"), nil)
