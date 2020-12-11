@@ -10,13 +10,24 @@ import java.io.*
 object ArchiveUtils {
     const val TAG = "ArchiveUtils"
 
-    fun untar(archive: String, extract_to: String): Boolean {
-        return try {
+    fun untar(archive: String, extract_to: String, deleteIfOk: Boolean = false): Boolean {
+        val success = try {
             uncompress(archive, extract_to)
         } catch (e: IOException) {
             Logger.w(TAG, "exception uncompressing $archive: $e")
+            e.printStackTrace()
             false
         }
+
+        if (success and deleteIfOk) {
+            try {
+                File(archive).delete()
+            } catch (e: IOException) {
+                Logger.w(TAG, "exception deleting $archive: $e")
+                e.printStackTrace()
+            }
+        }
+        return success
     }
 
     @Throws(IOException::class)
@@ -24,27 +35,37 @@ object ArchiveUtils {
         return getTarInput(archive)?.use {
             val output = File(dest)
             if (!output.exists()) {
-                Logger.v(TAG, "Creating dir ${output.absolutePath}")
+                Logger.i(TAG, "Creating destination dir: ${output.absolutePath}")
                 output.mkdir()
             }
             var tarEntry = it.nextTarEntry
             while (tarEntry != null) {
                 val destPath = File(dest, tarEntry.name)
-                if (tarEntry.isDirectory) {
-                    Logger.v(TAG, "Creating dir ${destPath.absolutePath}")
-                    destPath.mkdirs()
-                } else {
-                    Logger.v(TAG, "Creating file ${destPath.absolutePath}")
-                    destPath.createNewFile()
-                    val buffer = ByteArray(4096)
-                    val bufferOutput = BufferedOutputStream(FileOutputStream(destPath))
-                    var len: Int
-                    while (it.read(buffer).also { size -> len = size } != -1) {
-                        Logger.v(TAG, "Copying $len bytes to ${destPath.absolutePath}")
-                        bufferOutput.write(buffer, 0, len)
+                destPath.parentFile?.let { parent ->
+                    if (!parent.exists()) {
+                        parent.mkdirs()
                     }
-                    Logger.v(TAG, "File ${destPath.absolutePath} created OK")
-                    bufferOutput.close()
+                }
+                var isOverride = false
+                if (!tarEntry.isDirectory) {
+                    if (destPath.exists()) {
+                        isOverride = true
+                        destPath.delete()
+                    }
+                    if (destPath.createNewFile()) {
+                        val buffer = ByteArray(4096)
+                        val bufferOutput = BufferedOutputStream(FileOutputStream(destPath))
+                        var len: Int
+                        while (it.read(buffer).also { size -> len = size } != -1) {
+                            bufferOutput.write(buffer, 0, len)
+                        }
+
+                        val mode = if (isOverride) "overwritten" else "created"
+                        Logger.v(TAG, "File ${destPath.absolutePath} $mode OK")
+                        bufferOutput.close()
+                    } else {
+                        Logger.w(TAG, "Failed creating file ${destPath.absolutePath}")
+                    }
                 }
                 tarEntry = it.nextTarEntry
             }
