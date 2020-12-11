@@ -8,11 +8,11 @@ import org.koreader.launcher.Logger
 import java.io.*
 
 object ArchiveUtils {
-    const val TAG = "ArchiveUtils"
+    private const val TAG = "ArchiveUtils"
 
     fun untar(archive: String, extract_to: String, deleteIfOk: Boolean = false): Boolean {
         val success = try {
-            uncompress(archive, extract_to)
+            untar(archive, extract_to)
         } catch (e: IOException) {
             Logger.w(TAG, "exception uncompressing $archive: $e")
             e.printStackTrace()
@@ -31,16 +31,16 @@ object ArchiveUtils {
     }
 
     @Throws(IOException::class)
-    private fun uncompress(archive: String, dest: String): Boolean {
+    private fun untar(archive: String, extract_to: String): Boolean {
         return getTarInput(archive)?.use {
-            val output = File(dest)
+            val output = File(extract_to)
             if (!output.exists()) {
                 Logger.i(TAG, "Creating destination dir: ${output.absolutePath}")
                 output.mkdir()
             }
             var tarEntry = it.nextTarEntry
             while (tarEntry != null) {
-                val destPath = File(dest, tarEntry.name)
+                val destPath = File(extract_to, tarEntry.name)
                 destPath.parentFile?.let { parent ->
                     if (!parent.exists()) {
                         parent.mkdirs()
@@ -75,23 +75,22 @@ object ArchiveUtils {
     }
 
     private fun getTarInput(archive: String): TarArchiveInputStream? {
-        val ext = File(archive).extension
-        return if ((ext == "gz") or (ext == "tgz") or (ext == "bz2") or (ext == "lz")) {
-            Logger.i(TAG, "uncompressing $archive with compression $ext")
-            // ignore illegal values for group/userid, mode, device numbers and timestamp
-            TarArchiveInputStream(getCompressor(archive, ext) as InputStream, true)
+        val input = File(archive)
+        val validExtensions = arrayOf("bz2", "gz", "lz", "tgz")
+        return if (validExtensions.contains(input.extension)) {
+            Logger.i(TAG, "uncompressing $archive with compression ${input.extension}")
+            TarArchiveInputStream(
+                when (input.extension) {
+                    "bz2" -> BZip2CompressorInputStream(BufferedInputStream(FileInputStream(input)))
+                    "lz" -> LZMACompressorInputStream(BufferedInputStream(FileInputStream(input)))
+                    else -> GzipCompressorInputStream(BufferedInputStream(FileInputStream(input)))
+                },
+                // ignore illegal values for group/userid, mode, device numbers and timestamp
+                true
+            )
         } else {
             Logger.w(TAG, "invalid extension for $archive. Aborting")
             null
-        }
-    }
-
-    private fun getCompressor(archive: String, validExtension: String): Any {
-        val input = File(archive)
-        return when (validExtension) {
-            "bz2" -> BZip2CompressorInputStream(BufferedInputStream(FileInputStream(input)))
-            "lz" -> LZMACompressorInputStream(BufferedInputStream(FileInputStream(input)))
-            else -> GzipCompressorInputStream(BufferedInputStream(FileInputStream(input)))
         }
     }
 }
