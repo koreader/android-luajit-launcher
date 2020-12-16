@@ -10,19 +10,17 @@ android {
         targetSdkVersion targetSdk
         versionCode versCode as Integer
         versionName versName
+        manifestPlaceholders.APP_NAME = projectName
+        buildConfigField 'String', 'APP_NAME', '"' + projectName + '"'
     }
 
     buildTypes {
         release {
-            manifestPlaceholders.APP_NAME = projectName
-            buildConfigField 'String', 'APP_NAME', '"' + projectName + '"'
             minifyEnabled true
             shrinkResources true
         }
 
         debug {
-            manifestPlaceholders.APP_NAME = projectName + "-debug"
-            buildConfigField 'String', 'APP_NAME', '"' + projectName + '-debug"'
             minifyEnabled false
             debuggable true
         }
@@ -30,17 +28,7 @@ android {
 
     sourceSets {
         main {
-            manifest.srcFile('manifest/base.xml')
-            java.srcDirs = ['src']
-            res.srcDirs = ['res']
             assets.srcDirs = [ '../assets' ]
-        }
-        rocks {
-            manifest.srcFile('manifest/rocks.xml')
-            java.srcDirs = ['rocks']
-        }
-        fdroid {
-            java.srcDirs = ['fdroid']
         }
     }
 
