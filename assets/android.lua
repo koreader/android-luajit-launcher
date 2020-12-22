@@ -4,28 +4,15 @@ Java Native Interface (JNI) wrapper.
 @module android
 ]]
 
+-- Attempt to grab the full 512K of maxmcode in one go on startup,
+-- to avoid mcode_alloc failures later on at runtime...
+-- c.f., https://www.freelists.org/post/luajit/Android-performance-drop-moving-from-LuaJIT201-LuaJIT202
+-- The other workaround mentioned earlier in that thread would require moving to a shared LuaJIT build,
+-- and move the mmap hackery in jni/android-main.c before a dlopen of the luaJIT lib...
+jit.opt.start("sizemcode=512")
+for _ = 1, 100 do end  -- Force allocation of one large segment
+
 local ffi = require("ffi")
-
-ffi.cdef[[
-    void *mmap(void *addr, size_t length, int prot, int flags, int fd, size_t offset);
-    int munmap(void *addr, size_t length);
-]]
-
--- reservation enough mmap slots for mcode allocation
-local reserved_slots = {}
-for i = 1, 32 do
-  local len = 0x10000 + i*0x1000
-  local p = ffi.C.mmap(nil, len, 0x3, 0x22, -1, 0)
-  table.insert(reserved_slots, {p = p, len = len})
-end
--- free the reservation immediately
-for _, slot in ipairs(reserved_slots) do
-  ffi.C.munmap(slot.p, slot.len)
-end
--- and allocate a large mcode segment, hopefully it will succeed.
--- 64KB ought to be enough for everyone with 10000 loop threshold
-require("jit.opt").start("sizemcode=64","maxmcode=64", "hotloop=10000")
-for _=1,20000 do end  -- Force allocation of one large segment
 
 ffi.cdef[[
 // logging:
