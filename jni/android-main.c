@@ -72,6 +72,9 @@ void android_main(struct android_app* state) {
 
     LOGD("%s: starting", TAG);
 
+    // Shitty hack so that base can discriminate Android...
+    setenv("IS_ANDROID", "true", 1);
+
     // wait until the activity is initialized before launching LuaJIT assets
     state->onAppCmd = handle_cmd;
     LOGV("%s: waiting for activity", TAG);
