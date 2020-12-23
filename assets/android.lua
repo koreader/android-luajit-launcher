@@ -4,12 +4,14 @@ Java Native Interface (JNI) wrapper.
 @module android
 ]]
 
--- Attempt to grab the full 512K of maxmcode in one go on startup,
+-- Attempt to grab the full maxmcode region in one go on startup,
 -- to avoid mcode_alloc failures later on at runtime...
 -- c.f., https://www.freelists.org/post/luajit/Android-performance-drop-moving-from-LuaJIT201-LuaJIT202
 -- The other workaround mentioned earlier in that thread would require moving to a shared LuaJIT build,
 -- and move the mmap hackery in jni/android-main.c before a dlopen of the luaJIT lib...
-jit.opt.start("sizemcode=512")
+-- Without it, the most reliable results we can get are with a *single* 64K mcode block:
+-- trying that with a single 512K block (as that's the default maxmcode) doesn't yield great results...
+jit.opt.start("sizemcode=64", "maxmcode=64")
 for _ = 1, 100 do end  -- Force allocation of one large segment
 
 local ffi = require("ffi")
