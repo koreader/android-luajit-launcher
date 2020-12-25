@@ -11,10 +11,30 @@ Java Native Interface (JNI) wrapper.
 -- and move the mmap hackery in jni/android-main.c before a dlopen of the luaJIT lib...
 -- Without it, the most reliable results we can get are with a *single* 64K mcode block:
 -- trying that with a single 512K block (as that's the default maxmcode) doesn't yield great results...
-jit.opt.start("sizemcode=64", "maxmcode=64")
-for _ = 1, 100 do end  -- Force allocation of one large segment
 
 local ffi = require("ffi")
+
+ffi.cdef[[
+    void *mmap(void *addr, size_t length, int prot, int flags, int fd, size_t offset);
+    int munmap(void *addr, size_t length);
+]]
+
+-- Reserve enough mmap slots for mcode allocation
+local reserved_slots = {}
+for i = 1, 32 do
+    -- 64K + 4K per iter
+    local size = 0x10000 + i*0x1000
+    local p = ffi.C.mmap(nil, size, 0x3, 0x22, -1, 0)
+    table.insert(reserved_slots, {p = p, size = size})
+end
+-- Free them immediately
+for _, slot in ipairs(reserved_slots) do
+    ffi.C.munmap(slot.p, slot.size)
+end
+
+-- Hope that forcing the allocation of a single 64K segment *right now* will succeed...
+jit.opt.start("sizemcode=64", "maxmcode=64")
+for _ = 1, 20000 do end
 
 ffi.cdef[[
 // logging:
