@@ -95,6 +95,7 @@ function dl.dlopen(library, load_func)
                     -- liblog, libm, libmediandk, libOpenMAXAL, libOpenSLES, libstdc++,
                     -- libvulkan, and libz
                     -- However, we have our own dl implementation and don't need the rest.
+                    needed = needed:gsub(".so.*$", ".so")
                     A.LOGVV(log, string.format("         dl.dlopen - opening needed %s for %s", needed, lname))
                     dl.dlopen(needed)
                 end

@@ -12,15 +12,16 @@
     <!-- common android permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="29" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        tools:ignore="ScopedStorage" android:maxSdkVersion="29" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS"
         tools:ignore="ProtectedPermissions" />
 
-    <!-- These are used on API30+. Uncomment them when bumping targetSdk
+    <!-- These are used on API30+ -->
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
-    -->
 
     <application
         android:name=".MainApp"
@@ -30,6 +31,7 @@
         android:vmSafeMode="true"
         android:allowBackup="false"
         android:fullBackupContent="false"
+        android:extractNativeLibs="true"
         android:usesCleartextTraffic="true"
         android:requestLegacyExternalStorage="true" >
         <meta-data android:name="android.max_aspect" android:value="3.1" />

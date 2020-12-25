@@ -46,7 +46,7 @@ object FileUtils {
                 }
                 ContentResolver.SCHEME_CONTENT == contentUri.scheme -> {
                     uri.authority?.let { domain ->
-                        Logger.v(TAG, "trying to resolve a file path from content delivered by $domain")
+                        Logger.v("trying to resolve a file path from content delivered by $domain")
                     }
                     try {
                         val fd = context.contentResolver.openFileDescriptor(contentUri, "r")
@@ -79,6 +79,44 @@ object FileUtils {
             }
         } else {
             "null"
+        }
+    }
+
+    /**
+     * do symbolic link
+     *
+     * @param linkPath absolute path of the link
+     * @param filePath absolute path of the file
+     * @return success
+     */
+
+    fun symlink(linkPath: String, filePath: String): Boolean {
+        val destFile = File(linkPath)
+        if (destFile.exists()) {
+            Logger.v("removing symbolic link ${destFile.absolutePath}")
+            destFile.delete()
+        }
+        val srcFile = File(filePath)
+        if (!srcFile.exists()) {
+            Logger.w("File ${srcFile.absolutePath} does not exist ")
+            return false
+        } else {
+            Logger.v("Symlink $linkPath -> $filePath")
+        }
+
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                Os.symlink(filePath, linkPath)
+                return true
+            }
+            val os = Class.forName("libcore.io.Libcore").getDeclaredField("os")
+            os.isAccessible = true
+            os.get(null).javaClass.getMethod("symlink", String::class.java,
+                String::class.java).invoke(os, filePath, linkPath)
+            return true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return false
         }
     }
 

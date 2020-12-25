@@ -9,7 +9,7 @@ buildscript {
 
     ext.minSdk = 14
     ext.min64Sdk = 21
-    ext.targetSdk = 28
+    ext.targetSdk = 30
     ext.compileSdk = 30
 
     repositories {
