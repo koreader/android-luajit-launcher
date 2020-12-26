@@ -11,6 +11,7 @@ Java Native Interface (JNI) wrapper.
 -- and move the mmap hackery in jni/android-main.c before a dlopen of the luaJIT lib...
 -- Without it, the most reliable results we can get are with a *single* 64K mcode block:
 -- trying that with a single 512K block (as that's the default maxmcode) doesn't yield great results...
+-- Upstream issue: https://github.com/LuaJIT/LuaJIT/issues/285
 
 local ffi = require("ffi")
 
