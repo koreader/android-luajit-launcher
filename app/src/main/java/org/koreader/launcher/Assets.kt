@@ -69,7 +69,6 @@ class Assets {
         activity.runOnUiThread { dialog = FramelessProgressDialog.show(activity, "") }
         activity.assets.list(BUNDLE)?.let { bundle ->
             for (asset in bundle) {
-                Logger.i("Asset found", asset)
                 val assetName = "$BUNDLE/$asset"
                 if (assetName != VERSION) {
                     when {

@@ -91,11 +91,10 @@ object FileUtils {
      */
 
     fun symlink(linkPath: String, filePath: String): Boolean {
-        val destFile = File(linkPath)
-        if (destFile.exists()) {
-            Logger.v("removing symbolic link ${destFile.absolutePath}")
-            destFile.delete()
-        }
+        try {
+            File(linkPath).delete()
+        } catch (e: IOException) {}
+
         val srcFile = File(filePath)
         if (!srcFile.exists()) {
             Logger.w("File ${srcFile.absolutePath} does not exist ")
