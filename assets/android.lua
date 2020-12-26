@@ -13,32 +13,14 @@ Java Native Interface (JNI) wrapper.
 -- trying that with a single 512K block (as that's the default maxmcode) doesn't yield great results...
 -- Upstream issue: https://github.com/LuaJIT/LuaJIT/issues/285
 
-local ffi = require("ffi")
-
-ffi.cdef[[
-    void *mmap(void *addr, size_t length, int prot, int flags, int fd, size_t offset);
-    int munmap(void *addr, size_t length);
-]]
-
--- Reserve enough mmap slots for mcode allocation
-local reserved_slots = {}
-for i = 1, 32 do
-    -- 64K + 4K per iter
-    local size = 0x10000 + i*0x1000
-    local p = ffi.C.mmap(nil, size, 0x3, 0x22, -1, 0)
-    table.insert(reserved_slots, {p = p, size = size})
-end
--- Free them immediately
-for _, slot in ipairs(reserved_slots) do
-    ffi.C.munmap(slot.p, slot.size)
-end
-
--- Hope that forcing the allocation of a single 64K segment *right now* will succeed...
-jit.opt.start("sizemcode=64", "maxmcode=64")
-for _ = 1, 20000 do end
+-- Hope that forcing the allocation of a 64K segment in two blocks *right now* will succeed...
+jit.opt.start("sizemcode=32", "maxmcode=64")
+for _ = 1, 100 do end
 
 -- Disable the JIT for now, we'll enable it again when actually starting KOReader.
 jit.off(true, true)
+
+local ffi = require("ffi")
 
 ffi.cdef[[
 // logging:
