@@ -37,6 +37,9 @@ end
 jit.opt.start("sizemcode=64", "maxmcode=64")
 for _ = 1, 20000 do end
 
+-- Disable the JIT for now, we'll enable it again when actually starting KOReader.
+jit.off(true, true)
+
 ffi.cdef[[
 // logging:
 int __android_log_print(int prio, const char *tag,  const char *fmt, ...);

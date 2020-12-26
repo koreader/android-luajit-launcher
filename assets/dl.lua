@@ -13,6 +13,9 @@ and as such:
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
 --]]
 
+-- Disable the JIT in this module, in an attempt to avoid weird issues when loading libraries
+jit.off(true, true)
+
 local ffi = require("ffi")
 local A = require("android")
 local Elf = require("elf")
@@ -83,7 +86,7 @@ function dl.dlopen(library, load_func)
                     -- load the luajit-launcher libluajit with sys_dlopen
                     load_func("libluajit.so")
                 elseif needed ~= "libdl.so" and pspec ~= "/system/lib" then
-                    -- For Android >= 6.0, you the list of safe system libraries is:
+                    -- For Android >= 6.0, the list of safe system libraries is:
                     -- libandroid, libc, libcamera2ndk, libdl, libGLES, libjnigraphics,
                     -- liblog, libm, libmediandk, libOpenMAXAL, libOpenSLES, libstdc++,
                     -- libvulkan, and libz
