@@ -83,8 +83,12 @@ function dl.dlopen(library, load_func)
             -- calls, so those will always use sys_dlopen()
             for _, needed in pairs(lib:dlneeds()) do
                 if needed == "libluajit.so" then
+                    --[[
                     -- load the luajit-launcher libluajit with sys_dlopen
                     load_func("libluajit.so")
+                    --]]
+                    -- Do *NOT* load libluajit if it's needed by something: we're already linked against a static copy!
+                    A.LOGVV(log, string.format("         dl.dlopen - skipping needed %s for %s", needed, lname))
                 elseif needed ~= "libdl.so" and pspec ~= "/system/lib" then
                     -- For Android >= 6.0, the list of safe system libraries is:
                     -- libandroid, libc, libcamera2ndk, libdl, libGLES, libjnigraphics,
