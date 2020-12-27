@@ -40,7 +40,7 @@
             android:screenOrientation="nosensor"
             android:launchMode="singleInstance"
             android:configChanges="colorMode|density|fontScale|keyboard|keyboardHidden|layoutDirection|locale|mcc|mnc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|touchscreen|uiMode" >
-            <meta-data android:name="android.app.lib_name" android:value="luajit" />
+            <meta-data android:name="android.app.lib_name" android:value="luajit-launcher" />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
