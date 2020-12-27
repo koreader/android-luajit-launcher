@@ -35,8 +35,9 @@ LOCAL_PATH := $(BASE_PATH)
 LOCAL_MODULE := luajit-launcher
 LOCAL_SRC_FILES := android-main.c
 LOCAL_STATIC_LIBRARIES := android_native_app_glue
-# FIXME: I don't actually want to link to it, I just want the headers in the searchpath...
-LOCAL_SHARED_LIBRARIES := libluajit
+# NOTE: I don't actually want to link to it, I just want the headers in the searchpath...
+#LOCAL_SHARED_LIBRARIES := libluajit
+LOCAL_C_INCLUDES := $(LOCAL_PATH)/luajit/build/$(TARGET_ARCH_ABI)/include
 
 # remember to add libraries here that you plan to use via FFI:
 LOCAL_EXPORT_LDLIBS := -lm -ldl -llog -landroid
