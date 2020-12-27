@@ -13,8 +13,8 @@ Java Native Interface (JNI) wrapper.
 -- trying that with a single 512K block (as that's the default maxmcode) doesn't yield great results...
 -- Upstream issue: https://github.com/LuaJIT/LuaJIT/issues/285
 
--- Hope that forcing the allocation of a 64K segment in two blocks *right now* will succeed...
-jit.opt.start("sizemcode=32", "maxmcode=64")
+-- Hope that forcing the allocation of a 512K segment *right now* will succeed...
+jit.opt.start("sizemcode=512", "maxmcode=512")
 for _ = 1, 100 do end
 
 -- Disable the JIT for now, we'll enable it again when actually starting KOReader.

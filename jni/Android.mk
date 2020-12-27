@@ -43,8 +43,6 @@ LOCAL_STATIC_LIBRARIES := android_native_app_glue
 # NOTE: I don't actually want to link to it, I just want the headers in the searchpath...
 #LOCAL_SHARED_LIBRARIES := libluajit
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/luajit/build/$(TARGET_ARCH_ABI)/include
-# We'll be dlopen'ing LuaJIT, so, yep, Lua symbols will be undefined
-LOCAL_ALLOW_UNDEFINED_SYMBOLS := true
 
 # remember to add libraries here that you plan to use via FFI:
 LOCAL_EXPORT_LDLIBS := -lm -ldl -llog -landroid

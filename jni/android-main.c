@@ -132,27 +132,36 @@ void android_main(struct android_app* state) {
     // And free the mmap, it's sole purpose is to push libluajit far, far away in the virtual memory mappings.
     munmap(p, map_size);
 
-    // Load initial Lua loader from our asset store:
-    L = luaL_newstate();
-    luaL_openlibs(L);
+    // Get all the symbols we'll need now
+    lua_State* (*lj_luaL_newstate)(void) = dlsym(luajit, "luaL_newstate");
+    void (*lj_luaL_openlibs)(lua_State*) = dlsym(luajit, "luaL_openlibs");
+    int (*lj_luaL_loadbuffer)(lua_State*, const char*, size_t,  const char*) = dlsym(luajit, "luaL_loadbuffer");
+    const char* (*lj_lua_tolstring)(lua_State *, int, size_t *) = dlsym(luajit, "lua_tolstring");
+    void (*lj_lua_pushlightuserdata)(lua_State*, void*) = dlsym(luajit, "lua_pushlightuserdata");
+    int (*lj_lua_pcall)(lua_State *, int, int, int) = dlsym(luajit, "lua_pcall");
+    void (*lj_lua_close)(lua_State*) = dlsym(luajit, "lua_close");
 
-    status = luaL_loadbuffer(L, (const char*) buf, (size_t) bufsize, LOADER_ASSET);
+    // Load initial Lua loader from our asset store:
+    L = (*lj_luaL_newstate)();
+    (*lj_luaL_openlibs)(L);
+
+    status = (*lj_luaL_loadbuffer)(L, (const char*) buf, (size_t) bufsize, LOADER_ASSET);
     AAsset_close(luaCode);
     if (status) {
-        LOGE("%s: error loading file: %s", TAG, lua_tostring(L, -1));
+        LOGE("%s: error loading file: %s", TAG, (*lj_lua_tolstring)(L, -1, NULL));
         goto quit;
     }
 
     // pass the android_app state to Lua land:
-    lua_pushlightuserdata(L, state);
+    (*lj_lua_pushlightuserdata)(L, state);
 
-    status = lua_pcall(L, 1, LUA_MULTRET, 0);
+    status = (*lj_lua_pcall)(L, 1, LUA_MULTRET, 0);
     if (status) {
-        LOGE("%s: failed to run script: %s", TAG, lua_tostring(L, -1));
+        LOGE("%s: failed to run script: %s", TAG, (*lj_lua_tolstring)(L, -1, NULL));
         goto quit;
     }
 
-    lua_close(L);
+    (*lj_lua_close)(L);
 
 quit:
     LOGE("%s: Stopping due to previous errors", TAG);
