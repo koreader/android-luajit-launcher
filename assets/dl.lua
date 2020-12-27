@@ -20,16 +20,30 @@ local log = "dlopen"
 
 local C = ffi.C
 
-ffi.cdef[[
-void *dlopen(const char *filename, int flag);
-char *dlerror(void);
-const static int RTLD_LOCAL    = 0;
-const static int RTLD_LAZY     = 0x00001;
-const static int RTLD_NOW      = 0x00002;
-const static int RTLD_NOLOAD   = 0x00004;
-const static int RTLD_GLOBAL   = 0x00100;
-const static int RTLD_NODELETE = 0x01000;
-]]
+-- c.f., https://android.googlesource.com/platform/bionic/+/refs/heads/master/libc/include/dlfcn.h
+if jit.arch:sub(-2) == "64" then
+    ffi.cdef[[
+    void *dlopen(const char *filename, int flag);
+    char *dlerror(void);
+    const static int RTLD_LOCAL    = 0;
+    const static int RTLD_LAZY     = 0x00001;
+    const static int RTLD_NOW      = 0x00002;
+    const static int RTLD_NOLOAD   = 0x00004;
+    const static int RTLD_GLOBAL   = 0x00100;
+    const static int RTLD_NODELETE = 0x01000;
+    ]]
+else
+    ffi.cdef[[
+    void *dlopen(const char *filename, int flag);
+    char *dlerror(void);
+    const static int RTLD_LOCAL    = 0;
+    const static int RTLD_LAZY     = 0x00001;
+    const static int RTLD_NOW      = 0x00000;
+    const static int RTLD_NOLOAD   = 0x00004;
+    const static int RTLD_GLOBAL   = 0x00002;
+    const static int RTLD_NODELETE = 0x01000;
+    ]]
+end
 
 local dl = {
     -- set this to search in certain directories
