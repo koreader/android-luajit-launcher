@@ -34,10 +34,12 @@ object DeviceInfo {
     private val BOYUE_T103D: Boolean
     private val BOYUE_K103: Boolean
     private val BOYUE_K78W: Boolean
+    private val BOYUE_P6: Boolean
     private val CREMA: Boolean
     private val CREMA_0650L: Boolean
     private val ONYX_C67: Boolean
     private val ONYX_NOVA2: Boolean
+    private val ONYX_KON_TIKI: Boolean
     private val ENERGY: Boolean
     private val INKBOOK: Boolean
     private val TOLINO: Boolean
@@ -63,6 +65,7 @@ object DeviceInfo {
         BOYUE_T103D,
         BOYUE_K103,
         BOYUE_K78W,
+        BOYUE_P6,
         CREMA,
         CREMA_0650L,
         ONYX_C67,
@@ -82,6 +85,7 @@ object DeviceInfo {
     enum class BugDevice {
         NONE,
         SONY_RP1,
+        ONYX_KON_TIKI,
         EMULATOR
     }
 
@@ -138,6 +142,12 @@ object DeviceInfo {
         BOYUE_K78W = IS_BOYUE && PRODUCT.contentEquals("k78w")
         deviceMap[EinkDevice.BOYUE_K78W] = BOYUE_K78W
 
+        // Boyue Likebook P6
+        BOYUE_P6 = (MANUFACTURER.contentEquals("p6")
+            && BRAND.contentEquals("p6")
+            && MODEL.contentEquals("p6"))
+        deviceMap[EinkDevice.BOYUE_P6] = BOYUE_P6
+
         // Crema Note (1010P)
         CREMA = BRAND.contentEquals("crema") && PRODUCT.contentEquals("note")
         deviceMap[EinkDevice.CREMA] = CREMA
@@ -158,6 +168,12 @@ object DeviceInfo {
                 && (PRODUCT.startsWith("c67") || MODEL.contentEquals("rk30sdk"))
                 && DEVICE.startsWith("c67"))
         deviceMap[EinkDevice.ONYX_C67] = ONYX_C67
+
+        // Onyx Kon-Tiki
+        ONYX_KON_TIKI = (MANUFACTURER.contentEquals("onyx")
+            && MODEL.contentEquals("kon_tiki")
+            && PRODUCT.contentEquals("kon_tiki"))
+        bugMap[BugDevice.ONYX_KON_TIKI] = ONYX_KON_TIKI
 
         // Energy Sistem eReaders. Tested on Energy Ereader Pro 4
         ENERGY = (BRAND.contentEquals("energysistem") || BRAND.contentEquals("energy_sistem"))
@@ -241,6 +257,7 @@ object DeviceInfo {
             BOYUE_T103D ||
             BOYUE_K103 ||
             BOYUE_K78W ||
+            BOYUE_P6 ||
             CREMA_0650L ||
             ENERGY ||
             INKBOOK ||
@@ -258,7 +275,7 @@ object DeviceInfo {
         BUG_WAKELOCKS = BUG == BugDevice.SONY_RP1
 
         // 4.4+ device without native surface rotation
-        BUG_SCREEN_ROTATION = BUG == BugDevice.EMULATOR
+        BUG_SCREEN_ROTATION = BUG == BugDevice.ONYX_KON_TIKI
 
         // needs a surfaceView to do epd updates
         NEEDS_VIEW = EINK_FREESCALE || EINK_QCOM
