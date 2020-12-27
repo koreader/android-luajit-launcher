@@ -40,7 +40,7 @@ local dl = {
 
 local function sys_dlopen(library, global)
     A.LOGVV(log, string.format("sys_dlopen - loading library %s (in %s namespace)", library, global and "global" or "local"))
-    local p = C.dlopen(library, global and C.RTLD_GLOBAL or C.RTLD_LOCAL)
+    local p = C.dlopen(library, bit.bor(C.RTLD_LAZY, global and C.RTLD_GLOBAL or C.RTLD_LOCAL))
     if p == nil then
         local err_msg = C.dlerror()
         if err_msg ~= nil then
