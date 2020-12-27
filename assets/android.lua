@@ -16,9 +16,6 @@ Java Native Interface (JNI) wrapper.
 jit.opt.start("sizemcode=512", "maxmcode=512")
 for _ = 1, 100 do end
 
--- Disable the JIT for now, we'll enable it again when actually starting KOReader.
-jit.off(true, true)
-
 local ffi = require("ffi")
 
 ffi.cdef[[

@@ -1,6 +1,3 @@
--- Disable the JIT in this module
-jit.off(true, true)
-
 local ffi = require("ffi")
 local A = require("android")
 
@@ -44,9 +41,6 @@ else
 end
 
 local function launch()
-    -- Ignition!
-    jit.on(true, true)
-
     dofile(A.dir.."/llapp_main.lua")
 end
 

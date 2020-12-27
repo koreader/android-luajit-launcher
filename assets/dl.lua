@@ -13,9 +13,6 @@ and as such:
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
 --]]
 
--- Disable the JIT in this module, in an attempt to avoid weird issues when loading libraries
-jit.off(true, true)
-
 local ffi = require("ffi")
 local A = require("android")
 local Elf = require("elf")

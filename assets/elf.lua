@@ -14,9 +14,6 @@ and as such:
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
 --]]
 
--- Disable the JIT in this module
-jit.off(true, true)
-
 local ffi = require("ffi")
 
 local C = ffi.C
