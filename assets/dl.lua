@@ -23,8 +23,12 @@ local C = ffi.C
 ffi.cdef[[
 void *dlopen(const char *filename, int flag);
 char *dlerror(void);
-const static int RTLD_LOCAL = 0;
-const static int RTLD_GLOBAL = 0x00100;
+const static int RTLD_LOCAL    = 0;
+const static int RTLD_LAZY     = 0x00001;
+const static int RTLD_NOW      = 0x00002;
+const static int RTLD_NOLOAD   = 0x00004;
+const static int RTLD_GLOBAL   = 0x00100;
+const static int RTLD_NODELETE = 0x01000;
 ]]
 
 local dl = {
@@ -73,7 +77,7 @@ function dl.dlopen(library, load_func)
             ok, lib = pcall(Elf.open, lname)
         end
         if ok then
-            A.LOGVV(log, string.format("dl.dlopen - library lname detected %s", lname))
+            A.LOGVV(log, string.format("dl.dlopen - library lname detected %s (pspec: %s)", lname, pspec))
 
             -- check if we already opened it:
             if dl.loaded_libraries[lname] then
@@ -92,7 +96,7 @@ function dl.dlopen(library, load_func)
                     -- as we already dlopen luajit w/ RTLD_GLOBAL in the launcher...
                     sys_dlopen("libluajit.so")
                     -- We do not flag it as loaded, specifically because the only cases where this is necessary are because of namespace issues.
-                elseif needed ~= "libdl.so" and pspec ~= "/system/lib" then
+                elseif needed ~= "libdl.so" and needed ~= "libc.so" and pspec ~= "/system/lib" then
                     -- For Android >= 6.0, the list of safe system libraries is:
                     -- libandroid, libc, libcamera2ndk, libdl, libGLES, libjnigraphics,
                     -- liblog, libm, libmediandk, libOpenMAXAL, libOpenSLES, libstdc++,
