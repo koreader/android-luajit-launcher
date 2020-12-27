@@ -20,7 +20,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 #include <stdlib.h>
-#include <linux/elf.h>
+#include <dlfcn.h>
+#include <sys/mman.h>
 
 #include <android/log.h>
 #include <android/asset_manager.h>
@@ -109,8 +110,29 @@ void android_main(struct android_app* state) {
         goto quit;
     }
 
-    // Load initial Lua loader from our asset store:
+    // Shitty workaround for mcode allocation issues
+    // c.f., android.lua for more details.
+    // 512MB ought to be fine.
+    const size_t map_size = 512U * 1024U * 1024U;
+    void* p = mmap(NULL, map_size, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    if (p == MAP_FAILED) {
+        LOGE("%s: error allocating mmap for mcode alloc workaround", TAG);
+        goto quit;
+    }
+    // Resolve everything *now*, and put the symbols in the global scope, much like if we had linked it statically.
+    // This is necessary in order to be able to require Lua/C modules, c.f., LuaJIT docs on embedding.
+    // (Beware, Android's dynamic linker has a long history of weird and broken behavior,
+    // c.f., https://android.googlesource.com/platform/bionic/+/refs/heads/master/android-changes-for-ndk-developers.md)
+    void* luajit = dlopen("libluajit.so", RTLD_NOW | RTLD_GLOBAL);
+    if (!luajit) {
+        LOGE("%s: failed to load LuaJIT: %s", TAG, dlerror());
+    } else {
+        dlerror();
+    }
+    // And free the mmap, it's sole purpose is to push libluajit far, far away in the virtual memory mappings.
+    munmap(p, map_size);
 
+    // Load initial Lua loader from our asset store:
     L = luaL_newstate();
     luaL_openlibs(L);
 
