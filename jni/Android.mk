@@ -25,6 +25,11 @@ LOCAL_PATH := $(BASE_PATH)
 include $(LOCAL_PATH)/luajit/Android.mk
 include $(CLEAR_VARS)
 
+# Dummy target that will ensure we ship the LuaJIT shared library
+LOCAL_PATH := $(BASE_PATH)
+include $(LOCAL_PATH)/foo/Android.mk
+include $(CLEAR_VARS)
+
 # lib7z shared library
 LOCAL_PATH := $(BASE_PATH)
 include $(LOCAL_PATH)/lzma/Android.mk
