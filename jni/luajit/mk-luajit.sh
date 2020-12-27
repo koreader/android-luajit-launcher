@@ -55,7 +55,7 @@ case "$1" in
         NDKP=${TCVER[0]}/prebuilt/${HOST_ARCH}/bin/arm-linux-androideabi-
         NDKF="--sysroot ${NDK}/platforms/android-${NDKABI}/arch-arm"
         NDKARCH="-march=armv7-a -mfloat-abi=softfp -Wl,--fix-cortex-a8"
-        make -C luajit amalg install HOST_CC="gcc -m32" CFLAGS="-O2 -pipe" HOST_CFLAGS="-O2 -pipe -mtune=generic" LDFLAGS="" HOST_LDFLAGS="" TARGET_CFLAGS="${CFLAGS}" TARGET_LDFLAGS="${LDFLAGS}" TARGET_SONAME="libluajit.so" CROSS="$NDKP" TARGET_FLAGS="${NDKF} ${NDKARCH}" TARGET_SYS=Linux DESTDIR="${DEST}" PREFIX= INSTALL_SONAME=
+        make -C luajit amalg install HOST_CC="gcc -m32" CFLAGS="-O2 -pipe" HOST_CFLAGS="-O2 -pipe -mtune=generic" LDFLAGS="" HOST_LDFLAGS="" TARGET_CFLAGS="${CFLAGS}" TARGET_LDFLAGS="${LDFLAGS}" TARGET_SONAME="libluajit.so" CROSS="$NDKP" TARGET_FLAGS="${NDKF} ${NDKARCH}" TARGET_SYS=Linux DESTDIR="${DEST}" PREFIX=
         ln -sf "libluajit-5.1.so.2.1.0" "${DEST}/lib/libluajit.so"
         ;;
     arm64-v8a)
