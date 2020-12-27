@@ -80,7 +80,7 @@ function dl.dlopen(library, load_func)
             -- we found a library, now load its requirements
             -- we do _not_ pass the load_func to the cascaded
             -- calls, so those will always use sys_dlopen()
-            for _, needed in pairs(lib:dlneeds()) do
+            for _, needed in ipairs(lib:dlneeds()) do
                 if needed == "libluajit.so" then
                     -- load the luajit-launcher libluajit with sys_dlopen
                     -- This should be mostly unnecessary, except possibly on very old Android versions with an extremely broken linker/loader,
