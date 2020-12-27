@@ -46,6 +46,8 @@ local function sys_dlopen(library, global)
         if err_msg ~= nil then
             error("error opening "..library..": "..ffi.string(err_msg))
         end
+    else
+        C.dlerror()
     end
     return p
 end
