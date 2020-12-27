@@ -1137,6 +1137,7 @@ void AConfiguration_getCountry(AConfiguration* config, char* outCountry);
 ]]
 
 -- JNI Interfacing
+local C = ffi.C
 
 local JNI = {}
 
@@ -1144,9 +1145,9 @@ function JNI:context(jvm, runnable)
     self.jvm = jvm
 
     local env = ffi.new("JNIEnv*[1]")
-    self.jvm[0].GetEnv(self.jvm, ffi.cast("void**", env), ffi.C.JNI_VERSION_1_6)
+    self.jvm[0].GetEnv(self.jvm, ffi.cast("void**", env), C.JNI_VERSION_1_6)
 
-    assert(self.jvm[0].AttachCurrentThread(self.jvm, env, nil) ~= ffi.C.JNI_ERR,
+    assert(self.jvm[0].AttachCurrentThread(self.jvm, env, nil) ~= C.JNI_ERR,
         "cannot attach JVM to current thread")
 
     self.env = env[0]
@@ -1191,7 +1192,7 @@ function JNI:callBooleanMethod(object, method, signature, ...)
     local clazz = self.env[0].GetObjectClass(self.env, object)
     local methodID = self.env[0].GetMethodID(self.env, clazz, method, signature)
     self.env[0].DeleteLocalRef(self.env, clazz)
-    return self.env[0].CallBooleanMethod(self.env, object, methodID, ...) == ffi.C.JNI_TRUE
+    return self.env[0].CallBooleanMethod(self.env, object, methodID, ...) == C.JNI_TRUE
 end
 
 function JNI:callStaticBooleanMethod(class, method, signature, ...)
@@ -1199,7 +1200,7 @@ function JNI:callStaticBooleanMethod(class, method, signature, ...)
     local methodID = self.env[0].GetStaticMethodID(self.env, clazz, method, signature)
     local res = self.env[0].CallStaticBooleanMethod(self.env, clazz, methodID, ...)
     self.env[0].DeleteLocalRef(self.env, clazz)
-    return res == ffi.C.JNI_TRUE
+    return res == C.JNI_TRUE
 end
 
 function JNI:callObjectMethod(object, method, signature, ...)
@@ -1255,35 +1256,35 @@ local android = {
     app = nil,
     jni = JNI,
     log_name = "luajit-launcher",
-    lib = android_lib_ok and android_lib or ffi.C,
+    lib = android_lib_ok and android_lib or C,
 }
 
 -- Ditto for liblog
 local android_liblog_ok, android_liblog = pcall(ffi.load, "liblog.so")
-local android_log = android_liblog_ok and android_liblog or ffi.C
+local android_log = android_liblog_ok and android_liblog or C
 
 function android.LOG(level, message)
     android_log.__android_log_print(level, android.log_name, "%s", message)
 end
 
 function android.LOGVV(tag, message)
-    android_log.__android_log_print(ffi.C.ANDROID_LOG_VERBOSE, tag, "%s", message)
+    android_log.__android_log_print(C.ANDROID_LOG_VERBOSE, tag, "%s", message)
 end
 
 function android.LOGV(message)
-    android.LOG(ffi.C.ANDROID_LOG_VERBOSE, message)
+    android.LOG(C.ANDROID_LOG_VERBOSE, message)
 end
 function android.LOGD(message)
-    android.LOG(ffi.C.ANDROID_LOG_DEBUG, message)
+    android.LOG(C.ANDROID_LOG_DEBUG, message)
 end
 function android.LOGI(message)
-    android.LOG(ffi.C.ANDROID_LOG_INFO, message)
+    android.LOG(C.ANDROID_LOG_INFO, message)
 end
 function android.LOGW(message)
-    android.LOG(ffi.C.ANDROID_LOG_WARN, message)
+    android.LOG(C.ANDROID_LOG_WARN, message)
 end
 function android.LOGE(message)
-    android.LOG(ffi.C.ANDROID_LOG_ERROR, message)
+    android.LOG(C.ANDROID_LOG_ERROR, message)
 end
 
 --[[--
@@ -1299,7 +1300,7 @@ function android.asset_loader(modulename)
     local filename = string.gsub("?.lua", "%?", modulepath)
     local asset = android.lib.AAssetManager_open(
         android.app.activity.assetManager,
-        filename, ffi.C.AASSET_MODE_BUFFER)
+        filename, C.AASSET_MODE_BUFFER)
     --android.LOGI(string.format("trying to open asset %s: %s", filename, tostring(asset)))
     if asset ~= nil then
         -- read asset:
@@ -1777,8 +1778,8 @@ local function run(android_app_state)
             end)
         end,
         set = function(new_orientation)
-            if new_orientation >= ffi.C.ASCREEN_ORIENTATION_UNSPECIFIED and
-                new_orientation <= ffi.C.ASCREEN_ORIENTATION_FULL_SENSOR then
+            if new_orientation >= C.ASCREEN_ORIENTATION_UNSPECIFIED and
+                new_orientation <= C.ASCREEN_ORIENTATION_FULL_SENSOR then
                 JNI:context(android.app.activity.vm, function(jni)
                     jni:callVoidMethod(
                         android.app.activity.clazz,

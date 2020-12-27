@@ -21,6 +21,8 @@ local A = require("android")
 local Elf = require("elf")
 local log = "dlopen"
 
+local C = ffi.C
+
 ffi.cdef[[
 void *dlopen(const char *filename, int flag);
 char *dlerror(void);
@@ -37,9 +39,9 @@ local dl = {
 
 local function sys_dlopen(library)
     A.LOGVV(log, string.format("sys_dlopen - loading library %s", library))
-    local p = ffi.C.dlopen(library, ffi.C.RTLD_LOCAL)
+    local p = C.dlopen(library, C.RTLD_LOCAL)
     if p == nil then
-        local err_msg = ffi.C.dlerror()
+        local err_msg = C.dlerror()
         if err_msg ~= nil then
             error("error opening "..library..": "..ffi.string(err_msg))
         end

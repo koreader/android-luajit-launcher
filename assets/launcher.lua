@@ -4,13 +4,15 @@ jit.off(true, true)
 local ffi = require("ffi")
 local A = require("android")
 
+local C = ffi.C
+
 ffi.cdef[[
 int chdir(const char *path);
 char *getcwd(char *buf, size_t size);
 ]]
 
 local function chdir(path)
-    if ffi.C.chdir(path) == 0 then
+    if C.chdir(path) == 0 then
         return true
     else
         return nil, "Unable to change working directory to '" ..path.."'"
@@ -20,7 +22,7 @@ end
 local max_path = 4096
 local function currentdir()
     return ffi.string(
-        ffi.C.getcwd(ffi.new('char[?]', max_path), max_path))
+        C.getcwd(ffi.new('char[?]', max_path), max_path))
 end
 
 --require("test")
