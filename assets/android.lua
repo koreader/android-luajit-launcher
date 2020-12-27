@@ -1250,7 +1250,7 @@ end
 
 -- Android specific
 
--- We need to load libandroid in the global namespace
+-- We need to load libandroid, it's no longer in the global namespace, as we're running under a plain LuaJIT now
 local android_lib_ok, android_lib = pcall(ffi.load, "libandroid.so")
 local android = {
     app = nil,
