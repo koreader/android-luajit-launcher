@@ -19,7 +19,6 @@ include $(CLEAR_VARS)
 # Stupid dummy target just to ship the real libluajit...
 LOCAL_MODULE := foo
 LOCAL_SRC_FILES := main.c
-LOCAL_SHARED_LIBRARIES := libluajit
+LOCAL_SHARED_LIBRARIES := luajit
 
 include $(BUILD_SHARED_LIBRARY)
-

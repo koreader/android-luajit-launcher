@@ -1,7 +1,6 @@
 # Build app_glue static library.
 
 LOCAL_PATH:= $(call my-dir)
-
 include $(CLEAR_VARS)
 
 LOCAL_MODULE:= android_native_app_glue
