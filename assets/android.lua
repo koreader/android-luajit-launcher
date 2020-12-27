@@ -1249,8 +1249,7 @@ end
 
 -- Android specific
 
--- Some Android roms won't load libandroid.so to the global namespace thus
--- we load it by ourselves.
+-- We need to load libandroid in the global namespace
 local android_lib_ok, android_lib = pcall(ffi.load, "libandroid.so")
 local android = {
     app = nil,
@@ -1259,12 +1258,16 @@ local android = {
     lib = android_lib_ok and android_lib or ffi.C,
 }
 
+-- Ditto for liblog
+local android_liblog_ok, android_liblog = pcall(ffi.load, "liblog.so")
+local android_log = android_liblog_ok and android_liblog or ffi.C
+
 function android.LOG(level, message)
-    ffi.C.__android_log_print(level, android.log_name, "%s", message)
+    android_log.__android_log_print(level, android.log_name, "%s", message)
 end
 
 function android.LOGVV(tag, message)
-    ffi.C.__android_log_print(ffi.C.ANDROID_LOG_VERBOSE, tag, "%s", message)
+    android_log.__android_log_print(ffi.C.ANDROID_LOG_VERBOSE, tag, "%s", message)
 end
 
 function android.LOGV(message)
