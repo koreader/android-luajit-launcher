@@ -20,6 +20,7 @@ local log = "dlopen"
 
 local C = ffi.C
 
+-- There's a bit of heinous hackery going on on 32-bit arches with RTLD_NOW & RTLD_GLOBAL...
 -- c.f., https://android.googlesource.com/platform/bionic/+/refs/heads/master/libc/include/dlfcn.h
 if jit.arch:sub(-2) == "64" then
     ffi.cdef[[
@@ -108,7 +109,6 @@ function dl.dlopen(library, load_func, global)
                 elseif needed ~= "libdl.so" and needed ~= "libc.so" and pspec ~= "/system/lib" then
                     -- check if we already opened it:
                     if dl.loaded_libraries[needed] then
-                        lib.file:close()
                         A.LOGVV(log, string.format("         dl.dlopen - needed %s is already loaded", lname))
                     else
                         -- For Android >= 6.0, the list of safe system libraries is:
@@ -127,6 +127,7 @@ function dl.dlopen(library, load_func, global)
             if load_func == sys_dlopen then
                 return load_func(lname, global and true or false)
             else
+                A.LOGVV(log, string.format("dl.dlopen - deferring loading of %s to load_func", lname))
                 return load_func(lname)
             end
         end
