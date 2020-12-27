@@ -34,9 +34,9 @@ local dl = {
     loaded_libraries = {}
 }
 
-local function sys_dlopen(library)
-    A.LOGVV(log, string.format("sys_dlopen - loading library %s", library))
-    local p = C.dlopen(library, C.RTLD_LOCAL)
+local function sys_dlopen(library, global)
+    A.LOGVV(log, string.format("sys_dlopen - loading library %s (in %s namespace)", library, global and "global" or "local"))
+    local p = C.dlopen(library, global and C.RTLD_GLOBAL or C.RTLD_LOCAL)
     if p == nil then
         local err_msg = C.dlerror()
         if err_msg ~= nil then
@@ -73,13 +73,15 @@ function dl.dlopen(library, load_func)
             ok, lib = pcall(Elf.open, lname)
         end
         if ok then
+            A.LOGVV(log, string.format("dl.dlopen - library lname detected %s", lname))
+
             -- check if we already opened it:
             if dl.loaded_libraries[lname] then
                 lib.file:close()
+                A.LOGVV(log, string.format("dl.dlopen - %s is already loaded", lname))
                 return dl.loaded_libraries[lname]
             end
 
-            A.LOGVV(log, string.format("dl.dlopen - library lname detected %s", lname))
             -- we found a library, now load its requirements
             -- we do _not_ pass the load_func to the cascaded
             -- calls, so those will always use sys_dlopen()
@@ -103,7 +105,7 @@ function dl.dlopen(library, load_func)
                 end
             end
             lib.file:close()
-            return load_func(lname)
+            return load_func(lname, true)
         end
     end
 
