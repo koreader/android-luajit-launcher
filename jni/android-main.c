@@ -112,6 +112,9 @@ void android_main(struct android_app* state) {
 
     // Shitty workaround for mcode allocation issues
     // c.f., android.lua for more details.
+    // The idea is to push the libluajit.so mapping "far" enough away,
+    // that LuaJIT then succeeds in mapping mcode area(s) +/- 32MB (on arm, 128 MB on aarch64, 2GB on x86)
+    // from lj_vm_exit_handler (c.f., mcode_alloc @ lj_mcode.c)
     // 128MB ought to be fine.
     const size_t map_size = 128U * 1024U * 1024U;
     void* p = mmap(NULL, map_size, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
@@ -129,7 +132,7 @@ void android_main(struct android_app* state) {
     } else {
         dlerror();
     }
-    // And free the mmap, it's sole purpose is to push libluajit far, far away in the virtual memory mappings.
+    // And free the mmap, its sole purpose is to push libluajit.so away in the virtual memory mappings.
     munmap(p, map_size);
 
     // Get all the symbols we'll need now
