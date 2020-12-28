@@ -112,8 +112,8 @@ void android_main(struct android_app* state) {
 
     // Shitty workaround for mcode allocation issues
     // c.f., android.lua for more details.
-    // 512MB ought to be fine.
-    const size_t map_size = 512U * 1024U * 1024U;
+    // 128MB ought to be fine.
+    const size_t map_size = 128U * 1024U * 1024U;
     void* p = mmap(NULL, map_size, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
     if (p == MAP_FAILED) {
         LOGE("%s: error allocating mmap for mcode alloc workaround", TAG);
