@@ -122,7 +122,6 @@ function dl.dlopen(library, load_func, depth)
             depth = depth - 1
             padding = depth * 4
             if load_func == sys_dlopen then
-                A.LOGVV(log, string.format("%"..padding.."sdl.dlopen - sys_dlopen -> %s", "", lname))
                 return sys_dlopen(lname, false, padding)
             else
                 A.LOGVV(log, string.format("%"..padding.."sdl.dlopen - load_func -> %s", "", lname))
