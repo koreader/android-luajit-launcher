@@ -104,12 +104,7 @@ function dl.dlopen(library, load_func)
             local lib_needs = lib:dlneeds()
             lib:close()
             for i, needed in ipairs(lib_needs) do
-                if needed == "libluajit.so" then
-                    -- Load our libluajit with sys_dlopen
-                    -- This should be mostly unnecessary, except possibly on very old Android versions with an extremely broken linker/loader,
-                    -- as we already dlopen luajit w/ RTLD_GLOBAL in the launcher...
-                    sys_dlopen("libluajit.so", false)
-                elseif pspec ~= "/system/lib" then
+                if pspec ~= "/system/lib" then
                     -- For Android >= 6.0, the list of safe system libraries is:
                     -- libandroid, libc, libcamera2ndk, libdl, libGLES, libjnigraphics,
                     -- liblog, libm, libmediandk, libOpenMAXAL, libOpenSLES, libstdc++,
