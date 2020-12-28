@@ -75,7 +75,9 @@ if the library name is an absolute path (starting with "/"), then
 the library_path will not be used
 --]]
 function dl.dlopen(library, load_func, global)
+    local loaded
     load_func = load_func or sys_dlopen
+    A.LOGVV(log, string.format("dl.dlopen on %s", library))
 
     for pspec in string.gmatch(
             library:sub(1, 1) == "/" and "" or dl.library_path,
@@ -99,17 +101,20 @@ function dl.dlopen(library, load_func, global)
             -- we found a library, now load its requirements
             -- we do _not_ pass the load_func to the cascaded
             -- calls, so those will always use sys_dlopen()
-            for _, needed in ipairs(lib:dlneeds()) do
+            local lib_needs = lib:dlneeds()
+            lib:close()
+            for i, needed in ipairs(lib_needs) do
+                A.LOGVV(log, string.format("dl.dlopen - needed: %s (%d/%d)", needed, i, #lib_needs))
                 if needed == "libluajit.so" then
                     -- load the luajit-launcher libluajit with sys_dlopen
                     -- This should be mostly unnecessary, except possibly on very old Android versions with an extremely broken linker/loader,
                     -- as we already dlopen luajit w/ RTLD_GLOBAL in the launcher...
                     sys_dlopen("libluajit.so")
                     -- We do not flag it as loaded, specifically because the only cases where this is necessary are because of namespace issues.
-                elseif needed ~= "libdl.so" and needed ~= "libc.so" and pspec ~= "/system/lib" then
+                elseif needed ~= "libdl.so" and needed ~= "libc.so" and needed ~= "libm.so" and pspec ~= "/system/lib" then
                     -- check if we already opened it:
                     if dl.loaded_libraries[needed] then
-                        A.LOGVV(log, string.format("         dl.dlopen - needed %s is already loaded", lname))
+                        A.LOGVV(log, string.format("         dl.dlopen - needed %s was already loaded", lname))
                     else
                         -- For Android >= 6.0, the list of safe system libraries is:
                         -- libandroid, libc, libcamera2ndk, libdl, libGLES, libjnigraphics,
@@ -119,21 +124,26 @@ function dl.dlopen(library, load_func, global)
                         A.LOGVV(log, string.format("         dl.dlopen - opening needed %s for %s", needed, lname))
                         dl.dlopen(needed, sys_dlopen, false)
                         -- Flag it as loaded
+                        A.LOGVV(log, string.format("         dl.dlopen - Back from a recursive call on %s for %s", needed, lname))
                         dl.loaded_libraries[lname] = true
                     end
                 end
             end
-            lib.file:close()
             if load_func == sys_dlopen then
-                return load_func(lname, global and true or false)
+                A.LOGVV(log, string.format("dl.dlopen - deferring loading of required %s to sys_dlopen", lname))
+                load_func(lname, global and true or false)
             else
-                A.LOGVV(log, string.format("dl.dlopen - deferring loading of %s to load_func", lname))
-                return load_func(lname)
+                A.LOGVV(log, string.format("dl.dlopen - deferring loading of required %s to load_func", lname))
+                load_func(lname)
             end
+            loaded = true
+            break
         end
     end
 
-    error("could not find library " .. library)
+    if not loaded then
+        error("could not find library " .. library)
+    end
 end
 
 return dl

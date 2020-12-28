@@ -111,7 +111,16 @@ end
 
 -- close file when object is garbage collected
 function Elf:__gc()
-    self.file:close()
+    if self.file ~= nil then
+        self.file:close()
+    end
+end
+
+function Elf.__index:close()
+    if self.file ~= nil then
+        self.file:close()
+        self.file = nil
+    end
 end
 
 -- convenience method that seeks and reads and also casts to an FFI ctype
