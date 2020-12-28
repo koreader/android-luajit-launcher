@@ -108,9 +108,11 @@ function dl.dlopen(library, load_func, depth)
             local lib_needs = lib:dlneeds()
             lib:close()
             for i, needed in ipairs(lib_needs) do
-                -- That's the pspec of *library*, and not of *needed*
-                -- (i.e., we skip loading transitive dependencies of system libraries,
-                -- and not system libraries themselves when they're depedencies of bundled libs).
+                -- That's the pspec of the original *library*, and not of this *needed*
+                -- (i.e., we skip loading transitive dependencies of system libraries
+                -- (whether those are system libs or not),
+                -- but not system libraries themselves when they're depedencies of bundled libs,
+                -- and not when they're the actual library we requested to load).
                 if pspec ~= "/system/lib" then
                     -- For Android >= 6.0, the list of safe system libraries is:
                     -- libandroid, libc, libcamera2ndk, libdl, libGLES, libjnigraphics,
