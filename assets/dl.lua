@@ -6,7 +6,7 @@ c.f., https://android.googlesource.com/platform/bionic/+/refs/heads/master/andro
 
 This is heavily inspired by the lo_dlopen() implementation from
 LibreOffice (see
-http://cgit.freedesktop.org/libreoffice/core/tree/sal/android/lo-bootstrap.c)
+https://cgit.freedesktop.org/libreoffice/core/tree/sal/android/lo-bootstrap.c?id=963c98a65e4eddf179e170ff0bb30e4bfafc6b16)
 and as such:
 
  * This Source Code Form is subject to the terms of the Mozilla Public
