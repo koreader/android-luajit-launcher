@@ -100,6 +100,23 @@ function dl.dlopen(library, load_func, depth)
         end
         if ok then
             A.LOGVV(log, string.format("%"..padding.."sdl.dlopen - %s => %s", "", library, lname))
+            -- Skip loading system libraries (unless we explicitly asked for one, in which case, that's on the caller ;)).
+            -- c.f., https://github.com/koreader/android-luajit-launcher/pull/69
+            -- Note that, technically, for Android >= 6.0, the list of safe system libraries is:
+            -- libandroid, libc, libcamera2ndk, libdl, libGLES, libjnigraphics,
+            -- liblog, libm, libmediandk, libOpenMAXAL, libOpenSLES, libstdc++,
+            -- libvulkan, and libz
+            -- Our current code should *never* hit any non-whitelisted system libs, so, this is basically overkill ;).
+            if depth > 0 and (pspec == "/system/lib" or library == "libdl.so") then
+                -- depth > 0 to allow explicitly loading a system lib
+                -- pspec to reject system libs
+                -- secondary check on libdl, because apparently there are old ROMs out there where it isn't in /sytem/lib ?!
+                A.LOGVV(log, string.format("%"..padding.."sdl.dlopen - skipping %s (system lib)", "", lname))
+                -- We won't load it, so, we don't even need to look at its deps.
+                lib:close()
+                return nil
+            end
+
             depth = depth + 1
             padding = depth * 4
             -- we found a library, now load its requirements
@@ -108,19 +125,8 @@ function dl.dlopen(library, load_func, depth)
             local lib_needs = lib:dlneeds()
             lib:close()
             for i, needed in ipairs(lib_needs) do
-                -- That's the pspec of the original *library*, and not of this *needed*
-                -- (i.e., we skip loading transitive dependencies of system libraries
-                -- (whether those are system libs or not),
-                -- but not system libraries themselves when they're depedencies of bundled libs,
-                -- and not when they're the actual library we requested to load).
-                if pspec ~= "/system/lib" then
-                    -- For Android >= 6.0, the list of safe system libraries is:
-                    -- libandroid, libc, libcamera2ndk, libdl, libGLES, libjnigraphics,
-                    -- liblog, libm, libmediandk, libOpenMAXAL, libOpenSLES, libstdc++,
-                    -- libvulkan, and libz
-                    A.LOGVV(log, string.format("%"..padding.."sdl.dlopen - needed => %s (%d of %d) <= %s", "", needed, i, #lib_needs, lname))
-                    dl.dlopen(needed, sys_dlopen, depth)
-                end
+                A.LOGVV(log, string.format("%"..padding.."sdl.dlopen - needed => %s (%d of %d) <= %s", "", needed, i, #lib_needs, lname))
+                dl.dlopen(needed, sys_dlopen, depth)
             end
             depth = depth - 1
             padding = depth * 4
