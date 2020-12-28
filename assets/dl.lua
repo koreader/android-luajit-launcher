@@ -49,8 +49,6 @@ end
 local dl = {
     -- set this to search in certain directories
     library_path = '/lib/?;/usr/lib/?;/usr/local/lib/?',
-
-    loaded_libraries = {}
 }
 
 local function sys_dlopen(library, global)
@@ -74,8 +72,7 @@ if not given, the system's dlopen() will be used
 if the library name is an absolute path (starting with "/"), then
 the library_path will not be used
 --]]
-function dl.dlopen(library, load_func, global)
-    local loaded
+function dl.dlopen(library, load_func)
     load_func = load_func or sys_dlopen
     A.LOGVV(log, string.format("dl.dlopen on %s", library))
 
@@ -112,38 +109,26 @@ function dl.dlopen(library, load_func, global)
                     sys_dlopen("libluajit.so")
                     -- We do not flag it as loaded, specifically because the only cases where this is necessary are because of namespace issues.
                 elseif needed ~= "libdl.so" and needed ~= "libc.so" and needed ~= "libm.so" and pspec ~= "/system/lib" then
-                    -- check if we already opened it:
-                    if dl.loaded_libraries[needed] then
-                        A.LOGVV(log, string.format("         dl.dlopen - needed %s was already loaded", lname))
-                    else
-                        -- For Android >= 6.0, the list of safe system libraries is:
-                        -- libandroid, libc, libcamera2ndk, libdl, libGLES, libjnigraphics,
-                        -- liblog, libm, libmediandk, libOpenMAXAL, libOpenSLES, libstdc++,
-                        -- libvulkan, and libz
-                        -- However, we have our own dl implementation and don't need the rest.
-                        A.LOGVV(log, string.format("         dl.dlopen - opening needed %s for %s", needed, lname))
-                        dl.dlopen(needed, sys_dlopen, false)
-                        -- Flag it as loaded
-                        A.LOGVV(log, string.format("         dl.dlopen - Back from a recursive call on %s for %s", needed, lname))
-                        dl.loaded_libraries[lname] = true
-                    end
+                    -- For Android >= 6.0, the list of safe system libraries is:
+                    -- libandroid, libc, libcamera2ndk, libdl, libGLES, libjnigraphics,
+                    -- liblog, libm, libmediandk, libOpenMAXAL, libOpenSLES, libstdc++,
+                    -- libvulkan, and libz
+                    -- However, we have our own dl implementation and don't need the rest.
+                    A.LOGVV(log, string.format("         dl.dlopen - opening needed %s for %s", needed, lname))
+                    dl.dlopen(needed, sys_dlopen)
+                    A.LOGVV(log, string.format("         dl.dlopen - Back from a recursive call on %s for %s", needed, lname))
                 end
             end
             if load_func == sys_dlopen then
                 A.LOGVV(log, string.format("dl.dlopen - deferring loading of required %s to sys_dlopen", lname))
-                load_func(lname, global and true or false)
             else
                 A.LOGVV(log, string.format("dl.dlopen - deferring loading of required %s to load_func", lname))
-                load_func(lname)
             end
-            loaded = true
-            break
+            return load_func(lname)
         end
     end
 
-    if not loaded then
-        error("could not find library " .. library)
-    end
+    error("could not find library " .. library)
 end
 
 return dl
