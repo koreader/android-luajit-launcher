@@ -24,7 +24,7 @@ local log = "dlopen"
 
 local C = ffi.C
 
--- There's a bit of heinous hackery going on on 32-bit arches with RTLD_NOW & RTLD_GLOBAL...
+-- There's a bit of heinous hackery going on on 32-bit ABIs with RTLD_NOW & RTLD_GLOBAL...
 -- c.f., https://android.googlesource.com/platform/bionic/+/refs/heads/master/libc/include/dlfcn.h
 if jit.arch:sub(-2) == "64" then
     ffi.cdef[[
