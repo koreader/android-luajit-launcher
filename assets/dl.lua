@@ -14,7 +14,8 @@ and as such:
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
 --]]
 
--- Disable the JIT in this module, to avoid weird and mysterious issues with dlopen (here and in ffi.load)
+-- Disable the JIT in this module, to avoid weird and mysterious issues with dlopen (here and in ffi.load),
+-- as well as the nested loops in dl.dlopen mysteriously breaking early.
 jit.off(true, true)
 
 local ffi = require("ffi")
