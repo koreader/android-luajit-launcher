@@ -1,7 +1,8 @@
 --[[
 A LuaJIT FFI based version of dlopen() which loads dependencies
 first (for implementations of dlopen() lacking that feature, like
-on Android before API 23)
+on Android before API 23,
+c.f., https://android.googlesource.com/platform/bionic/+/refs/heads/master/android-changes-for-ndk-developers.md)
 
 This is heavily inspired by the lo_dlopen() implementation from
 LibreOffice (see
@@ -12,6 +13,9 @@ and as such:
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
 --]]
+
+-- Disable the JIT in this module, in an attempt to avoid weird issues when loading libraries
+jit.off(true, true)
 
 local ffi = require("ffi")
 local A = require("android")
