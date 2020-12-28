@@ -55,8 +55,8 @@ local dl = {
     library_path = '/lib/?;/usr/lib/?;/usr/local/lib/?',
 }
 
-local function sys_dlopen(library, global)
-    A.LOGVV(log, string.format("sys_dlopen - loading library %s (in %s namespace)", library, global and "global" or "local"))
+local function sys_dlopen(library, global, padding)
+    A.LOGVV(log, string.format("%"..padding.."ssys_dlopen - loading library %s (in %s namespace)", "", library, global and "global" or "local"))
     local p = C.dlopen(library, bit.bor(C.RTLD_NOW, global and C.RTLD_GLOBAL or C.RTLD_LOCAL))
     if p == nil then
         local err_msg = C.dlerror()
@@ -98,6 +98,7 @@ function dl.dlopen(library, load_func, depth)
             ok, lib = pcall(Elf.open, lname)
         end
         if ok then
+            A.LOGVV(log, string.format("%"..padding.."sdl.dlopen - library => %s", "", library))
             A.LOGVV(log, string.format("%"..padding.."sdl.dlopen - lname => %s", "", lname))
             A.LOGVV(log, string.format("%"..padding.."sdl.dlopen - pspec => %s", "", pspec))
             depth = depth + 1
@@ -109,6 +110,9 @@ function dl.dlopen(library, load_func, depth)
             local lib_needs = lib:dlneeds()
             lib:close()
             for i, needed in ipairs(lib_needs) do
+                -- That's the pspec of *library*, and not of *needed*
+                -- (i.e., we skip loading transitive dependencies of system libraries,
+                -- and not system libraries themselves when they're depedencies of bundled libs).
                 if pspec ~= "/system/lib" then
                     -- For Android >= 6.0, the list of safe system libraries is:
                     -- libandroid, libc, libcamera2ndk, libdl, libGLES, libjnigraphics,
@@ -122,10 +126,11 @@ function dl.dlopen(library, load_func, depth)
             padding = depth * 4
             if load_func == sys_dlopen then
                 A.LOGVV(log, string.format("%"..padding.."sdl.dlopen - sys_dlopen -> %s", "", lname))
+                return sys_dlopen(lname, false, padding)
             else
                 A.LOGVV(log, string.format("%"..padding.."sdl.dlopen - load_func -> %s", "", lname))
+                return load_func(lname)
             end
-            return load_func(lname)
         end
     end
 
