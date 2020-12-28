@@ -76,8 +76,10 @@ if not given, the system's dlopen() will be used
 if the library name is an absolute path (starting with "/"), then
 the library_path will not be used
 --]]
-function dl.dlopen(library, load_func)
+function dl.dlopen(library, load_func, depth)
     load_func = load_func or sys_dlopen
+    depth = depth or 0
+    local padding = depth * 4
 
     for pspec in string.gmatch(
             library:sub(1, 1) == "/" and "" or dl.library_path,
@@ -96,7 +98,10 @@ function dl.dlopen(library, load_func)
             ok, lib = pcall(Elf.open, lname)
         end
         if ok then
-            A.LOGVV(log, string.format("dl.dlopen - library lname detected %s", lname))
+            A.LOGVV(log, string.format("%"..padding.."sdl.dlopen - lname => %s", "", lname))
+            A.LOGVV(log, string.format("%"..padding.."sdl.dlopen - pspec => %s", "", pspec))
+            depth = depth + 1
+            padding = depth * 4
 
             -- we found a library, now load its requirements
             -- we do _not_ pass the load_func to the cascaded
@@ -109,15 +114,16 @@ function dl.dlopen(library, load_func)
                     -- libandroid, libc, libcamera2ndk, libdl, libGLES, libjnigraphics,
                     -- liblog, libm, libmediandk, libOpenMAXAL, libOpenSLES, libstdc++,
                     -- libvulkan, and libz
-                    A.LOGVV(log, string.format("         dl.dlopen - opening needed %s (%d of %d) for %s", needed, i, #lib_needs, lname))
-                    dl.dlopen(needed, sys_dlopen)
-                    A.LOGVV(log, string.format("         dl.dlopen - Back from a recursive call on needed %s (%d of %d) for %s", needed, i, #lib_needs, lname))
+                    A.LOGVV(log, string.format("%"..padding.."sdl.dlopen - needed => %s (%d of %d) <= %s", "", needed, i, #lib_needs, lname))
+                    dl.dlopen(needed, sys_dlopen, depth)
                 end
             end
+            depth = depth - 1
+            padding = depth * 4
             if load_func == sys_dlopen then
-                A.LOGVV(log, string.format("dl.dlopen - deferring loading of %s to sys_dlopen", lname))
+                A.LOGVV(log, string.format("%"..padding.."sdl.dlopen - sys_dlopen -> %s", "", lname))
             else
-                A.LOGVV(log, string.format("dl.dlopen - deferring loading of %s to load_func", lname))
+                A.LOGVV(log, string.format("%"..padding.."sdl.dlopen - load_func -> %s", "", lname))
             end
             return load_func(lname)
         end
