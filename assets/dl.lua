@@ -78,7 +78,6 @@ the library_path will not be used
 --]]
 function dl.dlopen(library, load_func)
     load_func = load_func or sys_dlopen
-    A.LOGVV(log, string.format("dl.dlopen on %s", library))
 
     for pspec in string.gmatch(
             library:sub(1, 1) == "/" and "" or dl.library_path,
@@ -97,7 +96,7 @@ function dl.dlopen(library, load_func)
             ok, lib = pcall(Elf.open, lname)
         end
         if ok then
-            A.LOGVV(log, string.format("dl.dlopen - library lname detected %s (pspec: %s)", lname, pspec))
+            A.LOGVV(log, string.format("dl.dlopen - library lname detected %s", lname))
 
             -- we found a library, now load its requirements
             -- we do _not_ pass the load_func to the cascaded
@@ -105,28 +104,25 @@ function dl.dlopen(library, load_func)
             local lib_needs = lib:dlneeds()
             lib:close()
             for i, needed in ipairs(lib_needs) do
-                A.LOGVV(log, string.format("dl.dlopen - needed: %s (%d/%d)", needed, i, #lib_needs))
                 if needed == "libluajit.so" then
-                    -- load the luajit-launcher libluajit with sys_dlopen
+                    -- Load our libluajit with sys_dlopen
                     -- This should be mostly unnecessary, except possibly on very old Android versions with an extremely broken linker/loader,
                     -- as we already dlopen luajit w/ RTLD_GLOBAL in the launcher...
-                    sys_dlopen("libluajit.so")
-                    -- We do not flag it as loaded, specifically because the only cases where this is necessary are because of namespace issues.
-                elseif needed ~= "libdl.so" and needed ~= "libc.so" and needed ~= "libm.so" and pspec ~= "/system/lib" then
+                    sys_dlopen("libluajit.so", false)
+                elseif pspec ~= "/system/lib" then
                     -- For Android >= 6.0, the list of safe system libraries is:
                     -- libandroid, libc, libcamera2ndk, libdl, libGLES, libjnigraphics,
                     -- liblog, libm, libmediandk, libOpenMAXAL, libOpenSLES, libstdc++,
                     -- libvulkan, and libz
-                    -- However, we have our own dl implementation and don't need the rest.
-                    A.LOGVV(log, string.format("         dl.dlopen - opening needed %s for %s", needed, lname))
+                    A.LOGVV(log, string.format("         dl.dlopen - opening needed %s (%d of %d) for %s", needed, i, #lib_needs, lname))
                     dl.dlopen(needed, sys_dlopen)
-                    A.LOGVV(log, string.format("         dl.dlopen - Back from a recursive call on %s for %s", needed, lname))
+                    A.LOGVV(log, string.format("         dl.dlopen - Back from a recursive call on needed %s (%d of %d) for %s", needed, i, #lib_needs, lname))
                 end
             end
             if load_func == sys_dlopen then
-                A.LOGVV(log, string.format("dl.dlopen - deferring loading of required %s to sys_dlopen", lname))
+                A.LOGVV(log, string.format("dl.dlopen - deferring loading of %s to sys_dlopen", lname))
             else
-                A.LOGVV(log, string.format("dl.dlopen - deferring loading of required %s to load_func", lname))
+                A.LOGVV(log, string.format("dl.dlopen - deferring loading of %s to load_func", lname))
             end
             return load_func(lname)
         end
