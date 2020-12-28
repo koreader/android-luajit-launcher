@@ -115,8 +115,8 @@ void android_main(struct android_app* state) {
     // The idea is to push the libluajit.so mapping "far" enough away,
     // that LuaJIT then succeeds in mapping mcode area(s) +/- 32MB (on arm, 128 MB on aarch64, 2GB on x86)
     // from lj_vm_exit_handler (c.f., mcode_alloc @ lj_mcode.c)
-    // 128MB ought to be fine.
-    const size_t map_size = 128U * 1024U * 1024U;
+    // ~128MB works out rather well (we're near the top of the allocs, soon after the last [dalvik-non moving space])
+    const size_t map_size = 152U * 1024U * 1024U;
     void* p = mmap(NULL, map_size, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
     if (p == MAP_FAILED) {
         LOGE("%s: error allocating mmap for mcode alloc workaround", TAG);
@@ -134,6 +134,9 @@ void android_main(struct android_app* state) {
     }
     // And free the mmap, its sole purpose is to push libluajit.so away in the virtual memory mappings.
     munmap(p, map_size);
+
+    // Recap where things end up...
+    LOGV("%s: mmap for mcode alloc workaround was @ %p to %p", TAG, p, p + map_size);
 
     // Get all the symbols we'll need now
     lua_State* (*lj_luaL_newstate)(void) = dlsym(luajit, "luaL_newstate");
