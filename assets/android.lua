@@ -1247,6 +1247,10 @@ end
 -- Android specific
 
 -- We need to load libandroid, it's no longer in the global namespace, as we're running under a plain LuaJIT now
+-- NOTE: We haven't overloaded fii.load yet
+--       (and we can't, as our custom implementation depends on libandroid and liblog for logging ^^),
+--       so, we hope that the fact we've kept linking libluajit-launcher against libandroid and liblog will be enough
+--       to satisfy old and broken platforms where dlopen is extra finicky...
 local android_lib_ok, android_lib = pcall(ffi.load, "libandroid.so")
 local android = {
     app = nil,
