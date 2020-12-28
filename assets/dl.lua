@@ -98,12 +98,9 @@ function dl.dlopen(library, load_func, depth)
             ok, lib = pcall(Elf.open, lname)
         end
         if ok then
-            A.LOGVV(log, string.format("%"..padding.."sdl.dlopen - library => %s", "", library))
-            A.LOGVV(log, string.format("%"..padding.."sdl.dlopen - lname => %s", "", lname))
-            A.LOGVV(log, string.format("%"..padding.."sdl.dlopen - pspec => %s", "", pspec))
+            A.LOGVV(log, string.format("%"..padding.."sdl.dlopen - %s => %s", "", library, lname))
             depth = depth + 1
             padding = depth * 4
-
             -- we found a library, now load its requirements
             -- we do _not_ pass the load_func to the cascaded
             -- calls, so those will always use sys_dlopen()
