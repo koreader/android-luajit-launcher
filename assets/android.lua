@@ -1246,29 +1246,30 @@ end
 
 -- Android specific
 
--- We need to load libandroid, it's no longer in the global namespace, as we're running under a plain LuaJIT now
+-- We need to load libandroid, liblog, and the app glue: they're no longer in the global namespace
+-- as we're now running under a plain LuaJIT.
 -- NOTE: We haven't overloaded fii.load yet
 --       (and we can't, as our custom implementation depends on libandroid and liblog for logging ^^),
 --       so, we hope that the fact we've kept linking libluajit-launcher against libandroid and liblog will be enough
 --       to satisfy old and broken platforms where dlopen is extra finicky...
 local android_lib_ok, android_lib = pcall(ffi.load, "libandroid.so")
+local android_log_ok, android_log = pcall(ffi.load, "liblog.so")
+local android_glue_ok, android_glue = pcall(ffi.load, "libluajit-launcher.so")
 local android = {
     app = nil,
     jni = JNI,
     log_name = "luajit-launcher",
     lib = android_lib_ok and android_lib or C,
+    log = android_log_ok and android_log or C,
+    glue = android_glue_ok and android_glue or C,
 }
 
--- Ditto for liblog
-local android_liblog_ok, android_liblog = pcall(ffi.load, "liblog.so")
-local android_log = android_liblog_ok and android_liblog or C
-
 function android.LOG(level, message)
-    android_log.__android_log_print(level, android.log_name, "%s", message)
+    android.log.__android_log_print(level, android.log_name, "%s", message)
 end
 
 function android.LOGVV(tag, message)
-    android_log.__android_log_print(C.ANDROID_LOG_VERBOSE, tag, "%s", message)
+    android.log.__android_log_print(C.ANDROID_LOG_VERBOSE, tag, "%s", message)
 end
 
 function android.LOGV(message)
