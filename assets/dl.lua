@@ -78,13 +78,13 @@ function dl.dlopen(library, load_func, global)
     load_func = load_func or sys_dlopen
 
     for pspec in string.gmatch(
-            library:sub(1,1) == "/" and "" or dl.library_path,
+            library:sub(1, 1) == "/" and "" or dl.library_path,
             "([^;:]+)") do
 
         local lname, matches = string.gsub(pspec, "%?", library)
         if matches == 0 then
-            -- if pathspec does not contain a '?', we do append
-            -- the library name to the pathspec
+            -- if pathspec does not contain a '?',
+            -- we append the library name to the pathspec
             lname = lname .. '/' .. library
         end
 
