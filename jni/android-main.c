@@ -136,9 +136,6 @@ void android_main(struct android_app* state) {
     // And free the mmap, its sole purpose is to push libluajit.so away in the virtual memory mappings.
     munmap(p, map_size);
 
-    // Recap where things end up...
-    LOGV("%s: mmap for mcode alloc workaround was @ %p to %p", TAG, p, p + map_size);
-
     // Get all the symbols we'll need now
     lua_State* (*lj_luaL_newstate)(void) = dlsym(luajit, "luaL_newstate");
     void (*lj_luaL_openlibs)(lua_State*) = dlsym(luajit, "luaL_openlibs");
@@ -147,6 +144,10 @@ void android_main(struct android_app* state) {
     void (*lj_lua_pushlightuserdata)(lua_State*, void*) = dlsym(luajit, "lua_pushlightuserdata");
     int (*lj_lua_pcall)(lua_State *, int, int, int) = dlsym(luajit, "lua_pcall");
     void (*lj_lua_close)(lua_State*) = dlsym(luajit, "lua_close");
+
+    // Recap where things end up...
+    LOGV("%s: mmap for mcode alloc workaround was @ %p to %p", TAG, p, p + map_size);
+    LOGV("%s: LuaJIT is mapped around %p", TAG, lj_lua_pcall);
 
     // Load initial Lua loader from our asset store:
     L = (*lj_luaL_newstate)();
