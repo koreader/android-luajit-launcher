@@ -116,7 +116,7 @@ void android_main(struct android_app* state) {
     // that LuaJIT then succeeds in mapping mcode area(s) +/- 32MB (on arm, 128 MB on aarch64, 2GB on x86)
     // from lj_vm_exit_handler (c.f., mcode_alloc @ lj_mcode.c)
     // ~128MB works out rather well (we're near the top of the allocs, soon after the last [dalvik-non moving space])
-    const size_t map_size = 152U * 1024U * 1024U;
+    const size_t map_size = 168U * 1024U * 1024U;
     void* p = mmap(NULL, map_size, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
     if (p == MAP_FAILED) {
         LOGE("%s: error allocating mmap for mcode alloc workaround", TAG);
