@@ -13,10 +13,8 @@ Java Native Interface (JNI) wrapper.
 
 -- Given that, hope that forcing the allocation of a 512K segment *right now* will succeed...
 -- (LuaJIT defaults are 32, 512 on 32-bit platforms, and 64, 512 otherwise).
---[[
 jit.opt.start("sizemcode=512", "maxmcode=512")
 for _ = 1, 100 do end
---]]
 local ffi = require("ffi")
 
 ffi.cdef[[
