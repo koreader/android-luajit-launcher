@@ -30,7 +30,7 @@ index 655b84c..24cb10e 100644
    MCode *mctop;		/* Top of current mcode area. */
    MCode *mcbot;		/* Bottom of current mcode area. */
 diff --git a/src/lj_mcode.c b/src/lj_mcode.c
-index a5153b2..8db7a98 100644
+index a5153b2..d68cf8b 100644
 --- a/src/lj_mcode.c
 +++ b/src/lj_mcode.c
 @@ -21,7 +21,6 @@
@@ -97,18 +97,54 @@ index a5153b2..8db7a98 100644
    J->mcarea = NULL;
    J->szallmcarea = 0;
    while (mc) {
+@@ -284,6 +294,19 @@ void lj_mcode_free(jit_State *J)
+   }
+ }
+ 
++/* Clear all MCode areas. */
++void lj_mcode_clear(jit_State *J)
++{
++  MCode *mc = J->mcarea;
++  /* We need write access to clear it */
++  mcode_protect(J, MCPROT_GEN);
++  while (mc) {
++    MCode *next = ((MCLink *)mc)->next;
++    memset(mc, 0, ((MCLink *)mc)->size);
++    mc = next;
++  }
++}
++
+ /* -- MCode transactions -------------------------------------------------- */
+ 
+ /* Reserve the remainder of the current MCode area. */
+diff --git a/src/lj_mcode.h b/src/lj_mcode.h
+index 2f31bf5..27f9c83 100644
+--- a/src/lj_mcode.h
++++ b/src/lj_mcode.h
+@@ -17,6 +17,7 @@ LJ_FUNC void lj_mcode_sync(void *start, void *end);
+ #include "lj_jit.h"
+ 
+ LJ_FUNC void lj_mcode_free(jit_State *J);
++LJ_FUNC void lj_mcode_clear(jit_State *J);
+ LJ_FUNC MCode *lj_mcode_reserve(jit_State *J, MCode **lim);
+ LJ_FUNC void lj_mcode_commit(jit_State *J, MCode *m);
+ LJ_FUNC void lj_mcode_abort(jit_State *J);
 diff --git a/src/lj_trace.c b/src/lj_trace.c
-index a398089..b16afe7 100644
+index a398089..a936fe1 100644
 --- a/src/lj_trace.c
 +++ b/src/lj_trace.c
-@@ -298,6 +298,7 @@ int lj_trace_flushall(lua_State *L)
+@@ -297,8 +297,9 @@ int lj_trace_flushall(lua_State *L)
+   J->freetrace = 0;
    /* Clear penalty cache. */
    memset(J->penalty, 0, sizeof(J->penalty));
-   /* Free the whole machine code and invalidate all exit stub groups. */
-+  LJ_LOG("will free mcode");
-   lj_mcode_free(J);
+-  /* Free the whole machine code and invalidate all exit stub groups. */
+-  lj_mcode_free(J);
++  /* Clear the whole machine code and invalidate all exit stub groups. */
++  LJ_LOG("will clear mcode");
++  lj_mcode_clear(J);
    memset(J->exitstubgroup, 0, sizeof(J->exitstubgroup));
    lj_vmevent_send(L, TRACE,
+     setstrV(L, L->top++, lj_str_newlit(L, "flush"));
 @@ -361,6 +362,7 @@ void lj_trace_freestate(global_State *g)
  		 "trace still allocated");
    }
