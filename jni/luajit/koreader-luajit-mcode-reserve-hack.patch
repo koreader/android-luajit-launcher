@@ -1,8 +1,18 @@
 diff --git a/src/lj_def.h b/src/lj_def.h
-index cfe18c4..6e18fb2 100644
+index cfe18c4..bbec79b 100644
 --- a/src/lj_def.h
 +++ b/src/lj_def.h
-@@ -45,6 +45,14 @@ typedef unsigned int uintptr_t;
+@@ -37,14 +37,24 @@ typedef unsigned int uint32_t;
+ typedef unsigned long long uint64_t;
+ typedef int intptr_t;
+ typedef unsigned int uintptr_t;
++typedef unsigned char bool;
+ #else
+ #include <stdint.h>
++#include <stdbool.h>
+ #endif
+ 
+ /* Needed everywhere. */
  #include <string.h>
  #include <stdlib.h>
  
