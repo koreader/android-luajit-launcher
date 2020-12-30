@@ -81,12 +81,6 @@ static void mmap_free(void *p, size_t sz)
     munmap(p, sz);
 }
 
-#if defined __LP64__
-    #define mmap_validptr(p)	(p)
-#else
-    #define mmap_validptr(p)	((p) && (uintptr_t)(p) < 0xffff0000)
-#endif
-
 #define ALIGN_UP(x, a)                                                                                       \
 ({                                                                                                           \
     __auto_type mask__ = (a) -1U;                                                                            \
@@ -203,12 +197,12 @@ void android_main(struct android_app* state) {
     for (size_t i = 0U; i < ((1U << jumprange) / 0x10000u); i++) {
         LOGV("%s: iter %d of %u", TAG, i, ((1U << jumprange) / 0x10000u));
         uintptr_t mapping = hint;
-        if (mmap_validptr(hint)) {
+        if (hint != NULL) {
             LOGV("%s: requesting mmap @ %p", TAG, (void *) hint);
             void *p = mmap_at(hint, reserve_size);
             mapping = (uintptr_t) p;
 
-            if (mmap_validptr(p) &&
+            if (p != NULL &&
                ((uintptr_t)p + reserve_size - lj_mcarea_target < range || lj_mcarea_target - (uintptr_t)p < range)) {
                 // Got it!
                 reserve_start = p;
