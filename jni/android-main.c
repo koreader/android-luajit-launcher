@@ -180,6 +180,8 @@ void android_main(struct android_app* state) {
     LOGV("%s: mmap for mcode alloc workaround was @ %p to %p", TAG, p, p + map_size);
     uintptr_t lj_mcarea_target = (uintptr_t) lj_lua_pcall & ~(uintptr_t) 0xffff;
     LOGV("%s: LuaJIT is mapped around %p", TAG, (void *) lj_mcarea_target);
+    uintptr_t g_lj_mcarea_reserve = dlsym(luajit, "g_lj_mcarea_reserve");
+    LOGV("%s: LuaJIT reserve mcarea is @ %p", TAG, (void *) g_lj_mcarea_reserve);
 
     // NOTE: On some devices, reserving larger areas has a tendency to punt the mapping off to wherever (generally too far),
     //       (and then repeatedly get the same address or around that first one),

@@ -76,7 +76,7 @@ index 655b84c..24cb10e 100644
    MCode *mctop;		/* Top of current mcode area. */
    MCode *mcbot;		/* Bottom of current mcode area. */
 diff --git a/src/lj_mcode.c b/src/lj_mcode.c
-index a5153b2..66942a5 100644
+index a5153b2..07ca0ca 100644
 --- a/src/lj_mcode.c
 +++ b/src/lj_mcode.c
 @@ -21,7 +21,6 @@
@@ -126,7 +126,7 @@ index a5153b2..66942a5 100644
    munmap(p, sz);
  }
  
-@@ -210,13 +216,27 @@ static void *mcode_alloc(jit_State *J, size_t sz)
+@@ -210,13 +216,30 @@ static void *mcode_alloc(jit_State *J, size_t sz)
    uintptr_t target = (uintptr_t)(void *)lj_vm_exit_handler & ~(uintptr_t)0xffff;
  #endif
    const uintptr_t range = (1u << (LJ_TARGET_JUMPRANGE-1)) - (1u << 21);
@@ -141,8 +141,11 @@ index a5153b2..66942a5 100644
 +  bool fixed = false;
 +  if (!J->mcarea && !J->lastmcarea) {
 +    // Don't bother computing it if we're not going to use it ;)
++    /*
 +    char* reserved_mcarea = getenv("LUAJIT_MCAREA_START");
 +    reserve = (uintptr_t) strtoul(reserved_mcarea, NULL, 16);
++    */
++    reserve = (uintptr_t) &g_lj_mcarea_reserve;
 +    // We'll only use it once, and we *know* it's here, so we can use MAP_FIXED
 +    fixed = true;
 +  }
@@ -157,7 +160,7 @@ index a5153b2..66942a5 100644
  
        if (mcode_validptr(p) &&
  	  ((uintptr_t)p + sz - target < range || target - (uintptr_t)p < range))
-@@ -226,8 +246,10 @@ static void *mcode_alloc(jit_State *J, size_t sz)
+@@ -226,8 +249,10 @@ static void *mcode_alloc(jit_State *J, size_t sz)
      /* Next try probing 64K-aligned pseudo-random addresses. */
      do {
        hint = lj_prng_u64(&J2G(J)->prng) & ((1u<<LJ_TARGET_JUMPRANGE)-0x10000);
@@ -168,7 +171,7 @@ index a5153b2..66942a5 100644
    }
    lj_trace_err(J, LJ_TRERR_MCODEAL);  /* Give up. OS probably ignores hints? */
    return NULL;
-@@ -240,14 +262,14 @@ static void *mcode_alloc(jit_State *J, size_t sz)
+@@ -240,14 +265,14 @@ static void *mcode_alloc(jit_State *J, size_t sz)
  {
  #if defined(__OpenBSD__) || LJ_TARGET_UWP
    /* Allow better executable memory allocation for OpenBSD W^X mode. */
@@ -185,7 +188,7 @@ index a5153b2..66942a5 100644
  #endif
  }
  
-@@ -275,6 +297,7 @@ static void mcode_allocarea(jit_State *J)
+@@ -275,6 +300,7 @@ static void mcode_allocarea(jit_State *J)
  void lj_mcode_free(jit_State *J)
  {
    MCode *mc = J->mcarea;
@@ -193,7 +196,7 @@ index a5153b2..66942a5 100644
    J->mcarea = NULL;
    J->szallmcarea = 0;
    while (mc) {
-@@ -284,11 +307,29 @@ void lj_mcode_free(jit_State *J)
+@@ -284,11 +310,29 @@ void lj_mcode_free(jit_State *J)
    }
  }
  
@@ -223,7 +226,7 @@ index a5153b2..66942a5 100644
    if (!J->mcarea)
      mcode_allocarea(J);
    else
-@@ -353,6 +394,7 @@ void lj_mcode_limiterr(jit_State *J, size_t need)
+@@ -353,6 +397,7 @@ void lj_mcode_limiterr(jit_State *J, size_t need)
    sizemcode = (size_t)J->param[JIT_P_sizemcode] << 10;
    sizemcode = (sizemcode + LJ_PAGESIZE-1) & ~(size_t)(LJ_PAGESIZE - 1);
    maxmcode = (size_t)J->param[JIT_P_maxmcode] << 10;
@@ -287,3 +290,17 @@ index a398089..bacca91 100644
    return 0;
  }
  
+diff --git a/src/ljamalg.c b/src/ljamalg.c
+index 56585e6..9c77132 100644
+--- a/src/ljamalg.c
++++ b/src/ljamalg.c
+@@ -18,6 +18,9 @@
+ #include "lua.h"
+ #include "lauxlib.h"
+ 
++/* Android hack: make a page-aligned 1MB hole we can use for the mcode area... */
++unsigned char g_lj_mcarea_reserve[1U<<20U] __attribute__((aligned(4096))) = { 0 };
++
+ #include "lj_assert.c"
+ #include "lj_gc.c"
+ #include "lj_err.c"
