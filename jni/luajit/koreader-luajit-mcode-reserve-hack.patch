@@ -11,14 +11,14 @@ index ecaf8a2..8af78dc 100644
        lj_err_caller(L, LJ_ERR_NOGCMM);
      if (tvisbool(o)) {
 diff --git a/src/lj_asm.c b/src/lj_asm.c
-index aae7b5b..038da4b 100644
+index aae7b5b..b675e96 100644
 --- a/src/lj_asm.c
 +++ b/src/lj_asm.c
 @@ -137,6 +137,7 @@ static LJ_AINLINE void checkmclim(ASMState *as)
        as->curins+1-REF_BIAS, ir->o, ir->op1-REF_BIAS, ir->op2-REF_BIAS);
    }
  #endif
-+  LJ_LOG("as->mcp: %p // as->mclim: %p", (void *) as->mcp, (void *) as->mclim);
++  //LJ_LOG("as->mcp: %p // as->mclim: %p", (void *) as->mcp, (void *) as->mclim);
    if (LJ_UNLIKELY(as->mcp < as->mclim)) asm_mclimit(as);
  #ifdef LUA_USE_ASSERT
    as->mcp_prev = as->mcp;
@@ -244,7 +244,7 @@ index 2f31bf5..27f9c83 100644
  LJ_FUNC void lj_mcode_commit(jit_State *J, MCode *m);
  LJ_FUNC void lj_mcode_abort(jit_State *J);
 diff --git a/src/lj_trace.c b/src/lj_trace.c
-index a398089..b84d70c 100644
+index a398089..bacca91 100644
 --- a/src/lj_trace.c
 +++ b/src/lj_trace.c
 @@ -297,8 +297,9 @@ int lj_trace_flushall(lua_State *L)
@@ -281,7 +281,7 @@ index a398089..b84d70c 100644
      return trace_downrec(J);
 -  else if (e == LJ_TRERR_MCODEAL)
 +  else if (e == LJ_TRERR_MCODEAL) {
-+   LJ_LOG("LJ_TRERR_MCODEAL -> flush");
++    LJ_LOG("LJ_TRERR_MCODEAL -> flush");
      lj_trace_flushall(L);
 +  }
    return 0;
