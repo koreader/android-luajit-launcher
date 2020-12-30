@@ -1,0 +1,119 @@
+diff --git a/src/lj_def.h b/src/lj_def.h
+index cfe18c4..6e18fb2 100644
+--- a/src/lj_def.h
++++ b/src/lj_def.h
+@@ -45,6 +45,14 @@ typedef unsigned int uintptr_t;
+ #include <string.h>
+ #include <stdlib.h>
+ 
++/* KOReader hack: debug logging */
++#ifdef __ANDROID__
++	#include <android/log.h>
++	#define LJ_LOG(fmt, ...) ((void)__android_log_print(ANDROID_LOG_VERBOSE, "LuaJIT", "%s: " fmt, __FUNCTION__, ##__VA_ARGS__))
++#else
++	#define LJ_LOG(fmt, ...) (fprintf(stderr, "[LuaJIT] [%s] " fmt "\n", __FUNCTION__, ##__VA_ARGS__))
++#endif
++
+ /* Various VM limits. */
+ #define LJ_MAX_MEM32	0x7fffff00	/* Max. 32 bit memory allocation. */
+ #define LJ_MAX_MEM64	((uint64_t)1<<47)  /* Max. 64 bit memory allocation. */
+diff --git a/src/lj_jit.h b/src/lj_jit.h
+index 655b84c..24cb10e 100644
+--- a/src/lj_jit.h
++++ b/src/lj_jit.h
+@@ -490,6 +490,7 @@ typedef struct jit_State {
+   BCIns patchins;	/* Instruction for pending re-patch. */
+ 
+   int mcprot;		/* Protection of current mcode area. */
++  MCode *lastmcarea;	/* Base of previous mcode area. */
+   MCode *mcarea;	/* Base of current mcode area. */
+   MCode *mctop;		/* Top of current mcode area. */
+   MCode *mcbot;		/* Bottom of current mcode area. */
+diff --git a/src/lj_mcode.c b/src/lj_mcode.c
+index a5153b2..8db7a98 100644
+--- a/src/lj_mcode.c
++++ b/src/lj_mcode.c
+@@ -21,7 +21,6 @@
+ #endif
+ 
+ /* -- OS-specific functions ----------------------------------------------- */
+-
+ #if LJ_HASJIT || LJ_HASFFI
+ 
+ /* Define this if you want to run LuaJIT with Valgrind. */
+@@ -100,17 +99,19 @@ static int mcode_setprot(void *p, size_t sz, DWORD prot)
+ 
+ static void *mcode_alloc_at(jit_State *J, uintptr_t hint, size_t sz, int prot)
+ {
+-  void *p = mmap((void *)hint, sz, prot, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
++  void *p = mmap((void *)hint, sz, prot, MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED, -1, 0);
+   if (p == MAP_FAILED) {
+     if (!hint) lj_trace_err(J, LJ_TRERR_MCODEAL);
+     p = NULL;
+   }
++  LJ_LOG("mapped at @ %p (%zuK)", p, sz / 1024U);
+   return p;
+ }
+ 
+ static void mcode_free(jit_State *J, void *p, size_t sz)
+ {
+   UNUSED(J);
++  LJ_LOG("unmapped at @ %p", p);
+   munmap(p, sz);
+ }
+ 
+@@ -210,8 +211,14 @@ static void *mcode_alloc(jit_State *J, size_t sz)
+   uintptr_t target = (uintptr_t)(void *)lj_vm_exit_handler & ~(uintptr_t)0xffff;
+ #endif
+   const uintptr_t range = (1u << (LJ_TARGET_JUMPRANGE-1)) - (1u << 21);
++  LJ_LOG("target is @ %p", (void *) target);
++  LJ_LOG("range is %p", (void *) range);
+   /* First try a contiguous area below the last one. */
+-  uintptr_t hint = J->mcarea ? (uintptr_t)J->mcarea - sz : 0;
++  uintptr_t reserve = 0;
++  char* reserved_mcarea = getenv("LUAJIT_MCAREA_START");
++  reserve = (uintptr_t) strtoul(reserved_mcarea, NULL, 16);
++  uintptr_t hint = J->mcarea ? (uintptr_t)J->mcarea - sz : J->lastmcarea ? (uintptr_t)J->lastmcarea : reserve;
++  LJ_LOG("original hint is @ %p (mcarea: %p / last: %p / reserve: %p)", (void *) hint, (void *) J->mcarea, (void *) J->lastmcarea, (void *) reserve);
+   int i;
+   /* Limit probing iterations, depending on the available pool size. */
+   for (i = 0; i < LJ_TARGET_JUMPRANGE; i++) {
+@@ -226,8 +233,10 @@ static void *mcode_alloc(jit_State *J, size_t sz)
+     /* Next try probing 64K-aligned pseudo-random addresses. */
+     do {
+       hint = lj_prng_u64(&J2G(J)->prng) & ((1u<<LJ_TARGET_JUMPRANGE)-0x10000);
++      LJ_LOG("random hint is @ %p", (void *) hint);
+     } while (!(hint + sz < range+range));
+     hint = target + hint - range;
++    LJ_LOG("requesting malloc @ %p (iter: %d)", (void *) hint, i);
+   }
+   lj_trace_err(J, LJ_TRERR_MCODEAL);  /* Give up. OS probably ignores hints? */
+   return NULL;
+@@ -275,6 +284,7 @@ static void mcode_allocarea(jit_State *J)
+ void lj_mcode_free(jit_State *J)
+ {
+   MCode *mc = J->mcarea;
++  J->lastmcarea = J->mcarea;
+   J->mcarea = NULL;
+   J->szallmcarea = 0;
+   while (mc) {
+diff --git a/src/lj_trace.c b/src/lj_trace.c
+index a398089..b16afe7 100644
+--- a/src/lj_trace.c
++++ b/src/lj_trace.c
+@@ -298,6 +298,7 @@ int lj_trace_flushall(lua_State *L)
+   /* Clear penalty cache. */
+   memset(J->penalty, 0, sizeof(J->penalty));
+   /* Free the whole machine code and invalidate all exit stub groups. */
++  LJ_LOG("will free mcode");
+   lj_mcode_free(J);
+   memset(J->exitstubgroup, 0, sizeof(J->exitstubgroup));
+   lj_vmevent_send(L, TRACE,
+@@ -361,6 +362,7 @@ void lj_trace_freestate(global_State *g)
+ 		 "trace still allocated");
+   }
+ #endif
++  LJ_LOG("will free mcode");
+   lj_mcode_free(J);
+   lj_mem_freevec(g, J->snapmapbuf, J->sizesnapmap, SnapEntry);
+   lj_mem_freevec(g, J->snapbuf, J->sizesnap, SnapShot);
