@@ -7,11 +7,17 @@ Java Native Interface (JNI) wrapper.
 -- Attempt to grab the full maxmcode region in one go on startup,
 -- to avoid mcode_alloc failures later on at runtime...
 -- c.f., https://www.freelists.org/post/luajit/Android-performance-drop-moving-from-LuaJIT201-LuaJIT202
--- The other, more impactful part of the workaround (mmap + dlopen) mentioned earlier in that thread
--- is implemented in jni/android-main.c ;).
+-- For optimal behavior, this relies on a few LuaJIT hacks:
+--   * Ensuring a flush doesn't unmap the mcarea, but only clears it,
+--     because when the mcarea is filled, LuaJIT flushes it,
+--     and the Lua blitter can happily require more than 256K to flip a CRe page,
+--     so flushes are common.
+--   * Reserving a 1MB area inside LuaJIT's address space via a global array
+--   * Making the first mcode_alloc use the address of this global via MAP_FIXED
+-- c.f., koreader-luajit-mcode-reserve-hack.patch
 -- Upstream issue: https://github.com/LuaJIT/LuaJIT/issues/285
 
--- Given that, hope that forcing the allocation of a 512K segment *right now* will succeed...
+-- Given that, force the allocation of a single 512K segment *right now*.
 -- (LuaJIT defaults are 32, 512 on 32-bit platforms, and 64, 512 otherwise).
 jit.opt.start("sizemcode=512", "maxmcode=512")
 for _ = 1, 100 do end

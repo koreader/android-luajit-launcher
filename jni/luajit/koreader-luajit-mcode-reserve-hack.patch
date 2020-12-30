@@ -76,18 +76,10 @@ index 655b84c..24cb10e 100644
    MCode *mctop;		/* Top of current mcode area. */
    MCode *mcbot;		/* Bottom of current mcode area. */
 diff --git a/src/lj_mcode.c b/src/lj_mcode.c
-index a5153b2..07ca0ca 100644
+index a5153b2..a8e6c1e 100644
 --- a/src/lj_mcode.c
 +++ b/src/lj_mcode.c
-@@ -21,7 +21,6 @@
- #endif
- 
- /* -- OS-specific functions ----------------------------------------------- */
--
- #if LJ_HASJIT || LJ_HASFFI
- 
- /* Define this if you want to run LuaJIT with Valgrind. */
-@@ -65,8 +64,9 @@ void lj_mcode_sync(void *start, void *end)
+@@ -65,8 +65,9 @@ void lj_mcode_sync(void *start, void *end)
  #define MCPROT_RX	PAGE_EXECUTE_READ
  #define MCPROT_RWX	PAGE_EXECUTE_READWRITE
  
@@ -98,7 +90,7 @@ index a5153b2..07ca0ca 100644
    void *p = LJ_WIN_VALLOC((void *)hint, sz,
  			  MEM_RESERVE|MEM_COMMIT|MEM_TOP_DOWN, prot);
    if (!p && !hint)
-@@ -98,19 +98,25 @@ static int mcode_setprot(void *p, size_t sz, DWORD prot)
+@@ -98,19 +99,25 @@ static int mcode_setprot(void *p, size_t sz, DWORD prot)
  #define MCPROT_RX	(PROT_READ|PROT_EXEC)
  #define MCPROT_RWX	(PROT_READ|PROT_WRITE|PROT_EXEC)
  
@@ -126,7 +118,7 @@ index a5153b2..07ca0ca 100644
    munmap(p, sz);
  }
  
-@@ -210,13 +216,30 @@ static void *mcode_alloc(jit_State *J, size_t sz)
+@@ -210,13 +217,28 @@ static void *mcode_alloc(jit_State *J, size_t sz)
    uintptr_t target = (uintptr_t)(void *)lj_vm_exit_handler & ~(uintptr_t)0xffff;
  #endif
    const uintptr_t range = (1u << (LJ_TARGET_JUMPRANGE-1)) - (1u << 21);
@@ -135,18 +127,16 @@ index a5153b2..07ca0ca 100644
 +  LJ_LOG("target is @ %p", (void *) target);
 +  LJ_LOG("range is %p", (void *) range);
 +  /* First try a contiguous area below the last one,
-+   * then if we unmapped it once, the last address we were mapped to,
-+   * and otherwise, the area reserved by the launcher. */
++   * then try the same address as the last area we unmapped
++   * (this usually happens after a flush (either explicit or because the mcarea was filled),
++   * but we patch flush to clear the region instead of unmapping it now),
++   * and otherwise, use the area we reserved inside the amalgam's address space
++   * (it's currently hard-coded at 1MB, which is twice the default maxmcode). */
 +  uintptr_t reserve = 0;
 +  bool fixed = false;
 +  if (!J->mcarea && !J->lastmcarea) {
-+    // Don't bother computing it if we're not going to use it ;)
-+    /*
-+    char* reserved_mcarea = getenv("LUAJIT_MCAREA_START");
-+    reserve = (uintptr_t) strtoul(reserved_mcarea, NULL, 16);
-+    */
 +    reserve = (uintptr_t) &g_lj_mcarea_reserve;
-+    // We'll only use it once, and we *know* it's here, so we can use MAP_FIXED
++    // We'll only use it once, and we *know* it's there, so use MAP_FIXED
 +    fixed = true;
 +  }
 +  uintptr_t hint = J->mcarea ? (uintptr_t)J->mcarea - sz : J->lastmcarea ? (uintptr_t)J->lastmcarea : reserve;
@@ -160,7 +150,7 @@ index a5153b2..07ca0ca 100644
  
        if (mcode_validptr(p) &&
  	  ((uintptr_t)p + sz - target < range || target - (uintptr_t)p < range))
-@@ -226,8 +249,10 @@ static void *mcode_alloc(jit_State *J, size_t sz)
+@@ -226,8 +248,10 @@ static void *mcode_alloc(jit_State *J, size_t sz)
      /* Next try probing 64K-aligned pseudo-random addresses. */
      do {
        hint = lj_prng_u64(&J2G(J)->prng) & ((1u<<LJ_TARGET_JUMPRANGE)-0x10000);
@@ -171,7 +161,7 @@ index a5153b2..07ca0ca 100644
    }
    lj_trace_err(J, LJ_TRERR_MCODEAL);  /* Give up. OS probably ignores hints? */
    return NULL;
-@@ -240,14 +265,14 @@ static void *mcode_alloc(jit_State *J, size_t sz)
+@@ -240,14 +264,14 @@ static void *mcode_alloc(jit_State *J, size_t sz)
  {
  #if defined(__OpenBSD__) || LJ_TARGET_UWP
    /* Allow better executable memory allocation for OpenBSD W^X mode. */
@@ -188,7 +178,7 @@ index a5153b2..07ca0ca 100644
  #endif
  }
  
-@@ -275,6 +300,7 @@ static void mcode_allocarea(jit_State *J)
+@@ -275,6 +299,7 @@ static void mcode_allocarea(jit_State *J)
  void lj_mcode_free(jit_State *J)
  {
    MCode *mc = J->mcarea;
@@ -196,7 +186,7 @@ index a5153b2..07ca0ca 100644
    J->mcarea = NULL;
    J->szallmcarea = 0;
    while (mc) {
-@@ -284,11 +310,29 @@ void lj_mcode_free(jit_State *J)
+@@ -284,11 +309,28 @@ void lj_mcode_free(jit_State *J)
    }
  }
  
@@ -211,10 +201,9 @@ index a5153b2..07ca0ca 100644
 +    memset(mc, 0, ((MCLink *)mc)->size);
 +    mc = next;
 +  }
-+  /* c.f., mcode_allocarea */
++  /* Tell the JIT that it has the full area available to generate code, c.f., mcode_allocarea */
 +  J->mctop = (MCode *)((char *)J->mcarea + J->szmcarea);
 +  J->mcbot = (MCode *)((char *)J->mcarea + sizeof(MCLink));
-+  //mcode_protect(J, MCPROT_RUN);
 +}
 +
  /* -- MCode transactions -------------------------------------------------- */
@@ -222,11 +211,11 @@ index a5153b2..07ca0ca 100644
  /* Reserve the remainder of the current MCode area. */
  MCode *lj_mcode_reserve(jit_State *J, MCode **lim)
  {
-+  LJ_LOG("J->mcarea: %p // lim: %p // mctop: %p // mcbot: %p", (void *) J->mcarea, (void *) *lim, (void *) J->mctop, (void *) J->mcbot);
++  //LJ_LOG("J->mcarea: %p // lim: %p // mctop: %p // mcbot: %p", (void *) J->mcarea, (void *) *lim, (void *) J->mctop, (void *) J->mcbot);
    if (!J->mcarea)
      mcode_allocarea(J);
    else
-@@ -353,6 +397,7 @@ void lj_mcode_limiterr(jit_State *J, size_t need)
+@@ -353,6 +395,7 @@ void lj_mcode_limiterr(jit_State *J, size_t need)
    sizemcode = (size_t)J->param[JIT_P_sizemcode] << 10;
    sizemcode = (sizemcode + LJ_PAGESIZE-1) & ~(size_t)(LJ_PAGESIZE - 1);
    maxmcode = (size_t)J->param[JIT_P_maxmcode] << 10;

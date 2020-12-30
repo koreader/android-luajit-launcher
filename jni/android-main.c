@@ -139,20 +139,6 @@ void android_main(struct android_app* state) {
         goto quit;
     }
 
-    // Shitty workaround for mcode allocation issues
-    // c.f., android.lua for more details.
-    // The idea is to push the libluajit.so mapping "far" enough away,
-    // that LuaJIT then succeeds in mapping mcode area(s) +/- 32MB (on arm, 128 MB on aarch64, 2GB on x86)
-    // from lj_vm_exit_handler (c.f., mcode_alloc @ lj_mcode.c)
-    // ~128MB works out rather well (we're near the top of the allocs, soon after the last [dalvik-non moving space])
-
-    const size_t map_size = 144U * 1024U * 1024U;
-    void* p = mmap(NULL, map_size, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_NORESERVE, -1, 0);
-    if (p == MAP_FAILED) {
-        LOGE("%s: error allocating mmap for mcode alloc workaround", TAG);
-        goto quit;
-    }
-
     // Resolve everything *now*, and put the symbols in the global scope, much like if we had linked it statically.
     // This is necessary in order to be able to require Lua/C modules, c.f., LuaJIT docs on embedding.
     // (Beware, Android's dynamic linker has a long history of weird and broken behavior,
@@ -164,9 +150,6 @@ void android_main(struct android_app* state) {
         dlerror();
     }
 
-    // And free the mmap, its sole purpose is to push libluajit.so away in the virtual memory mappings.
-    munmap(p, map_size);
-
     // Get all the symbols we'll need now
     lua_State* (*lj_luaL_newstate)(void) = dlsym(luajit, "luaL_newstate");
     void (*lj_luaL_openlibs)(lua_State*) = dlsym(luajit, "luaL_openlibs");
@@ -176,71 +159,11 @@ void android_main(struct android_app* state) {
     int (*lj_lua_pcall)(lua_State *, int, int, int) = dlsym(luajit, "lua_pcall");
     void (*lj_lua_close)(lua_State*) = dlsym(luajit, "lua_close");
 
-    // Recap where things end up...
-    LOGV("%s: mmap for mcode alloc workaround was @ %p to %p", TAG, p, p + map_size);
+    // Recap where things end up for our mcode_alloc shenanigans...
     uintptr_t lj_mcarea_target = (uintptr_t) lj_lua_pcall & ~(uintptr_t) 0xffff;
     LOGV("%s: LuaJIT is mapped around %p", TAG, (void *) lj_mcarea_target);
     uintptr_t g_lj_mcarea_reserve = dlsym(luajit, "g_lj_mcarea_reserve");
-    LOGV("%s: LuaJIT reserve mcarea is @ %p", TAG, (void *) g_lj_mcarea_reserve);
-
-    // NOTE: On some devices, reserving larger areas has a tendency to punt the mapping off to wherever (generally too far),
-    //       (and then repeatedly get the same address or around that first one),
-    //       so, keep it small. We mostly want a 512K block anyway ;).
-    // Reserve a nearly 1MB area near that (based on LuaJIT's lj_mcode.c and the arm jumprange: +-2^25 = +-32MB)
-    void * reserve_start = NULL;
-    const size_t jumprange = 25U;
-    const size_t reserve_size = 0xf0000u;
-
-    // Half the jumprange minus some 2MB of change
-    const uintptr_t range = (1U << (jumprange - 1U)) - (1U << 21U);
-    uintptr_t hint = lj_mcarea_target;
-    uintptr_t shift = 0U;
-    // Limit probing iterations, depending on the jump range and the iteration shift
-    for (size_t i = 0U; i < ((1U << jumprange) / 0x10000u); i++) {
-        LOGV("%s: iter %d of %u", TAG, i, ((1U << jumprange) / 0x10000u));
-        uintptr_t mapping = hint;
-        if (hint != NULL) {
-            LOGV("%s: requesting mmap @ %p", TAG, (void *) hint);
-            void *p = mmap_at(hint, reserve_size);
-            mapping = (uintptr_t) p;
-
-            if (p != NULL &&
-               ((uintptr_t)p + reserve_size - lj_mcarea_target < range || lj_mcarea_target - (uintptr_t)p < range)) {
-                // Got it!
-                reserve_start = p;
-                LOGV("%s: Match @ %p", TAG, p);
-                break;
-            }
-            if (p) {
-                // Free badly placed area.
-                LOGV("%s: OOR @ %p", TAG, p);
-                mmap_free(p, reserve_size);
-            }
-        } else {
-            LOGV("%s: invalid hint @ %p", TAG, (void *) hint);
-        }
-        // Next, try probing 64K away (alternate up and down)...
-        shift += 0x10000u;
-        LOGV("%s: shift hint by %p", TAG, (void *) shift);
-        if ((i & 0x01u) == 0u) {
-            hint = ALIGN_UP(lj_mcarea_target + shift, 0x10000u);
-        } else {
-            hint = ALIGN_DOWN(lj_mcarea_target - shift, 0x10000u);
-        }
-        LOGV("%s: next hint @ %p", TAG, (void *) hint);
-    }
-
-    // We failed to reserve a suitable mcode region...
-    if (reserve_start == NULL) {
-        LOGE("%s: failed to reserve an mcode region", TAG);
-        goto quit;
-    } else {
-        // FIXME: Compute effective range
-        LOGV("%s: Reserved an mcode area for LuaJIT @ %p", TAG, (void *) reserve_start);
-        char reserve_str[64] = { 0 };
-        snprintf(reserve_str, sizeof(reserve_str) - 1U, "%p", (void *) reserve_start);
-        setenv("LUAJIT_MCAREA_START", reserve_str, 1);
-    }
+    LOGV("%s: LuaJIT reserved mcarea is @ %p", TAG, (void *) g_lj_mcarea_reserve);
 
     // Load initial Lua loader from our asset store:
     L = (*lj_luaL_newstate)();
