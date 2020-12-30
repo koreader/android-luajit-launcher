@@ -20,7 +20,9 @@ Java Native Interface (JNI) wrapper.
 -- Given that, force the allocation of a single 512K segment *right now*.
 -- (LuaJIT defaults are 32, 512 on 32-bit platforms, and 64, 512 otherwise).
 jit.opt.start("sizemcode=512", "maxmcode=512")
+-- This ensures a trace is generated, which requires an mcarea alloc ;).
 for _ = 1, 100 do end
+
 local ffi = require("ffi")
 
 ffi.cdef[[
