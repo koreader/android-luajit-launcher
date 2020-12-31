@@ -20,10 +20,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 #include <stdlib.h>
-#include <sys/mman.h>
 
 #ifdef KO_DLOPEN_LUAJIT
 #  include <dlfcn.h>
+#  include <sys/mman.h>
 #endif
 
 #include <android/log.h>
