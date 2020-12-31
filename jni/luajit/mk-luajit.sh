@@ -15,9 +15,9 @@ HOST_ARCH="*"
 # In case of failure, it means we should try to apply the patch.
 function do_patch() {
     local patch_file="${1}"
-    if ! patch -R -p1 -N --dry-run <"${patch_file}" >/dev/null 2>&1; then
+    if ! patch -R -p2 -N --dry-run <"${patch_file}" >/dev/null 2>&1; then
         # Now patch for real.
-        if ! patch -p1 -N <"${patch_file}"; then
+        if ! patch -p2 -N <"${patch_file}"; then
             exit $?
         fi
     fi
