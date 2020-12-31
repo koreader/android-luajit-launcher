@@ -73,7 +73,7 @@ index 655b84c..1fa6292 100644
    MCode *mctop;		/* Top of current mcode area. */
    MCode *mcbot;		/* Bottom of current mcode area. */
 diff --git a/src/lj_mcode.c b/src/lj_mcode.c
-index a5153b2..5dc9531 100644
+index a5153b2..a4c9d20 100644
 --- a/src/lj_mcode.c
 +++ b/src/lj_mcode.c
 @@ -98,19 +98,25 @@ static int mcode_setprot(void *p, size_t sz, DWORD prot)
@@ -104,7 +104,7 @@ index a5153b2..5dc9531 100644
    munmap(p, sz);
  }
  
-@@ -210,24 +216,47 @@ static void *mcode_alloc(jit_State *J, size_t sz)
+@@ -210,24 +216,48 @@ static void *mcode_alloc(jit_State *J, size_t sz)
    uintptr_t target = (uintptr_t)(void *)lj_vm_exit_handler & ~(uintptr_t)0xffff;
  #endif
    const uintptr_t range = (1u << (LJ_TARGET_JUMPRANGE-1)) - (1u << 21);
@@ -120,9 +120,10 @@ index a5153b2..5dc9531 100644
 +   * (it's currently hard-coded at 1MB, which is twice the default maxmcode). */
 +  uintptr_t reserve = 0;
 +  bool fixed = false;
++  /* Only use the reserve for the very first alloc */
 +  if (!J->mcarea && !J->lastmcarea) {
 +    reserve = (uintptr_t) &g_lj_mcarea_reserve;
-+    // We'll only use it once, and we *know* it's there, so use MAP_FIXED
++    /* We'll only use it once, and we *know* it's there, so use MAP_FIXED */
 +    fixed = true;
 +  }
 +  uintptr_t hint = J->mcarea ? (uintptr_t)J->mcarea - sz : J->lastmcarea ? (uintptr_t)J->lastmcarea : reserve;
@@ -158,7 +159,7 @@ index a5153b2..5dc9531 100644
    }
    lj_trace_err(J, LJ_TRERR_MCODEAL);  /* Give up. OS probably ignores hints? */
    return NULL;
-@@ -240,14 +269,14 @@ static void *mcode_alloc(jit_State *J, size_t sz)
+@@ -240,14 +270,14 @@ static void *mcode_alloc(jit_State *J, size_t sz)
  {
  #if defined(__OpenBSD__) || LJ_TARGET_UWP
    /* Allow better executable memory allocation for OpenBSD W^X mode. */
@@ -175,7 +176,7 @@ index a5153b2..5dc9531 100644
  #endif
  }
  
-@@ -275,6 +304,7 @@ static void mcode_allocarea(jit_State *J)
+@@ -275,6 +305,7 @@ static void mcode_allocarea(jit_State *J)
  void lj_mcode_free(jit_State *J)
  {
    MCode *mc = J->mcarea;
@@ -183,7 +184,7 @@ index a5153b2..5dc9531 100644
    J->mcarea = NULL;
    J->szallmcarea = 0;
    while (mc) {
-@@ -284,11 +314,28 @@ void lj_mcode_free(jit_State *J)
+@@ -284,11 +315,28 @@ void lj_mcode_free(jit_State *J)
    }
  }
  
@@ -212,7 +213,7 @@ index a5153b2..5dc9531 100644
    if (!J->mcarea)
      mcode_allocarea(J);
    else
-@@ -353,6 +400,7 @@ void lj_mcode_limiterr(jit_State *J, size_t need)
+@@ -353,6 +401,7 @@ void lj_mcode_limiterr(jit_State *J, size_t need)
    sizemcode = (size_t)J->param[JIT_P_sizemcode] << 10;
    sizemcode = (sizemcode + LJ_PAGESIZE-1) & ~(size_t)(LJ_PAGESIZE - 1);
    maxmcode = (size_t)J->param[JIT_P_maxmcode] << 10;
