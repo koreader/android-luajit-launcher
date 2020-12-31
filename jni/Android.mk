@@ -26,9 +26,10 @@ include $(LOCAL_PATH)/luajit/Android.mk
 include $(CLEAR_VARS)
 
 # Dummy target that will ensure we ship the LuaJIT shared library
-LOCAL_PATH := $(BASE_PATH)
-include $(LOCAL_PATH)/foo/Android.mk
-include $(CLEAR_VARS)
+# NOTE: Only necessary if we want to dlopen LuaJIT, which isn't the default ;).
+#LOCAL_PATH := $(BASE_PATH)
+#include $(LOCAL_PATH)/foo/Android.mk
+#include $(CLEAR_VARS)
 
 # lib7z shared library
 LOCAL_PATH := $(BASE_PATH)
@@ -40,11 +41,11 @@ LOCAL_PATH := $(BASE_PATH)
 LOCAL_MODULE := luajit-launcher
 LOCAL_SRC_FILES := android-main.c
 LOCAL_STATIC_LIBRARIES := android_native_app_glue
-# NOTE: By default, we link against LuaJIT directly.
-#LOCAL_SHARED_LIBRARIES := luajit
-# But, we can also dlopen it, as a remnant of mcode_alloc workaround experimentations...
-LOCAL_C_INCLUDES := $(LOCAL_PATH)/luajit/build/$(TARGET_ARCH_ABI)/include
-LOCAL_CFLAGS += -DKO_DLOPEN_LUAJIT
+# NOTE: By default, we link against the shared LuaJIT library directly.
+LOCAL_SHARED_LIBRARIES := luajit
+# But, we can also dlopen it, as a remnant of mcode_alloc experimentations...
+#LOCAL_C_INCLUDES := $(LOCAL_PATH)/luajit/build/$(TARGET_ARCH_ABI)/include
+#LOCAL_CFLAGS += -DKO_DLOPEN_LUAJIT
 
 # Adding libraries that we plan to use via FFI here isn't strictly necessary anymore
 LOCAL_EXPORT_LDLIBS := -lm -ldl -llog -landroid
