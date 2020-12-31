@@ -139,6 +139,19 @@ void android_main(struct android_app* state) {
         goto quit;
     }
 
+    // Shitty workaround for mcode allocation issues
+    // c.f., android.lua for more details.
+    // The idea is to push the libluajit.so mapping "far" enough away,
+    // that LuaJIT then succeeds in mapping mcode area(s) +/- 32MB (on arm, 128 MB on aarch64, 2GB on x86)
+    // from lj_vm_exit_handler (c.f., mcode_alloc @ lj_mcode.c)
+    // ~128MB works out rather well on the API levels where this actually achieves something (while it doesn't even faze some).
+    const size_t map_size = 144U * 1024U * 1024U;
+    void* p = mmap(NULL, map_size, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_NORESERVE, -1, 0);
+    if (p == MAP_FAILED) {
+        LOGE("%s: error allocating mmap for mcode alloc workaround", TAG);
+        goto quit;
+    }
+
     // Resolve everything *now*, and put the symbols in the global scope, much like if we had linked it statically.
     // This is necessary in order to be able to require Lua/C modules, c.f., LuaJIT docs on embedding.
     // (Beware, Android's dynamic linker has a long history of weird and broken behavior,
@@ -150,6 +163,9 @@ void android_main(struct android_app* state) {
         dlerror();
     }
 
+    // And free the mmap, its sole purpose is to push libluajit.so away in the virtual memory mappings.
+    munmap(p, map_size);
+
     // Get all the symbols we'll need now
     lua_State* (*lj_luaL_newstate)(void) = dlsym(luajit, "luaL_newstate");
     void (*lj_luaL_openlibs)(lua_State*) = dlsym(luajit, "luaL_openlibs");
@@ -160,6 +176,7 @@ void android_main(struct android_app* state) {
     void (*lj_lua_close)(lua_State*) = dlsym(luajit, "lua_close");
 
     // Recap where things end up for our mcode_alloc shenanigans...
+    LOGV("%s: mmap for mcode alloc workaround mmap was @ %p to %p", TAG, p, p + map_size);
     uintptr_t lj_mcarea_target = (uintptr_t) lj_lua_pcall & ~(uintptr_t) 0xffff;
     LOGV("%s: LuaJIT is mapped around %p", TAG, (void *) lj_mcarea_target);
     uintptr_t g_lj_mcarea_reserve = dlsym(luajit, "g_lj_mcarea_reserve");
