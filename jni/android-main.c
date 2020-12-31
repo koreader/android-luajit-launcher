@@ -179,8 +179,8 @@ void android_main(struct android_app* state) {
     LOGV("%s: mmap for mcode alloc workaround mmap was @ %p to %p", TAG, p, p + map_size);
     uintptr_t lj_mcarea_target = (uintptr_t) lj_lua_pcall & ~(uintptr_t) 0xffff;
     LOGV("%s: LuaJIT is mapped around %p", TAG, (void *) lj_mcarea_target);
-    uintptr_t g_lj_mcarea_reserve = dlsym(luajit, "g_lj_mcarea_reserve");
-    LOGV("%s: LuaJIT reserved mcarea is @ %p", TAG, (void *) g_lj_mcarea_reserve);
+    void* g_lj_mcarea_reserve = dlsym(luajit, "g_lj_mcarea_reserve");
+    LOGV("%s: LuaJIT reserved mcarea is @ %p", TAG, g_lj_mcarea_reserve);
 
     // Load initial Lua loader from our asset store:
     L = (*lj_luaL_newstate)();
