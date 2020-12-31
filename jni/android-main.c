@@ -20,8 +20,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 #include <stdlib.h>
-#include <dlfcn.h>
 #include <sys/mman.h>
+
+#ifdef KO_DLOPEN_LUAJIT
+#  include <dlfcn.h>
+#endif
 
 #include <android/log.h>
 #include <android/asset_manager.h>
@@ -63,35 +66,6 @@ static void handle_cmd(struct android_app* app, int32_t cmd) {
             break;
     }
 }
-
-static void *mmap_at(uintptr_t hint, size_t sz)
-{
-    void *p = mmap((void *)hint, sz, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_NORESERVE, -1, 0);
-    if (p == MAP_FAILED) {
-        p = NULL;
-    }
-    LOGV("%s: got an mmap @ %p", TAG, p);
-    return p;
-}
-
-
-static void mmap_free(void *p, size_t sz)
-{
-    LOGV("%s: unmapped @ %p", TAG, p);
-    munmap(p, sz);
-}
-
-#define ALIGN_UP(x, a)                                                                                       \
-({                                                                                                           \
-    __auto_type mask__ = (a) -1U;                                                                            \
-    (((x) + (mask__)) & ~(mask__));                                                                          \
-})
-
-#define ALIGN_DOWN(x, a)                                                                                     \
-({                                                                                                           \
-    __auto_type mask__ = (a) -1U;                                                                            \
-    ((x) & ~(mask__));                                                                                       \
-})
 
 void android_main(struct android_app* state) {
     lua_State *L;
@@ -139,14 +113,15 @@ void android_main(struct android_app* state) {
         goto quit;
     }
 
-    // Shitty workaround for mcode allocation issues
+#ifdef KO_DLOPEN_LUAJIT
+    // Crappy workaround for mcode allocation issues
     // c.f., android.lua for more details.
     // The idea is to push the libluajit.so mapping "far" enough away,
     // that LuaJIT then succeeds in mapping mcode area(s) +/- 32MB (on arm, 128 MB on aarch64, 2GB on x86)
     // from lj_vm_exit_handler (c.f., mcode_alloc @ lj_mcode.c)
     // ~128MB works out rather well on the API levels where this actually achieves something (while it doesn't even faze some).
     const size_t map_size = 144U * 1024U * 1024U;
-    void* p = mmap(NULL, map_size, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    void* p = mmap(NULL, map_size, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_NORESERVE, -1, 0);
     if (p == MAP_FAILED) {
         LOGE("%s: error allocating mmap for mcode alloc workaround", TAG);
         goto quit;
@@ -203,6 +178,29 @@ void android_main(struct android_app* state) {
     }
 
     (*lj_lua_close)(L);
+#else
+    // Load initial Lua loader from our asset store:
+    L = luaL_newstate();
+    luaL_openlibs(L);
+
+    status = luaL_loadbuffer(L, (const char*) buf, (size_t) bufsize, LOADER_ASSET);
+    AAsset_close(luaCode);
+    if (status) {
+        LOGE("%s: error loading file: %s", TAG, lua_tostring(L, -1));
+        goto quit;
+    }
+
+    // pass the android_app state to Lua land:
+    lua_pushlightuserdata(L, state);
+
+    status = lua_pcall(L, 1, LUA_MULTRET, 0);
+    if (status) {
+        LOGE("%s: failed to run script: %s", TAG, lua_tostring(L, -1));
+        goto quit;
+    }
+
+    lua_close(L);
+#endif
 
 quit:
     LOGE("%s: Stopping due to previous errors", TAG);
