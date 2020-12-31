@@ -23,14 +23,11 @@ index aae7b5b..b675e96 100644
  #ifdef LUA_USE_ASSERT
    as->mcp_prev = as->mcp;
 diff --git a/src/lj_def.h b/src/lj_def.h
-index cfe18c4..bbec79b 100644
+index cfe18c4..f8de601 100644
 --- a/src/lj_def.h
 +++ b/src/lj_def.h
-@@ -37,14 +37,24 @@ typedef unsigned int uint32_t;
- typedef unsigned long long uint64_t;
- typedef int intptr_t;
+@@ -39,12 +39,21 @@ typedef int intptr_t;
  typedef unsigned int uintptr_t;
-+typedef unsigned char bool;
  #else
  #include <stdint.h>
 +#include <stdbool.h>
@@ -64,33 +61,22 @@ index 1d0ff54..8ef29a3 100644
      } else {
        if (!(mode & LUAJIT_MODE_ON))
 diff --git a/src/lj_jit.h b/src/lj_jit.h
-index 655b84c..24cb10e 100644
+index 655b84c..1fa6292 100644
 --- a/src/lj_jit.h
 +++ b/src/lj_jit.h
 @@ -490,6 +490,7 @@ typedef struct jit_State {
    BCIns patchins;	/* Instruction for pending re-patch. */
  
    int mcprot;		/* Protection of current mcode area. */
-+  MCode *lastmcarea;	/* Base of previous mcode area. */
++  MCode *lastmcarea;	/* Base of last unmapped mcode area (i.e., the previous one). */
    MCode *mcarea;	/* Base of current mcode area. */
    MCode *mctop;		/* Top of current mcode area. */
    MCode *mcbot;		/* Bottom of current mcode area. */
 diff --git a/src/lj_mcode.c b/src/lj_mcode.c
-index a5153b2..6716aa6 100644
+index a5153b2..5dc9531 100644
 --- a/src/lj_mcode.c
 +++ b/src/lj_mcode.c
-@@ -65,8 +65,9 @@ void lj_mcode_sync(void *start, void *end)
- #define MCPROT_RX	PAGE_EXECUTE_READ
- #define MCPROT_RWX	PAGE_EXECUTE_READWRITE
- 
--static void *mcode_alloc_at(jit_State *J, uintptr_t hint, size_t sz, DWORD prot)
-+static void *mcode_alloc_at(jit_State *J, uintptr_t hint, size_t sz, DWORD prot, bool fixed)
- {
-+  UNUSED(fixed);
-   void *p = LJ_WIN_VALLOC((void *)hint, sz,
- 			  MEM_RESERVE|MEM_COMMIT|MEM_TOP_DOWN, prot);
-   if (!p && !hint)
-@@ -98,19 +99,25 @@ static int mcode_setprot(void *p, size_t sz, DWORD prot)
+@@ -98,19 +98,25 @@ static int mcode_setprot(void *p, size_t sz, DWORD prot)
  #define MCPROT_RX	(PROT_READ|PROT_EXEC)
  #define MCPROT_RWX	(PROT_READ|PROT_WRITE|PROT_EXEC)
  
@@ -118,7 +104,7 @@ index a5153b2..6716aa6 100644
    munmap(p, sz);
  }
  
-@@ -210,24 +217,47 @@ static void *mcode_alloc(jit_State *J, size_t sz)
+@@ -210,24 +216,47 @@ static void *mcode_alloc(jit_State *J, size_t sz)
    uintptr_t target = (uintptr_t)(void *)lj_vm_exit_handler & ~(uintptr_t)0xffff;
  #endif
    const uintptr_t range = (1u << (LJ_TARGET_JUMPRANGE-1)) - (1u << 21);
@@ -172,7 +158,7 @@ index a5153b2..6716aa6 100644
    }
    lj_trace_err(J, LJ_TRERR_MCODEAL);  /* Give up. OS probably ignores hints? */
    return NULL;
-@@ -240,14 +270,14 @@ static void *mcode_alloc(jit_State *J, size_t sz)
+@@ -240,14 +269,14 @@ static void *mcode_alloc(jit_State *J, size_t sz)
  {
  #if defined(__OpenBSD__) || LJ_TARGET_UWP
    /* Allow better executable memory allocation for OpenBSD W^X mode. */
@@ -189,7 +175,7 @@ index a5153b2..6716aa6 100644
  #endif
  }
  
-@@ -275,6 +305,7 @@ static void mcode_allocarea(jit_State *J)
+@@ -275,6 +304,7 @@ static void mcode_allocarea(jit_State *J)
  void lj_mcode_free(jit_State *J)
  {
    MCode *mc = J->mcarea;
@@ -197,7 +183,7 @@ index a5153b2..6716aa6 100644
    J->mcarea = NULL;
    J->szallmcarea = 0;
    while (mc) {
-@@ -284,11 +315,28 @@ void lj_mcode_free(jit_State *J)
+@@ -284,11 +314,28 @@ void lj_mcode_free(jit_State *J)
    }
  }
  
@@ -212,7 +198,7 @@ index a5153b2..6716aa6 100644
 +    memset(mc, 0, ((MCLink *)mc)->size);
 +    mc = next;
 +  }
-+  /* Tell the JIT that it has the full area available to generate code, c.f., mcode_allocarea */
++  /* Tell the JIT that it once again has the full area available to generate code in, c.f., mcode_allocarea */
 +  J->mctop = (MCode *)((char *)J->mcarea + J->szmcarea);
 +  J->mcbot = (MCode *)((char *)J->mcarea + sizeof(MCLink));
 +}
@@ -226,7 +212,7 @@ index a5153b2..6716aa6 100644
    if (!J->mcarea)
      mcode_allocarea(J);
    else
-@@ -353,6 +401,7 @@ void lj_mcode_limiterr(jit_State *J, size_t need)
+@@ -353,6 +400,7 @@ void lj_mcode_limiterr(jit_State *J, size_t need)
    sizemcode = (size_t)J->param[JIT_P_sizemcode] << 10;
    sizemcode = (sizemcode + LJ_PAGESIZE-1) & ~(size_t)(LJ_PAGESIZE - 1);
    maxmcode = (size_t)J->param[JIT_P_maxmcode] << 10;
