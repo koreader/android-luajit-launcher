@@ -109,6 +109,7 @@ function dl.dlopen(library, load_func, depth)
             -- Our current code should *never* hit any non-whitelisted system libs, so, this is basically overkill ;).
             if depth > 0 and (pspec == "/system/lib" or library == "libdl.so") then
                 -- depth > 0 to allow explicitly loading a system lib
+                -- (because this might have genuine use cases, as some early API levels do not put DT_NEEDED libraries into the global namespace)
                 -- pspec to reject system libs
                 -- secondary check on libdl, because apparently there are old ROMs out there where it isn't in /sytem/lib ?!
                 A.LOGVV(log, string.format("%"..padding.."sdl.dlopen - skipping %s (system lib)", "", lname))
