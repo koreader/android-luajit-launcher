@@ -77,10 +77,15 @@ update:
 	@echo "using sdk in path $(ANDROID_SDK_FULLPATH)"
 	@echo "using ndk in path $(ANDROID_NDK_FULLPATH)"
 
+build-luajit-debug:
+	@echo "Building LuaJIT for $(ANDROID_FULL_ARCH) (debug)"
+	cd jni/luajit && \
+		./mk-luajit.sh "$(ANDROID_FULL_ARCH)" "debug"
+
 build-luajit:
 	@echo "Building LuaJIT for $(ANDROID_FULL_ARCH)"
 	cd jni/luajit && \
-		./mk-luajit.sh $(ANDROID_FULL_ARCH)
+		./mk-luajit.sh "$(ANDROID_FULL_ARCH)"
 
 prepare: update
 	@echo "Building LuaJIT for all supported ABIs"
@@ -90,7 +95,7 @@ prepare: update
 		./mk-luajit.sh clean && \
 		./mk-luajit.sh armeabi-v7a
 
-debug: update build-luajit
+debug: update build-luajit-debug
 	@echo "Building $(APPNAME) debug APK: Version $(NAME), release $(VERSION), flavor $(FLAVOR)"
 	./gradlew -PversName=$(NAME) -PversCode=$(VERSION) -PprojectName=$(APPNAME) app:$(BUILD_TASK)Debug
 	mkdir -p bin/
