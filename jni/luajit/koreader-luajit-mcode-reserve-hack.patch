@@ -1,7 +1,7 @@
 diff --git a/src/lj_def.h b/src/lj_def.h
 index cfe18c4..5b71dfc 100644
---- a/src/lj_def.h
-+++ b/src/lj_def.h
+--- a/luajit/src/lj_def.h
++++ b/luajit/src/lj_def.h
 @@ -39,6 +39,7 @@ typedef int intptr_t;
  typedef unsigned int uintptr_t;
  #else
@@ -12,8 +12,8 @@ index cfe18c4..5b71dfc 100644
  /* Needed everywhere. */
 diff --git a/src/lj_jit.h b/src/lj_jit.h
 index 655b84c..1fa6292 100644
---- a/src/lj_jit.h
-+++ b/src/lj_jit.h
+--- a/luajit/src/lj_jit.h
++++ b/luajit/src/lj_jit.h
 @@ -490,6 +490,7 @@ typedef struct jit_State {
    BCIns patchins;	/* Instruction for pending re-patch. */
  
@@ -24,8 +24,8 @@ index 655b84c..1fa6292 100644
    MCode *mcbot;		/* Bottom of current mcode area. */
 diff --git a/src/lj_mcode.c b/src/lj_mcode.c
 index a5153b2..1043daa 100644
---- a/src/lj_mcode.c
-+++ b/src/lj_mcode.c
+--- a/luajit/src/lj_mcode.c
++++ b/luajit/src/lj_mcode.c
 @@ -98,9 +98,13 @@ static int mcode_setprot(void *p, size_t sz, DWORD prot)
  #define MCPROT_RX	(PROT_READ|PROT_EXEC)
  #define MCPROT_RWX	(PROT_READ|PROT_WRITE|PROT_EXEC)
@@ -136,8 +136,8 @@ index a5153b2..1043daa 100644
  /* Reserve the remainder of the current MCode area. */
 diff --git a/src/lj_mcode.h b/src/lj_mcode.h
 index 2f31bf5..27f9c83 100644
---- a/src/lj_mcode.h
-+++ b/src/lj_mcode.h
+--- a/luajit/src/lj_mcode.h
++++ b/luajit/src/lj_mcode.h
 @@ -17,6 +17,7 @@ LJ_FUNC void lj_mcode_sync(void *start, void *end);
  #include "lj_jit.h"
  
@@ -148,8 +148,8 @@ index 2f31bf5..27f9c83 100644
  LJ_FUNC void lj_mcode_abort(jit_State *J);
 diff --git a/src/lj_trace.c b/src/lj_trace.c
 index a398089..e70756c 100644
---- a/src/lj_trace.c
-+++ b/src/lj_trace.c
+--- a/luajit/src/lj_trace.c
++++ b/luajit/src/lj_trace.c
 @@ -297,8 +297,8 @@ int lj_trace_flushall(lua_State *L)
    J->freetrace = 0;
    /* Clear penalty cache. */
@@ -174,8 +174,8 @@ index a398089..e70756c 100644
  
 diff --git a/src/ljamalg.c b/src/ljamalg.c
 index 56585e6..9c77132 100644
---- a/src/ljamalg.c
-+++ b/src/ljamalg.c
+--- a/luajit/src/ljamalg.c
++++ b/luajit/src/ljamalg.c
 @@ -18,6 +18,9 @@
  #include "lua.h"
  #include "lauxlib.h"
