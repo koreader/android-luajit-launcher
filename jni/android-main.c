@@ -146,7 +146,7 @@ void android_main(struct android_app* state) {
     // from lj_vm_exit_handler (c.f., mcode_alloc @ lj_mcode.c)
     // ~128MB works out rather well on the API levels where this actually achieves something (while it doesn't even faze some).
     const size_t map_size = 144U * 1024U * 1024U;
-    void* p = mmap(NULL, map_size, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_NORESERVE, -1, 0);
+    void* p = mmap(NULL, map_size, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
     if (p == MAP_FAILED) {
         LOGE("%s: error allocating mmap for mcode alloc workaround", TAG);
         goto quit;
