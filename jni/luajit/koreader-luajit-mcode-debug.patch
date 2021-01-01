@@ -55,7 +55,7 @@ index 1d0ff54..8ef29a3 100644
      } else {
        if (!(mode & LUAJIT_MODE_ON))
 diff --git a/src/lj_mcode.c b/src/lj_mcode.c
-index 3f6a684..7f63ca0 100644
+index 3f6a684..8ff7da6 100644
 --- a/src/lj_mcode.c
 +++ b/src/lj_mcode.c
 @@ -109,12 +109,14 @@ static void *mcode_alloc_at(jit_State *J, uintptr_t hint, size_t sz, int prot, b
@@ -105,7 +105,7 @@ index 3f6a684..7f63ca0 100644
        mcode_protfail(J);
      /* Don't touch the MCLink struct */
      memset(mc + sizeof(MCLink), 0, size - sizeof(MCLink));
-+    LJ_LOG("Cleared %zuK of link %p (next: %p)", size / 1024U, mc, next);
++    LJ_LOG("cleared %zuK @ %p (next: %p)", size / 1024U, mc, next);
      mc = next;
    }
    /* Update the protection cache */
