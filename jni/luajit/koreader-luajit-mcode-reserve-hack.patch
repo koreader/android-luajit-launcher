@@ -23,7 +23,7 @@ index 655b84c..1fa6292 100644
    MCode *mctop;		/* Top of current mcode area. */
    MCode *mcbot;		/* Bottom of current mcode area. */
 diff --git a/src/lj_mcode.c b/src/lj_mcode.c
-index a5153b2..798a570 100644
+index a5153b2..3f6a684 100644
 --- a/src/lj_mcode.c
 +++ b/src/lj_mcode.c
 @@ -98,9 +98,13 @@ static int mcode_setprot(void *p, size_t sz, DWORD prot)
@@ -111,7 +111,7 @@ index a5153b2..798a570 100644
    J->mcarea = NULL;
    J->szallmcarea = 0;
    while (mc) {
-@@ -284,6 +308,29 @@ void lj_mcode_free(jit_State *J)
+@@ -284,6 +308,27 @@ void lj_mcode_free(jit_State *J)
    }
  }
  
@@ -125,10 +125,8 @@ index a5153b2..798a570 100644
 +    /* We need write access to clear it */
 +    if (LJ_UNLIKELY(mcode_setprot(mc, size, MCPROT_GEN)))
 +      mcode_protfail(J);
-+    memset(mc, 0, size);
-+    /* Restore the MCLink metadata */
-+    ((MCLink *)mc)->next = next;
-+    ((MCLink *)mc)->size = size;
++    /* Don't touch the MCLink struct */
++    memset(mc + sizeof(MCLink), 0, size - sizeof(MCLink));
 +    mc = next;
 +  }
 +  /* Update the protection cache */
