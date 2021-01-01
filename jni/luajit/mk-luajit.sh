@@ -27,10 +27,10 @@ do_patch "koreader-luajit-makefile-tweaks.patch"
 do_patch "koreader-luajit-mcode-reserve-hack.patch"
 
 # In debug builds, we patch LuaJIT some more to grok what happens with mcode allocations
-#if [[ "$2" == "debug" ]]; then
+if [[ "$2" == "debug" ]]; then
     do_patch "koreader-luajit-mcode-debug.patch"
     EXTRA_LIBS="-landroid -llog"
-#fi
+fi
 
 function check_NDK() {
     [[ -n $NDK ]] || export NDK=/opt/android-ndk
