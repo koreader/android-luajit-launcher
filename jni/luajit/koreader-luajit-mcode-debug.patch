@@ -55,7 +55,7 @@ index 1d0ff54..8ef29a3 100644
      } else {
        if (!(mode & LUAJIT_MODE_ON))
 diff --git a/src/lj_mcode.c b/src/lj_mcode.c
-index 3f6a684..ea0c2a3 100644
+index 3f6a684..7f63ca0 100644
 --- a/src/lj_mcode.c
 +++ b/src/lj_mcode.c
 @@ -109,12 +109,14 @@ static void *mcode_alloc_at(jit_State *J, uintptr_t hint, size_t sz, int prot, b
@@ -101,7 +101,15 @@ index 3f6a684..ea0c2a3 100644
    }
    lj_trace_err(J, LJ_TRERR_MCODEAL);  /* Give up. OS probably ignores hints? */
    return NULL;
-@@ -334,6 +341,7 @@ void lj_mcode_clear(jit_State *J)
+@@ -320,6 +327,7 @@ void lj_mcode_clear(jit_State *J)
+       mcode_protfail(J);
+     /* Don't touch the MCLink struct */
+     memset(mc + sizeof(MCLink), 0, size - sizeof(MCLink));
++    LJ_LOG("Cleared %zuK of link %p (next: %p)", size / 1024U, mc, next);
+     mc = next;
+   }
+   /* Update the protection cache */
+@@ -334,6 +342,7 @@ void lj_mcode_clear(jit_State *J)
  /* Reserve the remainder of the current MCode area. */
  MCode *lj_mcode_reserve(jit_State *J, MCode **lim)
  {
@@ -109,7 +117,7 @@ index 3f6a684..ea0c2a3 100644
    if (!J->mcarea)
      mcode_allocarea(J);
    else
-@@ -398,6 +406,7 @@ void lj_mcode_limiterr(jit_State *J, size_t need)
+@@ -398,6 +407,7 @@ void lj_mcode_limiterr(jit_State *J, size_t need)
    sizemcode = (size_t)J->param[JIT_P_sizemcode] << 10;
    sizemcode = (sizemcode + LJ_PAGESIZE-1) & ~(size_t)(LJ_PAGESIZE - 1);
    maxmcode = (size_t)J->param[JIT_P_maxmcode] << 10;
