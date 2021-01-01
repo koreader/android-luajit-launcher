@@ -55,7 +55,7 @@ index 1d0ff54..8ef29a3 100644
      } else {
        if (!(mode & LUAJIT_MODE_ON))
 diff --git a/src/lj_mcode.c b/src/lj_mcode.c
-index e7eb95e..66d753b 100644
+index e7eb95e..668f500 100644
 --- a/src/lj_mcode.c
 +++ b/src/lj_mcode.c
 @@ -109,17 +109,20 @@ static void *mcode_alloc_at(jit_State *J, uintptr_t hint, size_t sz, int prot, b
@@ -115,7 +115,32 @@ index e7eb95e..66d753b 100644
    }
    lj_trace_err(J, LJ_TRERR_MCODEAL);  /* Give up. OS probably ignores hints? */
    return NULL;
-@@ -321,6 +330,7 @@ void lj_mcode_clear(jit_State *J)
+@@ -291,6 +300,7 @@ static void mcode_allocarea(jit_State *J)
+   J->mcbot = (MCode *)((char *)J->mcarea + sizeof(MCLink));
+   ((MCLink *)J->mcarea)->next = oldarea;
+   ((MCLink *)J->mcarea)->size = sz;
++  LJ_LOG("Setting ((MCLink *)J->mcarea)->size to %zu (mcarea: %p / szmcarea: %zu / size: %zu)", sz, J->mcarea, J->szmcarea, ((MCLink *)J->mcarea)->size);
+   J->szallmcarea += sz;
+ }
+ 
+@@ -312,15 +322,22 @@ void lj_mcode_free(jit_State *J)
+ void lj_mcode_clear(jit_State *J)
+ {
+   MCode *mc = J->mcarea;
++  LJ_LOG("mc: %p (mcarea: %p)", mc, J->mcarea);
+   while (mc) {
+     MCode *next = ((MCLink *)mc)->next;
++    size_t size = ((MCLink *)mc)->size;
++    LJ_LOG("size: %zu / next: %p", size, next);
+     /* We need write access to clear it */
+-    if (LJ_UNLIKELY(mcode_setprot(mc, ((MCLink *)mc)->size, MCPROT_GEN)))
++    if (LJ_UNLIKELY(mcode_setprot(mc, size, MCPROT_GEN)))
+       mcode_protfail(J);
+-    memset(mc, 0, ((MCLink *)mc)->size);
++    memset(mc, 0, size);
++    /* Restore the MCLink metadata */
++    ((MCLink *)mc)->next = next;
++    ((MCLink *)mc)->size = size;
      mc = next;
    }
    /* Update the protection cache */
@@ -123,7 +148,7 @@ index e7eb95e..66d753b 100644
    J->mcprot = MCPROT_GEN;
    /* Tell the JIT that it once again has the full area available to generate code in, c.f., mcode_allocarea */
    J->mctop = (MCode *)((char *)J->mcarea + J->szmcarea);
-@@ -332,6 +342,7 @@ void lj_mcode_clear(jit_State *J)
+@@ -332,6 +349,7 @@ void lj_mcode_clear(jit_State *J)
  /* Reserve the remainder of the current MCode area. */
  MCode *lj_mcode_reserve(jit_State *J, MCode **lim)
  {
@@ -131,7 +156,7 @@ index e7eb95e..66d753b 100644
    if (!J->mcarea)
      mcode_allocarea(J);
    else
-@@ -396,6 +407,7 @@ void lj_mcode_limiterr(jit_State *J, size_t need)
+@@ -396,6 +414,7 @@ void lj_mcode_limiterr(jit_State *J, size_t need)
    sizemcode = (size_t)J->param[JIT_P_sizemcode] << 10;
    sizemcode = (sizemcode + LJ_PAGESIZE-1) & ~(size_t)(LJ_PAGESIZE - 1);
    maxmcode = (size_t)J->param[JIT_P_maxmcode] << 10;
