@@ -23,10 +23,10 @@ index aae7b5b..b675e96 100644
  #ifdef LUA_USE_ASSERT
    as->mcp_prev = as->mcp;
 diff --git a/src/lj_def.h b/src/lj_def.h
-index 5b71dfc..f8de601 100644
+index 5b71dfc..1a52020 100644
 --- a/src/lj_def.h
 +++ b/src/lj_def.h
-@@ -46,6 +46,14 @@ typedef unsigned int uintptr_t;
+@@ -46,6 +46,15 @@ typedef unsigned int uintptr_t;
  #include <string.h>
  #include <stdlib.h>
  
@@ -35,6 +35,7 @@ index 5b71dfc..f8de601 100644
 +	#include <android/log.h>
 +	#define LJ_LOG(fmt, ...) ((void)__android_log_print(ANDROID_LOG_VERBOSE, "LuaJIT", "%s: " fmt, __FUNCTION__, ##__VA_ARGS__))
 +#else
++	#include <stdio.h>
 +	#define LJ_LOG(fmt, ...) (fprintf(stderr, "[LuaJIT] [%s] " fmt "\n", __FUNCTION__, ##__VA_ARGS__))
 +#endif
 +
