@@ -55,7 +55,7 @@ index 1d0ff54..8ef29a3 100644
      } else {
        if (!(mode & LUAJIT_MODE_ON))
 diff --git a/src/lj_mcode.c b/src/lj_mcode.c
-index e7eb95e..d85d9fc 100644
+index e7eb95e..66d753b 100644
 --- a/src/lj_mcode.c
 +++ b/src/lj_mcode.c
 @@ -109,17 +109,20 @@ static void *mcode_alloc_at(jit_State *J, uintptr_t hint, size_t sz, int prot, b
@@ -115,7 +115,15 @@ index e7eb95e..d85d9fc 100644
    }
    lj_trace_err(J, LJ_TRERR_MCODEAL);  /* Give up. OS probably ignores hints? */
    return NULL;
-@@ -332,6 +341,7 @@ void lj_mcode_clear(jit_State *J)
+@@ -321,6 +330,7 @@ void lj_mcode_clear(jit_State *J)
+     mc = next;
+   }
+   /* Update the protection cache */
++  LJ_LOG("protection cache: %d", J->mcprot);
+   J->mcprot = MCPROT_GEN;
+   /* Tell the JIT that it once again has the full area available to generate code in, c.f., mcode_allocarea */
+   J->mctop = (MCode *)((char *)J->mcarea + J->szmcarea);
+@@ -332,6 +342,7 @@ void lj_mcode_clear(jit_State *J)
  /* Reserve the remainder of the current MCode area. */
  MCode *lj_mcode_reserve(jit_State *J, MCode **lim)
  {
@@ -123,7 +131,7 @@ index e7eb95e..d85d9fc 100644
    if (!J->mcarea)
      mcode_allocarea(J);
    else
-@@ -396,6 +406,7 @@ void lj_mcode_limiterr(jit_State *J, size_t need)
+@@ -396,6 +407,7 @@ void lj_mcode_limiterr(jit_State *J, size_t need)
    sizemcode = (size_t)J->param[JIT_P_sizemcode] << 10;
    sizemcode = (sizemcode + LJ_PAGESIZE-1) & ~(size_t)(LJ_PAGESIZE - 1);
    maxmcode = (size_t)J->param[JIT_P_maxmcode] << 10;
