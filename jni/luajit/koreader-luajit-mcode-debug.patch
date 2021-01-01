@@ -54,7 +54,7 @@ index 1d0ff54..8ef29a3 100644
      } else {
        if (!(mode & LUAJIT_MODE_ON))
 diff --git a/src/lj_mcode.c b/src/lj_mcode.c
-index 1043daa..35de173 100644
+index e7eb95e..07c9635 100644
 --- a/src/lj_mcode.c
 +++ b/src/lj_mcode.c
 @@ -109,12 +109,14 @@ static void *mcode_alloc_at(jit_State *J, uintptr_t hint, size_t sz, int prot, b
@@ -100,7 +100,7 @@ index 1043daa..35de173 100644
    }
    lj_trace_err(J, LJ_TRERR_MCODEAL);  /* Give up. OS probably ignores hints? */
    return NULL;
-@@ -329,6 +336,7 @@ void lj_mcode_clear(jit_State *J)
+@@ -332,6 +339,7 @@ void lj_mcode_clear(jit_State *J)
  /* Reserve the remainder of the current MCode area. */
  MCode *lj_mcode_reserve(jit_State *J, MCode **lim)
  {
@@ -108,7 +108,7 @@ index 1043daa..35de173 100644
    if (!J->mcarea)
      mcode_allocarea(J);
    else
-@@ -393,6 +401,7 @@ void lj_mcode_limiterr(jit_State *J, size_t need)
+@@ -396,6 +404,7 @@ void lj_mcode_limiterr(jit_State *J, size_t need)
    sizemcode = (size_t)J->param[JIT_P_sizemcode] << 10;
    sizemcode = (sizemcode + LJ_PAGESIZE-1) & ~(size_t)(LJ_PAGESIZE - 1);
    maxmcode = (size_t)J->param[JIT_P_maxmcode] << 10;
