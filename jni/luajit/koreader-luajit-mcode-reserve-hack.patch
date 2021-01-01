@@ -23,7 +23,7 @@ index 655b84c..1fa6292 100644
    MCode *mctop;		/* Top of current mcode area. */
    MCode *mcbot;		/* Bottom of current mcode area. */
 diff --git a/src/lj_mcode.c b/src/lj_mcode.c
-index a5153b2..1043daa 100644
+index a5153b2..e7eb95e 100644
 --- a/src/lj_mcode.c
 +++ b/src/lj_mcode.c
 @@ -98,9 +98,13 @@ static int mcode_setprot(void *p, size_t sz, DWORD prot)
@@ -111,7 +111,7 @@ index a5153b2..1043daa 100644
    J->mcarea = NULL;
    J->szallmcarea = 0;
    while (mc) {
-@@ -284,6 +308,22 @@ void lj_mcode_free(jit_State *J)
+@@ -284,6 +308,25 @@ void lj_mcode_free(jit_State *J)
    }
  }
  
@@ -119,13 +119,16 @@ index a5153b2..1043daa 100644
 +void lj_mcode_clear(jit_State *J)
 +{
 +  MCode *mc = J->mcarea;
-+  /* We need write access to clear it */
-+  mcode_protect(J, MCPROT_GEN);
 +  while (mc) {
 +    MCode *next = ((MCLink *)mc)->next;
++    /* We need write access to clear it */
++    if (LJ_UNLIKELY(mcode_setprot(mc, ((MCLink *)mc)->size, MCPROT_GEN)))
++      mcode_protfail(J);
 +    memset(mc, 0, ((MCLink *)mc)->size);
 +    mc = next;
 +  }
++  /* Update the protection cache */
++  J->mcprot = MCPROT_GEN;
 +  /* Tell the JIT that it once again has the full area available to generate code in, c.f., mcode_allocarea */
 +  J->mctop = (MCode *)((char *)J->mcarea + J->szmcarea);
 +  J->mcbot = (MCode *)((char *)J->mcarea + sizeof(MCLink));
