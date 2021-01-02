@@ -143,9 +143,7 @@ object DeviceInfo {
         deviceMap[EinkDevice.BOYUE_K78W] = BOYUE_K78W
 
         // Boyue Likebook P6
-        BOYUE_P6 = (MANUFACTURER.contentEquals("p6")
-            && BRAND.contentEquals("p6")
-            && MODEL.contentEquals("p6"))
+        BOYUE_P6 = IS_BOYUE && PRODUCT.contentEquals("p6")
         deviceMap[EinkDevice.BOYUE_P6] = BOYUE_P6
 
         // Crema Note (1010P)
