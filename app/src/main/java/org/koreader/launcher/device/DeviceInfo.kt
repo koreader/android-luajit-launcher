@@ -39,7 +39,6 @@ object DeviceInfo {
     private val CREMA_0650L: Boolean
     private val ONYX_C67: Boolean
     private val ONYX_NOVA2: Boolean
-    private val ONYX_KON_TIKI: Boolean
     private val ENERGY: Boolean
     private val INKBOOK: Boolean
     private val TOLINO: Boolean
@@ -85,7 +84,6 @@ object DeviceInfo {
     enum class BugDevice {
         NONE,
         SONY_RP1,
-        ONYX_KON_TIKI,
         EMULATOR
     }
 
@@ -166,12 +164,6 @@ object DeviceInfo {
                 && (PRODUCT.startsWith("c67") || MODEL.contentEquals("rk30sdk"))
                 && DEVICE.startsWith("c67"))
         deviceMap[EinkDevice.ONYX_C67] = ONYX_C67
-
-        // Onyx Kon-Tiki
-        ONYX_KON_TIKI = (MANUFACTURER.contentEquals("onyx")
-            && MODEL.contentEquals("kon_tiki")
-            && PRODUCT.contentEquals("kon_tiki"))
-        bugMap[BugDevice.ONYX_KON_TIKI] = ONYX_KON_TIKI
 
         // Energy Sistem eReaders. Tested on Energy Ereader Pro 4
         ENERGY = (BRAND.contentEquals("energysistem") || BRAND.contentEquals("energy_sistem"))
@@ -273,7 +265,7 @@ object DeviceInfo {
         BUG_WAKELOCKS = BUG == BugDevice.SONY_RP1
 
         // 4.4+ device without native surface rotation
-        BUG_SCREEN_ROTATION = BUG == BugDevice.ONYX_KON_TIKI
+        BUG_SCREEN_ROTATION = BUG == BugDevice.EMULATOR
 
         // needs a surfaceView to do epd updates
         NEEDS_VIEW = EINK_FREESCALE || EINK_QCOM
