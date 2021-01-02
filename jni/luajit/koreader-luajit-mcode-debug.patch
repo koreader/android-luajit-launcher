@@ -55,7 +55,7 @@ index 1d0ff54..8ef29a3 100644
      } else {
        if (!(mode & LUAJIT_MODE_ON))
 diff --git a/src/lj_mcode.c b/src/lj_mcode.c
-index 4566158..ee3825f 100644
+index 9cb7a21..66b93de 100644
 --- a/src/lj_mcode.c
 +++ b/src/lj_mcode.c
 @@ -109,12 +109,14 @@ static void *mcode_alloc_at(jit_State *J, uintptr_t hint, size_t sz, int prot, b
