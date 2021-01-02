@@ -55,7 +55,7 @@ index 1d0ff54..8ef29a3 100644
      } else {
        if (!(mode & LUAJIT_MODE_ON))
 diff --git a/src/lj_mcode.c b/src/lj_mcode.c
-index 9cb7a21..87e026a 100644
+index 9cb7a21..4b7b649 100644
 --- a/src/lj_mcode.c
 +++ b/src/lj_mcode.c
 @@ -109,12 +109,14 @@ static void *mcode_alloc_at(jit_State *J, uintptr_t hint, size_t sz, int prot, b
@@ -105,7 +105,7 @@ index 9cb7a21..87e026a 100644
    size_t sz = (size_t)J->param[JIT_P_sizemcode] << 10;
    sz = (sz + LJ_PAGESIZE-1) & ~(size_t)(LJ_PAGESIZE - 1);
    J->mcarea = (MCode *)mcode_alloc(J, sz);
-+  LJ_LOG("new %zuK mcarea @ %p (oldarea @ %p)", sz, J->mcarea / 1024U, oldarea);
++  LJ_LOG("new %zuK mcarea @ %p (oldarea @ %p)", sz  / 1024U, J->mcarea, oldarea);
    J->szmcarea = sz;
    J->mcprot = MCPROT_GEN;
    J->mctop = (MCode *)((char *)J->mcarea + J->szmcarea);
