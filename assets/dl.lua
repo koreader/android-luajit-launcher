@@ -106,7 +106,8 @@ function dl.dlopen(library, load_func, depth)
             -- libandroid, libc, libcamera2ndk, libdl, libGLES, libjnigraphics,
             -- liblog, libm, libmediandk, libOpenMAXAL, libOpenSLES, libstdc++,
             -- libvulkan, and libz
-            -- Our current code should *never* hit any non-whitelisted system libs, so, this is basically overkill ;).
+            -- c.f., https://android.googlesource.com/platform/bionic/+/master/android-changes-for-ndk-developers.md#private-api-enforced-for-api-level-24
+            -- Our current code should *never* hit any private system libs, so, this is basically overkill ;).
             if depth > 0 and (pspec == "/system/lib" or library == "libdl.so") then
                 -- depth > 0 to allow explicitly loading a system lib
                 -- (because this might have genuine use cases, as some early API levels do not put DT_NEEDED libraries into the global namespace)

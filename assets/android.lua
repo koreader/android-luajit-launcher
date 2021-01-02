@@ -1255,10 +1255,10 @@ end
 
 -- We need to load libandroid, liblog, and the app glue: they're no longer in the global namespace
 -- as we're now running under a plain LuaJIT.
--- NOTE: We haven't overloaded fii.load yet
---       (and we can't, as our custom implementation depends on libandroid and liblog for logging ^^),
+-- NOTE: We haven't overloaded ffi.load yet
+--       (and we can't, as our custom dlopen wrapper depends on libandroid and liblog for logging ^^),
 --       so, we hope that the fact we've kept linking libluajit-launcher against libandroid and liblog will be enough
---       to satisfy old and broken platforms where dlopen is extra finicky...
+--       to satisfy old and broken platforms where dlopen and/or loading DT_NEEDED libraries is extra finicky...
 local android_lib_ok, android_lib = pcall(ffi.load, "libandroid.so")
 local android_log_ok, android_log = pcall(ffi.load, "liblog.so")
 local android_glue_ok, android_glue = pcall(ffi.load, "libluajit-launcher.so")
