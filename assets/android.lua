@@ -7,18 +7,21 @@ Java Native Interface (JNI) wrapper.
 -- Attempt to grab the full maxmcode region in one go on startup,
 -- to avoid mcode_alloc failures later on at runtime...
 -- c.f., https://www.freelists.org/post/luajit/Android-performance-drop-moving-from-LuaJIT201-LuaJIT202
--- The other workaround mentioned earlier in that thread would require moving to a shared LuaJIT build,
--- and move the mmap hackery in jni/android-main.c before a dlopen of the luaJIT lib...
--- Without it, the most reliable results we can get are with a *single* 64K mcode block:
--- trying that with a single 512K block (as that's the default maxmcode) doesn't yield great results...
+-- For optimal behavior, this relies on a few LuaJIT hacks:
+--   * Ensuring a flush doesn't unmap the mcarea, but only clears it,
+--     because when the mcarea is filled, LuaJIT flushes it,
+--     and the Lua blitter can happily require more than 256K to flip a CRe page,
+--     so flushes are common.
+--   * Reserving a 1MB area inside LuaJIT's address space via a global array
+--   * Making the first mcode_alloc use the address of this global via MAP_FIXED
+-- c.f., koreader-luajit-mcode-reserve-hack.patch
 -- Upstream issue: https://github.com/LuaJIT/LuaJIT/issues/285
 
--- Hope that forcing the allocation of a 64K segment in two blocks *right now* will succeed...
-jit.opt.start("sizemcode=32", "maxmcode=64")
+-- Given that, force the allocation of a single 512K segment *right now*.
+-- (LuaJIT defaults are 32, 512 on 32-bit platforms, and 64, 512 otherwise).
+jit.opt.start("sizemcode=512", "maxmcode=512")
+-- This ensures a trace is generated, which requires an mcarea alloc ;).
 for _ = 1, 100 do end
-
--- Disable the JIT for now, we'll enable it again when actually starting KOReader.
-jit.off(true, true)
 
 local ffi = require("ffi")
 
@@ -1137,6 +1140,7 @@ void AConfiguration_getCountry(AConfiguration* config, char* outCountry);
 ]]
 
 -- JNI Interfacing
+local C = ffi.C
 
 local JNI = {}
 
@@ -1144,9 +1148,9 @@ function JNI:context(jvm, runnable)
     self.jvm = jvm
 
     local env = ffi.new("JNIEnv*[1]")
-    self.jvm[0].GetEnv(self.jvm, ffi.cast("void**", env), ffi.C.JNI_VERSION_1_6)
+    self.jvm[0].GetEnv(self.jvm, ffi.cast("void**", env), C.JNI_VERSION_1_6)
 
-    assert(self.jvm[0].AttachCurrentThread(self.jvm, env, nil) ~= ffi.C.JNI_ERR,
+    assert(self.jvm[0].AttachCurrentThread(self.jvm, env, nil) ~= C.JNI_ERR,
         "cannot attach JVM to current thread")
 
     self.env = env[0]
@@ -1191,7 +1195,7 @@ function JNI:callBooleanMethod(object, method, signature, ...)
     local clazz = self.env[0].GetObjectClass(self.env, object)
     local methodID = self.env[0].GetMethodID(self.env, clazz, method, signature)
     self.env[0].DeleteLocalRef(self.env, clazz)
-    return self.env[0].CallBooleanMethod(self.env, object, methodID, ...) == ffi.C.JNI_TRUE
+    return self.env[0].CallBooleanMethod(self.env, object, methodID, ...) == C.JNI_TRUE
 end
 
 function JNI:callStaticBooleanMethod(class, method, signature, ...)
@@ -1199,7 +1203,7 @@ function JNI:callStaticBooleanMethod(class, method, signature, ...)
     local methodID = self.env[0].GetStaticMethodID(self.env, clazz, method, signature)
     local res = self.env[0].CallStaticBooleanMethod(self.env, clazz, methodID, ...)
     self.env[0].DeleteLocalRef(self.env, clazz)
-    return res == ffi.C.JNI_TRUE
+    return res == C.JNI_TRUE
 end
 
 function JNI:callObjectMethod(object, method, signature, ...)
@@ -1249,38 +1253,46 @@ end
 
 -- Android specific
 
--- Some Android roms won't load libandroid.so to the global namespace thus
--- we load it by ourselves.
+-- We need to load libandroid, liblog, and the app glue: they're no longer in the global namespace
+-- as we're now running under a plain LuaJIT.
+-- NOTE: We haven't overloaded ffi.load yet
+--       (and we can't, as our custom dlopen wrapper depends on libandroid and liblog for logging ^^),
+--       so, we hope that the fact we've kept linking libluajit-launcher against libandroid and liblog will be enough
+--       to satisfy old and broken platforms where dlopen and/or loading DT_NEEDED libraries is extra finicky...
 local android_lib_ok, android_lib = pcall(ffi.load, "libandroid.so")
+local android_log_ok, android_log = pcall(ffi.load, "liblog.so")
+local android_glue_ok, android_glue = pcall(ffi.load, "libluajit-launcher.so")
 local android = {
     app = nil,
     jni = JNI,
     log_name = "luajit-launcher",
-    lib = android_lib_ok and android_lib or ffi.C,
+    lib = android_lib_ok and android_lib or C,
+    log = android_log_ok and android_log or C,
+    glue = android_glue_ok and android_glue or C,
 }
 
 function android.LOG(level, message)
-    ffi.C.__android_log_print(level, android.log_name, "%s", message)
+    android.log.__android_log_print(level, android.log_name, "%s", message)
 end
 
 function android.LOGVV(tag, message)
-    ffi.C.__android_log_print(ffi.C.ANDROID_LOG_VERBOSE, tag, "%s", message)
+    android.log.__android_log_print(C.ANDROID_LOG_VERBOSE, tag, "%s", message)
 end
 
 function android.LOGV(message)
-    android.LOG(ffi.C.ANDROID_LOG_VERBOSE, message)
+    android.LOG(C.ANDROID_LOG_VERBOSE, message)
 end
 function android.LOGD(message)
-    android.LOG(ffi.C.ANDROID_LOG_DEBUG, message)
+    android.LOG(C.ANDROID_LOG_DEBUG, message)
 end
 function android.LOGI(message)
-    android.LOG(ffi.C.ANDROID_LOG_INFO, message)
+    android.LOG(C.ANDROID_LOG_INFO, message)
 end
 function android.LOGW(message)
-    android.LOG(ffi.C.ANDROID_LOG_WARN, message)
+    android.LOG(C.ANDROID_LOG_WARN, message)
 end
 function android.LOGE(message)
-    android.LOG(ffi.C.ANDROID_LOG_ERROR, message)
+    android.LOG(C.ANDROID_LOG_ERROR, message)
 end
 
 --[[--
@@ -1296,7 +1308,7 @@ function android.asset_loader(modulename)
     local filename = string.gsub("?.lua", "%?", modulepath)
     local asset = android.lib.AAssetManager_open(
         android.app.activity.assetManager,
-        filename, ffi.C.AASSET_MODE_BUFFER)
+        filename, C.AASSET_MODE_BUFFER)
     --android.LOGI(string.format("trying to open asset %s: %s", filename, tostring(asset)))
     if asset ~= nil then
         -- read asset:
@@ -1774,8 +1786,8 @@ local function run(android_app_state)
             end)
         end,
         set = function(new_orientation)
-            if new_orientation >= ffi.C.ASCREEN_ORIENTATION_UNSPECIFIED and
-                new_orientation <= ffi.C.ASCREEN_ORIENTATION_FULL_SENSOR then
+            if new_orientation >= C.ASCREEN_ORIENTATION_UNSPECIFIED and
+                new_orientation <= C.ASCREEN_ORIENTATION_FULL_SENSOR then
                 JNI:context(android.app.activity.vm, function(jni)
                     jni:callVoidMethod(
                         android.app.activity.clazz,

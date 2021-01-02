@@ -14,10 +14,9 @@ and as such:
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
 --]]
 
--- Disable the JIT in this module
-jit.off(true, true)
-
 local ffi = require("ffi")
+
+local C = ffi.C
 
 ffi.cdef[[
 /* from /usr/include/elf.h */
@@ -112,7 +111,16 @@ end
 
 -- close file when object is garbage collected
 function Elf:__gc()
-    self.file:close()
+    if self.file ~= nil then
+        self.file:close()
+    end
+end
+
+function Elf.__index:close()
+    if self.file ~= nil then
+        self.file:close()
+        self.file = nil
+    end
 end
 
 -- convenience method that seeks and reads and also casts to an FFI ctype
@@ -147,7 +155,7 @@ function Elf.__index:dlneeds()
     self.file:seek("set", hdr.e_shoff)
     for i = 0, hdr.e_shnum - 1 do
         shdr = self:read_at(0, "cur", "Elf32_Shdr")
-        if shdr.sh_type == ffi.C.SHT_STRTAB
+        if shdr.sh_type == C.SHT_STRTAB
         and ffi.string(shstrtab + shdr.sh_name) == ".dynstr" then
             dynstr = self:read_at(shdr.sh_offset, "set", "char[?]", shdr.sh_size)
             break
@@ -160,13 +168,13 @@ function Elf.__index:dlneeds()
     self.file:seek("set", hdr.e_shoff)
     for i = 0, hdr.e_shnum - 1 do
         shdr = self:read_at(0, "cur", "Elf32_Shdr")
-        if shdr.sh_type == ffi.C.SHT_DYNAMIC then
+        if shdr.sh_type == C.SHT_DYNAMIC then
             local offs = 0
             self.file:seek("set", shdr.sh_offset)
             while offs < shdr.sh_size do
                 local dyn = self:read_at(0, "cur", "Elf32_Dyn")
                 offs = offs + ffi.sizeof(dyn)
-                if dyn.d_tag == ffi.C.DT_NEEDED then
+                if dyn.d_tag == C.DT_NEEDED then
                     table.insert(needs, ffi.string(dynstr + dyn.d_un.d_val))
                 end
             end
