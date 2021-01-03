@@ -55,14 +55,14 @@ index 1d0ff54..8ef29a3 100644
      } else {
        if (!(mode & LUAJIT_MODE_ON))
 diff --git a/src/lj_mcode.c b/src/lj_mcode.c
-index 241c86a..198fdd2 100644
+index 9cb7a21..4b7b649 100644
 --- a/src/lj_mcode.c
 +++ b/src/lj_mcode.c
 @@ -109,12 +109,14 @@ static void *mcode_alloc_at(jit_State *J, uintptr_t hint, size_t sz, int prot, b
      if (!hint) lj_trace_err(J, LJ_TRERR_MCODEAL);
      p = NULL;
    }
-+  LJ_LOG("mapped at @ %p (%zuK)", p, sz / 1024U);
++  LJ_LOG("mapped %zuK at @ %p", sz / 1024U, p);
    return p;
  }
  
@@ -105,7 +105,7 @@ index 241c86a..198fdd2 100644
    size_t sz = (size_t)J->param[JIT_P_sizemcode] << 10;
    sz = (sz + LJ_PAGESIZE-1) & ~(size_t)(LJ_PAGESIZE - 1);
    J->mcarea = (MCode *)mcode_alloc(J, sz);
-+  LJ_LOG("new %zuK mcarea @ %p (oldarea @ %p)", sz, J->mcarea, oldarea);
++  LJ_LOG("new %zuK mcarea @ %p (oldarea @ %p)", sz  / 1024U, J->mcarea, oldarea);
    J->szmcarea = sz;
    J->mcprot = MCPROT_GEN;
    J->mctop = (MCode *)((char *)J->mcarea + J->szmcarea);
@@ -125,25 +125,26 @@ index 241c86a..198fdd2 100644
  }
  
  /* Clear all MCode areas. */
-@@ -326,7 +336,9 @@ void lj_mcode_clear(jit_State *J)
-       szallmcarea += size;
+@@ -328,8 +338,10 @@ void lj_mcode_clear(jit_State *J)
        mcarea = mc;
-       prevsize = size;
+       szmcarea = size;
+       szallmcarea += size;
 +      LJ_LOG("contiguous %zuK link detected @ %p (total: %zuK) (next @ %p)", size / 1024U, mc, szallmcarea / 1024U, next);
      } else {
-+      LJ_LOG("non-contiguous %zuK link detected @ %p (next @ %p)!", size / 1024U, mc, next);
        mcarea = NULL;
++      LJ_LOG("non-contiguous %zuK link detected @ %p (next @ %p)!", size / 1024U, mc, next);
+       /* A non-contiguous link anywhere in the chain means we scrap the whole chain, to keep things simple */
+       break;
      }
-     mc = next;
-@@ -353,6 +365,7 @@ void lj_mcode_clear(jit_State *J)
+@@ -358,6 +370,7 @@ void lj_mcode_clear(jit_State *J)
+   ((MCLink *)J->mcarea)->next = NULL;
    ((MCLink *)J->mcarea)->size = J->szmcarea;
-   /* Update the protection cache */
-   J->mcprot = MCPROT_GEN;
-+  LJ_LOG("recycled mcarea @ %p (%zuK)", J->mcarea, J->szmcarea / 1024U);
+   J->szallmcarea = J->szmcarea;
++  LJ_LOG("recycled %zuK mcarea @ %p", J->szmcarea / 1024U, J->mcarea);
  }
  
  /* -- MCode transactions -------------------------------------------------- */
-@@ -360,6 +373,7 @@ void lj_mcode_clear(jit_State *J)
+@@ -365,6 +378,7 @@ void lj_mcode_clear(jit_State *J)
  /* Reserve the remainder of the current MCode area. */
  MCode *lj_mcode_reserve(jit_State *J, MCode **lim)
  {
@@ -151,7 +152,7 @@ index 241c86a..198fdd2 100644
    if (!J->mcarea)
      mcode_allocarea(J);
    else
-@@ -424,6 +438,7 @@ void lj_mcode_limiterr(jit_State *J, size_t need)
+@@ -429,6 +443,7 @@ void lj_mcode_limiterr(jit_State *J, size_t need)
    sizemcode = (size_t)J->param[JIT_P_sizemcode] << 10;
    sizemcode = (sizemcode + LJ_PAGESIZE-1) & ~(size_t)(LJ_PAGESIZE - 1);
    maxmcode = (size_t)J->param[JIT_P_maxmcode] << 10;

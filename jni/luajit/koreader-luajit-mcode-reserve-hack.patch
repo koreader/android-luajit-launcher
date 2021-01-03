@@ -23,7 +23,7 @@ index 655b84c..1fa6292 100644
    MCode *mctop;		/* Top of current mcode area. */
    MCode *mcbot;		/* Bottom of current mcode area. */
 diff --git a/src/lj_mcode.c b/src/lj_mcode.c
-index a5153b2..241c86a 100644
+index a5153b2..9cb7a21 100644
 --- a/src/lj_mcode.c
 +++ b/src/lj_mcode.c
 @@ -98,9 +98,13 @@ static int mcode_setprot(void *p, size_t sz, DWORD prot)
@@ -103,11 +103,11 @@ index a5153b2..241c86a 100644
  #endif
  }
  
-@@ -280,8 +303,56 @@ void lj_mcode_free(jit_State *J)
+@@ -280,8 +303,61 @@ void lj_mcode_free(jit_State *J)
    while (mc) {
      MCode *next = ((MCLink *)mc)->next;
      mcode_free(J, mc, ((MCLink *)mc)->size);
-+    /* Remember the oldest link as lastmcarea */
++    /* Remember the oldest (i.e., highest address) link as lastmcarea */
 +    if (!next) {
 +      J->lastmcarea = mc;
 +    }
@@ -119,44 +119,49 @@ index a5153b2..241c86a 100644
 +void lj_mcode_clear(jit_State *J)
 +{
 +  MCode *mc = J->mcarea;
++  /* Keep track of the previous link in the chain */
 +  MCode *mcarea = J->mcarea;
 +  size_t szallmcarea = 0;
-+  size_t prevsize = 0;
++  size_t szmcarea = 0;
 +  while (mc) {
 +    MCode *next = ((MCLink *)mc)->next;
 +    size_t size = ((MCLink *)mc)->size;
 +    /* Reset mcarea to the oldest contiguous link */
-+    if ((next && next == mc + size) || (!next && mc == mcarea + prevsize) || (!next && mc == mcarea)) {
-+      szallmcarea += size;
++    if ((next && next == mc + size) || (!next && mc == mcarea + szmcarea) || (!next && mc == mcarea)) {
++      /* ^ next link is contiguous      ^ last link is contiguous             ^ single link in the chain */
 +      mcarea = mc;
-+      prevsize = size;
++      szmcarea = size;
++      szallmcarea += size;
 +    } else {
 +      mcarea = NULL;
++      /* A non-contiguous link anywhere in the chain means we scrap the whole chain, to keep things simple */
++      break;
 +    }
      mc = next;
    }
 +
-+  /* If there were non-contiguous links, fallback to lj_mcode_free */
++  /* If we hit a non-contiguous link, fallback to lj_mcode_free */
 +  if (!mcarea) {
 +    return lj_mcode_free(J);
 +  }
 +
-+  /* Recycle the full chain */
-+  J->mcarea = mcarea + prevsize - szallmcarea;
++  /* Ready to recycle the full chain */
++  /* Rewind to the lowest address (as links are allocated high to low, c.f., mcode_alloc) */
++  J->mcarea = mcarea + szmcarea - szallmcarea;
 +  J->szmcarea = szallmcarea;
-+  J->szallmcarea = szallmcarea;
-+  /* Tell the JIT that it once again has the full area available to generate code in, c.f., mcode_allocarea */
-+  J->mctop = (MCode *)((char *)J->mcarea + J->szmcarea);
-+  J->mcbot = (MCode *)((char *)J->mcarea + sizeof(MCLink));
 +  /* We need write access to clear it */
 +  if (LJ_UNLIKELY(mcode_setprot(J->mcarea, J->szmcarea, MCPROT_GEN)))
 +    mcode_protfail(J);
++  /* Update the protection cache */
++  J->mcprot = MCPROT_GEN;
 +  memset(J->mcarea, 0, J->szmcarea);
++  /* Tell the JIT that it once again has the full area available to generate code in, c.f., mcode_allocarea */
++  J->mctop = (MCode *)((char *)J->mcarea + J->szmcarea);
++  J->mcbot = (MCode *)((char *)J->mcarea + sizeof(MCLink));
 +  /* Update the MCLink data for the newly coalesced area */
 +  ((MCLink *)J->mcarea)->next = NULL;
 +  ((MCLink *)J->mcarea)->size = J->szmcarea;
-+  /* Update the protection cache */
-+  J->mcprot = MCPROT_GEN;
++  J->szallmcarea = J->szmcarea;
  }
  
  /* -- MCode transactions -------------------------------------------------- */
