@@ -1,5 +1,5 @@
 diff --git a/src/lj_def.h b/src/lj_def.h
-index cfe18c4..5b71dfc 100644
+index 3a28026c..e441c0e6 100644
 --- a/src/lj_def.h
 +++ b/src/lj_def.h
 @@ -39,6 +39,7 @@ typedef int intptr_t;
@@ -11,7 +11,7 @@ index cfe18c4..5b71dfc 100644
  
  /* Needed everywhere. */
 diff --git a/src/lj_jit.h b/src/lj_jit.h
-index 655b84c..1fa6292 100644
+index 03ed3ea0..6efc78a5 100644
 --- a/src/lj_jit.h
 +++ b/src/lj_jit.h
 @@ -490,6 +490,7 @@ typedef struct jit_State {
@@ -23,7 +23,7 @@ index 655b84c..1fa6292 100644
    MCode *mctop;		/* Top of current mcode area. */
    MCode *mcbot;		/* Bottom of current mcode area. */
 diff --git a/src/lj_mcode.c b/src/lj_mcode.c
-index a5153b2..9cb7a21 100644
+index 9ce1deec..9ae9f7dc 100644
 --- a/src/lj_mcode.c
 +++ b/src/lj_mcode.c
 @@ -98,9 +98,13 @@ static int mcode_setprot(void *p, size_t sz, DWORD prot)
@@ -127,8 +127,8 @@ index a5153b2..9cb7a21 100644
 +    MCode *next = ((MCLink *)mc)->next;
 +    size_t size = ((MCLink *)mc)->size;
 +    /* Reset mcarea to the oldest contiguous link */
-+    if ((next && next == mc + size) || (!next && mc == mcarea + szmcarea) || (!next && mc == mcarea)) {
-+      /* ^ next link is contiguous      ^ last link is contiguous             ^ single link in the chain */
++    if ((next && next == (MCode *)((char *)mc + size)) || (!next && mc == (MCode *)((char *)mcarea + szmcarea)) || (!next && mc == mcarea)) {
++      /* ^ next link is contiguous                         ^ last link is contiguous                                ^ single link in the chain */
 +      mcarea = mc;
 +      szmcarea = size;
 +      szallmcarea += size;
@@ -147,7 +147,7 @@ index a5153b2..9cb7a21 100644
 +
 +  /* Ready to recycle the full chain */
 +  /* Rewind to the lowest address (as links are allocated high to low, c.f., mcode_alloc) */
-+  J->mcarea = mcarea + szmcarea - szallmcarea;
++  J->mcarea = (MCode *)((char *)mcarea + szmcarea - szallmcarea);
 +  J->szmcarea = szallmcarea;
 +  /* We need write access to clear it */
 +  if (LJ_UNLIKELY(mcode_setprot(J->mcarea, J->szmcarea, MCPROT_GEN)))
@@ -166,7 +166,7 @@ index a5153b2..9cb7a21 100644
  
  /* -- MCode transactions -------------------------------------------------- */
 diff --git a/src/lj_mcode.h b/src/lj_mcode.h
-index 2f31bf5..27f9c83 100644
+index caaaec61..f4ebe621 100644
 --- a/src/lj_mcode.h
 +++ b/src/lj_mcode.h
 @@ -17,6 +17,7 @@ LJ_FUNC void lj_mcode_sync(void *start, void *end);
@@ -178,7 +178,7 @@ index 2f31bf5..27f9c83 100644
  LJ_FUNC void lj_mcode_commit(jit_State *J, MCode *m);
  LJ_FUNC void lj_mcode_abort(jit_State *J);
 diff --git a/src/lj_trace.c b/src/lj_trace.c
-index a398089..e70756c 100644
+index 4608f81f..5cab8f70 100644
 --- a/src/lj_trace.c
 +++ b/src/lj_trace.c
 @@ -297,8 +297,8 @@ int lj_trace_flushall(lua_State *L)
@@ -204,7 +204,7 @@ index a398089..e70756c 100644
  }
  
 diff --git a/src/ljamalg.c b/src/ljamalg.c
-index 56585e6..9c77132 100644
+index 8e2d4937..364bfd0b 100644
 --- a/src/ljamalg.c
 +++ b/src/ljamalg.c
 @@ -18,6 +18,9 @@
