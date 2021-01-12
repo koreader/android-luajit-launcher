@@ -314,39 +314,25 @@ class MainActivity : NativeActivity(), JNILuaInterface,
         return device.product
     }
 
-    override fun getScreenAvailableWidth(): Int {
-        return ScreenUtils.getScreenAvailableWidth(this)
-    }
-
     override fun getScreenAvailableHeight(): Int {
         return ScreenUtils.getScreenAvailableHeight(this)
+    }
+
+    override fun getScreenAvailableWidth(): Int {
+        return ScreenUtils.getScreenAvailableWidth(this)
     }
 
     override fun getScreenBrightness(): Int {
         return device.getScreenBrightness(this)
     }
 
-    override fun getTopInsetHeight(): Int {
-        return topInsetHeight
-    }
-
     override fun getScreenHeight(): Int {
-        /*
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            ScreenUtils.getScreenHeight(this) - topInsetHeight
-        } else {
-            ScreenUtils.getScreenHeight(this)
-        }
-        */
-
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             // It handles the all insets for us, and is rotation-aware
             ScreenUtils.getScreenAvailableHeight(this)
         } else {
             ScreenUtils.getScreenHeight(this)
         }
-
-        //return ScreenUtils.getScreenHeight(this)
     }
 
     override fun getScreenMaxBrightness(): Int {
@@ -380,8 +366,6 @@ class MainActivity : NativeActivity(), JNILuaInterface,
         } else {
             ScreenUtils.getScreenWidth(this)
         }
-
-        //return ScreenUtils.getScreenWidth(this)
     }
 
     override fun getStatusBarHeight(): Int {
