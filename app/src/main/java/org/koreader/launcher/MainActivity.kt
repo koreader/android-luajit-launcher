@@ -328,7 +328,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
 
     override fun getScreenHeight(): Int {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            // It handles the all insets for us, and is rotation-aware
+            // It handles all the insets for us, and is rotation-aware
             ScreenUtils.getScreenAvailableHeight(this)
         } else {
             ScreenUtils.getScreenHeight(this)
@@ -361,7 +361,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
 
     override fun getScreenWidth(): Int {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            // It handles the all insets for us, and is rotation-aware
+            // It handles all the insets for us, and is rotation-aware
             ScreenUtils.getScreenAvailableWidth(this)
         } else {
             ScreenUtils.getScreenWidth(this)
