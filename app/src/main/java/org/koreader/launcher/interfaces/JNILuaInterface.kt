@@ -25,8 +25,10 @@ interface JNILuaInterface {
     fun getNetworkInfo(): String
     fun getPlatformName(): String
     fun getProduct(): String
+    fun getScreenAvailableWidth(): Int
     fun getScreenAvailableHeight(): Int
     fun getScreenBrightness(): Int
+    fun getTopInsetHeight(): Int
     fun getScreenHeight(): Int
     fun getScreenMaxBrightness(): Int
     fun getScreenMinBrightness(): Int

@@ -314,6 +314,10 @@ class MainActivity : NativeActivity(), JNILuaInterface,
         return device.product
     }
 
+    override fun getScreenAvailableWidth(): Int {
+        return ScreenUtils.getScreenAvailableWidth(this)
+    }
+
     override fun getScreenAvailableHeight(): Int {
         return ScreenUtils.getScreenAvailableHeight(this)
     }
@@ -322,12 +326,27 @@ class MainActivity : NativeActivity(), JNILuaInterface,
         return device.getScreenBrightness(this)
     }
 
+    override fun getTopInsetHeight(): Int {
+        return topInsetHeight
+    }
+
     override fun getScreenHeight(): Int {
+        /*
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             ScreenUtils.getScreenHeight(this) - topInsetHeight
         } else {
             ScreenUtils.getScreenHeight(this)
         }
+        */
+
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            // It handles the all insets for us, and is rotation-aware
+            ScreenUtils.getScreenAvailableHeight(this)
+        } else {
+            ScreenUtils.getScreenHeight(this)
+        }
+
+        //return ScreenUtils.getScreenHeight(this)
     }
 
     override fun getScreenMaxBrightness(): Int {
@@ -355,7 +374,14 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     }
 
     override fun getScreenWidth(): Int {
-        return ScreenUtils.getScreenWidth(this)
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            // It handles the all insets for us, and is rotation-aware
+            ScreenUtils.getScreenAvailableWidth(this)
+        } else {
+            ScreenUtils.getScreenWidth(this)
+        }
+
+        //return ScreenUtils.getScreenWidth(this)
     }
 
     override fun getStatusBarHeight(): Int {
@@ -377,8 +403,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     override fun hasNativeRotation(): Boolean {
         return if (device.platform == "android") {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                // FIXME: hw rotation is disabled in devices with a Notch.
-                !((topInsetHeight > 0) || (device.bugRotation))
+                !(device.bugRotation)
             } else false
         } else false
     }

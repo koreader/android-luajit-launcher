@@ -1737,6 +1737,18 @@ local function run(android_app_state)
         end
     end
 
+    --- Gets the notch height
+    -- @treturn int notch height
+    android.getTopInsetHeight = function()
+        return JNI:context(android.app.activity.vm, function(jni)
+            return jni:callIntMethod(
+                android.app.activity.clazz,
+                "getTopInsetHeight",
+                "()I"
+            )
+        end)
+    end
+
     --- Gets screen width.
     -- @treturn int screen width
     android.getScreenWidth = function()
@@ -1756,6 +1768,16 @@ local function run(android_app_state)
             return jni:callIntMethod(
                 android.app.activity.clazz,
                 "getScreenHeight",
+                "()I"
+            )
+        end)
+    end
+
+    android.getScreenAvailableWidth = function()
+        return JNI:context(android.app.activity.vm, function(jni)
+            return jni:callIntMethod(
+                android.app.activity.clazz,
+                "getScreenAvailableWidth",
                 "()I"
             )
         end)
