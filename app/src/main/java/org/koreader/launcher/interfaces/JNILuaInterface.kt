@@ -26,6 +26,7 @@ interface JNILuaInterface {
     fun getPlatformName(): String
     fun getProduct(): String
     fun getScreenAvailableHeight(): Int
+    fun getScreenAvailableWidth(): Int
     fun getScreenBrightness(): Int
     fun getScreenHeight(): Int
     fun getScreenMaxBrightness(): Int

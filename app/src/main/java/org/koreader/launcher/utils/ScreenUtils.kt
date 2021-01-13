@@ -13,6 +13,10 @@ import java.util.concurrent.CountDownLatch
 object ScreenUtils {
     private const val TAG = "ScreenUtils"
 
+    fun getScreenAvailableWidth(activity: Activity): Int {
+        return getScreenSizeWithConstraints(activity).x
+    }
+
     fun getScreenAvailableHeight(activity: Activity): Int {
         return getScreenSizeWithConstraints(activity).y
     }

@@ -318,13 +318,24 @@ class MainActivity : NativeActivity(), JNILuaInterface,
         return ScreenUtils.getScreenAvailableHeight(this)
     }
 
+    override fun getScreenAvailableWidth(): Int {
+        return ScreenUtils.getScreenAvailableWidth(this)
+    }
+
     override fun getScreenBrightness(): Int {
         return device.getScreenBrightness(this)
     }
 
     override fun getScreenHeight(): Int {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            ScreenUtils.getScreenHeight(this) - topInsetHeight
+            // We need to handle the notch in Portrait
+            // NOTE: getScreenAvailableHeight does it automatically, but it also excludes the nav bar, when there's one :/
+            if (device.getScreenOrientation(this).and(1) == 0) {
+                // getScreenOrientation returns LinuxFB rotation constants, Portrait rotations are always even
+                ScreenUtils.getScreenHeight(this) - topInsetHeight
+            } else {
+                ScreenUtils.getScreenHeight(this)
+            }
         } else {
             ScreenUtils.getScreenHeight(this)
         }
@@ -355,7 +366,18 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     }
 
     override fun getScreenWidth(): Int {
-        return ScreenUtils.getScreenWidth(this)
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            // We need to handle the notch in Landscape
+            // NOTE: getScreenAvailableWidth does it automatically, but it also excludes the nav bar, when there's one :/
+            if (device.getScreenOrientation(this).and(1) == 1) {
+                // getScreenOrientation returns LinuxFB rotation constants, Landscape rotations are always odd
+                ScreenUtils.getScreenWidth(this) - topInsetHeight
+            } else {
+                ScreenUtils.getScreenWidth(this)
+            }
+        } else {
+            ScreenUtils.getScreenWidth(this)
+        }
     }
 
     override fun getStatusBarHeight(): Int {
@@ -377,8 +399,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     override fun hasNativeRotation(): Boolean {
         return if (device.platform == "android") {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                // FIXME: hw rotation is disabled in devices with a Notch.
-                !((topInsetHeight > 0) || (device.bugRotation))
+                !(device.bugRotation)
             } else false
         } else false
     }
