@@ -328,8 +328,14 @@ class MainActivity : NativeActivity(), JNILuaInterface,
 
     override fun getScreenHeight(): Int {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            // It handles all the insets for us, and is rotation-aware
-            ScreenUtils.getScreenAvailableHeight(this)
+            // We need to handle the notch in Portrait
+            // NOTE: getScreenAvailableHeight does it automatically, but it also excludes the status bar, when there's one :/
+            if (device.getScreenOrientation(this).and(1) == 0) {
+                // getScreenOrientation returns LinuxFB rotation constants, Portrait rotations are always even
+                ScreenUtils.getScreenHeight(this) - topInsetHeight
+            } else {
+                ScreenUtils.getScreenHeight(this)
+            }
         } else {
             ScreenUtils.getScreenHeight(this)
         }
@@ -361,8 +367,14 @@ class MainActivity : NativeActivity(), JNILuaInterface,
 
     override fun getScreenWidth(): Int {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            // It handles all the insets for us, and is rotation-aware
-            ScreenUtils.getScreenAvailableWidth(this)
+            // We need to handle the notch in Landscape
+            // NOTE: getScreenAvailableWidth does it automatically, but it also excludes the status bar, when there's one :/
+            if (device.getScreenOrientation(this).and(1) == 1) {
+                // getScreenOrientation returns LinuxFB rotation constants, Landscape rotations are always odd
+                ScreenUtils.getScreenWidth(this) - topInsetHeight
+            } else {
+                ScreenUtils.getScreenWidth(this)
+            }
         } else {
             ScreenUtils.getScreenWidth(this)
         }
