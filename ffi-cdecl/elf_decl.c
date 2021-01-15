@@ -35,3 +35,21 @@ cdecl_type(Elf32_Shdr)
 cdecl_type(Elf32_Dyn)
 
 // ELFCLASS64
+cdecl_c99_type(Elf64_Half, uint16_t)
+cdecl_c99_type(Elf64_Word, uint32_t)
+cdecl_c99_type(Elf64_Sword, int32_t)
+
+cdecl_c99_type(Elf64_Xword, uint64_t)
+cdecl_c99_type(Elf64_Sxword, int64_t)
+
+cdecl_c99_type(Elf64_Addr, uint64_t)
+
+cdecl_c99_type(Elf64_Off, uint64_t)
+
+cdecl_c99_type(Elf64_Section, uint16_t)
+
+cdecl_c99_type(Elf64_Versym, Elf64_Half)
+
+cdecl_type(Elf64_Ehdr)
+cdecl_type(Elf64_Shdr)
+cdecl_type(Elf64_Dyn)
