@@ -64,9 +64,13 @@ end
 
 -- convenience method that seeks and reads and also casts to an FFI ctype
 function Elf.__index:read_at(pos, whence, ctype, size)
+    -- We'll get a cdata instead of a plain Lua number with Elf64, coerce that back in a way seek handles
+    pos = tonumber(pos)
     local t
     if size then
         t = ffi.new(ctype, size)
+        -- Same idea as for pos above, io.read doen't like a cdata size ;)
+        size = tonumber(size)
     else
         t = ffi.new(ctype)
     end
@@ -84,14 +88,13 @@ function Elf.__index:dlneeds()
     local hdr = self:read_at(0, "set", self.Elf_Ehdr)
 
     -- Fetch string tables
-    local shdr = self:read_at(
-        hdr.e_shoff + hdr.e_shstrndx * ffi.sizeof(self.Elf_Shdr),
-        "set", self.Elf_Shdr)
+    local shdr_pos = tonumber(hdr.e_shoff + hdr.e_shstrndx * ffi.sizeof(self.Elf_Shdr))
+    local shdr = self:read_at(shdr_pos, "set", self.Elf_Shdr)
     local shstrtab = self:read_at(shdr.sh_offset, "set", "char[?]", shdr.sh_size)
 
     -- read .dynstr string table which contains the actual library names
     local dynstr
-    self.file:seek("set", hdr.e_shoff)
+    self.file:seek("set", tonumber(hdr.e_shoff))
     for i = 0, hdr.e_shnum - 1 do
         shdr = self:read_at(0, "cur", self.Elf_Shdr)
         if shdr.sh_type == C.SHT_STRTAB
@@ -104,12 +107,12 @@ function Elf.__index:dlneeds()
 
     local needs = {}
     -- walk through the table of needed libraries
-    self.file:seek("set", hdr.e_shoff)
+    self.file:seek("set", tonumber(hdr.e_shoff))
     for i = 0, hdr.e_shnum - 1 do
         shdr = self:read_at(0, "cur", self.Elf_Shdr)
         if shdr.sh_type == C.SHT_DYNAMIC then
             local offs = 0
-            self.file:seek("set", shdr.sh_offset)
+            self.file:seek("set", tonumber(shdr.sh_offset))
             while offs < shdr.sh_size do
                 local dyn = self:read_at(0, "cur", self.Elf_Dyn)
                 offs = offs + ffi.sizeof(dyn)
