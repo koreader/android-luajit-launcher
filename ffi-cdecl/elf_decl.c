@@ -4,6 +4,7 @@
 #include "ffi-cdecl.h"
 
 // Constants
+cdecl_const(EI_NIDENT)
 cdecl_const(EI_CLASS)
 cdecl_const(ELFCLASSNONE)
 cdecl_const(ELFCLASS32)

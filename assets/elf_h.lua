@@ -1,6 +1,7 @@
 local ffi = require("ffi")
 
 ffi.cdef[[
+static const int EI_NIDENT = 16;
 static const int EI_CLASS = 4;
 static const int ELFCLASSNONE = 0;
 static const int ELFCLASS32 = 1;
