@@ -85,7 +85,7 @@ function Elf.__index:dlneeds()
 
     -- Fetch string tables
     local shdr = self:read_at(
-        hdr.e_shoff + hdr.e_shstrndx * ffi.sizeof(self.Elf_Shdr,
+        hdr.e_shoff + hdr.e_shstrndx * ffi.sizeof(self.Elf_Shdr),
         "set", self.Elf_Shdr)
     local shstrtab = self:read_at(shdr.sh_offset, "set", "char[?]", shdr.sh_size)
 
