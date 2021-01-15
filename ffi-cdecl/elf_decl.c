@@ -1,4 +1,3 @@
-// NOTE: Fix the typedefs manually, ffi-cdecl resolves those to the canonical type they point to, which makes it unstable across ABIs, unlike the original C99 names...
 #include <elf.h>
 
 #include "ffi-cdecl.h"

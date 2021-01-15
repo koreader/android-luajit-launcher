@@ -69,7 +69,7 @@ function Elf.__index:read_at(pos, whence, ctype, size)
     local t
     if size then
         t = ffi.new(ctype, size)
-        -- Same idea as for pos above, io.read doen't like a cdata size ;)
+        -- Same idea as for pos above, io.read doesn't like a cdata size ;)
         size = tonumber(size)
     else
         t = ffi.new(ctype)
