@@ -10,13 +10,13 @@ static const int SHT_DYNAMIC = 6;
 static const int DT_NEEDED = 1;
 typedef uint16_t Elf32_Half;
 typedef uint32_t Elf32_Word;
-typedef int32_t Elf32_Sword;
+typedef int32_t  Elf32_Sword;
 typedef uint64_t Elf32_Xword;
-typedef int64_t Elf32_Sxword;
+typedef int64_t  Elf32_Sxword;
 typedef uint32_t Elf32_Addr;
 typedef uint32_t Elf32_Off;
 typedef uint16_t Elf32_Section;
-typedef uint16_t Elf32_Versym;
+typedef Elf32_Half Elf32_Versym;
 typedef struct {
   unsigned char e_ident[16];
   Elf32_Half e_type;
