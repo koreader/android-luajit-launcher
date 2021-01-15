@@ -34,7 +34,7 @@ function Elf.open(filename)
     -- Check the Elf class (head of the Ehdr, which is at the head of the file)
     local e_ident = e:read_at(0, "set", "unsigned char[?]", C.EI_NIDENT)
     e.class = e_ident[C.EI_CLASS]
-    assert(e.class == C.ELFCLASS32 or e.class == C.ELFCLASS64, filename .. " is not a valid ELF file")
+    assert(e.class == C.ELFCLASS32 or e.class == C.ELFCLASS64, filename .. " is not a valid ELF binary")
     -- Set the ctypes we'll use given the Elf class
     if e.class == C.ELFCLASS64 then
         e.Elf_Ehdr = ffi.typeof("Elf64_Ehdr")
