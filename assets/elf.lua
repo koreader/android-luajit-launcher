@@ -35,6 +35,16 @@ function Elf.open(filename)
     local e_ident = e:read_at(0, "set", "unsigned char[?]", C.EI_NIDENT)
     e.class = e_ident[C.EI_CLASS]
     assert(e.class == C.ELFCLASS32 or e.class == C.ELFCLASS64, filename .. " is not a valid ELF file")
+    -- Set the ctypes we'll use given the Elf class
+    if e.class == C.ELFCLASS64 then
+        e.Elf_Ehdr = ffi.typeof("Elf64_Ehdr")
+        e.Elf_Shdr = ffi.typeof("Elf64_Shdr")
+        e.Elf_Dyn = ffi.typeof("Elf64_Dyn")
+    else
+        e.Elf_Ehdr = ffi.typeof("Elf32_Ehdr")
+        e.Elf_Shdr = ffi.typeof("Elf32_Shdr")
+        e.Elf_Dyn = ffi.typeof("Elf32_Dyn")
+    end
     return e
 end
 
@@ -71,19 +81,19 @@ end
 -- read the list of libraries that are needed by the ELF file
 function Elf.__index:dlneeds()
     -- ELF header:
-    local hdr = self:read_at(0, "set", self.class == C.ELFCLASS64 and "Elf64_Ehdr" or "Elf32_Ehdr")
+    local hdr = self:read_at(0, "set", self.Elf_Ehdr)
 
     -- Fetch string tables
     local shdr = self:read_at(
-        hdr.e_shoff + hdr.e_shstrndx * ffi.sizeof(self.class == C.ELFCLASS64 and "Elf64_Shdr" or "Elf32_Shdr"),
-        "set", self.class == C.ELFCLASS64 and "Elf64_Shdr" or "Elf32_Shdr")
+        hdr.e_shoff + hdr.e_shstrndx * ffi.sizeof(self.Elf_Shdr,
+        "set", self.Elf_Shdr)
     local shstrtab = self:read_at(shdr.sh_offset, "set", "char[?]", shdr.sh_size)
 
     -- read .dynstr string table which contains the actual library names
     local dynstr
     self.file:seek("set", hdr.e_shoff)
     for i = 0, hdr.e_shnum - 1 do
-        shdr = self:read_at(0, "cur", self.class == C.ELFCLASS64 and "Elf64_Shdr" or "Elf32_Shdr")
+        shdr = self:read_at(0, "cur", self.Elf_Shdr)
         if shdr.sh_type == C.SHT_STRTAB
         and ffi.string(shstrtab + shdr.sh_name) == ".dynstr" then
             dynstr = self:read_at(shdr.sh_offset, "set", "char[?]", shdr.sh_size)
@@ -96,12 +106,12 @@ function Elf.__index:dlneeds()
     -- walk through the table of needed libraries
     self.file:seek("set", hdr.e_shoff)
     for i = 0, hdr.e_shnum - 1 do
-        shdr = self:read_at(0, "cur", self.class == C.ELFCLASS64 and "Elf64_Shdr" or "Elf32_Shdr")
+        shdr = self:read_at(0, "cur", self.Elf_Shdr)
         if shdr.sh_type == C.SHT_DYNAMIC then
             local offs = 0
             self.file:seek("set", shdr.sh_offset)
             while offs < shdr.sh_size do
-                local dyn = self:read_at(0, "cur", self.class == C.ELFCLASS64 and "Elf64_Dyn" or "Elf32_Dyn")
+                local dyn = self:read_at(0, "cur", self.Elf_Dyn)
                 offs = offs + ffi.sizeof(dyn)
                 if dyn.d_tag == C.DT_NEEDED then
                     table.insert(needs, ffi.string(dynstr + dyn.d_un.d_val))
