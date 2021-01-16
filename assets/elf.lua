@@ -27,7 +27,7 @@ local Elf = {__index={}}
 function Elf.open(filename)
     local e = {}
     e.filename = filename
-    e.file = assert(io.open(filename, "r"), "cannot open file "..filename)
+    e.file = assert(io.open(filename, "r"))
     -- should also raise error if 'filename' is a directory
     assert(e.file:read(0), filename .. " is not a regular file")
     setmetatable(e, Elf)
