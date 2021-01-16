@@ -5,7 +5,7 @@ jit.off(true, true)
 
 local ffi = require("ffi")
 
-package.path = "?.lua;" .. "assets/?.lua;" .. "../assets/?.lua;" .. package.path
+package.path = "?.lua;" .. "utils/?.lua;" .. "assets/?.lua;" .. "../assets/?.lua;" .. package.path
 local Elf = require("elf")
 
 lname = arg[1]
