@@ -86,7 +86,7 @@ function Elf.__index:read_at(pos, whence, ctype, size)
     end
     self.file:seek(whence, pos)
     local s = assert(self.file:read(size or ffi.sizeof(t)))
-    assert(#s == size or ffi.sizeof(t), "short read from "..self.filename)
+    assert(#s == size or ffi.sizeof(t), "short read")
     ffi.copy(t, s, #s)
     return t
 end

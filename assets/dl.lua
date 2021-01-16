@@ -144,8 +144,12 @@ function dl.dlopen(library, load_func, depth)
             -- The first io.open assert will return a table, so that we can preserve the errno,
             -- allowing us to somewhat cleanly skip logging ENOENT errors,
             -- because 99.99% of those will happen in the course of the searchpath lookups...
-            -- NOTE: #define ENOENT 2 @ /usr/include/asm-generic/errno-base.h ;).
-            if type(lib) ~= "table" or lib.num ~= 2 then
+            if type(lib) == "table" then
+                -- NOTE: #define ENOENT 2 @ /usr/include/asm-generic/errno-base.h ;).
+                if lib.num and lib.num ~= 2 then
+                    A.LOGVV(log, string.format("Failed to parse ELF binary %s: %s", lname, lib.str))
+                end
+            else
                 A.LOGVV(log, string.format("Failed to parse ELF binary %s: %s", lname, lib))
             end
         end
