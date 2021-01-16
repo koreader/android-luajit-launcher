@@ -2,6 +2,14 @@ local ffi = require("ffi")
 
 ffi.cdef[[
 static const int EI_NIDENT = 16;
+static const int EI_MAG0 = 0;
+static const int ELFMAG0 = 127;
+static const int EI_MAG1 = 1;
+static const int ELFMAG1 = 69;
+static const int EI_MAG2 = 2;
+static const int ELFMAG2 = 76;
+static const int EI_MAG3 = 3;
+static const int ELFMAG3 = 70;
 static const int EI_CLASS = 4;
 static const int ELFCLASSNONE = 0;
 static const int ELFCLASS32 = 1;

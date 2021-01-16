@@ -4,10 +4,21 @@
 
 // Constants
 cdecl_const(EI_NIDENT)
+
+cdecl_const(EI_MAG0)
+cdecl_const(ELFMAG0)
+cdecl_const(EI_MAG1)
+cdecl_const(ELFMAG1)
+cdecl_const(EI_MAG2)
+cdecl_const(ELFMAG2)
+cdecl_const(EI_MAG3)
+cdecl_const(ELFMAG3)
+
 cdecl_const(EI_CLASS)
 cdecl_const(ELFCLASSNONE)
 cdecl_const(ELFCLASS32)
 cdecl_const(ELFCLASS64)
+
 
 cdecl_const(SHT_STRTAB)
 cdecl_const(SHT_DYNAMIC)

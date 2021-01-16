@@ -33,8 +33,15 @@ function Elf.open(filename)
     setmetatable(e, Elf)
     -- Check the Elf class (head of the Ehdr, which is at the head of the file)
     local e_ident = e:read_at(0, "set", "unsigned char[?]", C.EI_NIDENT)
+    -- Check the ELF magic, first
+    assert(e_ident[C.EI_MAG0] == C.ELFMAG0 and
+           e_ident[C.EI_MAG1] == C.ELFMAG1 and
+           e_ident[C.EI_MAG2] == C.ELFMAG2 and
+           e_ident[C.EI_MAG3] == C.ELFMAG3,
+           filename .. " is not a valid ELF binary")
+    -- Then the class
     e.class = e_ident[C.EI_CLASS]
-    assert(e.class == C.ELFCLASS32 or e.class == C.ELFCLASS64, filename .. " is not a valid ELF binary")
+    assert(e.class == C.ELFCLASS32 or e.class == C.ELFCLASS64, filename .. " has an invalid ELF class")
     -- Set the ctypes we'll use given the Elf class
     if e.class == C.ELFCLASS64 then
         e.Elf_Ehdr = ffi.typeof("Elf64_Ehdr")
