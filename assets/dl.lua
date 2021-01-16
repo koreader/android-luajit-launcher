@@ -147,7 +147,7 @@ function dl.dlopen(library, load_func, depth)
             if type(lib) == "table" then
                 -- NOTE: #define ENOENT 2 @ /usr/include/asm-generic/errno-base.h ;).
                 if lib.num and lib.num ~= 2 then
-                    A.LOGVV(log, string.format("Failed to parse ELF binary %s: %s", lname, lib.str))
+                    A.LOGVV(log, string.format("Failed to open %s", lib.str))
                 end
             else
                 A.LOGVV(log, string.format("Failed to parse ELF binary %s: %s", lname, lib))
