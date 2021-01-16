@@ -141,11 +141,12 @@ function dl.dlopen(library, load_func, depth)
                 return load_func(lname)
             end
         else
-            -- Filter out ENOENT errors to weed out the various searchpath lookup failures...
-            -- (It's mildy less convoluted that mangling the assert in elf to pass a table to it instead of a string,
-            -- so as to preserve open's third argument, which is errno, which we could then compare against C.ENOENT here...)
-            if not lib:find("No such file or directory") then
-                A.LOGVV(log, string.format("Failed to parse ELF binary for %s (%s)", lname, lib))
+            -- The first io.open assert will return a table, so that we can preserve the errno,
+            -- allowing us to somewhat cleanly skip logging ENOENT errors,
+            -- because 99.99% of those will happen in the course of the searchpath lookups...
+            -- NOTE: #define ENOENT 2 @ /usr/include/asm-generic/errno-base.h ;).
+            if type(lib) ~= "table" or lib.num ~= 2 then
+                A.LOGVV(log, string.format("Failed to parse ELF binary %s: %s", lname, lib))
             end
         end
     end

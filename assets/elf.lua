@@ -27,9 +27,12 @@ local Elf = {__index={}}
 function Elf.open(filename)
     local e = {}
     e.filename = filename
-    e.file = assert(io.open(filename, "r"))
+    -- Slightly more roundabout than e.file = assert(io.open(filename, "r")) in order to preserve the errno...
+    local err = {}
+    e.file, err.str, err.num = io.open(filename, "r")
+    assert(e.file, err)
     -- should also raise error if 'filename' is a directory
-    assert(e.file:read(0), filename .. " is not a regular file")
+    assert(e.file:read(0))
     setmetatable(e, Elf)
     -- Check the Elf class (head of the Ehdr, which is at the head of the file)
     local e_ident = e:read_at(0, "set", "unsigned char[?]", C.EI_NIDENT)
@@ -38,10 +41,10 @@ function Elf.open(filename)
            e_ident[C.EI_MAG1] == C.ELFMAG1 and
            e_ident[C.EI_MAG2] == C.ELFMAG2 and
            e_ident[C.EI_MAG3] == C.ELFMAG3,
-           filename .. " is not a valid ELF binary")
+           "not a valid ELF binary")
     -- Then the class
     e.class = e_ident[C.EI_CLASS]
-    assert(e.class == C.ELFCLASS32 or e.class == C.ELFCLASS64, filename .. " has an invalid ELF class")
+    assert(e.class == C.ELFCLASS32 or e.class == C.ELFCLASS64, "invalid ELF class")
     -- Set the ctypes we'll use given the Elf class
     if e.class == C.ELFCLASS64 then
         e.Elf_Ehdr = ffi.typeof("Elf64_Ehdr")
@@ -82,9 +85,8 @@ function Elf.__index:read_at(pos, whence, ctype, size)
         t = ffi.new(ctype)
     end
     self.file:seek(whence, pos)
-    local s = assert(self.file:read(size or ffi.sizeof(t)),
-        "cannot read from file "..self.filename)
-    assert(#s == size or ffi.sizeof(t), "too short read from "..self.filename)
+    local s = assert(self.file:read(size or ffi.sizeof(t)))
+    assert(#s == size or ffi.sizeof(t), "short read from "..self.filename)
     ffi.copy(t, s, #s)
     return t
 end
@@ -110,7 +112,7 @@ function Elf.__index:dlneeds()
             break
         end
     end
-    assert(dynstr, "no .dynstr section in "..self.filename)
+    assert(dynstr, "no .dynstr section")
 
     local needs = {}
     -- walk through the table of needed libraries
