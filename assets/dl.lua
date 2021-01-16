@@ -62,7 +62,9 @@ local function sys_dlopen(library, global, padding)
     if p == nil then
         local err_msg = C.dlerror()
         if err_msg ~= nil then
-            error("error opening "..library..": "..ffi.string(err_msg))
+            local err = "error dlopen'ing "..library..": "..ffi.string(err_msg)
+            A.LOGVV(log, err)
+            error(err)
         end
     else
         C.dlerror()
@@ -138,10 +140,19 @@ function dl.dlopen(library, load_func, depth)
                 A.LOGVV(log, string.format("%"..padding.."sdl.dlopen - load_func -> %s", "", lname))
                 return load_func(lname)
             end
+        else
+            -- Filter out ENOENT errors to weed out the various searchpath lookup failures...
+            -- (It's mildy less convoluted that mangling the assert in elf to pass a table to it instead of a string,
+            -- so as to preserve open's third argument, which is errno, which we could then compare against C.ENOENT here...)
+            if not lib:find("No such file or directory") then
+                A.LOGVV(log, string.format("Failed to parse ELF binary for %s (%s)", lname, lib))
+            end
         end
     end
 
-    error("could not find library " .. library)
+    local err = "could not find library " .. library
+    A.LOGVV(log, err)
+    error(err)
 end
 
 return dl
