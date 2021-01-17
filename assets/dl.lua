@@ -27,7 +27,7 @@ local C = ffi.C
 
 -- There's a bit of heinous hackery going on on 32-bit ABIs with RTLD_NOW & RTLD_GLOBAL...
 -- c.f., https://android.googlesource.com/platform/bionic/+/refs/heads/master/libc/include/dlfcn.h
-if jit.arch:sub(-2) == "64" then
+if ffi.abi("64bit") then
     ffi.cdef[[
     void *dlopen(const char *filename, int flag);
     char *dlerror(void);
@@ -62,7 +62,9 @@ local function sys_dlopen(library, global, padding)
     if p == nil then
         local err_msg = C.dlerror()
         if err_msg ~= nil then
-            error("error opening "..library..": "..ffi.string(err_msg))
+            local err = "error dlopen'ing "..library..": "..ffi.string(err_msg)
+            A.LOGVV(log, err)
+            error(err)
         end
     else
         C.dlerror()
@@ -138,10 +140,24 @@ function dl.dlopen(library, load_func, depth)
                 A.LOGVV(log, string.format("%"..padding.."sdl.dlopen - load_func -> %s", "", lname))
                 return load_func(lname)
             end
+        else
+            -- The first io.open assert will return a table, so that we can preserve the errno,
+            -- allowing us to somewhat cleanly skip logging ENOENT errors,
+            -- because 99.99% of those will happen in the course of the searchpath lookups...
+            if type(lib) == "table" then
+                -- NOTE: #define ENOENT 2 @ /usr/include/asm-generic/errno-base.h ;).
+                if lib.num and lib.num ~= 2 then
+                    A.LOGVV(log, string.format("Failed to open %s", lib.str))
+                end
+            else
+                A.LOGVV(log, string.format("Failed to parse ELF binary %s: %s", lname, lib))
+            end
         end
     end
 
-    error("could not find library " .. library)
+    local err = "could not find library " .. library
+    A.LOGVV(log, err)
+    error(err)
 end
 
 return dl

@@ -18,83 +18,8 @@ local ffi = require("ffi")
 
 local C = ffi.C
 
-ffi.cdef[[
-/* from /usr/include/elf.h */
-
-/* Type for a 16-bit quantity.  */
-typedef uint16_t Elf32_Half;
-
-/* Types for signed and unsigned 32-bit quantities.  */
-typedef uint32_t Elf32_Word;
-typedef int32_t  Elf32_Sword;
-
-/* Types for signed and unsigned 64-bit quantities.  */
-typedef uint64_t Elf32_Xword;
-typedef int64_t  Elf32_Sxword;
-
-/* Type of addresses.  */
-typedef uint32_t Elf32_Addr;
-
-/* Type of file offsets.  */
-typedef uint32_t Elf32_Off;
-
-/* Type for section indices, which are 16-bit quantities.  */
-typedef uint16_t Elf32_Section;
-
-/* Type for version symbol information.  */
-typedef Elf32_Half Elf32_Versym;
-
-typedef struct
-{
-  unsigned char e_ident[16];            /* Magic number and other info */
-  Elf32_Half    e_type;                 /* Object file type */
-  Elf32_Half    e_machine;              /* Architecture */
-  Elf32_Word    e_version;              /* Object file version */
-  Elf32_Addr    e_entry;                /* Entry point virtual address */
-  Elf32_Off     e_phoff;                /* Program header table file offset */
-  Elf32_Off     e_shoff;                /* Section header table file offset */
-  Elf32_Word    e_flags;                /* Processor-specific flags */
-  Elf32_Half    e_ehsize;               /* ELF header size in bytes */
-  Elf32_Half    e_phentsize;            /* Program header table entry size */
-  Elf32_Half    e_phnum;                /* Program header table entry count */
-  Elf32_Half    e_shentsize;            /* Section header table entry size */
-  Elf32_Half    e_shnum;                /* Section header table entry count */
-  Elf32_Half    e_shstrndx;             /* Section header string table index */
-} Elf32_Ehdr;
-
-/* Section header.  */
-
-typedef struct
-{
-  Elf32_Word    sh_name;                /* Section name (string tbl index) */
-  Elf32_Word    sh_type;                /* Section type */
-  Elf32_Word    sh_flags;               /* Section flags */
-  Elf32_Addr    sh_addr;                /* Section virtual addr at execution */
-  Elf32_Off     sh_offset;              /* Section file offset */
-  Elf32_Word    sh_size;                /* Section size in bytes */
-  Elf32_Word    sh_link;                /* Link to another section */
-  Elf32_Word    sh_info;                /* Additional section information */
-  Elf32_Word    sh_addralign;           /* Section alignment */
-  Elf32_Word    sh_entsize;             /* Entry size if section holds table */
-} Elf32_Shdr;
-
-/* Dynamic section entry.  */
-
-typedef struct
-{
-  Elf32_Sword   d_tag;                  /* Dynamic entry type */
-  union
-    {
-      Elf32_Word d_val;                 /* Integer value */
-      Elf32_Addr d_ptr;                 /* Address value */
-    } d_un;
-} Elf32_Dyn;
-
-static const int SHT_STRTAB = 3;
-static const int SHT_DYNAMIC = 6;
-
-static const int DT_NEEDED = 1;
-]]
+-- Pull in the necessary cdefs
+require("elf_h")
 
 local Elf = {__index={}}
 
@@ -102,10 +27,34 @@ local Elf = {__index={}}
 function Elf.open(filename)
     local e = {}
     e.filename = filename
-    e.file = assert(io.open(filename, "r"), "cannot open file "..filename)
+    -- Slightly more roundabout than e.file = assert(io.open(filename, "r")) in order to preserve the errno...
+    local err = {}
+    e.file, err.str, err.num = io.open(filename, "r")
+    assert(e.file, err)
     -- should also raise error if 'filename' is a directory
-    assert(e.file:read(0), filename .. " is not a regular file")
+    assert(e.file:read(0))
     setmetatable(e, Elf)
+    -- Check the Elf class (head of the Ehdr, which is at the head of the file)
+    local e_ident = e:read_at(0, "set", "unsigned char[?]", C.EI_NIDENT)
+    -- Check the ELF magic, first
+    assert(e_ident[C.EI_MAG0] == C.ELFMAG0 and
+           e_ident[C.EI_MAG1] == C.ELFMAG1 and
+           e_ident[C.EI_MAG2] == C.ELFMAG2 and
+           e_ident[C.EI_MAG3] == C.ELFMAG3,
+           "not a valid ELF binary")
+    -- Then the class
+    e.class = e_ident[C.EI_CLASS]
+    assert(e.class == C.ELFCLASS32 or e.class == C.ELFCLASS64, "invalid ELF class")
+    -- Set the ctypes we'll use given the Elf class
+    if e.class == C.ELFCLASS64 then
+        e.Elf_Ehdr = ffi.typeof("Elf64_Ehdr")
+        e.Elf_Shdr = ffi.typeof("Elf64_Shdr")
+        e.Elf_Dyn = ffi.typeof("Elf64_Dyn")
+    else
+        e.Elf_Ehdr = ffi.typeof("Elf32_Ehdr")
+        e.Elf_Shdr = ffi.typeof("Elf32_Shdr")
+        e.Elf_Dyn = ffi.typeof("Elf32_Dyn")
+    end
     return e
 end
 
@@ -125,16 +74,19 @@ end
 
 -- convenience method that seeks and reads and also casts to an FFI ctype
 function Elf.__index:read_at(pos, whence, ctype, size)
+    -- We'll get a cdata instead of a plain Lua number with Elf64, coerce that back in a way seek handles
+    pos = tonumber(pos)
     local t
     if size then
         t = ffi.new(ctype, size)
+        -- Same idea as for pos above, io.read doesn't like a cdata size ;)
+        size = tonumber(size)
     else
         t = ffi.new(ctype)
     end
     self.file:seek(whence, pos)
-    local s = assert(self.file:read(size or ffi.sizeof(t)),
-        "cannot read from file "..self.filename)
-    assert(#s == size or ffi.sizeof(t), "too short read from "..self.filename)
+    local s = assert(self.file:read(size or ffi.sizeof(t)))
+    assert(#s == size or ffi.sizeof(t), "short read")
     ffi.copy(t, s, #s)
     return t
 end
@@ -142,37 +94,36 @@ end
 -- read the list of libraries that are needed by the ELF file
 function Elf.__index:dlneeds()
     -- ELF header:
-    local hdr = self:read_at(0, "set", "Elf32_Ehdr")
+    local hdr = self:read_at(0, "set", self.Elf_Ehdr)
 
     -- Fetch string tables
-    local shdr = self:read_at(
-        hdr.e_shoff + hdr.e_shstrndx * ffi.sizeof("Elf32_Shdr"),
-        "set", "Elf32_Shdr")
+    local shdr_pos = tonumber(hdr.e_shoff + hdr.e_shstrndx * ffi.sizeof(self.Elf_Shdr))
+    local shdr = self:read_at(shdr_pos, "set", self.Elf_Shdr)
     local shstrtab = self:read_at(shdr.sh_offset, "set", "char[?]", shdr.sh_size)
 
     -- read .dynstr string table which contains the actual library names
     local dynstr
-    self.file:seek("set", hdr.e_shoff)
+    self.file:seek("set", tonumber(hdr.e_shoff))
     for i = 0, hdr.e_shnum - 1 do
-        shdr = self:read_at(0, "cur", "Elf32_Shdr")
+        shdr = self:read_at(0, "cur", self.Elf_Shdr)
         if shdr.sh_type == C.SHT_STRTAB
         and ffi.string(shstrtab + shdr.sh_name) == ".dynstr" then
             dynstr = self:read_at(shdr.sh_offset, "set", "char[?]", shdr.sh_size)
             break
         end
     end
-    assert(dynstr, "no .dynstr section in "..self.filename)
+    assert(dynstr, "no .dynstr section")
 
     local needs = {}
     -- walk through the table of needed libraries
-    self.file:seek("set", hdr.e_shoff)
+    self.file:seek("set", tonumber(hdr.e_shoff))
     for i = 0, hdr.e_shnum - 1 do
-        shdr = self:read_at(0, "cur", "Elf32_Shdr")
+        shdr = self:read_at(0, "cur", self.Elf_Shdr)
         if shdr.sh_type == C.SHT_DYNAMIC then
             local offs = 0
-            self.file:seek("set", shdr.sh_offset)
+            self.file:seek("set", tonumber(shdr.sh_offset))
             while offs < shdr.sh_size do
-                local dyn = self:read_at(0, "cur", "Elf32_Dyn")
+                local dyn = self:read_at(0, "cur", self.Elf_Dyn)
                 offs = offs + ffi.sizeof(dyn)
                 if dyn.d_tag == C.DT_NEEDED then
                     table.insert(needs, ffi.string(dynstr + dyn.d_un.d_val))
