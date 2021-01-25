@@ -1,12 +1,14 @@
 package org.koreader.launcher.utils
 
 import android.app.Activity
+import android.graphics.PixelFormat
 import android.graphics.Point
 import android.graphics.Rect
 import android.os.Build
 import android.util.DisplayMetrics
 import android.view.WindowManager
 import org.koreader.launcher.Logger
+import java.util.Locale
 import java.util.concurrent.CountDownLatch
 
 @Suppress("DEPRECATION")
@@ -61,6 +63,16 @@ object ScreenUtils {
             cd.await()
         } catch (ex: InterruptedException) {
             Logger.e(TAG, ex.toString())
+        }
+    }
+
+    fun pixelFormatName(format: Int): String {
+        return when(format) {
+            PixelFormat.RGBA_8888 -> "RGBA_8888"
+            PixelFormat.RGBX_8888 -> "RGBX_8888"
+            PixelFormat.RGB_888 -> "RGB_888"
+            PixelFormat.RGB_565 -> "RGB_565"
+            else -> String.format(Locale.US, "Unknown: %d", format)
         }
     }
 

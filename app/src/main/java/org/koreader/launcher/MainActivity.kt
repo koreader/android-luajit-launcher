@@ -58,7 +58,9 @@ class MainActivity : NativeActivity(), JNILuaInterface,
         }
         override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
             Logger.v(tag, String.format(Locale.US,
-                "surface changed {\n  width:  %d\n  height: %d\n}", width, height))
+                "surface changed {\n  width:  %d\n  height: %d\n format: %s\n}",
+                width, height, ScreenUtils.pixelFormatName(format))
+            )
         }
         override fun surfaceDestroyed(holder: SurfaceHolder) {
             Logger.v(tag, "surface destroyed")
@@ -133,6 +135,10 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     }
 
     override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
+        Logger.v(TAG_MAIN, String.format(Locale.US,
+            "surface changed {\n  width:  %d\n  height: %d\n format: %s\n}",
+            width, height, ScreenUtils.pixelFormatName(format))
+        )
         super.surfaceChanged(holder, format, width, height)
         drawSplashScreen(holder)
     }
