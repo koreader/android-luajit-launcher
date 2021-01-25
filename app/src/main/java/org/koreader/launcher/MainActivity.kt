@@ -65,13 +65,15 @@ class MainActivity : NativeActivity(), JNILuaInterface,
         }
     }
 
-
-
     companion object {
         private const val TAG_MAIN = "MainActivity"
         private const val ACTION_SAF_FILEPICKER = 2
         private val BATTERY_FILTER = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
         private val RUNTIME_VERSION = Build.VERSION.RELEASE
+    }
+
+    init {
+        System.loadLibrary("luajit")
     }
 
     /*---------------------------------------------------------------
