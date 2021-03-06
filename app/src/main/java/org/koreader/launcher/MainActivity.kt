@@ -30,6 +30,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     private lateinit var clipboard: Clipboard
     private lateinit var device: Device
     private lateinit var timeout: Timeout
+    private lateinit var powerConnection: PowerConnection
 
     // Path of last file imported
     private var lastImportedPath: String? = null
@@ -91,6 +92,13 @@ class MainActivity : NativeActivity(), JNILuaInterface,
         clipboard = Clipboard(this)
         device = Device(this)
         timeout = Timeout()
+
+        powerConnection = PowerConnection()
+        val filter = IntentFilter()
+        filter.addAction(Intent.ACTION_POWER_CONNECTED)
+        filter.addAction(Intent.ACTION_POWER_DISCONNECTED)
+        this.registerReceiver(powerConnection, filter)
+
         super.onCreate(savedInstanceState)
         setTheme(R.style.Fullscreen)
 
@@ -413,7 +421,9 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     }
 
     override fun isCharging(): Boolean {
-        return (getBatteryState(false) == 1)
+        // returns the value of the ACTION_POWER_xxxConnected registerReceiver
+        // is fast and mean and frrrightening
+        return powerConnection.isPowerConnected != 0
     }
 
     override fun isChromeOS(): Boolean {
@@ -623,6 +633,11 @@ class MainActivity : NativeActivity(), JNILuaInterface,
             val scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, 100)
             val plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1)
             val percent = level * 100 / scale
+
+            if (plugged == BatteryManager.BATTERY_PLUGGED_AC || plugged == BatteryManager.BATTERY_PLUGGED_USB)
+                powerConnection.isPowerConnected = 1
+            else
+                powerConnection.isPowerConnected = 0
 
             return if (isPercent) {
                 percent
