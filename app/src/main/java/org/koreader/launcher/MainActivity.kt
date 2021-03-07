@@ -94,6 +94,9 @@ class MainActivity : NativeActivity(), JNILuaInterface,
         timeout = Timeout()
 
         powerConnection = PowerConnection()
+
+        powerConnection.isPowerConnected = getBatteryState(false)
+
         val filter = IntentFilter()
         filter.addAction(Intent.ACTION_POWER_CONNECTED)
         filter.addAction(Intent.ACTION_POWER_DISCONNECTED)
@@ -225,8 +228,13 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     override fun canIgnoreBatteryOptimizations(): Boolean {
         return Permissions.isIgnoringBatteryOptimizations(this)
     }
+
     override fun canWriteSystemSettings(): Boolean {
         return Permissions.hasWriteSettingsPermission(this)
+    }
+
+    override fun powerConnectionEvent(): Boolean {
+        return powerConnection.connectionEvent()
     }
 
     override fun dictLookup(text: String?, action: String?, nullablePackage: String?) {
@@ -274,6 +282,27 @@ class MainActivity : NativeActivity(), JNILuaInterface,
 
     override fun getBatteryLevel(): Int {
         return getBatteryState(true)
+    }
+
+    override fun getBatteryState(isPercent: Boolean): Int {
+        val intent = applicationContext.registerReceiver(null, BATTERY_FILTER)
+        if (intent != null) {
+            val level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0)
+            val scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, 100)
+            val plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1)
+            val percent = level * 100 / scale
+
+            return if (isPercent) {
+                percent
+            } else if (plugged == BatteryManager.BATTERY_PLUGGED_AC ||
+                plugged == BatteryManager.BATTERY_PLUGGED_USB) {
+                if (percent != 100) 1 else 0
+            } else {
+                0
+            }
+        } else {
+            return 0
+        }
     }
 
     override fun getClipboardText(): String {
@@ -623,32 +652,6 @@ class MainActivity : NativeActivity(), JNILuaInterface,
                 }
                 holder.unlockCanvasAndPost(canvas)
             }
-        }
-    }
-
-    private fun getBatteryState(isPercent: Boolean): Int {
-        val intent = applicationContext.registerReceiver(null, BATTERY_FILTER)
-        if (intent != null) {
-            val level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0)
-            val scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, 100)
-            val plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1)
-            val percent = level * 100 / scale
-
-            if (plugged == BatteryManager.BATTERY_PLUGGED_AC || plugged == BatteryManager.BATTERY_PLUGGED_USB)
-                powerConnection.isPowerConnected = 1
-            else
-                powerConnection.isPowerConnected = 0
-
-            return if (isPercent) {
-                percent
-            } else if (plugged == BatteryManager.BATTERY_PLUGGED_AC ||
-                plugged == BatteryManager.BATTERY_PLUGGED_USB) {
-                if (percent != 100) 1 else 0
-            } else {
-                0
-            }
-        } else {
-            return 0
         }
     }
 

@@ -6,6 +6,7 @@ package org.koreader.launcher.interfaces
 interface JNILuaInterface {
     fun canIgnoreBatteryOptimizations(): Boolean
     fun canWriteSystemSettings(): Boolean
+    fun powerConnectionEvent(): Boolean
     fun dictLookup(text: String?, action: String?, nullablePackage: String?)
     fun download(url: String, name: String): Int
     fun einkUpdate(mode: Int)
@@ -13,6 +14,7 @@ interface JNILuaInterface {
     fun enableFrontlightSwitch(): Boolean
     fun extractAssets(): Boolean
     fun getBatteryLevel(): Int
+    fun getBatteryState(isPercent: Boolean): Int
     fun getClipboardText(): String
     fun getEinkPlatform(): String
     fun getExternalPath(): String
