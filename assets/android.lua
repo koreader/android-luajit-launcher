@@ -1938,17 +1938,6 @@ local function run(android_app_state)
         end)
     end
 
-    android.powerConnectionEvent = function()
-        return JNI:context(android.app.activity.vm, function(jni)
-            return jni:callBooleanMethod(
-                android.app.activity.clazz,
-                "powerConnectionEvent",
-                "()Z"
-            )
-        end)
-    end
-
-
     android.isTv = function()
         return JNI:context(android.app.activity.vm, function(jni)
             return jni:callBooleanMethod(

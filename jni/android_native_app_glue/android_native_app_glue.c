@@ -21,6 +21,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 #include <android/log.h>
 
@@ -28,6 +31,8 @@
 #include "../logger.h"
 
 #define  TAG "[NativeGlue]"
+
+#define FIFO_PATH "/data/data/org.koreader.launcher/files/alooper.fifo"
 
 #define LOGE(...) ((void)__android_log_print(ANDROID_LOG_ERROR, LOGGER_NAME, __VA_ARGS__))
 
@@ -200,6 +205,22 @@ static void process_cmd(struct android_app* app, struct android_poll_source* sou
     android_app_post_exec_cmd(app, cmd);
 }
 
+ALooper *native_glue_looper;
+
+int fifoCallback(int fd, int events, void *data)
+{
+    char c;
+    int result = read(fd, &c, sizeof(c));
+/*    if (result != -1 )
+        ((int32_t*) data)[0]=(int32_t) c+100000;
+*/
+    LOGD("%s: FIFO data read %d", TAG, c);
+
+    ALooper_wake(native_glue_looper);
+    return 1; // continue reading, leave fd open
+}
+
+
 static void* android_app_entry(void* param) {
     struct android_app* android_app = (struct android_app*)param;
 
@@ -215,16 +236,32 @@ static void* android_app_entry(void* param) {
     android_app->inputPollSource.app = android_app;
     android_app->inputPollSource.process = process_input;
 
-    ALooper* looper = ALooper_prepare(ALOOPER_PREPARE_ALLOW_NON_CALLBACKS);
-    ALooper_addFd(looper, android_app->msgread, LOOPER_ID_MAIN, ALOOPER_EVENT_INPUT, NULL,
-            &android_app->cmdPollSource);
-    android_app->looper = looper;
+    native_glue_looper = ALooper_prepare(ALOOPER_PREPARE_ALLOW_NON_CALLBACKS);
 
+    ALooper_addFd(native_glue_looper, android_app->msgread, LOOPER_ID_MAIN, ALOOPER_EVENT_INPUT, NULL,
+            &android_app->cmdPollSource);
+
+    if (mkfifo(FIFO_PATH, 0666) == -1) {
+        if (errno == EEXIST)
+            LOGD("%s: FIFO \"%s\" already exists", TAG, FIFO_PATH);
+        else
+            LOGE("%s: FIFO \"%s\" cannot be created!", TAG, FIFO_PATH);
+    } else
+        LOGD("%s: FIFO \"%s\" created", TAG, FIFO_PATH);
+
+
+    int fifo_fd = open(FIFO_PATH, O_RDWR | O_CLOEXEC);
+    if (fifo_fd  == -1)
+        LOGE("%s: FIFO errnor=0%x", TAG, errno);
+    else
+        ALooper_addFd(native_glue_looper, fifo_fd, 0, ALOOPER_EVENT_INPUT, fifoCallback, &android_app->cmdPollSource);
+
+
+    android_app->looper = native_glue_looper;
     pthread_mutex_lock(&android_app->mutex);
     android_app->running = 1;
     pthread_cond_broadcast(&android_app->cond);
     pthread_mutex_unlock(&android_app->mutex);
-
     android_main(android_app);
 
     android_app_destroy(android_app);

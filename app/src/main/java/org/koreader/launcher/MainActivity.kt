@@ -22,6 +22,11 @@ import org.koreader.launcher.interfaces.JNILuaInterface
 import org.koreader.launcher.utils.*
 import java.util.*
 
+import android.content.BroadcastReceiver
+import java.io.*
+
+val ALOOPER_FIFO = "/data/data/org.koreader.launcher/files/alooper.fifo"
+
 @Keep
 class MainActivity : NativeActivity(), JNILuaInterface,
     ActivityCompat.OnRequestPermissionsResultCallback{
@@ -68,6 +73,41 @@ class MainActivity : NativeActivity(), JNILuaInterface,
         }
     }
 
+    inner class PowerConnection : BroadcastReceiver() {
+        var isPowerConnected = -1
+        private lateinit var alooper_fifo: FileWriter
+
+        init {
+//            var command = "mkfifo /data/data/org.koreader.launcher/files/alooper.fifo" ;
+//            var process = Runtime.getRuntime().exec(command);
+//            process.waitFor();
+        }
+
+        override fun onReceive(context: Context?, intent: Intent?) {
+            val action = intent?.action
+            when (action) {
+                Intent.ACTION_POWER_CONNECTED -> {
+                    isPowerConnected = 1
+
+                    if (!this::alooper_fifo.isInitialized) {
+                        alooper_fifo = FileWriter(ALOOPER_FIFO, true)
+                    }
+                    alooper_fifo.write( 69 )
+                    alooper_fifo.flush()
+                }
+                Intent.ACTION_POWER_DISCONNECTED -> {
+                    isPowerConnected = 0
+
+                    if (!this::alooper_fifo.isInitialized) {
+                        alooper_fifo = FileWriter(ALOOPER_FIFO, true)
+                    }
+                    alooper_fifo.write( 65 )
+                    alooper_fifo.flush()
+                }
+            }
+        }
+    }
+
     companion object {
         private const val TAG_MAIN = "MainActivity"
         private const val ACTION_SAF_FILEPICKER = 2
@@ -94,7 +134,6 @@ class MainActivity : NativeActivity(), JNILuaInterface,
         timeout = Timeout()
 
         powerConnection = PowerConnection()
-
         powerConnection.isPowerConnected = getBatteryState(false)
 
         val filter = IntentFilter()
@@ -123,6 +162,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
         if (!Permissions.hasStoragePermission(this)) {
             Permissions.requestStoragePermission(this)
         }
+
     }
 
     /* Called when the activity has become visible. */
@@ -233,10 +273,6 @@ class MainActivity : NativeActivity(), JNILuaInterface,
         return Permissions.hasWriteSettingsPermission(this)
     }
 
-    override fun powerConnectionEvent(): Boolean {
-        return powerConnection.connectionEvent()
-    }
-
     override fun dictLookup(text: String?, action: String?, nullablePackage: String?) {
         text?.let { lookupText ->
             action?.let { lookupAction ->
@@ -282,27 +318,6 @@ class MainActivity : NativeActivity(), JNILuaInterface,
 
     override fun getBatteryLevel(): Int {
         return getBatteryState(true)
-    }
-
-    override fun getBatteryState(isPercent: Boolean): Int {
-        val intent = applicationContext.registerReceiver(null, BATTERY_FILTER)
-        if (intent != null) {
-            val level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0)
-            val scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, 100)
-            val plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1)
-            val percent = level * 100 / scale
-
-            return if (isPercent) {
-                percent
-            } else if (plugged == BatteryManager.BATTERY_PLUGGED_AC ||
-                plugged == BatteryManager.BATTERY_PLUGGED_USB) {
-                if (percent != 100) 1 else 0
-            } else {
-                0
-            }
-        } else {
-            return 0
-        }
     }
 
     override fun getClipboardText(): String {
@@ -450,8 +465,6 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     }
 
     override fun isCharging(): Boolean {
-        // returns the value of the ACTION_POWER_xxxConnected registerReceiver
-        // is fast and mean and frrrightening
         return powerConnection.isPowerConnected != 0
     }
 
@@ -652,6 +665,27 @@ class MainActivity : NativeActivity(), JNILuaInterface,
                 }
                 holder.unlockCanvasAndPost(canvas)
             }
+        }
+    }
+
+    private fun getBatteryState(isPercent: Boolean): Int {
+        val intent = applicationContext.registerReceiver(null, BATTERY_FILTER)
+        if (intent != null) {
+            val level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0)
+            val scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, 100)
+            val plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1)
+            val percent = level * 100 / scale
+
+            return if (isPercent) {
+                percent
+            } else if (plugged == BatteryManager.BATTERY_PLUGGED_AC ||
+                plugged == BatteryManager.BATTERY_PLUGGED_USB) {
+                if (percent != 100) 1 else 0
+            } else {
+                0
+            }
+        } else {
+            return 0
         }
     }
 
