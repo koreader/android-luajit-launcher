@@ -220,7 +220,6 @@ int fifoCallback(int fd, int events, void *data)
     return 1; // continue reading, leave fd open
 }
 
-
 static void* android_app_entry(void* param) {
     struct android_app* android_app = (struct android_app*)param;
 
@@ -255,7 +254,6 @@ static void* android_app_entry(void* param) {
         LOGE("%s: FIFO errnor=0%x", TAG, errno);
     else
         ALooper_addFd(native_glue_looper, fifo_fd, 0, ALOOPER_EVENT_INPUT, fifoCallback, &android_app->cmdPollSource);
-
 
     android_app->looper = native_glue_looper;
     pthread_mutex_lock(&android_app->mutex);
