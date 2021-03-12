@@ -162,7 +162,6 @@ class MainActivity : NativeActivity(), JNILuaInterface,
         if (!Permissions.hasStoragePermission(this)) {
             Permissions.requestStoragePermission(this)
         }
-
     }
 
     /* Called when the activity has become visible. */

@@ -241,25 +241,28 @@ static void* android_app_entry(void* param) {
             &android_app->cmdPollSource);
 
     if (mkfifo(FIFO_PATH, 0666) == -1) {
-        if (errno == EEXIST)
+        if (errno == EEXIST) {
             LOGD("%s: FIFO \"%s\" already exists", TAG, FIFO_PATH);
-        else
+        } else {
             LOGE("%s: FIFO \"%s\" cannot be created!", TAG, FIFO_PATH);
-    } else
+        }
+    } else {
         LOGD("%s: FIFO \"%s\" created", TAG, FIFO_PATH);
-
+    }
 
     int fifo_fd = open(FIFO_PATH, O_RDWR | O_CLOEXEC);
-    if (fifo_fd  == -1)
+    if (fifo_fd  == -1) {
         LOGE("%s: FIFO errnor=0%x", TAG, errno);
-    else
+    } else {
         ALooper_addFd(native_glue_looper, fifo_fd, 0, ALOOPER_EVENT_INPUT, fifoCallback, &android_app->cmdPollSource);
+    }
 
     android_app->looper = native_glue_looper;
     pthread_mutex_lock(&android_app->mutex);
     android_app->running = 1;
     pthread_cond_broadcast(&android_app->cond);
     pthread_mutex_unlock(&android_app->mutex);
+
     android_main(android_app);
 
     android_app_destroy(android_app);
