@@ -25,8 +25,6 @@ import java.util.*
 import android.content.BroadcastReceiver
 import java.io.*
 
-val ALOOPER_FIFO = "/data/data/org.koreader.launcher/files/alooper.fifo"
-
 @Keep
 class MainActivity : NativeActivity(), JNILuaInterface,
     ActivityCompat.OnRequestPermissionsResultCallback{
@@ -75,13 +73,8 @@ class MainActivity : NativeActivity(), JNILuaInterface,
 
     inner class PowerConnection : BroadcastReceiver() {
         var isPowerConnected = -1
+        private lateinit var fifo_name: String
         private lateinit var alooper_fifo: FileWriter
-
-        init {
-//            var command = "mkfifo /data/data/org.koreader.launcher/files/alooper.fifo" ;
-//            var process = Runtime.getRuntime().exec(command);
-//            process.waitFor();
-        }
 
         override fun onReceive(context: Context?, intent: Intent?) {
             val action = intent?.action
@@ -90,7 +83,9 @@ class MainActivity : NativeActivity(), JNILuaInterface,
                     isPowerConnected = 1
 
                     if (!this::alooper_fifo.isInitialized) {
-                        alooper_fifo = FileWriter(ALOOPER_FIFO, true)
+                        fifo_name = File(getCacheDir(),"alooper.fifo").getPath()
+                        Logger.e("xxxxxxxxxxxxxxxxxxxxxx %s", fifo_name)
+                        alooper_fifo = FileWriter(fifo_name, true)
                     }
                     alooper_fifo.write( 69 )
                     alooper_fifo.flush()
@@ -99,7 +94,9 @@ class MainActivity : NativeActivity(), JNILuaInterface,
                     isPowerConnected = 0
 
                     if (!this::alooper_fifo.isInitialized) {
-                        alooper_fifo = FileWriter(ALOOPER_FIFO, true)
+                        fifo_name = File(getCacheDir(),"alooper.fifo").getPath()
+                        Logger.e("xxxxxxxxxxxxxxxxxxxxxx %s", fifo_name)
+                        alooper_fifo = FileWriter(fifo_name, true)
                     }
                     alooper_fifo.write( 65 )
                     alooper_fifo.flush()

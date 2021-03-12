@@ -32,7 +32,8 @@
 
 #define  TAG "[NativeGlue]"
 
-#define FIFO_PATH "/data/data/org.koreader.launcher/files/alooper.fifo"
+// ToDO: How can I retrieve the path to the cache directory from here (native_app_glue)?
+#define FIFO_PATH "/data/data/org.koreader.launcher/cache/alooper.fifo"
 
 #define LOGE(...) ((void)__android_log_print(ANDROID_LOG_ERROR, LOGGER_NAME, __VA_ARGS__))
 
@@ -211,9 +212,6 @@ int fifoCallback(int fd, int events, void *data)
 {
     char c;
     int result = read(fd, &c, sizeof(c));
-/*    if (result != -1 )
-        ((int32_t*) data)[0]=(int32_t) c+100000;
-*/
     LOGD("%s: FIFO data read %d", TAG, c);
 
     ALooper_wake(native_glue_looper);
