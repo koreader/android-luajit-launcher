@@ -110,6 +110,12 @@ typedef int (*ALooper_callbackFunc)(int fd, int events, void* data);
 int ALooper_pollAll(int timeoutMillis, int* outFd, int* outEvents, void** outData);
 int ALooper_pollOnce(int timeoutMillis, int* outFd, int* outEvents, void** outData);
 
+// for alooper.fifo event
+
+enum {
+    MSC_CHARGE = 100,
+};
+
 // from android-ndk/platforms/android-9/arch-arm/usr/include/android/input.h:
 
 enum {
