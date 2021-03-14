@@ -76,30 +76,35 @@ class MainActivity : NativeActivity(), JNILuaInterface,
         private lateinit var fifo_name: String
         private lateinit var alooper_fifo: FileWriter
 
+        fun feed_alooper_fifo(state: Int) {
+            if (!this::alooper_fifo.isInitialized) {
+                 try {
+                     fifo_name = File(getFilesDir(),"alooper.fifo").getPath()
+                     alooper_fifo = FileWriter(fifo_name, true)
+                 } catch (e: Exception) {
+                     Logger.e("BroadcastReceiver: ERROR opening ALooper fifo: \"$fifo_name\"")
+                     Logger.e("$e")
+                 }
+             }
+             try {
+                 alooper_fifo.write(state)
+                 alooper_fifo.flush()
+             } catch (e: Exception) {
+                 Logger.e("BroadcastReceiver: ERROR writing to  ALooper fifo: \"$fifo_name\"")
+                 Logger.e("$e")
+             }
+        }
+
         override fun onReceive(context: Context?, intent: Intent?) {
             val action = intent?.action
             when (action) {
                 Intent.ACTION_POWER_CONNECTED -> {
                     isPowerConnected = 1
-
-                    if (!this::alooper_fifo.isInitialized) {
-                        fifo_name = File(getCacheDir(),"alooper.fifo").getPath()
-                        Logger.e("xxxxxxxxxxxxxxxxxxxxxx %s", fifo_name)
-                        alooper_fifo = FileWriter(fifo_name, true)
-                    }
-                    alooper_fifo.write( 69 )
-                    alooper_fifo.flush()
+                    feed_alooper_fifo(1)
                 }
                 Intent.ACTION_POWER_DISCONNECTED -> {
                     isPowerConnected = 0
-
-                    if (!this::alooper_fifo.isInitialized) {
-                        fifo_name = File(getCacheDir(),"alooper.fifo").getPath()
-                        Logger.e("xxxxxxxxxxxxxxxxxxxxxx %s", fifo_name)
-                        alooper_fifo = FileWriter(fifo_name, true)
-                    }
-                    alooper_fifo.write( 65 )
-                    alooper_fifo.flush()
+                    feed_alooper_fifo(0)
                 }
             }
         }

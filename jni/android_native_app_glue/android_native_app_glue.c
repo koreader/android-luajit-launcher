@@ -33,7 +33,7 @@
 #define  TAG "[NativeGlue]"
 
 // ToDO: How can I retrieve the path to the cache directory from here (native_app_glue)?
-#define FIFO_PATH "/data/data/org.koreader.launcher/cache/alooper.fifo"
+#define FIFO_NAME "alooper.fifo"
 
 #define LOGE(...) ((void)__android_log_print(ANDROID_LOG_ERROR, LOGGER_NAME, __VA_ARGS__))
 
@@ -238,17 +238,24 @@ static void* android_app_entry(void* param) {
     ALooper_addFd(native_glue_looper, android_app->msgread, LOOPER_ID_MAIN, ALOOPER_EVENT_INPUT, NULL,
             &android_app->cmdPollSource);
 
-    if (mkfifo(FIFO_PATH, 0666) == -1) {
+
+    const char* fifo_path = android_app->activity->internalDataPath;
+    char fifo_file[strlen(fifo_path) + strlen(FIFO_NAME) + 2]; // +1 for "/" and +1 for NULL
+    strcpy(fifo_file, fifo_path);
+    strcat(fifo_file, "/");
+    strcat(fifo_file, FIFO_NAME);
+
+    if (mkfifo(fifo_file, 0666) == -1) {
         if (errno == EEXIST) {
-            LOGD("%s: FIFO \"%s\" already exists", TAG, FIFO_PATH);
+            LOGD("%s: FIFO \"%s\" already exists", TAG, fifo_file);
         } else {
-            LOGE("%s: FIFO \"%s\" cannot be created!", TAG, FIFO_PATH);
+            LOGE("%s: FIFO \"%s\" cannot be created!", TAG, fifo_file);
         }
     } else {
-        LOGD("%s: FIFO \"%s\" created", TAG, FIFO_PATH);
+        LOGD("%s: FIFO \"%s\" created", TAG, fifo_file);
     }
 
-    int fifo_fd = open(FIFO_PATH, O_RDWR | O_CLOEXEC);
+    int fifo_fd = open(fifo_file, O_RDWR | O_CLOEXEC);
     if (fifo_fd  == -1) {
         LOGE("%s: FIFO errnor=0%x", TAG, errno);
     } else {
@@ -262,6 +269,11 @@ static void* android_app_entry(void* param) {
     pthread_mutex_unlock(&android_app->mutex);
 
     android_main(android_app);
+
+    if (fifo_fd != -1) {
+        close(fifo_fd);
+        ALooper_removeFd(native_glue_looper, fifo_fd);
+    }
 
     android_app_destroy(android_app);
     return NULL;
