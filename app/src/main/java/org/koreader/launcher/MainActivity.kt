@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.annotation.TargetApi
 import android.app.Activity
 import android.app.NativeActivity
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -21,8 +22,6 @@ import androidx.core.content.ContextCompat
 import org.koreader.launcher.interfaces.JNILuaInterface
 import org.koreader.launcher.utils.*
 import java.util.*
-
-import android.content.BroadcastReceiver
 import java.io.*
 
 @Keep

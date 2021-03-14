@@ -33,7 +33,6 @@
 
 #define  TAG "[NativeGlue]"
 
-// ToDO: How can I retrieve the path to the cache directory from here (native_app_glue)?
 #define FIFO_NAME "alooper.fifo"
 
 #define LOGE(...) ((void)__android_log_print(ANDROID_LOG_ERROR, LOGGER_NAME, __VA_ARGS__))
@@ -206,7 +205,10 @@ static void process_cmd(struct android_app* app, struct android_poll_source* sou
     if (app->onAppCmd != NULL) app->onAppCmd(app, cmd);
     android_app_post_exec_cmd(app, cmd);
 }
-
+/* We use a fifo to communicate with MainActivity.
+ * fifoCallback is called, when MainActivity writes a message to that fifo.
+ * native_glue_looper is needed to wake that looper
+ */
 ALooper *native_glue_looper;
 
 int fifoCallback(int fd, int events, void *data)
@@ -234,11 +236,13 @@ static void* android_app_entry(void* param) {
     android_app->inputPollSource.app = android_app;
     android_app->inputPollSource.process = process_input;
 
-    native_glue_looper = ALooper_prepare(ALOOPER_PREPARE_ALLOW_NON_CALLBACKS);
+    ALooper *looper = ALooper_prepare(ALOOPER_PREPARE_ALLOW_NON_CALLBACKS);
+    native_glue_looper = looper;
 
-    ALooper_addFd(native_glue_looper, android_app->msgread, LOOPER_ID_MAIN, ALOOPER_EVENT_INPUT, NULL,
+    ALooper_addFd(looper, android_app->msgread, LOOPER_ID_MAIN, ALOOPER_EVENT_INPUT, NULL,
             &android_app->cmdPollSource);
 
+    // create and open fifo for communication with MainActivity
     const char* fifo_path = android_app->activity->internalDataPath;
     char fifo_file[strlen(fifo_path) + strlen(FIFO_NAME) + 2U]; // +1 for "/" and +1 for NULL
     snprintf(fifo_file, sizeof(fifo_file), "%s/%s", fifo_path, FIFO_NAME);
@@ -268,6 +272,7 @@ static void* android_app_entry(void* param) {
 
     android_main(android_app);
 
+    // clean up fifo
     if (fifo_fd != -1) {
         close(fifo_fd);
         ALooper_removeFd(native_glue_looper, fifo_fd);
