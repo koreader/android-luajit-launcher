@@ -20,6 +20,7 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -211,7 +212,7 @@ ALooper *native_glue_looper;
 int fifoCallback(int fd, int events, void *data)
 {
     char c;
-    int result = read(fd, &c, sizeof(c));
+    ssize_t result = read(fd, &c, sizeof(c));
     LOGD("%s: FIFO data read %d", TAG, c);
 
     ALooper_wake(native_glue_looper);
@@ -238,12 +239,9 @@ static void* android_app_entry(void* param) {
     ALooper_addFd(native_glue_looper, android_app->msgread, LOOPER_ID_MAIN, ALOOPER_EVENT_INPUT, NULL,
             &android_app->cmdPollSource);
 
-
     const char* fifo_path = android_app->activity->internalDataPath;
-    char fifo_file[strlen(fifo_path) + strlen(FIFO_NAME) + 2]; // +1 for "/" and +1 for NULL
-    strcpy(fifo_file, fifo_path);
-    strcat(fifo_file, "/");
-    strcat(fifo_file, FIFO_NAME);
+    char fifo_file[strlen(fifo_path) + strlen(FIFO_NAME) + 2U]; // +1 for "/" and +1 for NULL
+    snprintf(fifo_file, sizeof(fifo_file), "%s/%s", fifo_path, FIFO_NAME);
 
     if (mkfifo(fifo_file, 0666) == -1) {
         if (errno == EEXIST) {
