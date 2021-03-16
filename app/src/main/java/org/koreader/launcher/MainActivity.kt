@@ -71,7 +71,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     }
 
     inner class PowerConnection : BroadcastReceiver() {
-        var isPowerConnected = -1
+ //       var isPowerConnected = -1
         private lateinit var fifo_name: String
         private lateinit var alooper_fifo: FileWriter
 
@@ -98,12 +98,12 @@ class MainActivity : NativeActivity(), JNILuaInterface,
             val action = intent?.action
             when (action) {
                 Intent.ACTION_POWER_CONNECTED -> {
-                    isPowerConnected = 1
-                    feed_alooper_fifo(1)
+//                    isPowerConnected = 1
+                    feed_alooper_fifo(100)
                 }
                 Intent.ACTION_POWER_DISCONNECTED -> {
-                    isPowerConnected = 0
-                    feed_alooper_fifo(0)
+//                    isPowerConnected = 0
+                    feed_alooper_fifo(101)
                 }
             }
         }
@@ -135,7 +135,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
         timeout = Timeout()
 
         powerConnection = PowerConnection()
-        powerConnection.isPowerConnected = getBatteryState(false)
+//        powerConnection.isPowerConnected = getBatteryState(false)
 
         val filter = IntentFilter()
         filter.addAction(Intent.ACTION_POWER_CONNECTED)
@@ -465,7 +465,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     }
 
     override fun isCharging(): Boolean {
-        return powerConnection.isPowerConnected != 0
+        return (getBatteryState(false) == 1)
     }
 
     override fun isChromeOS(): Boolean {
