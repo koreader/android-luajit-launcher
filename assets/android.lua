@@ -112,8 +112,8 @@ int ALooper_pollOnce(int timeoutMillis, int* outFd, int* outEvents, void** outDa
 
 // for alooper.fifo messages
 enum {
-    EVENT_POWER_CONNECTED = 100,
-    EVENT_POWER_DISCONNECTED = 101,
+    ALOOPER_FIFO_POWER_CONNECTED = 100,
+    ALOOPER_FIFO_POWER_DISCONNECTED = 101,
 };
 
 // from android-ndk/platforms/android-9/arch-arm/usr/include/android/input.h:

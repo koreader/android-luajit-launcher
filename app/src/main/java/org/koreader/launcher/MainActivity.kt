@@ -22,7 +22,6 @@ import androidx.core.content.ContextCompat
 import org.koreader.launcher.interfaces.JNILuaInterface
 import org.koreader.launcher.utils.*
 import java.util.*
-import java.io.*
 
 @Keep
 class MainActivity : NativeActivity(), JNILuaInterface,
@@ -71,39 +70,14 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     }
 
     inner class PowerConnection : BroadcastReceiver() {
- //       var isPowerConnected = -1
-        private lateinit var fifo_name: String
-        private lateinit var alooper_fifo: FileWriter
-
-        fun feed_alooper_fifo(state: Int) {
-            if (!this::alooper_fifo.isInitialized) {
-                 try {
-                     fifo_name = File(getFilesDir(),"alooper.fifo").getPath()
-                     alooper_fifo = FileWriter(fifo_name, true)
-                 } catch (e: Exception) {
-                     Logger.e("BroadcastReceiver: ERROR opening ALooper fifo: \"$fifo_name\"")
-                     Logger.e("$e")
-                 }
-             }
-             try {
-                 alooper_fifo.write(state)
-                 alooper_fifo.flush()
-             } catch (e: Exception) {
-                 Logger.e("BroadcastReceiver: ERROR writing to  ALooper fifo: \"$fifo_name\"")
-                 Logger.e("$e")
-             }
-        }
-
         override fun onReceive(context: Context?, intent: Intent?) {
             val action = intent?.action
             when (action) {
                 Intent.ACTION_POWER_CONNECTED -> {
-//                    isPowerConnected = 1
-                    feed_alooper_fifo(100)
+                    MainApp.feed_alooper_fifo(ALOOPER_FIFO_POWER_CONNECTED)
                 }
                 Intent.ACTION_POWER_DISCONNECTED -> {
-//                    isPowerConnected = 0
-                    feed_alooper_fifo(101)
+                    MainApp.feed_alooper_fifo(ALOOPER_FIFO_POWER_DISCONNECTED)
                 }
             }
         }
@@ -114,6 +88,10 @@ class MainActivity : NativeActivity(), JNILuaInterface,
         private const val ACTION_SAF_FILEPICKER = 2
         private val BATTERY_FILTER = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
         private val RUNTIME_VERSION = Build.VERSION.RELEASE
+
+        // these are the messages going over the fifo to the native activity
+        private const val ALOOPER_FIFO_POWER_CONNECTED = 100
+        private const val ALOOPER_FIFO_POWER_DISCONNECTED = 101
     }
 
     init {

@@ -211,7 +211,8 @@ static void process_cmd(struct android_app* app, struct android_poll_source* sou
  * native_glue_looper is needed to wake that looper
  */
 ALooper *native_glue_looper;
-int8_t message_to_lua[4];  //maximum 4 byte messages (for now)
+#define MESSAGE_SIZE 4
+u_int8_t message_to_lua[MESSAGE_SIZE];  //maximum 4 byte messages
 
 int fifoCallback(int fd, int events, void *data)
 {
@@ -220,11 +221,10 @@ int fifoCallback(int fd, int events, void *data)
     // for now use just one byte
     // could be extended in future, but then be sure
     //    enough data is writte to the fifo
-    ssize_t result = read(fd, &c, sizeof(c));
-    LOGD("%s: FIFO data read %d", TAG, c);
-    LOGE("xxxxxxxxxxxxx %s: FIFO data read %d", TAG, c);
+    ssize_t result = read(fd, user_data, MESSAGE_SIZE * sizeof(u_int8_t) );
+    LOGD("%s: FIFO data read %d, %d, %d, %d", TAG, user_data[0], user_data[1], user_data[2], user_data[3]);
+    LOGE("%s: xxxxxxxxxx FIFO data read %d, %d, %d, %d", TAG, user_data[0], user_data[1], user_data[2], user_data[3]);
 
-    user_data[0] = c;
     ALooper_wake(native_glue_looper);
     return 1; // continue reading, leave fd open
 }
