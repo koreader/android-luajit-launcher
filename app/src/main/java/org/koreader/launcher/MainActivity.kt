@@ -74,10 +74,10 @@ class MainActivity : NativeActivity(), JNILuaInterface,
             val action = intent?.action
             when (action) {
                 Intent.ACTION_POWER_CONNECTED -> {
-                    MainApp.feed_alooper_fifo(ALOOPER_FIFO_POWER_CONNECTED)
+                    MainApp.postMessages(MainApp.ALOOPER_FIFO_POWER_CONNECTED)
                 }
                 Intent.ACTION_POWER_DISCONNECTED -> {
-                    MainApp.feed_alooper_fifo(ALOOPER_FIFO_POWER_DISCONNECTED)
+                    MainApp.postMessages(MainApp.ALOOPER_FIFO_POWER_DISCONNECTED)
                 }
             }
         }
@@ -88,10 +88,6 @@ class MainActivity : NativeActivity(), JNILuaInterface,
         private const val ACTION_SAF_FILEPICKER = 2
         private val BATTERY_FILTER = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
         private val RUNTIME_VERSION = Build.VERSION.RELEASE
-
-        // these are the messages going over the fifo to the native activity
-        private const val ALOOPER_FIFO_POWER_CONNECTED = 100
-        private const val ALOOPER_FIFO_POWER_DISCONNECTED = 101
     }
 
     init {
