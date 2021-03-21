@@ -18,13 +18,11 @@
 #include <jni.h>
 
 #include <errno.h>
+#include <fcntl.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
 #include <unistd.h>
-#include <sys/types.h>
 #include <sys/stat.h>
-#include <fcntl.h>
 
 #include <android/log.h>
 
@@ -221,10 +219,10 @@ int fifoCallback(int fd, int events, void *data)
     // for now use just one byte
     // could be extended in future, but then be sure
     //    enough data is writte to the fifo
-    ssize_t result = read(fd, user_data, MESSAGE_SIZE * sizeof(u_int8_t) );
+    ssize_t bytes_received = read(fd, user_data, MESSAGE_SIZE * sizeof(u_int8_t) );
+    for (int i = bytes_received; i < MESSAGE_SIZE; ++i)
+        user_data[i] = 0;
     LOGD("%s: FIFO data read %d, %d, %d, %d", TAG, user_data[0], user_data[1], user_data[2], user_data[3]);
-    LOGE("%s: xxxxxxxxxx FIFO data read %d, %d, %d, %d", TAG, user_data[0], user_data[1], user_data[2], user_data[3]);
-
     ALooper_wake(native_glue_looper);
     return 1; // continue reading, leave fd open
 }
@@ -244,11 +242,14 @@ static void* android_app_entry(void* param) {
     android_app->inputPollSource.app = android_app;
     android_app->inputPollSource.process = process_input;
 
-    ALooper *looper = ALooper_prepare(ALOOPER_PREPARE_ALLOW_NON_CALLBACKS);
-    native_glue_looper = looper;
-
+    ALooper* looper = ALooper_prepare(ALOOPER_PREPARE_ALLOW_NON_CALLBACKS);
     ALooper_addFd(looper, android_app->msgread, LOOPER_ID_MAIN, ALOOPER_EVENT_INPUT, NULL,
             &android_app->cmdPollSource);
+    android_app->looper = looper;
+    pthread_mutex_lock(&android_app->mutex);
+    android_app->running = 1;
+    pthread_cond_broadcast(&android_app->cond);
+    pthread_mutex_unlock(&android_app->mutex);
 
     // create and open fifo for communication with MainActivity
     const char* fifo_path = android_app->activity->internalDataPath;
@@ -270,21 +271,16 @@ static void* android_app_entry(void* param) {
         LOGE("%s: FIFO errnor=0%x", TAG, errno);
     } else {
         android_app->userData = message_to_lua;
-        ALooper_addFd(native_glue_looper, fifo_fd, 0, ALOOPER_EVENT_INPUT, fifoCallback, message_to_lua);
+        native_glue_looper = looper;
+        ALooper_addFd(looper, fifo_fd, 0, ALOOPER_EVENT_INPUT, fifoCallback, message_to_lua);
     }
-
-    android_app->looper = native_glue_looper;
-    pthread_mutex_lock(&android_app->mutex);
-    android_app->running = 1;
-    pthread_cond_broadcast(&android_app->cond);
-    pthread_mutex_unlock(&android_app->mutex);
 
     android_main(android_app);
 
     // clean up fifo
     if (fifo_fd != -1) {
-        close(fifo_fd);
         ALooper_removeFd(native_glue_looper, fifo_fd);
+        close(fifo_fd);
     }
 
     android_app_destroy(android_app);

@@ -31,7 +31,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     private lateinit var clipboard: Clipboard
     private lateinit var device: Device
     private lateinit var timeout: Timeout
-    private lateinit var powerConnection: PowerConnection
+    private lateinit var event: EventReceiver
 
     // Path of last file imported
     private var lastImportedPath: String? = null
@@ -69,15 +69,18 @@ class MainActivity : NativeActivity(), JNILuaInterface,
         }
     }
 
-    inner class PowerConnection : BroadcastReceiver() {
+    inner class EventReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             val action = intent?.action
             when (action) {
                 Intent.ACTION_POWER_CONNECTED -> {
-                    MainApp.postMessages(MainApp.ALOOPER_FIFO_POWER_CONNECTED)
+                    MainApp.postMessages(Device.ALOOPER_FIFO_POWER_CONNECTED)
                 }
                 Intent.ACTION_POWER_DISCONNECTED -> {
-                    MainApp.postMessages(MainApp.ALOOPER_FIFO_POWER_DISCONNECTED)
+                    MainApp.postMessages(Device.ALOOPER_FIFO_POWER_DISCONNECTED)
+                }
+                else -> {
+                    /* do nothing here */
                 }
             }
         }
@@ -108,13 +111,12 @@ class MainActivity : NativeActivity(), JNILuaInterface,
         device = Device(this)
         timeout = Timeout()
 
-        powerConnection = PowerConnection()
-//        powerConnection.isPowerConnected = getBatteryState(false)
+        event = EventReceiver()
 
         val filter = IntentFilter()
         filter.addAction(Intent.ACTION_POWER_CONNECTED)
         filter.addAction(Intent.ACTION_POWER_DISCONNECTED)
-        this.registerReceiver(powerConnection, filter)
+        this.registerReceiver(event, filter)
 
         super.onCreate(savedInstanceState)
         setTheme(R.style.Fullscreen)

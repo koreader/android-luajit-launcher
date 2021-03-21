@@ -75,6 +75,12 @@ class Device(activity: Activity) {
         private const val LINUX_LANDSCAPE = 1
         private const val LINUX_REVERSE_PORTRAIT = 2
         private const val LINUX_REVERSE_LANDSCAPE = 3
+
+        // These are the messages going over the fifo to the native glue.
+        // The defines here should correspond to the ones in android.lua
+        // 32bit (4-byte) get transmitted. The low byte is the command
+        val ALOOPER_FIFO_POWER_CONNECTED = 100
+        val ALOOPER_FIFO_POWER_DISCONNECTED = 101
     }
 
     init {

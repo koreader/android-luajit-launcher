@@ -22,12 +22,6 @@ class MainApp : android.app.Application() {
         lateinit var platform_type: String
             private set
 
-        // These are the messages going over the fifo to the native activity.
-        // The defines here should correspond to the ones in android.lua
-        // 32bit (4-byte) get transmitted. The low byte is the command
-        val ALOOPER_FIFO_POWER_CONNECTED = 100
-        val ALOOPER_FIFO_POWER_DISCONNECTED = 101
-
         // post an 32 bit message which can be evaluated after an ALooper_pollAll()
         // low byte first
         fun postMessages(state: Int) {
@@ -39,7 +33,7 @@ class MainApp : android.app.Application() {
                 fifo_bytes[2] = ((state ushr 16) and 0xFF).toChar()
                 fifo_bytes[3] = ((state ushr 24) and 0xFF).toChar()
                 writer.write(fifo_bytes, 0, 4)
-                writer.flush()
+                writer.close()
             } catch (e: Exception) {
                 Logger.e("Feed ALooper fifo: ERROR writing to  ALooper fifo: \"$fifo_path\"")
                 Logger.e("$e")
@@ -69,7 +63,7 @@ class MainApp : android.app.Application() {
         @Suppress("DEPRECATION")
         storage_path = Environment.getExternalStorageDirectory().absolutePath
 
-        // Path to the fifo for sending messages to ALooper (navite glue and Lua)
+        // Path to the fifo for sending messages to ALooper (native glue and Lua)
         fifo_path = File(filesDir, "alooper.fifo").path
 
         platform_type = if (pm.hasSystemFeature("org.chromium.arc.device_management")) {
