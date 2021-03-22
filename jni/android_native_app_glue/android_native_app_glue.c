@@ -34,6 +34,7 @@
 #define FIFO_NAME "alooper.fifo"
 
 #define LOGE(...) ((void)__android_log_print(ANDROID_LOG_ERROR, LOGGER_NAME, __VA_ARGS__))
+#define LOGV(...) ((void)__android_log_print(ANDROID_LOG_VERBOSE, LOGGER_NAME, __VA_ARGS__))
 
 #ifndef NDEBUG
 #  define LOGD(...) ((void)__android_log_print(ANDROID_LOG_DEBUG, LOGGER_NAME, __VA_ARGS__))
@@ -248,6 +249,7 @@ static void* android_app_entry(void* param) {
     ALooper_addFd(looper, android_app->msgread, LOOPER_ID_MAIN, ALOOPER_EVENT_INPUT, NULL,
             &android_app->cmdPollSource);
     android_app->looper = looper;
+
     pthread_mutex_lock(&android_app->mutex);
     android_app->running = 1;
     pthread_cond_broadcast(&android_app->cond);
@@ -260,12 +262,12 @@ static void* android_app_entry(void* param) {
 
     if (mkfifo(fifo_file, 0666) == -1) {
         if (errno == EEXIST) {
-            LOGD("%s: FIFO \"%s\" already exists", TAG, fifo_file);
+            LOGV("%s: FIFO \"%s\" already exists", TAG, fifo_file);
         } else {
             LOGE("%s: FIFO \"%s\" cannot be created!", TAG, fifo_file);
         }
     } else {
-        LOGD("%s: FIFO \"%s\" created", TAG, fifo_file);
+        LOGV("%s: FIFO \"%s\" created", TAG, fifo_file);
     }
 
     int fifo_fd = open(fifo_file, O_RDWR | O_CLOEXEC);
