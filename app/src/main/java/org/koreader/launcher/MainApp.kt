@@ -7,7 +7,6 @@ import android.content.pm.PackageManager
 import android.os.Environment
 import android.os.StrictMode
 import java.io.File
-import java.io.FileWriter
 
 class MainApp : android.app.Application() {
     companion object {
@@ -22,23 +21,6 @@ class MainApp : android.app.Application() {
         lateinit var platform_type: String
             private set
 
-        // post an 32 bit message which can be evaluated after an ALooper_pollAll()
-        // low byte first
-        fun postMessages(state: Int) {
-            try {
-                val writer = FileWriter(MainApp.fifo_path, true)
-                val fifo_bytes = CharArray(4)
-                fifo_bytes[0] = (state and 0xFF).toChar()
-                fifo_bytes[1] = ((state ushr 8) and 0xFF).toChar()
-                fifo_bytes[2] = ((state ushr 16) and 0xFF).toChar()
-                fifo_bytes[3] = ((state ushr 24) and 0xFF).toChar()
-                writer.write(fifo_bytes, 0, 4)
-                writer.close()
-            } catch (e: Exception) {
-                Logger.e("Feed ALooper fifo: ERROR writing to  ALooper fifo: \"$fifo_path\"")
-                Logger.e("$e")
-            }
-        }
     }
 
     override fun onCreate() {

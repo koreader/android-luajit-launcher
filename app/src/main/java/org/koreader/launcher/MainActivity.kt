@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.annotation.TargetApi
 import android.app.Activity
 import android.app.NativeActivity
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -31,7 +30,6 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     private lateinit var clipboard: Clipboard
     private lateinit var device: Device
     private lateinit var timeout: Timeout
-    private lateinit var event: EventReceiver
 
     // Path of last file imported
     private var lastImportedPath: String? = null
@@ -69,23 +67,6 @@ class MainActivity : NativeActivity(), JNILuaInterface,
         }
     }
 
-    inner class EventReceiver : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            val action = intent?.action
-            when (action) {
-                Intent.ACTION_POWER_CONNECTED -> {
-                    MainApp.postMessages(Device.ALOOPER_FIFO_POWER_CONNECTED)
-                }
-                Intent.ACTION_POWER_DISCONNECTED -> {
-                    MainApp.postMessages(Device.ALOOPER_FIFO_POWER_DISCONNECTED)
-                }
-                else -> {
-                    /* do nothing here */
-                }
-            }
-        }
-    }
-
     companion object {
         private const val TAG_MAIN = "MainActivity"
         private const val ACTION_SAF_FILEPICKER = 2
@@ -110,14 +91,6 @@ class MainActivity : NativeActivity(), JNILuaInterface,
         clipboard = Clipboard(this)
         device = Device(this)
         timeout = Timeout()
-
-        event = EventReceiver()
-
-        val filter = IntentFilter()
-        filter.addAction(Intent.ACTION_POWER_CONNECTED)
-        filter.addAction(Intent.ACTION_POWER_DISCONNECTED)
-        this.registerReceiver(event, filter)
-
         super.onCreate(savedInstanceState)
         setTheme(R.style.Fullscreen)
 

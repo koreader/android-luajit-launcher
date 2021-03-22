@@ -2,6 +2,10 @@ package org.koreader.launcher
 
 import android.app.Activity
 import android.app.AlertDialog
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Build
 import android.view.Gravity
 import android.view.Surface
@@ -12,6 +16,7 @@ import android.widget.TextView
 import org.koreader.launcher.device.DeviceInfo
 import org.koreader.launcher.device.EPDFactory
 import org.koreader.launcher.device.LightsFactory
+import java.io.FileWriter
 import java.util.*
 
 class Device(activity: Activity) {
@@ -57,6 +62,8 @@ class Device(activity: Activity) {
     // Hardware orientation for this device (matches android logo)
     private var screenIsLandscape: Boolean = false
 
+    private var event: EventReceiver
+
     companion object {
         private const val TAG = "DeviceHelper"
         private const val LIGHT_DIALOG_CLOSED = -1
@@ -77,10 +84,26 @@ class Device(activity: Activity) {
         private const val LINUX_REVERSE_LANDSCAPE = 3
 
         // These are the messages going over the fifo to the native glue.
-        // The defines here should correspond to the ones in android.lua
         // 32bit (4-byte) get transmitted. The low byte is the command
-        val ALOOPER_FIFO_POWER_CONNECTED = 100
-        val ALOOPER_FIFO_POWER_DISCONNECTED = 101
+        private const val EVENT_POWER_CONNECTED = 100
+        private const val EVENT_POWER_DISCONNECTED = 101
+    }
+
+    inner class EventReceiver : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            val action = intent?.action
+            when (action) {
+                Intent.ACTION_POWER_CONNECTED -> {
+                    postMessages(EVENT_POWER_CONNECTED)
+                }
+                Intent.ACTION_POWER_DISCONNECTED -> {
+                    postMessages(EVENT_POWER_DISCONNECTED)
+                }
+                else -> {
+                    /* do nothing here */
+                }
+            }
+        }
     }
 
     init {
@@ -88,6 +111,31 @@ class Device(activity: Activity) {
 
         Logger.v(TAG, String.format(Locale.US,
             "native orientation: %s", if (this.screenIsLandscape) "landscape" else "portrait"))
+
+        event = EventReceiver()
+
+        val filter = IntentFilter()
+        filter.addAction(Intent.ACTION_POWER_CONNECTED)
+        filter.addAction(Intent.ACTION_POWER_DISCONNECTED)
+        activity.getApplicationContext().registerReceiver(event, filter)
+    }
+
+    // post an 32 bit message which can be evaluated after an ALooper_pollAll()
+    // low byte first
+    fun postMessages(state: Int) {
+        try {
+            val writer = FileWriter(MainApp.fifo_path, true)
+            val fifo_bytes = CharArray(4)
+            fifo_bytes[0] = (state and 0xFF).toChar()
+            fifo_bytes[1] = ((state ushr 8) and 0xFF).toChar()
+            fifo_bytes[2] = ((state ushr 16) and 0xFF).toChar()
+            fifo_bytes[3] = ((state ushr 24) and 0xFF).toChar()
+            writer.write(fifo_bytes, 0, 4)
+            writer.close()
+        } catch (e: Exception) {
+            Logger.e("Feed ALooper fifo: ERROR writing to  ALooper fifo: \"$MainApp.fifo_path\"")
+            Logger.e("$e")
+        }
     }
 
     fun onResume() {
