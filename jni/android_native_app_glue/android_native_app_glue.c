@@ -222,7 +222,9 @@ int fifoCallback(int fd, int events, void *data)
     ssize_t bytes_received = read(fd, user_data, MESSAGE_SIZE * sizeof(u_int8_t) );
     for (int i = bytes_received; i < MESSAGE_SIZE; ++i)
         user_data[i] = 0;
-    LOGD("%s: FIFO data read %d, %d, %d, %d", TAG, user_data[0], user_data[1], user_data[2], user_data[3]);
+    LOGD("%s: FIFO data read %d bytes: %d, %d, %d, %d", TAG, bytes_received,
+        user_data[0], user_data[1], user_data[2], user_data[3]);
+
     ALooper_wake(native_glue_looper);
     return 1; // continue reading, leave fd open
 }

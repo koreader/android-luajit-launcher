@@ -117,12 +117,12 @@ class Device(activity: Activity) {
         val filter = IntentFilter()
         filter.addAction(Intent.ACTION_POWER_CONNECTED)
         filter.addAction(Intent.ACTION_POWER_DISCONNECTED)
-        activity.getApplicationContext().registerReceiver(event, filter)
+        activity.applicationContext.registerReceiver(event, filter)
     }
 
     // post an 32 bit message which can be evaluated after an ALooper_pollAll()
     // low byte first
-    fun postMessages(state: Int) {
+    private fun postMessages(state: Int) {
         try {
             val writer = FileWriter(MainApp.fifo_path, true)
             val fifo_bytes = CharArray(4)
