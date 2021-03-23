@@ -68,10 +68,15 @@ object ScreenUtils {
 
     fun pixelFormatName(format: Int): String {
         return when(format) {
+            PixelFormat.OPAQUE -> "OPAQUE"
+            PixelFormat.RGBA_1010102 -> "RGBA_1010102"
             PixelFormat.RGBA_8888 -> "RGBA_8888"
+            PixelFormat.RGBA_F16 -> "RGBA_F16"
             PixelFormat.RGBX_8888 -> "RGBX_8888"
             PixelFormat.RGB_888 -> "RGB_888"
             PixelFormat.RGB_565 -> "RGB_565"
+            PixelFormat.TRANSLUCENT -> "TRANSLUCENT"
+            PixelFormat.TRANSPARENT -> "TRANSPARENT"
             else -> String.format(Locale.US, "Unknown: %d", format)
         }
     }
