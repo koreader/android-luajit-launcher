@@ -205,11 +205,12 @@ static void process_cmd(struct android_app* app, struct android_poll_source* sou
     android_app_post_exec_cmd(app, cmd);
 }
 
+
 /* We use a fifo to communicate from Java-land to luaspace.
  * fifoCallback is called, when writen a message to that fifo.
  * native_glue_looper is needed to wake that looper
  */
-ALooper *native_glue_looper;
+/*ALooper *native_glue_looper;
 #define MESSAGE_SIZE 4
 u_int8_t message_to_lua[MESSAGE_SIZE];  //maximum 4 byte messages
 
@@ -229,7 +230,7 @@ int fifoCallback(int fd, int events, void *data)
     ALooper_wake(native_glue_looper);
     return 1; // continue reading, leave fd open
 }
-
+*/
 static void* android_app_entry(void* param) {
     struct android_app* android_app = (struct android_app*)param;
 
@@ -274,9 +275,9 @@ static void* android_app_entry(void* param) {
     if (fifo_fd  == -1) {
         LOGE("%s: FIFO errnor=0%x", TAG, errno);
     } else {
-        android_app->userData = message_to_lua;
-        native_glue_looper = looper;
-        ALooper_addFd(looper, fifo_fd, 0, ALOOPER_EVENT_INPUT, fifoCallback, message_to_lua);
+//        android_app->userData = message_to_lua;
+//        native_glue_looper = looper;
+        ALooper_addFd(looper, fifo_fd, 0, ALOOPER_EVENT_INPUT, NULL, &android_app->cmdPollSource);
     }
 
     android_main(android_app);
