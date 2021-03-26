@@ -32,7 +32,6 @@
 #define  TAG "[NativeGlue]"
 
 #define FIFO_NAME "alooper.fifo"
-#define ALOOPER_EVENT_FIFO_MESSAGE (1<<5)
 
 #define LOGE(...) ((void)__android_log_print(ANDROID_LOG_ERROR, LOGGER_NAME, __VA_ARGS__))
 #define LOGV(...) ((void)__android_log_print(ANDROID_LOG_VERBOSE, LOGGER_NAME, __VA_ARGS__))
@@ -252,7 +251,7 @@ static void* android_app_entry(void* param) {
     } else {
 //        android_app->userData = message_to_lua;
 //        native_glue_looper = looper;
-        ALooper_addFd(looper, fifo_fd, ALOOPER_EVENT_FIFO_MESSAGE, ALOOPER_EVENT_INPUT, NULL, &android_app->cmdPollSource);
+        ALooper_addFd(looper, fifo_fd, LOOPER_ID_USER, ALOOPER_EVENT_INPUT, NULL, &android_app->cmdPollSource);
     }
 
     android_main(android_app);

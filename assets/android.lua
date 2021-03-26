@@ -111,9 +111,6 @@ int ALooper_pollAll(int timeoutMillis, int* outFd, int* outEvents, void** outDat
 int ALooper_pollOnce(int timeoutMillis, int* outFd, int* outEvents, void** outData);
 
 // for alooper.fifo messages
-enum  {
-    ALOOPER_EVENT_FIFO_MESSAGE = 1<<5,
-};
 enum {
     EVENT_POWER_CONNECTED = 100,
     EVENT_POWER_DISCONNECTED = 101,
