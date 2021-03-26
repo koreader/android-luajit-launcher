@@ -32,6 +32,7 @@
 #define  TAG "[NativeGlue]"
 
 #define FIFO_NAME "alooper.fifo"
+#define ALOOPER_EVENT_FIFO_MESSAGE (1<<5)
 
 #define LOGE(...) ((void)__android_log_print(ANDROID_LOG_ERROR, LOGGER_NAME, __VA_ARGS__))
 #define LOGV(...) ((void)__android_log_print(ANDROID_LOG_VERBOSE, LOGGER_NAME, __VA_ARGS__))
@@ -205,32 +206,6 @@ static void process_cmd(struct android_app* app, struct android_poll_source* sou
     android_app_post_exec_cmd(app, cmd);
 }
 
-
-/* We use a fifo to communicate from Java-land to luaspace.
- * fifoCallback is called, when writen a message to that fifo.
- * native_glue_looper is needed to wake that looper
- */
-/*ALooper *native_glue_looper;
-#define MESSAGE_SIZE 4
-u_int8_t message_to_lua[MESSAGE_SIZE];  //maximum 4 byte messages
-
-int fifoCallback(int fd, int events, void *data)
-{
-    char c;
-    int8_t *user_data = data;
-    // for now use just one byte
-    // could be extended in future, but then be sure
-    //    enough data is writte to the fifo
-    ssize_t bytes_received = read(fd, user_data, MESSAGE_SIZE * sizeof(u_int8_t) );
-    for (int i = bytes_received; i < MESSAGE_SIZE; ++i)
-        user_data[i] = 0;
-    LOGD("%s: FIFO data read %d bytes: %d, %d, %d, %d", TAG, bytes_received,
-        user_data[0], user_data[1], user_data[2], user_data[3]);
-
-    ALooper_wake(native_glue_looper);
-    return 1; // continue reading, leave fd open
-}
-*/
 static void* android_app_entry(void* param) {
     struct android_app* android_app = (struct android_app*)param;
 
@@ -277,14 +252,14 @@ static void* android_app_entry(void* param) {
     } else {
 //        android_app->userData = message_to_lua;
 //        native_glue_looper = looper;
-        ALooper_addFd(looper, fifo_fd, 0, ALOOPER_EVENT_INPUT, NULL, &android_app->cmdPollSource);
+        ALooper_addFd(looper, fifo_fd, ALOOPER_EVENT_FIFO_MESSAGE, ALOOPER_EVENT_INPUT, NULL, &android_app->cmdPollSource);
     }
 
     android_main(android_app);
 
     // clean up fifo
     if (fifo_fd != -1) {
-        ALooper_removeFd(native_glue_looper, fifo_fd);
+        ALooper_removeFd(looper, fifo_fd);
         close(fifo_fd);
     }
 
