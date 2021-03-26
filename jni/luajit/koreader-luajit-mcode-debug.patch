@@ -55,7 +55,7 @@ index bf8d8812..de8b55ad 100644
      } else {
        if (!(mode & LUAJIT_MODE_ON))
 diff --git a/src/lj_mcode.c b/src/lj_mcode.c
-index 501f4b35..fbff0981 100644
+index 20a9d6b6..158f3de7 100644
 --- a/src/lj_mcode.c
 +++ b/src/lj_mcode.c
 @@ -109,12 +109,14 @@ static void *mcode_alloc_at(jit_State *J, uintptr_t hint, size_t sz, int prot, b
@@ -139,7 +139,7 @@ index 501f4b35..fbff0981 100644
 @@ -363,6 +375,7 @@ void lj_mcode_clear(jit_State *J)
    ((MCLink *)J->mcarea)->size = J->szmcarea;
    J->szallmcarea = J->szmcarea;
-   J->mcbot = (MCode *)lj_err_register_mcode(J->mcarea, sz, (uint8_t *)J->mcbot);
+   J->mcbot = (MCode *)lj_err_register_mcode(J->mcarea, J->szmcarea, (uint8_t *)J->mcbot);
 +  LJ_LOG("recycled %zuK mcarea @ %p", J->szmcarea / 1024U, J->mcarea);
  }
  

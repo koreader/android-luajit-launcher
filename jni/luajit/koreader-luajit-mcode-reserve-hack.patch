@@ -23,7 +23,7 @@ index 34ddf907..9e1902b4 100644
    MCode *mctop;		/* Top of current mcode area. */
    MCode *mcbot;		/* Bottom of current mcode area. */
 diff --git a/src/lj_mcode.c b/src/lj_mcode.c
-index b34d7c85..501f4b35 100644
+index b34d7c85..20a9d6b6 100644
 --- a/src/lj_mcode.c
 +++ b/src/lj_mcode.c
 @@ -98,9 +98,13 @@ static int mcode_setprot(void *p, size_t sz, DWORD prot)
@@ -103,7 +103,7 @@ index b34d7c85..501f4b35 100644
  #endif
  }
  
-@@ -283,10 +306,65 @@ void lj_mcode_free(jit_State *J)
+@@ -283,8 +306,63 @@ void lj_mcode_free(jit_State *J)
      size_t sz = ((MCLink *)mc)->size;
      lj_err_deregister_mcode(mc, sz, (uint8_t *)mc + sizeof(MCLink));
      mcode_free(J, mc, sz);
@@ -111,10 +111,10 @@ index b34d7c85..501f4b35 100644
 +    if (!next) {
 +      J->lastmcarea = mc;
 +    }
-     mc = next;
-   }
- }
- 
++    mc = next;
++  }
++}
++
 +/* Clear all MCode areas. */
 +void lj_mcode_clear(jit_State *J)
 +{
@@ -138,8 +138,8 @@ index b34d7c85..501f4b35 100644
 +      /* A non-contiguous link anywhere in the chain means we scrap the whole chain, to keep things simple */
 +      break;
 +    }
-+    mc = next;
-+  }
+     mc = next;
+   }
 +
 +  /* If we hit a non-contiguous link, fallback to lj_mcode_free */
 +  if (!mcarea) {
@@ -163,12 +163,10 @@ index b34d7c85..501f4b35 100644
 +  ((MCLink *)J->mcarea)->next = NULL;
 +  ((MCLink *)J->mcarea)->size = J->szmcarea;
 +  J->szallmcarea = J->szmcarea;
-+  J->mcbot = (MCode *)lj_err_register_mcode(J->mcarea, sz, (uint8_t *)J->mcbot);
-+}
-+
- /* -- MCode transactions -------------------------------------------------- */
++  J->mcbot = (MCode *)lj_err_register_mcode(J->mcarea, J->szmcarea, (uint8_t *)J->mcbot);
+ }
  
- /* Reserve the remainder of the current MCode area. */
+ /* -- MCode transactions -------------------------------------------------- */
 diff --git a/src/lj_mcode.h b/src/lj_mcode.h
 index caaaec61..f4ebe621 100644
 --- a/src/lj_mcode.h
