@@ -110,12 +110,6 @@ typedef int (*ALooper_callbackFunc)(int fd, int events, void* data);
 int ALooper_pollAll(int timeoutMillis, int* outFd, int* outEvents, void** outData);
 int ALooper_pollOnce(int timeoutMillis, int* outFd, int* outEvents, void** outData);
 
-// for alooper.fifo messages
-enum {
-    EVENT_POWER_CONNECTED = 100,
-    EVENT_POWER_DISCONNECTED = 101,
-};
-
 // from android-ndk/platforms/android-9/arch-arm/usr/include/android/input.h:
 
 enum {
@@ -366,6 +360,11 @@ enum {
     ASCREEN_ORIENTATION_REVERSE_LANDSCAPE = 8,
     ASCREEN_ORIENTATION_REVERSE_PORTRAIT = 9,
     ASCREEN_ORIENTATION_FULL_SENSOR = 10,
+};
+
+enum {
+    EVENT_POWER_CONNECTED = 100,
+    EVENT_POWER_DISCONNECTED = 101,
 };
 
 int32_t AInputEvent_getType(const AInputEvent* event);

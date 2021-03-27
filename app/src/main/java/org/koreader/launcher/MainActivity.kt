@@ -217,7 +217,6 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     override fun canIgnoreBatteryOptimizations(): Boolean {
         return Permissions.isIgnoringBatteryOptimizations(this)
     }
-
     override fun canWriteSystemSettings(): Boolean {
         return Permissions.hasWriteSettingsPermission(this)
     }

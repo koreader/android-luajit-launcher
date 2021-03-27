@@ -91,16 +91,17 @@ class Device(activity: Activity) {
 
     inner class EventReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            val action = intent?.action
-            when (action) {
-                Intent.ACTION_POWER_CONNECTED -> {
-                    postMessages(EVENT_POWER_CONNECTED)
-                }
-                Intent.ACTION_POWER_DISCONNECTED -> {
-                    postMessages(EVENT_POWER_DISCONNECTED)
-                }
-                else -> {
-                    /* do nothing here */
+            intent?.let { event ->
+                when (event.action) {
+                    Intent.ACTION_POWER_CONNECTED -> {
+                        postMessages(EVENT_POWER_CONNECTED)
+                    }
+                    Intent.ACTION_POWER_DISCONNECTED -> {
+                        postMessages(EVENT_POWER_DISCONNECTED)
+                    }
+                    else -> {
+                        /* do nothing here */
+                    }
                 }
             }
         }
@@ -133,8 +134,7 @@ class Device(activity: Activity) {
             writer.write(fifo_bytes, 0, 4)
             writer.close()
         } catch (e: Exception) {
-            Logger.e("Feed ALooper fifo: ERROR writing to  ALooper fifo: \"$MainApp.fifo_path\"")
-            Logger.e("$e")
+            Logger.e("Feed ALooper fifo:", "ERROR writing to file: ${MainApp.fifo_path}: \n$e")
         }
     }
 

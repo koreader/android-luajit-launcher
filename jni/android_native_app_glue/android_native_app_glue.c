@@ -249,8 +249,6 @@ static void* android_app_entry(void* param) {
     if (fifo_fd  == -1) {
         LOGE("%s: FIFO errnor=0%x", TAG, errno);
     } else {
-//        android_app->userData = message_to_lua;
-//        native_glue_looper = looper;
         ALooper_addFd(looper, fifo_fd, LOOPER_ID_USER, ALOOPER_EVENT_INPUT, NULL, &android_app->cmdPollSource);
     }
 
