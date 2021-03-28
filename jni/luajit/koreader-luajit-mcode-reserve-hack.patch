@@ -10,28 +10,6 @@ index 3a28026c..e441c0e6 100644
  #endif
  
  /* Needed everywhere. */
-diff --git a/src/lj_err.c b/src/lj_err.c
-index 9fc3adc7..db86de10 100644
---- a/src/lj_err.c
-+++ b/src/lj_err.c
-@@ -595,7 +595,16 @@ uint8_t *lj_err_register_mcode(void *base, size_t sz, uint8_t *info)
- void lj_err_deregister_mcode(void *base, size_t sz, uint8_t *info)
- {
-   UNUSED(base); UNUSED(sz);
--  __deregister_frame(info + ERR_FRAME_JIT_OFS_REGISTER);
-+  /* Guard against double frees, because lj_mcode_free may be called on an MCLink
-+   * that was already deregistered in lj_mcode_clear, in case of non-contiguous links...
-+   * c.f., https://gcc.gnu.org/git/?p=gcc.git;a=blob;f=libgcc/unwind-dw2-fde.c;h=5d2213c3f88f3a496da74a6fea0b41046c9bd941;hb=HEAD#l248
-+   *     & https://github.com/llvm/llvm-project/blob/dcaa0293c1068cf0b06c4e4304d3290ca3e7d5e3/libunwind/src/libunwind.cpp#L277-L281
-+   *       https://github.com/llvm/llvm-project/blob/dcaa0293c1068cf0b06c4e4304d3290ca3e7d5e3/libunwind/src/UnwindCursor.hpp#L185-L198
-+   */
-+  if (*(uint32_t *)(info + ERR_FRAME_JIT_OFS_CODE_SIZE) != 0) {
-+    __deregister_frame(info + ERR_FRAME_JIT_OFS_REGISTER);
-+    *(uint32_t *)(info + ERR_FRAME_JIT_OFS_CODE_SIZE) = 0;
-+  }
- }
- #endif
- 
 diff --git a/src/lj_jit.h b/src/lj_jit.h
 index 34ddf907..9e1902b4 100644
 --- a/src/lj_jit.h
@@ -45,7 +23,7 @@ index 34ddf907..9e1902b4 100644
    MCode *mctop;		/* Top of current mcode area. */
    MCode *mcbot;		/* Bottom of current mcode area. */
 diff --git a/src/lj_mcode.c b/src/lj_mcode.c
-index b34d7c85..20a9d6b6 100644
+index b34d7c85..57e4018f 100644
 --- a/src/lj_mcode.c
 +++ b/src/lj_mcode.c
 @@ -98,9 +98,13 @@ static int mcode_setprot(void *p, size_t sz, DWORD prot)
@@ -125,7 +103,7 @@ index b34d7c85..20a9d6b6 100644
  #endif
  }
  
-@@ -283,8 +306,63 @@ void lj_mcode_free(jit_State *J)
+@@ -283,10 +306,74 @@ void lj_mcode_free(jit_State *J)
      size_t sz = ((MCLink *)mc)->size;
      lj_err_deregister_mcode(mc, sz, (uint8_t *)mc + sizeof(MCLink));
      mcode_free(J, mc, sz);
@@ -133,10 +111,10 @@ index b34d7c85..20a9d6b6 100644
 +    if (!next) {
 +      J->lastmcarea = mc;
 +    }
-+    mc = next;
-+  }
-+}
-+
+     mc = next;
+   }
+ }
+ 
 +/* Clear all MCode areas. */
 +void lj_mcode_clear(jit_State *J)
 +{
@@ -148,7 +126,6 @@ index b34d7c85..20a9d6b6 100644
 +  while (mc) {
 +    MCode *next = ((MCLink *)mc)->next;
 +    size_t size = ((MCLink *)mc)->size;
-+    lj_err_deregister_mcode(mc, size, (uint8_t *)mc + sizeof(MCLink));
 +    /* Reset mcarea to the oldest contiguous link */
 +    if ((next && next == (MCode *)((char *)mc + size)) || (!next && mc == (MCode *)((char *)mcarea + szmcarea)) || (!next && mc == mcarea)) {
 +      /* ^ next link is contiguous                         ^ last link is contiguous                                ^ single link in the chain */
@@ -160,12 +137,22 @@ index b34d7c85..20a9d6b6 100644
 +      /* A non-contiguous link anywhere in the chain means we scrap the whole chain, to keep things simple */
 +      break;
 +    }
-     mc = next;
-   }
++    mc = next;
++  }
 +
 +  /* If we hit a non-contiguous link, fallback to lj_mcode_free */
 +  if (!mcarea) {
 +    return lj_mcode_free(J);
++  }
++
++  /* We need to handle lj_err_deregister_mcode in a second pass in order to avoid calling it twice on the same link,
++   * because we can fall back to lj_mcode_free in the middle of the list if we hit a non-contiguous link... */
++  mc = J->mcarea;
++  while (mc) {
++    MCode *next = ((MCLink *)mc)->next;
++    size_t size = ((MCLink *)mc)->size;
++    lj_err_deregister_mcode(mc, size, (uint8_t *)mc + sizeof(MCLink));
++    mc = next;
 +  }
 +
 +  /* Ready to recycle the full chain */
@@ -186,9 +173,11 @@ index b34d7c85..20a9d6b6 100644
 +  ((MCLink *)J->mcarea)->size = J->szmcarea;
 +  J->szallmcarea = J->szmcarea;
 +  J->mcbot = (MCode *)lj_err_register_mcode(J->mcarea, J->szmcarea, (uint8_t *)J->mcbot);
- }
- 
++}
++
  /* -- MCode transactions -------------------------------------------------- */
+ 
+ /* Reserve the remainder of the current MCode area. */
 diff --git a/src/lj_mcode.h b/src/lj_mcode.h
 index caaaec61..f4ebe621 100644
 --- a/src/lj_mcode.h

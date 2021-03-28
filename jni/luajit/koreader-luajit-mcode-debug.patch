@@ -55,7 +55,7 @@ index bf8d8812..de8b55ad 100644
      } else {
        if (!(mode & LUAJIT_MODE_ON))
 diff --git a/src/lj_mcode.c b/src/lj_mcode.c
-index 20a9d6b6..158f3de7 100644
+index 57e4018f..4401b4f5 100644
 --- a/src/lj_mcode.c
 +++ b/src/lj_mcode.c
 @@ -109,12 +109,14 @@ static void *mcode_alloc_at(jit_State *J, uintptr_t hint, size_t sz, int prot, b
@@ -125,7 +125,7 @@ index 20a9d6b6..158f3de7 100644
  }
  
  /* Clear all MCode areas. */
-@@ -332,8 +342,10 @@ void lj_mcode_clear(jit_State *J)
+@@ -331,8 +341,10 @@ void lj_mcode_clear(jit_State *J)
        mcarea = mc;
        szmcarea = size;
        szallmcarea += size;
@@ -136,7 +136,7 @@ index 20a9d6b6..158f3de7 100644
        /* A non-contiguous link anywhere in the chain means we scrap the whole chain, to keep things simple */
        break;
      }
-@@ -363,6 +375,7 @@ void lj_mcode_clear(jit_State *J)
+@@ -372,6 +384,7 @@ void lj_mcode_clear(jit_State *J)
    ((MCLink *)J->mcarea)->size = J->szmcarea;
    J->szallmcarea = J->szmcarea;
    J->mcbot = (MCode *)lj_err_register_mcode(J->mcarea, J->szmcarea, (uint8_t *)J->mcbot);
@@ -144,7 +144,7 @@ index 20a9d6b6..158f3de7 100644
  }
  
  /* -- MCode transactions -------------------------------------------------- */
-@@ -370,6 +383,7 @@ void lj_mcode_clear(jit_State *J)
+@@ -379,6 +392,7 @@ void lj_mcode_clear(jit_State *J)
  /* Reserve the remainder of the current MCode area. */
  MCode *lj_mcode_reserve(jit_State *J, MCode **lim)
  {
@@ -152,7 +152,7 @@ index 20a9d6b6..158f3de7 100644
    if (!J->mcarea)
      mcode_allocarea(J);
    else
-@@ -435,6 +449,7 @@ void lj_mcode_limiterr(jit_State *J, size_t need)
+@@ -444,6 +458,7 @@ void lj_mcode_limiterr(jit_State *J, size_t need)
    sizemcode = (size_t)J->param[JIT_P_sizemcode] << 10;
    sizemcode = (sizemcode + LJ_PAGESIZE-1) & ~(size_t)(LJ_PAGESIZE - 1);
    maxmcode = (size_t)J->param[JIT_P_maxmcode] << 10;
