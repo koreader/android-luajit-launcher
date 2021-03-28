@@ -363,8 +363,8 @@ enum {
 };
 
 enum {
-    EVENT_POWER_CONNECTED = 100,
-    EVENT_POWER_DISCONNECTED = 101,
+    AEVENT_POWER_CONNECTED = 100,
+    AEVENT_POWER_DISCONNECTED = 101,
 };
 
 int32_t AInputEvent_getType(const AInputEvent* event);

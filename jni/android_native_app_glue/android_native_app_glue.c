@@ -230,16 +230,22 @@ static void* android_app_entry(void* param) {
     pthread_cond_broadcast(&android_app->cond);
     pthread_mutex_unlock(&android_app->mutex);
 
-    // create and open fifo for communication with MainActivity
+    /* from https://github.com/koreader/android-luajit-launcher/pull/294
+
+    We use a named pipe to push events to our main loop running in LuaJIT.
+    Here we create the file, open it and register it as a poll source if everything went well.
+
+    Its state is available as part of the android ffi module.
+    */
     const char* fifo_path = android_app->activity->internalDataPath;
     char fifo_file[strlen(fifo_path) + strlen(FIFO_NAME) + 2U]; // +1 for "/" and +1 for NULL
     snprintf(fifo_file, sizeof(fifo_file), "%s/%s", fifo_path, FIFO_NAME);
 
     if (mkfifo(fifo_file, 0666) == -1) {
         if (errno == EEXIST) {
-            LOGV("%s: FIFO \"%s\" already exists", TAG, fifo_file);
+            LOGV("%s: file %s already exists", TAG, fifo_file);
         } else {
-            LOGE("%s: FIFO \"%s\" cannot be created!", TAG, fifo_file);
+            LOGE("%s: file %s cannot be created!", TAG, fifo_file);
         }
     } else {
         LOGV("%s: FIFO \"%s\" created", TAG, fifo_file);

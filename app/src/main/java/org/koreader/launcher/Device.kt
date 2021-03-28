@@ -84,9 +84,9 @@ class Device(activity: Activity) {
         private const val LINUX_REVERSE_LANDSCAPE = 3
 
         // These are the messages going over the fifo to the native glue.
-        // 32bit (4-byte) get transmitted. The low byte is the command
-        private const val EVENT_POWER_CONNECTED = 100
-        private const val EVENT_POWER_DISCONNECTED = 101
+        // 32 bits (4-byte) get transmitted. The low byte is the command
+        private const val AEVENT_POWER_CONNECTED = 100
+        private const val AEVENT_POWER_DISCONNECTED = 101
     }
 
     inner class EventReceiver : BroadcastReceiver() {
@@ -94,10 +94,10 @@ class Device(activity: Activity) {
             intent?.let { event ->
                 when (event.action) {
                     Intent.ACTION_POWER_CONNECTED -> {
-                        postMessages(EVENT_POWER_CONNECTED)
+                        postMessages(AEVENT_POWER_CONNECTED)
                     }
                     Intent.ACTION_POWER_DISCONNECTED -> {
-                        postMessages(EVENT_POWER_DISCONNECTED)
+                        postMessages(AEVENT_POWER_DISCONNECTED)
                     }
                     else -> {
                         /* do nothing here */
@@ -121,7 +121,7 @@ class Device(activity: Activity) {
         activity.applicationContext.registerReceiver(event, filter)
     }
 
-    // post an 32 bit message which can be evaluated after an ALooper_pollAll()
+    // post a 32-bit message which can be evaluated after an ALooper_pollAll()
     // low byte first
     private fun postMessages(state: Int) {
         try {
@@ -134,7 +134,7 @@ class Device(activity: Activity) {
             writer.write(fifo_bytes, 0, 4)
             writer.close()
         } catch (e: Exception) {
-            Logger.e("Feed ALooper fifo:", "ERROR writing to file: ${MainApp.fifo_path}: \n$e")
+            Logger.e("FIFO", "Cannot write to file ${MainApp.fifo_path}: \n$e")
         }
     }
 
