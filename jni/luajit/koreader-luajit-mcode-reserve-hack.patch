@@ -10,6 +10,24 @@ index 3a28026c..e441c0e6 100644
  #endif
  
  /* Needed everywhere. */
+diff --git a/src/lj_err.c b/src/lj_err.c
+index 9fc3adc7..813ddf13 100644
+--- a/src/lj_err.c
++++ b/src/lj_err.c
+@@ -596,6 +596,13 @@ void lj_err_deregister_mcode(void *base, size_t sz, uint8_t *info)
+ {
+   UNUSED(base); UNUSED(sz);
+   __deregister_frame(info + ERR_FRAME_JIT_OFS_REGISTER);
++  /* Guard against double frees, because lj_mcode_free may be called on an MCLink
++   * that was already deregistered in lj_mcode_clear, in case of non-contiguous links...
++   * c.f., https://gcc.gnu.org/git/?p=gcc.git;a=blob;f=libgcc/unwind-dw2-fde.c;h=5d2213c3f88f3a496da74a6fea0b41046c9bd941;hb=HEAD#l248
++   *     & https://github.com/llvm/llvm-project/blob/dcaa0293c1068cf0b06c4e4304d3290ca3e7d5e3/libunwind/src/libunwind.cpp#L277-L281
++   *       https://github.com/llvm/llvm-project/blob/dcaa0293c1068cf0b06c4e4304d3290ca3e7d5e3/libunwind/src/UnwindCursor.hpp#L185-L198
++   */
++  memset(info + ERR_FRAME_JIT_OFS_REGISTER, 0, sizeof(unsigned int));
+ }
+ #endif
+ 
 diff --git a/src/lj_jit.h b/src/lj_jit.h
 index 34ddf907..9e1902b4 100644
 --- a/src/lj_jit.h
