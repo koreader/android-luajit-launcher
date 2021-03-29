@@ -23,7 +23,7 @@ index 34ddf907..9e1902b4 100644
    MCode *mctop;		/* Top of current mcode area. */
    MCode *mcbot;		/* Bottom of current mcode area. */
 diff --git a/src/lj_mcode.c b/src/lj_mcode.c
-index b34d7c85..57e4018f 100644
+index b34d7c85..5f484507 100644
 --- a/src/lj_mcode.c
 +++ b/src/lj_mcode.c
 @@ -98,9 +98,13 @@ static int mcode_setprot(void *p, size_t sz, DWORD prot)
@@ -103,7 +103,7 @@ index b34d7c85..57e4018f 100644
  #endif
  }
  
-@@ -283,10 +306,74 @@ void lj_mcode_free(jit_State *J)
+@@ -283,10 +306,79 @@ void lj_mcode_free(jit_State *J)
      size_t sz = ((MCLink *)mc)->size;
      lj_err_deregister_mcode(mc, sz, (uint8_t *)mc + sizeof(MCLink));
      mcode_free(J, mc, sz);
@@ -146,7 +146,12 @@ index b34d7c85..57e4018f 100644
 +  }
 +
 +  /* We need to handle lj_err_deregister_mcode in a second pass in order to avoid calling it twice on the same link,
-+   * because we can fall back to lj_mcode_free in the middle of the list if we hit a non-contiguous link... */
++   * because we can fall back to lj_mcode_free in the middle of the list if we hit a non-contiguous link...
++   * Another approach would be to implement a guard in lj_err_deregister_mcode,
++   * by checking/clearing the uint32_t at (info + ERR_FRAME_JIT_OFS_CODE_SIZE),
++   * but we'd need to fiddle early with mcode_setprot to allow writes,
++   * and that's even more unwieldy than looping twice here,
++   * especially given that we're ultimately aiming for a single link in the list... */
 +  mc = J->mcarea;
 +  while (mc) {
 +    MCode *next = ((MCLink *)mc)->next;
