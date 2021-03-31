@@ -248,12 +248,12 @@ static void* android_app_entry(void* param) {
             LOGE("%s: file %s cannot be created!", TAG, fifo_file);
         }
     } else {
-        LOGV("%s: FIFO \"%s\" created", TAG, fifo_file);
+        LOGV("%s: file %s created", TAG, fifo_file);
     }
 
     int fifo_fd = open(fifo_file, O_RDWR | O_CLOEXEC);
     if (fifo_fd  == -1) {
-        LOGE("%s: FIFO errnor=0%x", TAG, errno);
+        LOGE("%s: file %s open error, errno=%d", TAG, fifo_file, errno);
     } else {
         ALooper_addFd(looper, fifo_fd, LOOPER_ID_USER, ALOOPER_EVENT_INPUT, NULL, &android_app->cmdPollSource);
     }
