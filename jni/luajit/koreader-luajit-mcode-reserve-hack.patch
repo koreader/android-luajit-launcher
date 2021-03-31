@@ -11,10 +11,10 @@ index 3a28026c..e441c0e6 100644
  
  /* Needed everywhere. */
 diff --git a/src/lj_jit.h b/src/lj_jit.h
-index 03ed3ea0..6efc78a5 100644
+index 34ddf907..9e1902b4 100644
 --- a/src/lj_jit.h
 +++ b/src/lj_jit.h
-@@ -490,6 +490,7 @@ typedef struct jit_State {
+@@ -492,6 +492,7 @@ typedef struct jit_State {
    BCIns patchins;	/* Instruction for pending re-patch. */
  
    int mcprot;		/* Protection of current mcode area. */
@@ -23,7 +23,7 @@ index 03ed3ea0..6efc78a5 100644
    MCode *mctop;		/* Top of current mcode area. */
    MCode *mcbot;		/* Bottom of current mcode area. */
 diff --git a/src/lj_mcode.c b/src/lj_mcode.c
-index 9ce1deec..9ae9f7dc 100644
+index b34d7c85..5f484507 100644
 --- a/src/lj_mcode.c
 +++ b/src/lj_mcode.c
 @@ -98,9 +98,13 @@ static int mcode_setprot(void *p, size_t sz, DWORD prot)
@@ -103,18 +103,18 @@ index 9ce1deec..9ae9f7dc 100644
  #endif
  }
  
-@@ -280,8 +303,61 @@ void lj_mcode_free(jit_State *J)
-   while (mc) {
-     MCode *next = ((MCLink *)mc)->next;
-     mcode_free(J, mc, ((MCLink *)mc)->size);
+@@ -283,10 +306,79 @@ void lj_mcode_free(jit_State *J)
+     size_t sz = ((MCLink *)mc)->size;
+     lj_err_deregister_mcode(mc, sz, (uint8_t *)mc + sizeof(MCLink));
+     mcode_free(J, mc, sz);
 +    /* Remember the oldest (i.e., highest address) link as lastmcarea */
 +    if (!next) {
 +      J->lastmcarea = mc;
 +    }
-+    mc = next;
-+  }
-+}
-+
+     mc = next;
+   }
+ }
+ 
 +/* Clear all MCode areas. */
 +void lj_mcode_clear(jit_State *J)
 +{
@@ -137,12 +137,27 @@ index 9ce1deec..9ae9f7dc 100644
 +      /* A non-contiguous link anywhere in the chain means we scrap the whole chain, to keep things simple */
 +      break;
 +    }
-     mc = next;
-   }
++    mc = next;
++  }
 +
 +  /* If we hit a non-contiguous link, fallback to lj_mcode_free */
 +  if (!mcarea) {
 +    return lj_mcode_free(J);
++  }
++
++  /* We need to handle lj_err_deregister_mcode in a second pass in order to avoid calling it twice on the same link,
++   * because we can fall back to lj_mcode_free in the middle of the list if we hit a non-contiguous link...
++   * Another approach would be to implement a guard in lj_err_deregister_mcode,
++   * by checking/clearing the uint32_t at (info + ERR_FRAME_JIT_OFS_CODE_SIZE),
++   * but we'd need to fiddle early with mcode_setprot to allow writes,
++   * and that's even more unwieldy than looping twice here,
++   * especially given that we're ultimately aiming for a single link in the list... */
++  mc = J->mcarea;
++  while (mc) {
++    MCode *next = ((MCLink *)mc)->next;
++    size_t size = ((MCLink *)mc)->size;
++    lj_err_deregister_mcode(mc, size, (uint8_t *)mc + sizeof(MCLink));
++    mc = next;
 +  }
 +
 +  /* Ready to recycle the full chain */
@@ -162,9 +177,12 @@ index 9ce1deec..9ae9f7dc 100644
 +  ((MCLink *)J->mcarea)->next = NULL;
 +  ((MCLink *)J->mcarea)->size = J->szmcarea;
 +  J->szallmcarea = J->szmcarea;
- }
- 
++  J->mcbot = (MCode *)lj_err_register_mcode(J->mcarea, J->szmcarea, (uint8_t *)J->mcbot);
++}
++
  /* -- MCode transactions -------------------------------------------------- */
+ 
+ /* Reserve the remainder of the current MCode area. */
 diff --git a/src/lj_mcode.h b/src/lj_mcode.h
 index caaaec61..f4ebe621 100644
 --- a/src/lj_mcode.h
@@ -178,7 +196,7 @@ index caaaec61..f4ebe621 100644
  LJ_FUNC void lj_mcode_commit(jit_State *J, MCode *m);
  LJ_FUNC void lj_mcode_abort(jit_State *J);
 diff --git a/src/lj_trace.c b/src/lj_trace.c
-index 4608f81f..5cab8f70 100644
+index a0ff8864..9fda7017 100644
 --- a/src/lj_trace.c
 +++ b/src/lj_trace.c
 @@ -297,8 +297,8 @@ int lj_trace_flushall(lua_State *L)
@@ -204,7 +222,7 @@ index 4608f81f..5cab8f70 100644
  }
  
 diff --git a/src/ljamalg.c b/src/ljamalg.c
-index 8e2d4937..364bfd0b 100644
+index 384b3cc1..c80f6268 100644
 --- a/src/ljamalg.c
 +++ b/src/ljamalg.c
 @@ -18,6 +18,9 @@

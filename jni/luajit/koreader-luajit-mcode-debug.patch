@@ -1,8 +1,8 @@
 diff --git a/src/lj_api.c b/src/lj_api.c
-index 8b00436d..69540639 100644
+index 18a7ecbc..10253126 100644
 --- a/src/lj_api.c
 +++ b/src/lj_api.c
-@@ -1069,6 +1069,7 @@ LUA_API int lua_setmetatable(lua_State *L, int idx)
+@@ -1043,6 +1043,7 @@ LUA_API int lua_setmetatable(lua_State *L, int idx)
        lj_gc_objbarrier(L, udataV(o), mt);
    } else {
      /* Flush cache, since traces specialize to basemt. But not during __gc. */
@@ -11,10 +11,10 @@ index 8b00436d..69540639 100644
        lj_err_caller(L, LJ_ERR_NOGCMM);
      if (tvisbool(o)) {
 diff --git a/src/lj_asm.c b/src/lj_asm.c
-index 7c9a4237..eb0eb1fe 100644
+index db180315..b761fd24 100644
 --- a/src/lj_asm.c
 +++ b/src/lj_asm.c
-@@ -137,6 +137,7 @@ static LJ_AINLINE void checkmclim(ASMState *as)
+@@ -140,6 +140,7 @@ static LJ_AINLINE void checkmclim(ASMState *as)
        as->curins+1-REF_BIAS, ir->o, ir->op1-REF_BIAS, ir->op2-REF_BIAS);
    }
  #endif
@@ -55,7 +55,7 @@ index bf8d8812..de8b55ad 100644
      } else {
        if (!(mode & LUAJIT_MODE_ON))
 diff --git a/src/lj_mcode.c b/src/lj_mcode.c
-index 9ae9f7dc..02c32b2d 100644
+index 5f484507..236ed2a6 100644
 --- a/src/lj_mcode.c
 +++ b/src/lj_mcode.c
 @@ -109,12 +109,14 @@ static void *mcode_alloc_at(jit_State *J, uintptr_t hint, size_t sz, int prot, b
@@ -109,7 +109,7 @@ index 9ae9f7dc..02c32b2d 100644
    J->szmcarea = sz;
    J->mcprot = MCPROT_GEN;
    J->mctop = (MCode *)((char *)J->mcarea + J->szmcarea);
-@@ -298,6 +306,7 @@ static void mcode_allocarea(jit_State *J)
+@@ -299,6 +307,7 @@ static void mcode_allocarea(jit_State *J)
  void lj_mcode_free(jit_State *J)
  {
    MCode *mc = J->mcarea;
@@ -117,7 +117,7 @@ index 9ae9f7dc..02c32b2d 100644
    J->mcarea = NULL;
    J->szallmcarea = 0;
    while (mc) {
-@@ -309,6 +318,7 @@ void lj_mcode_free(jit_State *J)
+@@ -312,6 +321,7 @@ void lj_mcode_free(jit_State *J)
      }
      mc = next;
    }
@@ -125,7 +125,7 @@ index 9ae9f7dc..02c32b2d 100644
  }
  
  /* Clear all MCode areas. */
-@@ -328,8 +338,10 @@ void lj_mcode_clear(jit_State *J)
+@@ -331,8 +341,10 @@ void lj_mcode_clear(jit_State *J)
        mcarea = mc;
        szmcarea = size;
        szallmcarea += size;
@@ -136,15 +136,15 @@ index 9ae9f7dc..02c32b2d 100644
        /* A non-contiguous link anywhere in the chain means we scrap the whole chain, to keep things simple */
        break;
      }
-@@ -358,6 +370,7 @@ void lj_mcode_clear(jit_State *J)
-   ((MCLink *)J->mcarea)->next = NULL;
+@@ -377,6 +389,7 @@ void lj_mcode_clear(jit_State *J)
    ((MCLink *)J->mcarea)->size = J->szmcarea;
    J->szallmcarea = J->szmcarea;
+   J->mcbot = (MCode *)lj_err_register_mcode(J->mcarea, J->szmcarea, (uint8_t *)J->mcbot);
 +  LJ_LOG("recycled %zuK mcarea @ %p", J->szmcarea / 1024U, J->mcarea);
  }
  
  /* -- MCode transactions -------------------------------------------------- */
-@@ -365,6 +378,7 @@ void lj_mcode_clear(jit_State *J)
+@@ -384,6 +397,7 @@ void lj_mcode_clear(jit_State *J)
  /* Reserve the remainder of the current MCode area. */
  MCode *lj_mcode_reserve(jit_State *J, MCode **lim)
  {
@@ -152,7 +152,7 @@ index 9ae9f7dc..02c32b2d 100644
    if (!J->mcarea)
      mcode_allocarea(J);
    else
-@@ -429,6 +443,7 @@ void lj_mcode_limiterr(jit_State *J, size_t need)
+@@ -449,6 +463,7 @@ void lj_mcode_limiterr(jit_State *J, size_t need)
    sizemcode = (size_t)J->param[JIT_P_sizemcode] << 10;
    sizemcode = (sizemcode + LJ_PAGESIZE-1) & ~(size_t)(LJ_PAGESIZE - 1);
    maxmcode = (size_t)J->param[JIT_P_maxmcode] << 10;
@@ -161,7 +161,7 @@ index 9ae9f7dc..02c32b2d 100644
      lj_trace_err(J, LJ_TRERR_MCODEOV);  /* Too long for any area. */
    if (J->szallmcarea + sizemcode > maxmcode)
 diff --git a/src/lj_trace.c b/src/lj_trace.c
-index 5cab8f70..d16a9b29 100644
+index 9fda7017..961d8009 100644
 --- a/src/lj_trace.c
 +++ b/src/lj_trace.c
 @@ -298,6 +298,7 @@ int lj_trace_flushall(lua_State *L)
