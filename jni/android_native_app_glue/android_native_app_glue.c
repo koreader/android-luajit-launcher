@@ -238,8 +238,9 @@ static void* android_app_entry(void* param) {
     Its state is available as part of the android ffi module.
     */
     const char* fifo_path = android_app->activity->internalDataPath;
-    char fifo_file[strlen(fifo_path) + strlen(FIFO_NAME) + 2U]; // +1 for "/" and +1 for NULL
-    snprintf(fifo_file, sizeof(fifo_file), "%s/%s", fifo_path, FIFO_NAME);
+    size_t len = strlen(fifo_path) + strlen(FIFO_NAME) + 2U; // +1 for "/" and +1 for NULL
+    char fifo_file[len];
+    snprintf(fifo_file, len, "%s/%s", fifo_path, FIFO_NAME);
 
     if (mkfifo(fifo_file, 0666) == -1) {
         if (errno == EEXIST) {
