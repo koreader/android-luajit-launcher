@@ -18,9 +18,11 @@
 #include <jni.h>
 
 #include <errno.h>
+#include <fcntl.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/stat.h>
 
 #include <android/log.h>
 
@@ -29,7 +31,10 @@
 
 #define  TAG "[NativeGlue]"
 
+#define FIFO_NAME "alooper.fifo"
+
 #define LOGE(...) ((void)__android_log_print(ANDROID_LOG_ERROR, LOGGER_NAME, __VA_ARGS__))
+#define LOGV(...) ((void)__android_log_print(ANDROID_LOG_VERBOSE, LOGGER_NAME, __VA_ARGS__))
 
 #ifndef NDEBUG
 #  define LOGD(...) ((void)__android_log_print(ANDROID_LOG_DEBUG, LOGGER_NAME, __VA_ARGS__))
@@ -225,7 +230,42 @@ static void* android_app_entry(void* param) {
     pthread_cond_broadcast(&android_app->cond);
     pthread_mutex_unlock(&android_app->mutex);
 
+    /* from https://github.com/koreader/android-luajit-launcher/pull/294
+
+    We use a named pipe to push events to our main loop running in LuaJIT.
+    Here we create the file, open it and register it as a poll source if everything went well.
+
+    Its state is available as part of the android ffi module.
+    */
+    const char* fifo_path = android_app->activity->internalDataPath;
+    size_t len = strlen(fifo_path) + strlen(FIFO_NAME) + 2U; // +1 for "/" and +1 for NULL
+    char fifo_file[len];
+    snprintf(fifo_file, len, "%s/%s", fifo_path, FIFO_NAME);
+
+    if (mkfifo(fifo_file, 0666) == -1) {
+        if (errno == EEXIST) {
+            LOGV("%s: file %s already exists", TAG, fifo_file);
+        } else {
+            LOGE("%s: file %s cannot be created!", TAG, fifo_file);
+        }
+    } else {
+        LOGV("%s: file %s created", TAG, fifo_file);
+    }
+
+    int fifo_fd = open(fifo_file, O_RDWR | O_CLOEXEC);
+    if (fifo_fd  == -1) {
+        LOGE("%s: file %s open error, errno=%d", TAG, fifo_file, errno);
+    } else {
+        ALooper_addFd(looper, fifo_fd, LOOPER_ID_USER, ALOOPER_EVENT_INPUT, NULL, &android_app->cmdPollSource);
+    }
+
     android_main(android_app);
+
+    // clean up fifo
+    if (fifo_fd != -1) {
+        ALooper_removeFd(looper, fifo_fd);
+        close(fifo_fd);
+    }
 
     android_app_destroy(android_app);
     return NULL;

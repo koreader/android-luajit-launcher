@@ -362,6 +362,11 @@ enum {
     ASCREEN_ORIENTATION_FULL_SENSOR = 10,
 };
 
+enum {
+    AEVENT_POWER_CONNECTED = 100,
+    AEVENT_POWER_DISCONNECTED = 101,
+};
+
 int32_t AInputEvent_getType(const AInputEvent* event);
 int32_t AInputEvent_getDeviceId(const AInputEvent* event);
 int32_t AInputEvent_getSource(const AInputEvent* event);

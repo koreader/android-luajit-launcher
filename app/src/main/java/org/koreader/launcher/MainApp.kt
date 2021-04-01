@@ -6,6 +6,7 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.os.Environment
 import android.os.StrictMode
+import java.io.File
 
 class MainApp : android.app.Application() {
     companion object {
@@ -13,10 +14,13 @@ class MainApp : android.app.Application() {
 
         lateinit var info: String
             private set
+        lateinit var fifo_path: String
+            private set
         lateinit var storage_path: String
             private set
         lateinit var platform_type: String
             private set
+
     }
 
     override fun onCreate() {
@@ -40,6 +44,10 @@ class MainApp : android.app.Application() {
 
         @Suppress("DEPRECATION")
         storage_path = Environment.getExternalStorageDirectory().absolutePath
+
+        // Path to the fifo for sending messages to ALooper (native glue and Lua)
+        fifo_path = File(filesDir, "alooper.fifo").path
+
         platform_type = if (pm.hasSystemFeature("org.chromium.arc.device_management")) {
             "chrome"
         } else if ((runtime >= 21) && pm.hasSystemFeature(PackageManager.FEATURE_LEANBACK)) {
