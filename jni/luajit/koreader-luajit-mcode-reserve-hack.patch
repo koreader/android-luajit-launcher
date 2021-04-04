@@ -23,26 +23,26 @@ index 34ddf907..9e1902b4 100644
    MCode *mctop;		/* Top of current mcode area. */
    MCode *mcbot;		/* Bottom of current mcode area. */
 diff --git a/src/lj_mcode.c b/src/lj_mcode.c
-index b34d7c85..5f484507 100644
+index b3efbc55..536b9ab7 100644
 --- a/src/lj_mcode.c
 +++ b/src/lj_mcode.c
-@@ -98,9 +98,13 @@ static int mcode_setprot(void *p, size_t sz, DWORD prot)
- #define MCPROT_RX	(PROT_READ|PROT_EXEC)
- #define MCPROT_RWX	(PROT_READ|PROT_WRITE|PROT_EXEC)
+@@ -103,9 +103,13 @@ static int mcode_setprot(void *p, size_t sz, DWORD prot)
+ #define MCPROT_CREATE	0
+ #endif
  
 -static void *mcode_alloc_at(jit_State *J, uintptr_t hint, size_t sz, int prot)
 +static void *mcode_alloc_at(jit_State *J, uintptr_t hint, size_t sz, int prot, bool fixed)
  {
--  void *p = mmap((void *)hint, sz, prot, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
+-  void *p = mmap((void *)hint, sz, prot|MCPROT_CREATE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
 +  int flags = MAP_PRIVATE | MAP_ANONYMOUS;
 +  if (fixed) {
 +    flags |= MAP_FIXED;
 +  }
-+  void *p = mmap((void *)hint, sz, prot, flags, -1, 0);
++  void *p = mmap((void *)hint, sz, prot|MCPROT_CREATE, flags, -1, 0);
    if (p == MAP_FAILED) {
      if (!hint) lj_trace_err(J, LJ_TRERR_MCODEAL);
      p = NULL;
-@@ -210,18 +214,37 @@ static void *mcode_alloc(jit_State *J, size_t sz)
+@@ -215,18 +219,37 @@ static void *mcode_alloc(jit_State *J, size_t sz)
    uintptr_t target = (uintptr_t)(void *)lj_vm_exit_handler & ~(uintptr_t)0xffff;
  #endif
    const uintptr_t range = (1u << (LJ_TARGET_JUMPRANGE-1)) - (1u << 21);
@@ -86,9 +86,9 @@ index b34d7c85..5f484507 100644
      }
      /* Next try probing 64K-aligned pseudo-random addresses. */
      do {
-@@ -240,14 +263,14 @@ static void *mcode_alloc(jit_State *J, size_t sz)
+@@ -245,14 +268,14 @@ static void *mcode_alloc(jit_State *J, size_t sz)
  {
- #if defined(__OpenBSD__) || LJ_TARGET_UWP
+ #if defined(__OpenBSD__) || defined(__NetBSD__) || LJ_TARGET_UWP
    /* Allow better executable memory allocation for OpenBSD W^X mode. */
 -  void *p = mcode_alloc_at(J, 0, sz, MCPROT_RUN);
 +  void *p = mcode_alloc_at(J, 0, sz, MCPROT_RUN, false);
@@ -103,7 +103,7 @@ index b34d7c85..5f484507 100644
  #endif
  }
  
-@@ -283,10 +306,79 @@ void lj_mcode_free(jit_State *J)
+@@ -288,10 +311,79 @@ void lj_mcode_free(jit_State *J)
      size_t sz = ((MCLink *)mc)->size;
      lj_err_deregister_mcode(mc, sz, (uint8_t *)mc + sizeof(MCLink));
      mcode_free(J, mc, sz);
