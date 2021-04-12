@@ -6,7 +6,6 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.os.Environment
 import android.os.StrictMode
-import java.io.File
 
 class MainApp : android.app.Application() {
     companion object {
@@ -14,7 +13,7 @@ class MainApp : android.app.Application() {
 
         lateinit var info: String
             private set
-        lateinit var fifo_path: String
+        lateinit var assets_path: String
             private set
         lateinit var storage_path: String
             private set
@@ -27,7 +26,7 @@ class MainApp : android.app.Application() {
         super.onCreate()
         val pm = packageManager
         val am = this.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-        val assetsDir = filesDir.absolutePath
+        assets_path = filesDir.absolutePath
         val isSystemApp = (pm.getPackageInfo(packageName, 0).applicationInfo.flags
             and ApplicationInfo.FLAG_SYSTEM == 1)
 
@@ -45,9 +44,6 @@ class MainApp : android.app.Application() {
         @Suppress("DEPRECATION")
         storage_path = Environment.getExternalStorageDirectory().absolutePath
 
-        // Path to the fifo for sending messages to ALooper (native glue and Lua)
-        fifo_path = File(filesDir, "alooper.fifo").path
-
         platform_type = if (pm.hasSystemFeature("org.chromium.arc.device_management")) {
             "chrome"
         } else if ((runtime >= 21) && pm.hasSystemFeature(PackageManager.FEATURE_LEANBACK)) {
@@ -58,7 +54,7 @@ class MainApp : android.app.Application() {
 
         info = StringBuilder(400)
             .append("{\n  VM heap: ${am.memoryClass}MB\n  Flags: $flags\n  ")
-            .append("Paths: {\n\tAssets: $assetsDir\n\tStorage: $storage_path\n  }\n}")
+            .append("Paths: {\n\tAssets: $assets_path\n\tStorage: $storage_path\n  }\n}")
             .toString()
     }
 }
