@@ -112,7 +112,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
         }
         Logger.v(TAG_MAIN, "surface: $surfaceKind")
 
-        registerReceiver(event, event.filter())
+        registerReceiver(event, event.filter)
         if (!Permissions.hasStoragePermission(this)) {
             Permissions.requestStoragePermission(this)
         }
