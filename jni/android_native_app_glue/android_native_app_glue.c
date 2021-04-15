@@ -55,7 +55,7 @@ static void free_saved_state(struct android_app* android_app) {
 int8_t android_app_read_cmd(struct android_app* android_app) {
     int8_t cmd;
     if (read(android_app->msgread, &cmd, sizeof(cmd)) != sizeof(cmd)) {
-        LOGE("%s: No data on command pipe!", TAG);
+        LOGD("%s: No data on command pipe!", TAG);
         return -1;
     }
     if (cmd == APP_CMD_SAVE_STATE) free_saved_state(android_app);
