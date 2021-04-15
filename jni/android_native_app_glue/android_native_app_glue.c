@@ -55,10 +55,12 @@ static void free_saved_state(struct android_app* android_app) {
 int8_t android_app_read_cmd(struct android_app* android_app) {
     int8_t cmd;
     if (read(android_app->msgread, &cmd, sizeof(cmd)) != sizeof(cmd)) {
-        LOGD("%s: No data on command pipe!", TAG);
+        LOGD("%s: No more data on command pipe!", TAG);
         return -1;
     }
-    if (cmd == APP_CMD_SAVE_STATE) free_saved_state(android_app);
+    if (cmd == APP_CMD_SAVE_STATE) {
+        free_saved_state(android_app);
+    }
     return cmd;
 }
 
@@ -252,7 +254,7 @@ static void* android_app_entry(void* param) {
         LOGV("%s: file %s created", TAG, fifo_file);
     }
 
-    int fifo_fd = open(fifo_file, O_RDWR | O_CLOEXEC);
+    int fifo_fd = open(fifo_file, O_RDWR | O_NONBLOCK | O_CLOEXEC);
     if (fifo_fd  == -1) {
         LOGE("%s: file %s open error, errno=%d", TAG, fifo_file, errno);
     } else {
@@ -294,6 +296,15 @@ static struct android_app* android_app_create(ANativeActivity* activity,
         LOGE("%s: could not create pipe: %s", TAG, strerror(errno));
         return NULL;
     }
+    // Because pipe2 has only been available as a bionic wrapper hilariously recently...
+    // (https://android.googlesource.com/platform/bionic/+/1fad5283a07e87b3ae28f4a2dd6943d600c2926b)
+    for (size_t i = 0U; i < 2U; i++) {
+        int flflags = fcntl(msgpipe[i], F_GETFL);
+        fcntl(msgpipe[i], F_SETFL, flflags | O_NONBLOCK);
+        int fdflags = fcntl(msgpipe[i], F_GETFD);
+        fcntl(msgpipe[i], F_SETFD, fdflags | FD_CLOEXEC);
+    }
+
     android_app->msgread = msgpipe[0];
     android_app->msgwrite = msgpipe[1];
 
