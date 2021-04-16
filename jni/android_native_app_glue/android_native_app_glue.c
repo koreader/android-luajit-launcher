@@ -55,10 +55,17 @@ static void free_saved_state(struct android_app* android_app) {
 int8_t android_app_read_cmd(struct android_app* android_app) {
     int8_t cmd;
     if (read(android_app->msgread, &cmd, sizeof(cmd)) != sizeof(cmd)) {
-        LOGE("%s: No data on command pipe!", TAG);
+        // NOTE: We drain the pipe in one batch in ffi/input_android.lua,
+        //       meaning we *expect* the -1 return to detect EAGAIN,
+        //       so this is just noise.
+        if (errno != EAGAIN) {
+            LOGE("%s: Failed to read command pipe: %s", TAG, strerror(errno));
+        }
         return -1;
     }
-    if (cmd == APP_CMD_SAVE_STATE) free_saved_state(android_app);
+    if (cmd == APP_CMD_SAVE_STATE) {
+        free_saved_state(android_app);
+    }
     return cmd;
 }
 
@@ -244,17 +251,17 @@ static void* android_app_entry(void* param) {
 
     if (mkfifo(fifo_file, 0666) == -1) {
         if (errno == EEXIST) {
-            LOGV("%s: file %s already exists", TAG, fifo_file);
+            LOGV("%s: User FIFO already exists at `%s`", TAG, fifo_file);
         } else {
-            LOGE("%s: file %s cannot be created!", TAG, fifo_file);
+            LOGE("%s: Failed to create user FIFO at `%s`: %s", TAG, fifo_file, strerror(errno));
         }
     } else {
-        LOGV("%s: file %s created", TAG, fifo_file);
+        LOGV("%s: User FIFO created at `%s`", TAG, fifo_file);
     }
 
-    int fifo_fd = open(fifo_file, O_RDWR | O_CLOEXEC);
+    int fifo_fd = open(fifo_file, O_RDWR | O_NONBLOCK | O_CLOEXEC);
     if (fifo_fd  == -1) {
-        LOGE("%s: file %s open error, errno=%d", TAG, fifo_file, errno);
+        LOGE("%s: Failed to open user FIFO at `%s`: %s", TAG, fifo_file, strerror(errno));
     } else {
         ALooper_addFd(looper, fifo_fd, LOOPER_ID_USER, ALOOPER_EVENT_INPUT, NULL, &android_app->cmdPollSource);
     }
@@ -291,9 +298,18 @@ static struct android_app* android_app_create(ANativeActivity* activity,
 
     int msgpipe[2];
     if (pipe(msgpipe)) {
-        LOGE("%s: could not create pipe: %s", TAG, strerror(errno));
+        LOGE("%s: Failed to create command pipe: %s", TAG, strerror(errno));
         return NULL;
     }
+    // Because pipe2 has only been available as a bionic wrapper hilariously recently...
+    // (https://android.googlesource.com/platform/bionic/+/1fad5283a07e87b3ae28f4a2dd6943d600c2926b)
+    for (size_t i = 0U; i < 2U; i++) {
+        int flflags = fcntl(msgpipe[i], F_GETFL);
+        fcntl(msgpipe[i], F_SETFL, flflags | O_NONBLOCK);
+        int fdflags = fcntl(msgpipe[i], F_GETFD);
+        fcntl(msgpipe[i], F_SETFD, fdflags | FD_CLOEXEC);
+    }
+
     android_app->msgread = msgpipe[0];
     android_app->msgwrite = msgpipe[1];
 
@@ -314,7 +330,7 @@ static struct android_app* android_app_create(ANativeActivity* activity,
 
 static void android_app_write_cmd(struct android_app* android_app, int8_t cmd) {
     if (write(android_app->msgwrite, &cmd, sizeof(cmd)) != sizeof(cmd)) {
-        LOGE("%s: Failure writing android_app cmd: %s", TAG, strerror(errno));
+        LOGE("%s: Failed to write to command pipe: %s", TAG, strerror(errno));
     }
 }
 
