@@ -29,6 +29,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     private lateinit var assets: Assets
     private lateinit var clipboard: Clipboard
     private lateinit var device: Device
+    private lateinit var event: EventReceiver
     private lateinit var timeout: Timeout
 
     // Path of last file imported
@@ -91,6 +92,8 @@ class MainActivity : NativeActivity(), JNILuaInterface,
         clipboard = Clipboard(this)
         device = Device(this)
         timeout = Timeout()
+        event = EventReceiver()
+
         super.onCreate(savedInstanceState)
         setTheme(R.style.Fullscreen)
 
@@ -109,6 +112,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
         }
         Logger.v(TAG_MAIN, "surface: $surfaceKind")
 
+        registerReceiver(event, event.filter)
         if (!Permissions.hasStoragePermission(this)) {
             Permissions.requestStoragePermission(this)
         }
@@ -207,6 +211,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     /* Called when the activity is going to be destroyed */
     public override fun onDestroy() {
         Logger.v(TAG_MAIN, "onDestroy()")
+        unregisterReceiver(event)
         super.onDestroy()
     }
 
