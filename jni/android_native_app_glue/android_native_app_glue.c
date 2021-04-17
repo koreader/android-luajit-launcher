@@ -154,7 +154,7 @@ void android_app_pre_exec_cmd(struct android_app* android_app, int8_t cmd) {
 void android_app_post_exec_cmd(struct android_app* android_app, int8_t cmd) {
     switch (cmd) {
         case APP_CMD_TERM_WINDOW:
-            LOGD("%s: APP_CMD_TERM_WINDOW", TAG);
+            LOGD("%s: Post APP_CMD_TERM_WINDOW", TAG);
             pthread_mutex_lock(&android_app->mutex);
             android_app->window = NULL;
             pthread_cond_broadcast(&android_app->cond);
@@ -162,7 +162,7 @@ void android_app_post_exec_cmd(struct android_app* android_app, int8_t cmd) {
             break;
 
         case APP_CMD_SAVE_STATE:
-            LOGD("%s: APP_CMD_SAVE_STATE", TAG);
+            LOGD("%s: Post APP_CMD_SAVE_STATE", TAG);
             pthread_mutex_lock(&android_app->mutex);
             android_app->stateSaved = 1;
             pthread_cond_broadcast(&android_app->cond);
@@ -170,6 +170,7 @@ void android_app_post_exec_cmd(struct android_app* android_app, int8_t cmd) {
             break;
 
         case APP_CMD_RESUME:
+            LOGD("%s: Post APP_CMD_RESUME", TAG);
             free_saved_state(android_app);
             break;
     }
