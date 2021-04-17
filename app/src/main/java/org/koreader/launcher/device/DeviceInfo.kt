@@ -78,7 +78,8 @@ object DeviceInfo {
     enum class LightsDevice {
         NONE,
         TOLINO_EPOS,
-        ONYX_NOVA2
+        ONYX_NOVA2,
+        ONYX_C67
     }
 
     enum class BugDevice {
@@ -163,6 +164,7 @@ object DeviceInfo {
         ONYX_C67 = (MANUFACTURER.contentEquals("onyx")
                 && (PRODUCT.startsWith("c67") || MODEL.contentEquals("rk30sdk"))
                 && DEVICE.startsWith("c67"))
+        lightsMap[LightsDevice.ONYX_C67] = ONYX_C67
         deviceMap[EinkDevice.ONYX_C67] = ONYX_C67
 
         // Energy Sistem eReaders. Tested on Energy Ereader Pro 4
