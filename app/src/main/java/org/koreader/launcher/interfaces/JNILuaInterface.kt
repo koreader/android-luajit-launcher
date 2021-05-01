@@ -41,6 +41,7 @@ interface JNILuaInterface {
     fun hasClipboardText(): Boolean
     fun hasExternalStoragePermission(): Boolean
     fun hasNativeRotation(): Boolean
+    fun hasOTAUpdates(): Boolean
     fun isCharging(): Boolean
     fun isChromeOS(): Boolean
     fun isDebuggable(): Boolean

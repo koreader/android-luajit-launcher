@@ -2103,6 +2103,16 @@ local function run(android_app_state)
         end)
     end
 
+    android.hasOTAUpdates = function()
+        return JNI:context(android.app.activity.vm, function(jni)
+            return jni:callBooleanMethod(
+                android.app.activity.clazz,
+                "hasOTAUpdates",
+                "()Z"
+            )
+        end)
+    end
+
     android.getPlatformName = function()
         return JNI:context(android.app.activity.vm, function(jni)
             local platform = jni:callObjectMethod(

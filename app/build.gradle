@@ -12,6 +12,7 @@ android {
         versionName versName
         manifestPlaceholders.APP_NAME = projectName
         buildConfigField 'String', 'APP_NAME', '"' + projectName + '"'
+        buildConfigField "boolean", "IN_APP_UPDATES", "false"
     }
 
     buildTypes {
@@ -59,6 +60,7 @@ android {
         }
         rocks {
             dimension = 'CHANNEL'
+            buildConfigField "boolean", "IN_APP_UPDATES", "true"
         }
     }
 

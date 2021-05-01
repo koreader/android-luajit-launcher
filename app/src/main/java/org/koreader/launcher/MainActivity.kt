@@ -3,6 +3,7 @@ package org.koreader.launcher
 import android.annotation.SuppressLint
 import android.annotation.TargetApi
 import android.app.Activity
+import android.app.DownloadManager
 import android.app.NativeActivity
 import android.content.Context
 import android.content.Intent
@@ -12,6 +13,7 @@ import android.net.Uri
 import android.os.BatteryManager
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.provider.Settings
 import android.view.*
 import android.widget.Toast
@@ -20,6 +22,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import org.koreader.launcher.interfaces.JNILuaInterface
 import org.koreader.launcher.utils.*
+import java.io.File
 import java.util.*
 
 @Keep
@@ -72,6 +75,10 @@ class MainActivity : NativeActivity(), JNILuaInterface,
 
     companion object {
         private const val ACTION_SAF_FILEPICKER = 2
+        private const val DOWNLOAD_OK = 0
+        private const val DOWNLOAD_EXISTS = 1
+        private const val DOWNLOAD_FAILED = -1
+        private const val DOWNLOAD_NOT_SUPPORTED = -2
         private val BATTERY_FILTER = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
         private val RUNTIME_VERSION = Build.VERSION.RELEASE
     }
@@ -239,7 +246,34 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     }
 
     override fun download(url: String, name: String): Int {
-        return ApkUpdater.download(this, url, name)
+        return if (MainApp.has_ota_updates) {
+            val path = Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_DOWNLOADS).toString() + "/" + name
+
+            val request = DownloadManager.Request(Uri.parse(url))
+            request.setTitle(MainApp.name)
+            request.setDescription(name)
+            request.setMimeType("application/vnd.android.package-archive")
+            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_HIDDEN)
+            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, name)
+
+            /* Try to download the request. This *should* not fail, but it fails
+               on some AOSP devices that don't need to pass google CTS. */
+            try {
+                if (File(path).exists()) {
+                    DOWNLOAD_EXISTS
+                }
+                val manager = applicationContext.getSystemService(Context.DOWNLOAD_SERVICE)
+                    as DownloadManager
+                manager.enqueue(request)
+                DOWNLOAD_OK
+            } catch (e: Exception) {
+                e.printStackTrace()
+                DOWNLOAD_FAILED
+            }
+        } else  {
+            DOWNLOAD_NOT_SUPPORTED
+        }
     }
 
     override fun einkUpdate(mode: Int) {
@@ -416,6 +450,10 @@ class MainActivity : NativeActivity(), JNILuaInterface,
                 !(device.bugRotation)
             } else false
         } else false
+    }
+
+    override fun hasOTAUpdates(): Boolean {
+        return MainApp.has_ota_updates
     }
 
     override fun isCharging(): Boolean {
