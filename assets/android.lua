@@ -495,6 +495,7 @@ enum {
 enum {
     AEVENT_POWER_CONNECTED = 100,
     AEVENT_POWER_DISCONNECTED = 101,
+    AEVENT_DOWNLOAD_COMPLETE = 110,
 };
 
 int32_t AInputEvent_getType(const AInputEvent* event);
@@ -2121,6 +2122,16 @@ local function run(android_app_state)
                 "()Ljava/lang/String;"
             )
             return jni:to_string(platform)
+        end)
+    end
+
+    android.installApk = function()
+        JNI:context(android.app.activity.vm, function(jni)
+            jni:callVoidMethod(
+                android.app.activity.clazz,
+                "installApk",
+                "()V"
+            )
         end)
     end
 

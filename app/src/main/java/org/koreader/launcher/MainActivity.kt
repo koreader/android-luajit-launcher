@@ -20,12 +20,14 @@ import android.widget.Toast
 import androidx.annotation.Keep
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import org.koreader.launcher.interfaces.JNILuaInterface
 import org.koreader.launcher.utils.*
 import java.io.File
 import java.util.*
 
 @Keep
+@SuppressLint("ObsoleteSdkInt")
 class MainActivity : NativeActivity(), JNILuaInterface,
     ActivityCompat.OnRequestPermissionsResultCallback{
 
@@ -39,6 +41,9 @@ class MainActivity : NativeActivity(), JNILuaInterface,
 
     // Path of last file imported
     private var lastImportedPath: String? = null
+
+    // Path of the last APK downloaded, only used in flavors with IN_APP_UPDATES
+    private var lastDownload: String? = null
 
     // Some devices need to take control of the native window
     private var takesWindowOwnership: Boolean = false
@@ -454,6 +459,25 @@ class MainActivity : NativeActivity(), JNILuaInterface,
 
     override fun hasOTAUpdates(): Boolean {
         return MainApp.has_ota_updates
+    }
+
+    override fun installApk() {
+        lastDownload?.let { path ->
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                val uri = FileProvider.getUriForFile(this, MainApp.provider, File(path))
+                val intent = Intent(Intent.ACTION_INSTALL_PACKAGE)
+                intent.data = uri
+                intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+                startActivity(intent)
+            } else {
+                val uri = Uri.fromFile(File(path))
+                val intent = Intent(Intent.ACTION_VIEW)
+                intent.setDataAndType(uri, "application/vnd.android.package-archive")
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                startActivity(intent)
+            }
+            lastDownload = null
+        }
     }
 
     override fun isCharging(): Boolean {

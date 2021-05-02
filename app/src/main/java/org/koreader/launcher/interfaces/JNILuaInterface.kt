@@ -42,6 +42,7 @@ interface JNILuaInterface {
     fun hasExternalStoragePermission(): Boolean
     fun hasNativeRotation(): Boolean
     fun hasOTAUpdates(): Boolean
+    fun installApk()
     fun isCharging(): Boolean
     fun isChromeOS(): Boolean
     fun isDebuggable(): Boolean

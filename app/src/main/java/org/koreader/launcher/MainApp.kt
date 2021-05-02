@@ -11,10 +11,12 @@ class MainApp : android.app.Application() {
     companion object {
 
         // build time
-        val is_debug = BuildConfig.DEBUG
         const val name = BuildConfig.APP_NAME
         const val flavor = BuildConfig.FLAVOR_CHANNEL
         const val has_ota_updates = BuildConfig.IN_APP_UPDATES
+
+        val is_debug = BuildConfig.DEBUG
+        val provider = "${BuildConfig.APPLICATION_ID}.provider"
 
         // runtime dependant
         private val runtime = android.os.Build.VERSION.SDK_INT
