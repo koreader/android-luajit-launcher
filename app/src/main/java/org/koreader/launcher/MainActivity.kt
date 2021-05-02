@@ -254,7 +254,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
             request.setTitle(MainApp.name)
             request.setDescription(name)
             request.setMimeType("application/vnd.android.package-archive")
-            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_HIDDEN)
+            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
             request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, name)
 
             /* Try to download the request. This *should* not fail, but it fails
