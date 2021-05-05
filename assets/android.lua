@@ -498,6 +498,13 @@ enum {
     AEVENT_DOWNLOAD_COMPLETE = 110,
 };
 
+enum {
+    ADOWNLOAD_NOT_SUPPORTED = -2,
+    ADOWNLOAD_FAILED = -1,
+    ADOWNLOAD_OK = 0,
+    ADOWNLOAD_EXISTS = 1,
+};
+
 int32_t AInputEvent_getType(const AInputEvent* event);
 int32_t AInputEvent_getDeviceId(const AInputEvent* event);
 int32_t AInputEvent_getSource(const AInputEvent* event);
@@ -1921,6 +1928,28 @@ local function run(android_app_state)
     android.screen.width = android.getScreenWidth()
     android.screen.height = android.getScreenHeight()
 
+    android.ota = {
+        isPending = false,
+        isEnabled = function()
+            return JNI:context(android.app.activity.vm, function(jni)
+                return jni:callBooleanMethod(
+                    android.app.activity.clazz,
+                    "hasOTAUpdates",
+                    "()Z"
+                )
+            end)
+        end,
+        install = function()
+            JNI:context(android.app.activity.vm, function(jni)
+                jni:callVoidMethod(
+                    android.app.activity.clazz,
+                    "installApk",
+                    "()V"
+                )
+            end)
+        end,
+    }
+
     android.orientation = {
         get = function()
             return JNI:context(android.app.activity.vm, function(jni)
@@ -2104,16 +2133,6 @@ local function run(android_app_state)
         end)
     end
 
-    android.hasOTAUpdates = function()
-        return JNI:context(android.app.activity.vm, function(jni)
-            return jni:callBooleanMethod(
-                android.app.activity.clazz,
-                "hasOTAUpdates",
-                "()Z"
-            )
-        end)
-    end
-
     android.getPlatformName = function()
         return JNI:context(android.app.activity.vm, function(jni)
             local platform = jni:callObjectMethod(
@@ -2122,16 +2141,6 @@ local function run(android_app_state)
                 "()Ljava/lang/String;"
             )
             return jni:to_string(platform)
-        end)
-    end
-
-    android.installApk = function()
-        JNI:context(android.app.activity.vm, function(jni)
-            jni:callVoidMethod(
-                android.app.activity.clazz,
-                "installApk",
-                "()V"
-            )
         end)
     end
 
@@ -2401,6 +2410,16 @@ local function run(android_app_state)
             )
             jni.env[0].DeleteLocalRef(jni.env, _package)
             return enabled
+        end)
+    end
+
+    android.isResumed = function()
+        return JNI:context(android.app.activity.vm, function(jni)
+            return jni:callBooleanMethod(
+                android.app.activity.clazz,
+                "isActivityResumed",
+                "()Z"
+            )
         end)
     end
 

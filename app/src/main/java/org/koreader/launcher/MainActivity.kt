@@ -250,34 +250,40 @@ class MainActivity : NativeActivity(), JNILuaInterface,
         } ?: Logger.e(tag, "invalid lookup: no text")
     }
 
+    @Suppress("DEPRECATION")
     override fun download(url: String, name: String): Int {
-        return if (MainApp.has_ota_updates) {
-            val path = Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_DOWNLOADS).toString() + "/" + name
+        if (MainApp.has_ota_updates) {
+            val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS
+            ).toString()
+            val file = File(path + File.separator + name)
 
-            val request = DownloadManager.Request(Uri.parse(url))
-            request.setTitle(MainApp.name)
-            request.setDescription(name)
-            request.setMimeType("application/vnd.android.package-archive")
-            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, name)
+            Logger.v(tag, "Download file ${file.absolutePath} in $path")
 
             /* Try to download the request. This *should* not fail, but it fails
-               on some AOSP devices that don't need to pass google CTS. */
-            try {
-                if (File(path).exists()) {
+            on some AOSP devices that don't need to pass google CTS. */
+            return try {
+                if (file.exists()) {
+                    Logger.v(tag, "file exists")
+                    lastDownload = file.absolutePath
                     DOWNLOAD_EXISTS
+                } else {
+                    Logger.v(tag, "file does not exist, download")
+                    val request = DownloadManager.Request(Uri.parse(url))
+                    request.setMimeType("application/vnd.android.package-archive")
+                    request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_HIDDEN)
+                    request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, name)
+                    val manager = applicationContext.getSystemService(Context.DOWNLOAD_SERVICE)
+                        as DownloadManager
+                    manager.enqueue(request)
+                    lastDownload = file.absolutePath
+                    DOWNLOAD_OK
                 }
-                val manager = applicationContext.getSystemService(Context.DOWNLOAD_SERVICE)
-                    as DownloadManager
-                manager.enqueue(request)
-                DOWNLOAD_OK
             } catch (e: Exception) {
                 e.printStackTrace()
                 DOWNLOAD_FAILED
             }
-        } else  {
-            DOWNLOAD_NOT_SUPPORTED
+        } else {
+            return DOWNLOAD_NOT_SUPPORTED
         }
     }
 
@@ -461,8 +467,12 @@ class MainActivity : NativeActivity(), JNILuaInterface,
         return MainApp.has_ota_updates
     }
 
+    @Suppress("DEPRECATION")
     override fun installApk() {
+        Logger.v(tag, "Attempt to install APK")
+
         lastDownload?.let { path ->
+            Logger.v(tag, "APK to install: $path")
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 val uri = FileProvider.getUriForFile(this, MainApp.provider, File(path))
                 val intent = Intent(Intent.ACTION_INSTALL_PACKAGE)
@@ -477,7 +487,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
                 startActivity(intent)
             }
             lastDownload = null
-        }
+        } ?: Logger.v(tag, "No APK to install")
     }
 
     override fun isCharging(): Boolean {
@@ -530,6 +540,10 @@ class MainActivity : NativeActivity(), JNILuaInterface,
             path.startsWith(device.externalStorage) -> true
             else -> false
         }
+    }
+
+    override fun isActivityResumed(): Boolean {
+        return device.isResumed
     }
 
     override fun isTv(): Boolean {

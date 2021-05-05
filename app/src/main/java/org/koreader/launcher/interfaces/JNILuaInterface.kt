@@ -51,6 +51,7 @@ interface JNILuaInterface {
     fun isFullscreen(): Boolean
     fun isPackageEnabled(pkg: String): Boolean
     fun isPathInsideSandbox(path: String): Boolean
+    fun isActivityResumed(): Boolean
     fun isTv(): Boolean
     fun isWarmthDevice(): Boolean
     fun needsWakelocks(): Boolean
