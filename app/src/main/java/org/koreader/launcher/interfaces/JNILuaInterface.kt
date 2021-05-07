@@ -41,6 +41,9 @@ interface JNILuaInterface {
     fun hasClipboardText(): Boolean
     fun hasExternalStoragePermission(): Boolean
     fun hasNativeRotation(): Boolean
+    fun hasOTAUpdates(): Boolean
+    fun hasRuntimeChanges(): Boolean
+    fun installApk()
     fun isCharging(): Boolean
     fun isChromeOS(): Boolean
     fun isDebuggable(): Boolean
@@ -49,6 +52,7 @@ interface JNILuaInterface {
     fun isFullscreen(): Boolean
     fun isPackageEnabled(pkg: String): Boolean
     fun isPathInsideSandbox(path: String): Boolean
+    fun isActivityResumed(): Boolean
     fun isTv(): Boolean
     fun isWarmthDevice(): Boolean
     fun needsWakelocks(): Boolean

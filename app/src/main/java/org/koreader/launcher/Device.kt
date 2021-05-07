@@ -47,6 +47,8 @@ class Device(activity: Activity) {
         (isTv || isChromeOS)
     }
 
+    var isResumed = false
+
     // EPD driver for this device
     private val epd = EPDFactory.epdController
 
@@ -85,10 +87,12 @@ class Device(activity: Activity) {
     }
 
     fun onResume() {
+        isResumed = true
         epd.resume()
     }
 
     fun onPause() {
+        isResumed = false
         epd.pause()
     }
 

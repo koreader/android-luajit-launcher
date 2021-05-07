@@ -2,6 +2,7 @@
 
 package org.koreader.launcher
 
+import android.app.DownloadManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -20,6 +21,7 @@ class EventReceiver : BroadcastReceiver() {
     init {
         eventMap[Intent.ACTION_POWER_CONNECTED] = 100
         eventMap[Intent.ACTION_POWER_DISCONNECTED] = 101
+        eventMap[DownloadManager.ACTION_DOWNLOAD_COMPLETE] = 110
     }
 
     val filter: IntentFilter

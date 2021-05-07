@@ -34,12 +34,12 @@ object Logger {
 
     fun d(message: String) {
         @Suppress("ConstantConditionIf")
-        if (BuildConfig.DEBUG)
+        if (MainApp.is_debug)
             doLog(formatMessage(null, message), LogLevel.DEBUG)
     }
     fun d(tag: String, message: String) {
         @Suppress("ConstantConditionIf")
-        if (BuildConfig.DEBUG)
+        if (MainApp.is_debug)
             doLog(formatMessage(tag, message), LogLevel.DEBUG)
     }
 
@@ -57,12 +57,13 @@ object Logger {
 
     /* log using application name as the logger tag */
     private fun doLog(message: String, level: LogLevel) {
+        val tag = MainApp.name
         when (level) {
-            LogLevel.ERROR -> Log.e(BuildConfig.APP_NAME, message)
-            LogLevel.WARNING -> Log.w(BuildConfig.APP_NAME, message)
-            LogLevel.INFO -> Log.i(BuildConfig.APP_NAME, message)
-            LogLevel.DEBUG -> Log.d(BuildConfig.APP_NAME, message)
-            LogLevel.VERBOSE -> Log.v(BuildConfig.APP_NAME, message)
+            LogLevel.ERROR -> Log.e(tag, message)
+            LogLevel.WARNING -> Log.w(tag, message)
+            LogLevel.INFO -> Log.i(tag, message)
+            LogLevel.DEBUG -> Log.d(tag, message)
+            LogLevel.VERBOSE -> Log.v(tag, message)
         }
     }
 }

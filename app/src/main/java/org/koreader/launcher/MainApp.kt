@@ -9,6 +9,18 @@ import android.os.StrictMode
 
 class MainApp : android.app.Application() {
     companion object {
+
+        // build time
+        const val name = BuildConfig.APP_NAME
+        const val flavor = BuildConfig.FLAVOR_CHANNEL
+        const val has_ota_updates = BuildConfig.IN_APP_UPDATES
+        const val supports_runtime_changes = BuildConfig.SUPPORTS_RUNTIME_CHANGES
+        const val provider = "${BuildConfig.APPLICATION_ID}.provider"
+
+        val is_debug = BuildConfig.DEBUG
+
+
+        // runtime dependant
         private val runtime = android.os.Build.VERSION.SDK_INT
 
         lateinit var info: String
@@ -30,8 +42,7 @@ class MainApp : android.app.Application() {
         val isSystemApp = (pm.getPackageInfo(packageName, 0).applicationInfo.flags
             and ApplicationInfo.FLAG_SYSTEM == 1)
 
-        @Suppress("ConstantConditionIf")
-        val flags: String = if (BuildConfig.DEBUG) {
+        val flags: String = if (is_debug) {
             val threadPolicy = StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build()
             val vmPolicy = StrictMode.VmPolicy.Builder().detectAll().penaltyLog().build()
             StrictMode.setThreadPolicy(threadPolicy)
