@@ -7,187 +7,132 @@ import android.content.res.AssetManager
 import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.ProgressBar
+import androidx.annotation.Keep
 import androidx.core.content.ContextCompat
 import java.io.*
 
+@Keep
 class Assets {
-    companion object {
-        private const val TAG = "AssetsHelper"
-        private const val CONTAINER = "7z"
-    }
+
+    private val tag = this::class.java.simpleName
 
     init {
-        System.loadLibrary(CONTAINER)
+        System.loadLibrary("7z")
     }
 
     fun extract(activity: Activity): Boolean {
-        val output = activity.filesDir.absolutePath
+        return if (isNewBundle(activity)) {
+            val startTime = System.nanoTime()
+            val result = bootstrap(activity)
+            val elapsedTime = System.nanoTime() - startTime
+            Logger.i("update installed in ${elapsedTime / 1000000} milliseconds")
+            result
+        } else {
+            true
+        }
+    }
+
+    private fun isNewBundle(context: Context): Boolean {
+        val path = "${context.filesDir.absolutePath}/git-rev"
         return try {
-            // check if the app has zipped assets
-            val payload = getFromAsset(activity)
-            if (payload != null) {
-                var ok = true
-                Logger.i("Check file in asset module: $payload")
-                // upgrade or downgrade files from zip
-                if (!isSameVersion(activity, payload)) {
-                    showProgress(activity) // show progress dialog (animated dots)
-                    val startTime = System.nanoTime()
-                    Logger.i("Installing new package to $output")
-                    ok = uncompress(activity, "module/$payload", output)
-                    val endTime = System.nanoTime()
-                    val elapsedTime = endTime - startTime
-                    Logger.i("update installed in ${elapsedTime/1000000} milliseconds")
-                    dismissProgress(activity) // dismiss progress dialog
-                }
-                if (!ok) {
+            if (!File(path).exists()) {
+                Logger.i("New install")
+                return true
+            }
+            context.assets.open("module/version.txt").bufferedReader().use {
+                val version = it.readLine()
+                val fileReader = FileReader(File(path).absolutePath)
+                val bufferedReader = BufferedReader(fileReader)
+                val installedVersion = bufferedReader.readLine()
+                bufferedReader.close()
+                return if (version == installedVersion) {
+                    Logger.i("Skip installation for revision $version")
                     false
-                } else {
-                    copyLibs(activity)
+                } else  {
+                    Logger.i("Found new package revision $version")
+                    true
                 }
-            } else {
-                // check if the app has other, non-zipped, raw assets
-                Logger.i("Zip file not found, trying raw assets...")
-                copyRawAssets(activity)
             }
-        } catch (e: IOException) {
-            Logger.e(TAG, "error extracting assets:\n$e")
-            dismissProgress(activity)
-            false
-        }
-    }
-
-    private external fun extract(assetManager: AssetManager, payload: String, output: String): Int
-
-    private fun uncompress(activity: Activity, payload: String, output: String): Boolean {
-        return try {
-            (extract(activity.assets, payload, output) == 0)
         } catch (e: Exception) {
-            Logger.w(TAG, "error extracting: %e")
-            false
+            Logger.i("New install")
+            true
         }
     }
 
-    private fun copyLibs(context: Context): Boolean {
-        val assetManager = context.assets
-        val libsDir = File(context.filesDir.absolutePath + "/libs")
-        if (!libsDir.exists()) {
-            libsDir.mkdir()
-        }
+    private fun bootstrap(activity: Activity): Boolean {
+        val filesDir = activity.filesDir.absolutePath
+        activity.runOnUiThread { dialog = FramelessProgressDialog.show(activity, "") }
 
-        val libsPath = libsDir.absolutePath
-        try {
-            val assets = assetManager.list("libs")
-            return if (assets != null) {
-                for (asset in assets) {
-                    val file = File(libsPath, asset)
-                    val input = assetManager.open("libs/$asset")
-                    val output = FileOutputStream(file)
-                    copyFile(input, output)
-                    input.close()
-                    output.flush()
-                    output.close()
-                }
-                true
-            } else {
-                Logger.i("No libraries to copy")
-                true
-            }
-        } catch (e: IOException) {
-            Logger.e(TAG, "error copying libraries: $e")
-            return false
-        }
-    }
-
-    /* copy raw assets from the assets module */
-    private fun copyRawAssets(context: Context): Boolean {
-        val assetManager = context.assets
-        val assetsDir = context.filesDir.absolutePath
-        var entryPoint = false
-        try {
-            val assets = assetManager.list("module")
-            if (assets != null) {
-                for (asset in assets) {
-                    val file = File(assetsDir, asset)
-                    val input = assetManager.open("module/$asset")
-                    val output = FileOutputStream(file)
-                    copyFile(input, output)
-                    input.close()
-                    output.flush()
-                    output.close()
-                    // llapp_main.lua is the entry point for frontend code.
-                    if ("llapp_main.lua" == asset) {
-                        entryPoint = true
+        /* copy regular files and extract 7z files from assets store */
+        activity.assets.list("module")?.let { bundle ->
+            for (asset in bundle) {
+                val assetName = "module/$asset"
+                if (assetName != "module/version.txt") {
+                    when {
+                        (asset.endsWith("7z")) -> {
+                            /* Extract all 7z files in assets store */
+                            Logger.v(tag, "Uncompressing $assetName")
+                            try {
+                                val ok = (extract(activity.assets, assetName, filesDir) == 0)
+                                if (!ok)
+                                    return false
+                            } catch (e: Exception) {
+                                Logger.e(tag, "Error extracting 7z file: %e")
+                                return false
+                            }
+                        }
+                        else -> {
+                            /* Copy all regular files in assets store */
+                            Logger.v(tag, "Extracting $assetName")
+                            try {
+                                val file = File(filesDir, asset)
+                                val inputStream = activity.assets.open(assetName)
+                                val outputStream = FileOutputStream(file)
+                                inputStream.use { source ->
+                                    outputStream.use { target ->
+                                        source.copyTo(target)
+                                    }
+                                }
+                                inputStream.close()
+                                outputStream.flush()
+                                outputStream.close()
+                            } catch (e: IOException) {
+                                Logger.w(tag, "Error copying $assetName:\n$e")
+                            }
+                        }
                     }
                 }
             }
-        } catch (e: IOException) {
-            entryPoint = false
-            Logger.e(TAG, "error copying raw assets: $e")
         }
-        return entryPoint
-    }
 
-    /* get the first compressed file inside the assets module */
-    private fun getFromAsset(context: Context): String? {
-        val assetManager = context.assets
-        try {
-            val assets = assetManager.list("module")
-            if (assets != null) {
-                for (asset in assets) {
-                    if (asset.endsWith(CONTAINER)) {
-                        return asset
+        /* copy libraries stored as raw assets */
+        activity.assets.list("libs")?.let {
+            val libsDir = File("$filesDir/libs")
+            val libsPath = libsDir.absolutePath
+            if (!libsDir.exists()) {
+                libsDir.mkdir()
+            }
+            for (lib in it) {
+                try {
+                    val file = File(libsPath, lib)
+                    val inputStream = activity.assets.open("libs/$lib")
+                    val outputStream = FileOutputStream(file)
+                    inputStream.use { source ->
+                        outputStream.use { target ->
+                            source.copyTo(target)
+                        }
                     }
+                    inputStream.close()
+                    outputStream.flush()
+                    outputStream.close()
+                } catch (e: Exception) {
+                    Logger.w(tag, "Error copying library: $lib:\n$e")
                 }
             }
-            return null
-        } catch (e: Exception) {
-            Logger.e(TAG, "error finding a $CONTAINER in assets store: $e")
-            return null
-        }
-    }
+        } ?: Logger.v(tag, "No libraries to copy")
 
-    /* check if installed files have the same revision as assets */
-    private fun isSameVersion(context: Context, file: String): Boolean {
-        val newVersion = getPackageRevision(file)
-        try {
-            val output = context.filesDir.absolutePath
-            val fileReader = FileReader("$output/git-rev")
-            val bufferedReader = BufferedReader(fileReader)
-            val installedVersion = bufferedReader.readLine()
-            bufferedReader.close()
-            return if (newVersion == installedVersion) {
-                Logger.i("Skip installation for revision $newVersion")
-                true
-            } else {
-                Logger.i("Found new package revision $newVersion")
-                false
-            }
-        } catch (e: Exception) {
-            Logger.i("Found new package revision $newVersion")
-            return false
-        }
-    }
-
-    /* get package revision from zipFile name. Zips must use the scheme: name-revision.zip */
-    private fun getPackageRevision(file: String): String {
-        val suffix = String.format(".%s", CONTAINER)
-        val name = file.replace(suffix, "")
-        val parts = name.split("-".toRegex()).dropLastWhile{ it.isEmpty() }.toTypedArray()
-        return name.replace(parts[0] + "-", "")
-    }
-
-    /* copy files from stream */
-    @Throws(IOException::class)
-    private fun copyFile(input: InputStream, output: OutputStream) {
-        try {
-            input.use { source ->
-                output.use { target ->
-                    source.copyTo(target)
-                }
-            }
-        } catch (e: Exception) {
-            Logger.e(TAG, "Error copying file: $e")
-        }
+        activity.runOnUiThread { dialog?.dismiss() }
+        return true
     }
 
     /* dialog used while extracting assets from zip */
@@ -219,14 +164,5 @@ class Assets {
         }
     }
 
-    private fun showProgress(activity: Activity) {
-        activity.runOnUiThread {
-            dialog = FramelessProgressDialog.show(activity, "") }
-    }
-
-    private fun dismissProgress(activity: Activity) {
-        activity.runOnUiThread {
-            dialog?.dismiss()
-        }
-    }
+    private external fun extract(assetManager: AssetManager, payload: String, output: String): Int
 }
