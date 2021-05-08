@@ -2,16 +2,24 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion compileSdk
-
+    compileSdkVersion 30
     defaultConfig {
         applicationId "org.koreader.launcher"
-        minSdkVersion minSdk
-        targetSdkVersion targetSdk
+
+        // Required when setting minSdkVersion to 20 or lower
+        multiDexEnabled true
+
+        minSdkVersion 14
+
+        //noinspection ExpiredTargetSdkVersion
+        targetSdkVersion 28
+
         versionCode versCode as Integer
         versionName versName
         manifestPlaceholders.APP_NAME = projectName
         buildConfigField 'String', 'APP_NAME', '"' + projectName + '"'
+        buildConfigField "boolean", "IN_APP_UPDATES", "false"
+        buildConfigField "boolean", "SUPPORTS_RUNTIME_CHANGES", "false"
     }
 
     buildTypes {
@@ -33,6 +41,15 @@ android {
         }
     }
 
+    compileOptions {
+        // Flag to enable support for the new language APIs
+        coreLibraryDesugaringEnabled true
+
+        // Sets Java compatibility to Java 8
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
     flavorDimensions 'ABI', 'CHANNEL'
     productFlavors {
         x86 {
@@ -42,7 +59,7 @@ android {
         x86_64 {
             ndk { abiFilters "x86_64" }
             dimension = 'ABI'
-            minSdkVersion min64Sdk
+            minSdkVersion 21
         }
         arm {
             ndk { abiFilters "armeabi-v7a" }
@@ -51,7 +68,7 @@ android {
         arm64 {
             ndk { abiFilters "arm64-v8a" }
             dimension = 'ABI'
-            minSdkVersion min64Sdk
+            minSdkVersion 21
         }
 
         fdroid {
@@ -59,6 +76,8 @@ android {
         }
         rocks {
             dimension = 'CHANNEL'
+            buildConfigField "boolean", "IN_APP_UPDATES", "true"
+            buildConfigField "boolean", "SUPPORTS_RUNTIME_CHANGES", "true"
         }
     }
 
@@ -77,14 +96,17 @@ android {
 
 repositories {
     google()
-    jcenter()
     mavenCentral()
 }
 
 dependencies {
+    coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:$android_desugar_jdk"
+
     implementation "androidx.core:core-ktx:$androidx_core_version"
     implementation "androidx.appcompat:appcompat:$androidx_appcompat_version"
     implementation "androidx.legacy:legacy-support-v4:$androidx_supportv4_version"
+
+    //noinspection GradleDependency
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_plugin_version"
     implementation "org.apache.commons:commons-compress:$commons_compress_version"
 

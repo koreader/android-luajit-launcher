@@ -495,6 +495,14 @@ enum {
 enum {
     AEVENT_POWER_CONNECTED = 100,
     AEVENT_POWER_DISCONNECTED = 101,
+    AEVENT_DOWNLOAD_COMPLETE = 110,
+};
+
+enum {
+    ADOWNLOAD_NOT_SUPPORTED = -2,
+    ADOWNLOAD_FAILED = -1,
+    ADOWNLOAD_OK = 0,
+    ADOWNLOAD_EXISTS = 1,
 };
 
 int32_t AInputEvent_getType(const AInputEvent* event);
@@ -1690,6 +1698,16 @@ local function run(android_app_state)
         end)
     end
 
+    android.supportsRuntimeChanges = function()
+        return JNI:context(android.app.activity.vm, function(jni)
+            return jni:callBooleanMethod(
+                android.app.activity.clazz,
+                "hasRuntimeChanges",
+                "()Z"
+            )
+        end)
+    end
+
     -- input settings
     android.input = {}
 
@@ -1857,6 +1875,7 @@ local function run(android_app_state)
     android.prop.name = android.getName()
     android.prop.flavor = android.getFlavor()
     android.prop.isDebuggable = android.isDebuggable()
+    android.prop.runtimeChanges = android.supportsRuntimeChanges()
 
     -- device properties
     android.prop.product = android.getProduct()
@@ -1919,6 +1938,28 @@ local function run(android_app_state)
     android.screen = {}
     android.screen.width = android.getScreenWidth()
     android.screen.height = android.getScreenHeight()
+
+    android.ota = {
+        isPending = false,
+        isEnabled = function()
+            return JNI:context(android.app.activity.vm, function(jni)
+                return jni:callBooleanMethod(
+                    android.app.activity.clazz,
+                    "hasOTAUpdates",
+                    "()Z"
+                )
+            end)
+        end,
+        install = function()
+            JNI:context(android.app.activity.vm, function(jni)
+                jni:callVoidMethod(
+                    android.app.activity.clazz,
+                    "installApk",
+                    "()V"
+                )
+            end)
+        end,
+    }
 
     android.orientation = {
         get = function()
@@ -2380,6 +2421,16 @@ local function run(android_app_state)
             )
             jni.env[0].DeleteLocalRef(jni.env, _package)
             return enabled
+        end)
+    end
+
+    android.isResumed = function()
+        return JNI:context(android.app.activity.vm, function(jni)
+            return jni:callBooleanMethod(
+                android.app.activity.clazz,
+                "isActivityResumed",
+                "()Z"
+            )
         end)
     end
 
