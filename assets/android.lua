@@ -1940,6 +1940,7 @@ local function run(android_app_state)
     android.screen.height = android.getScreenHeight()
 
     android.ota = {
+        isRunning = false,
         isPending = false,
         isEnabled = function()
             return JNI:context(android.app.activity.vm, function(jni)
