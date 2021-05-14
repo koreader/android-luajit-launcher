@@ -37,12 +37,14 @@ object DeviceInfo {
     private val BOYUE_P6: Boolean
     private val CREMA: Boolean
     private val CREMA_0650L: Boolean
+    private val FIDIBOOK: Boolean
     private val ONYX_C67: Boolean
     private val ONYX_NOVA2: Boolean
     private val ENERGY: Boolean
     private val INKBOOK: Boolean
     private val TOLINO: Boolean
     private val TOLINO_EPOS: Boolean
+    private val JDREAD: Boolean
     private val NOOK_V520: Boolean
     private val SONY_RP1: Boolean
     private val EMULATOR_X86: Boolean
@@ -67,10 +69,12 @@ object DeviceInfo {
         BOYUE_P6,
         CREMA,
         CREMA_0650L,
+        FIDIBOOK,
         ONYX_C67,
         ONYX_NOVA2,
         ENERGY,
         INKBOOK,
+        JDREAD,
         TOLINO,
         NOOK_V520
     }
@@ -122,23 +126,28 @@ object DeviceInfo {
         deviceMap[EinkDevice.BOYUE_T80S] = BOYUE_T80S
 
         // Boyue Likebook Mars
-        BOYUE_T80D = IS_BOYUE && PRODUCT.contentEquals("t80d")
+        BOYUE_T80D = IS_BOYUE
+            && (PRODUCT.contentEquals("t80d") || PRODUCT.contentEquals("mars"))
         deviceMap[EinkDevice.BOYUE_T80D] = BOYUE_T80D
 
         // Boyue Likebook Muses
-        BOYUE_T78D = IS_BOYUE && PRODUCT.contentEquals("t78d")
+        BOYUE_T78D = IS_BOYUE
+            && (PRODUCT.contentEquals("t78d") || PRODUCT.contentEquals("muses"))
         deviceMap[EinkDevice.BOYUE_T78D] = BOYUE_T78D
 
         // Boyue Likebook Mimas
-        BOYUE_T103D = IS_BOYUE && PRODUCT.contentEquals("t103d")
+        BOYUE_T103D = IS_BOYUE
+            && (PRODUCT.contentEquals("t103d") || PRODUCT.contentEquals("mimas"))
         deviceMap[EinkDevice.BOYUE_T103D] = BOYUE_T103D
 
         // Boyue Likebook Alita
-        BOYUE_K103 = IS_BOYUE && PRODUCT.contentEquals("k103")
+        BOYUE_K103 = IS_BOYUE
+            && (PRODUCT.contentEquals("k103") || PRODUCT.contentEquals("alita"))
         deviceMap[EinkDevice.BOYUE_K103] = BOYUE_K103
 
         // Boyue Likebook Ares
-        BOYUE_K78W = IS_BOYUE && PRODUCT.contentEquals("k78w")
+        BOYUE_K78W = IS_BOYUE
+            && (PRODUCT.contentEquals("k78w") || PRODUCT.contentEquals("ares"))
         deviceMap[EinkDevice.BOYUE_K78W] = BOYUE_K78W
 
         // Boyue Likebook P6
@@ -194,6 +203,15 @@ object DeviceInfo {
                 && (MODEL.contentEquals("bnrv510") || MODEL.contentEquals("bnrv520") || MODEL.contentEquals("bnrv700")
                 || MODEL.contentEquals("evk_mx6sl") || MODEL.startsWith("ereader"))
         deviceMap[EinkDevice.NOOK_V520] = NOOK_V520
+
+        // Fidibook
+        FIDIBOOK = MANUFACTURER.contentEquals("fidibo") && MODEL.contentEquals("fidibook")
+        deviceMap[EinkDevice.FIDIBOOK] = FIDIBOOK
+
+        // JDRead1
+        JDREAD = MANUFACTURER.contentEquals("onyx") && MODEL.contentEquals("jdread")
+        deviceMap[EinkDevice.JDREAD] = JDREAD
+
 
         // Sony DPT-RP1
         SONY_RP1 = MANUFACTURER.contentEquals("sony") && MODEL.contentEquals("dpt-rp1")

@@ -19,6 +19,7 @@ object EPDFactory {
                 DeviceInfo.EinkDevice.BOYUE_T62,
                 DeviceInfo.EinkDevice.BOYUE_T80S,
                 DeviceInfo.EinkDevice.CREMA_0650L,
+                DeviceInfo.EinkDevice.FIDIBOOK,
                 DeviceInfo.EinkDevice.ONYX_C67,
                 DeviceInfo.EinkDevice.ENERGY,
                 DeviceInfo.EinkDevice.INKBOOK -> {
@@ -36,13 +37,14 @@ object EPDFactory {
                 }
                 DeviceInfo.EinkDevice.BOYUE_T65S,
                 DeviceInfo.EinkDevice.CREMA,
+                DeviceInfo.EinkDevice.JDREAD,
                 DeviceInfo.EinkDevice.TOLINO,
                 DeviceInfo.EinkDevice.NOOK_V520 -> {
                     logController("Freescale NTX")
                     NTXNewEPDController()
                 }
                 DeviceInfo.EinkDevice.ONYX_NOVA2 -> {
-                    logController("QualcommEPDController")
+                    logController("Qualcomm")
                     QualcommOnyxEPDController()
                 }
                 else -> {
