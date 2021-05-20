@@ -71,7 +71,6 @@ update:
 	git submodule init
 	git submodule sync
 	git submodule update
-	@echo "#define LOGGER_NAME \"$(APPNAME)\"" > jni/logger.h
 	@echo "sdk.dir=$(ANDROID_SDK_FULLPATH)" > local.properties
 	@echo "ndk.dir=$(ANDROID_NDK_FULLPATH)" >> local.properties
 	@echo "using sdk in path $(ANDROID_SDK_FULLPATH)"

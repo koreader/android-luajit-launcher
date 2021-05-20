@@ -8,7 +8,7 @@ import java.io.File
 
 class OnyxC67Controller : LightInterface {
     companion object {
-        private const val TAG = "lights"
+        private const val TAG = "Lights"
         private const val BRIGHTNESS_MAX = 255
         private const val BRIGHTNESS_MIN = 0
         private const val BRIGHTNESS_FILE = "/sys/class/backlight/rk28_bl/brightness"

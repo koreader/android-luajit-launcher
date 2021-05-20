@@ -57,24 +57,24 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     private var view: NativeSurfaceView? = null
     private class NativeSurfaceView(context: Context): SurfaceView(context),
         SurfaceHolder.Callback {
-        val tag = "NativeSurfaceView"
         init { holder.addCallback(this) }
         override fun surfaceCreated(holder: SurfaceHolder) {
-            Logger.v(tag, "surface created")
+            Logger.v(TAG_SURFACE, "surface created")
             setWillNotDraw(false)
         }
         override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
-            Logger.v(tag, String.format(Locale.US,
+            Logger.v(TAG_SURFACE, String.format(Locale.US,
                 "surface changed {\n  width:  %d\n  height: %d\n format: %s\n}",
                 width, height, ScreenUtils.pixelFormatName(format))
             )
         }
         override fun surfaceDestroyed(holder: SurfaceHolder) {
-            Logger.v(tag, "surface destroyed")
+            Logger.v(TAG_SURFACE, "surface destroyed")
         }
     }
 
     companion object {
+        private const val TAG_SURFACE = "Surface"
         private const val ACTION_SAF_FILEPICKER = 2
         private val BATTERY_FILTER = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
         private val RUNTIME_VERSION = Build.VERSION.RELEASE
@@ -90,8 +90,8 @@ class MainActivity : NativeActivity(), JNILuaInterface,
 
     /* Called when the activity is first created. */
     override fun onCreate(savedInstanceState: Bundle?) {
-        Logger.v(String.format(Locale.US,
-            "Launching %s %s", MainApp.name, MainApp.info))
+        Logger.v(tag, String.format(Locale.US,
+            "Launching %s\n%s", MainApp.name, MainApp.info))
 
         assets = Assets()
         clipboard = Clipboard(this)
@@ -116,7 +116,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
         } else {
             "Native Content"
         }
-        Logger.v(tag, "surface: $surfaceKind")
+        Logger.v(TAG_SURFACE, "using $surfaceKind")
 
         registerReceiver(event, event.filter)
         if (!Permissions.hasStoragePermission(this)) {
@@ -145,7 +145,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     }
 
     override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
-        Logger.v(tag, String.format(Locale.US,
+        Logger.v(TAG_SURFACE, String.format(Locale.US,
             "surface changed {\n  width:  %d\n  height: %d\n format: %s\n}",
             width, height, ScreenUtils.pixelFormatName(format))
         )
@@ -154,14 +154,14 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     }
 
     override fun onAttachedToWindow() {
-        Logger.d(tag, "onAttachedToWindow()")
+        Logger.d(TAG_SURFACE, "onAttachedToWindow()")
         super.onAttachedToWindow()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             val cut: DisplayCutout? = window.decorView.rootWindowInsets.displayCutout
             if (cut != null) {
                 val cutPixels = cut.safeInsetTop
                 if (topInsetHeight != cutPixels) {
-                    Logger.v(tag,
+                    Logger.v(TAG_SURFACE,
                         "top $cutPixels pixels are not available, reason: window inset")
                     topInsetHeight = cutPixels
                 }

@@ -4,10 +4,12 @@ import android.app.Activity
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import androidx.annotation.Keep
 import java.util.concurrent.CountDownLatch
 
+@Keep
 class Clipboard(activity: Activity) {
-
+    private val tag = this::class.java.simpleName
     private var clipboard: ClipboardManager = activity.applicationContext.getSystemService(Context.CLIPBOARD_SERVICE)
         as ClipboardManager
 
@@ -31,7 +33,7 @@ class Clipboard(activity: Activity) {
                     }
                 }
             } catch (e: Exception) {
-                Logger.w(e.toString())
+                Logger.w(tag, e.toString())
                 result.value = ""
             }
             cd.countDown()
@@ -58,7 +60,7 @@ class Clipboard(activity: Activity) {
                 @Suppress("UsePropertyAccessSyntax")
                 clipboard.setPrimaryClip(ClipData.newPlainText("KOReader_clipboard", text))
             } catch (e: Exception) {
-                Logger.w(e.toString())
+                Logger.w(tag, e.toString())
             }
         }
     }

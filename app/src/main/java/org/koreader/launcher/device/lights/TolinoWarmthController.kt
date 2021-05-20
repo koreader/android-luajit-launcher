@@ -14,7 +14,7 @@ import java.io.File
 
 class TolinoWarmthController : LightInterface {
     companion object {
-        private const val TAG = "lights"
+        private const val TAG = "Lights"
         private const val BRIGHTNESS_MAX = 255
         private const val WARMTH_MAX = 10
         private const val MIN = 0
@@ -77,7 +77,7 @@ class TolinoWarmthController : LightInterface {
                 Runtime.getRuntime().exec("su -c input keyevent KEYCODE_BUTTON_A && echo OK")
                 1
             } catch (e: Exception) {
-                Logger.w("Exception in enableFrontlightSwitch", e.toString())
+                e.printStackTrace()
                 0
             }
         }

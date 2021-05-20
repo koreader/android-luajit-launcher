@@ -8,7 +8,7 @@ import java.io.File
 
 class OnyxWarmthController : LightInterface {
     companion object {
-        private const val TAG = "lights"
+        private const val TAG = "Lights"
         private const val BRIGHTNESS_MAX = 255
         private const val WARMTH_MAX = 255
         private const val MIN = 0

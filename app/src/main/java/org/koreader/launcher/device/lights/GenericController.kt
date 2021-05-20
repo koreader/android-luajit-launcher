@@ -9,7 +9,7 @@ import org.koreader.launcher.interfaces.LightInterface
 
 class GenericController : LightInterface {
     companion object {
-        private const val TAG = "lights"
+        private const val TAG = "Lights"
         private const val BRIGHTNESS_MAX = 255
         private const val BRIGHTNESS_MIN = 1 // zero would mean system-settings
     }
