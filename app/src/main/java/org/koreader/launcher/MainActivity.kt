@@ -235,9 +235,22 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     override fun dictLookup(text: String?, action: String?, nullablePackage: String?) {
         text?.let { lookupText ->
             action?.let { lookupAction ->
-                val lookupIntent = Intent(IntentUtils.getByAction(lookupText, lookupAction, nullablePackage))
-                if (!startActivityIfSafe(lookupIntent)) {
-                    Logger.e(tag, "invalid lookup: can't find a package able to resolve $action")
+                val intent: Intent? = when (lookupAction) {
+                    // generic actions used by a lot of apps
+                    "send" ->  Intent(IntentUtils.getSendTextIntent(lookupText, nullablePackage))
+                    "search" -> Intent(IntentUtils.getSearchTextIntent(text, nullablePackage))
+                    "text" ->  Intent(IntentUtils.getProcessTextIntent(text, nullablePackage))
+                    // actions for specific apps
+                    "aard2" ->  Intent(IntentUtils.getAard2Intent(text))
+                    "colordict" -> Intent(IntentUtils.getColordictIntent(text, nullablePackage))
+                    "quickdic" -> Intent(IntentUtils.getQuickdicIntent(text))
+                    else -> null
+                }
+                intent?.let {
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
+                    if (!startActivityIfSafe(intent)) {
+                        Logger.e(tag, "invalid lookup: can't find a package able to resolve $lookupAction")
+                    }
                 }
             } ?: Logger.e(tag, "invalid lookup: no action")
         } ?: Logger.e(tag, "invalid lookup: no text")
@@ -552,29 +565,18 @@ class MainActivity : NativeActivity(), JNILuaInterface,
 
     override fun safFilePicker(path: String?): Boolean {
         lastImportedPath = path
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
-            intent.addCategory(Intent.CATEGORY_OPENABLE)
-            intent.type = "*/*"
-            intent.putExtra(Intent.EXTRA_MIME_TYPES, getSupportedMimetypes())
-            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
-            lastImportedPath?.let {
-                try {
-                    startActivityForResult(intent, ACTION_SAF_FILEPICKER)
-                    true
-                } catch (e: Exception) {
-                    false
-                }
-            } ?: false
-        } else {
-            false
-        }
+        return path?.let { _ ->
+            IntentUtils.safIntent?.let {
+                intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
+                startActivityForResult(it, ACTION_SAF_FILEPICKER)
+                true
+            }?: false
+        } ?: false
     }
 
     override fun sendText(text: String?) {
         text?.let {
-            startActivityIfSafe(IntentUtils.getSendIntent(it, null))
+            startActivityIfSafe(IntentUtils.getSendTextIntent(it, null))
         }
     }
 
@@ -681,49 +683,6 @@ class MainActivity : NativeActivity(), JNILuaInterface,
         }
     }
 
-    private fun getSupportedMimetypes(): Array<String> {
-        return arrayOf(
-            "application/epub+zip",
-            "application/fb2",
-            "application/fb3",
-            "application/msword",
-            "application/oxps",
-            "application/pdf",
-            "application/rtf",
-            "application/tcr",
-            "application/vnd.amazon.mobi8-ebook",
-            "application/vnd.comicbook+tar",
-            "application/vnd.comicbook+zip",
-            "application/vnd.ms-htmlhelp",
-            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-            "application/vnd.palm",
-            "application/x-cbz",
-            "application/x-chm",
-            "application/x-fb2",
-            "application/x-fb3",
-            "application/x-mobipocket-ebook",
-            "application/x-tar",
-            "application/xhtml+xml",
-            "application/xml",
-            "application/zip",
-            "image/djvu",
-            "image/gif",
-            "image/jp2",
-            "image/jpeg",
-            "image/jxr",
-            "image/png",
-            "image/svg+xml",
-            "image/tiff",
-            "image/vnd.djvu",
-            "image/vnd.ms-photo",
-            "image/x-djvu",
-            "image/x-portable-arbitrarymap",
-            "image/x-portable-bitmap",
-            "text/html",
-            "text/plain"
-        )
-    }
-
     @Suppress("DEPRECATION")
     private fun setFullscreenLayout() {
         val decorView = window.decorView
@@ -744,23 +703,20 @@ class MainActivity : NativeActivity(), JNILuaInterface,
 
     @SuppressLint("QueryPermissionsNeeded")
     private fun startActivityIfSafe(intent: Intent?): Boolean {
-        if (intent == null) return false
-        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
-        val intentStr = IntentUtils.intentToString(intent)
-        try {
-            val pm = packageManager
-            val act = pm.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY)
-            if (act.size > 0) {
-                Logger.d(tag, "starting activity with intent: $intentStr")
-                startActivity(intent)
-                return true
-            } else {
-                Logger.w(tag, "unable to find a package for $intentStr")
+        return intent?.let {
+            return try {
+                val pm = packageManager
+                val act = pm.queryIntentActivities(it, PackageManager.MATCH_DEFAULT_ONLY)
+                if (act.size > 0) {
+                    startActivity(it)
+                    true
+                } else {
+                    false
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                false
             }
-            return false
-        } catch (e: Exception) {
-            Logger.e(tag, "error opening $intentStr\nException: $e")
-            return false
-        }
+        } ?: false
     }
 }
