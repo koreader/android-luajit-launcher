@@ -20,6 +20,9 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import org.koreader.launcher.interfaces.JNILuaInterface
 import org.koreader.launcher.utils.*
+import java.io.BufferedReader
+import java.io.File
+import java.io.InputStreamReader
 import java.util.*
 
 @Keep
@@ -242,6 +245,24 @@ class MainActivity : NativeActivity(), JNILuaInterface,
 
     override fun download(url: String, name: String): Int {
         return updater.download(this, url, name)
+    }
+
+    override fun dumpLogs(path: String): Boolean {
+        return try {
+            File(path).printWriter().use { log ->
+                val proc = Runtime.getRuntime().exec("logcat -d")
+                val buffer = BufferedReader(InputStreamReader(proc.inputStream))
+                while (true) {
+                    buffer.readLine()?.let { line ->
+                        log.println(line)
+                    } ?: break
+                }
+            }
+            true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
     }
 
     override fun einkUpdate(mode: Int) {

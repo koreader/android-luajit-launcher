@@ -8,6 +8,7 @@ interface JNILuaInterface {
     fun canWriteSystemSettings(): Boolean
     fun dictLookup(text: String?, action: String?, nullablePackage: String?)
     fun download(url: String, name: String): Int
+    fun dumpLogs(path: String): Boolean
     fun einkUpdate(mode: Int)
     fun einkUpdate(mode: Int, delay: Long, x: Int, y: Int, width: Int, height: Int)
     fun enableFrontlightSwitch(): Boolean
