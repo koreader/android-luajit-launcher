@@ -27,17 +27,16 @@
 #include <android/log.h>
 
 #include "android_native_app_glue.h"
-#include "../logger.h"
 
-#define  TAG "[NativeGlue]"
+#define  TAG "NativeGlue"
 
 #define FIFO_NAME "alooper.fifo"
 
-#define LOGE(...) ((void)__android_log_print(ANDROID_LOG_ERROR, LOGGER_NAME, __VA_ARGS__))
-#define LOGV(...) ((void)__android_log_print(ANDROID_LOG_VERBOSE, LOGGER_NAME, __VA_ARGS__))
+#define LOGE(...) ((void)__android_log_print(ANDROID_LOG_ERROR, TAG, __VA_ARGS__))
+#define LOGV(...) ((void)__android_log_print(ANDROID_LOG_VERBOSE, TAG, __VA_ARGS__))
 
 #ifndef NDEBUG
-#  define LOGD(...) ((void)__android_log_print(ANDROID_LOG_DEBUG, LOGGER_NAME, __VA_ARGS__))
+#  define LOGD(...) ((void)__android_log_print(ANDROID_LOG_DEBUG, TAG, __VA_ARGS__))
 #else
 #  define LOGD(...) ((void)0)
 #endif
@@ -59,7 +58,7 @@ int8_t android_app_read_cmd(struct android_app* android_app) {
         //       meaning we *expect* the -1 return to detect EAGAIN,
         //       so this is just noise.
         if (errno != EAGAIN) {
-            LOGE("%s: Failed to read command pipe: %s", TAG, strerror(errno));
+            LOGE("Failed to read command pipe: %s", strerror(errno));
         }
         return -1;
     }
@@ -74,9 +73,9 @@ int8_t android_app_read_cmd(struct android_app* android_app) {
     AConfiguration_getLanguage(android_app->config, lang);
     AConfiguration_getCountry(android_app->config, country);
 
-    LOGD("%s: Config: mcc=%d mnc=%d lang=%c%c cnt=%c%c orien=%d touch=%d dens=%d "
+    LOGD("Config: mcc=%d mnc=%d lang=%c%c cnt=%c%c orien=%d touch=%d dens=%d "
             "keys=%d nav=%d keysHid=%d navHid=%d sdk=%d size=%d long=%d "
-            "modetype=%d modenight=%d", TAG,
+            "modetype=%d modenight=%d",
             AConfiguration_getMcc(android_app->config),
             AConfiguration_getMnc(android_app->config),
             lang[0], lang[1], country[0], country[1],
@@ -97,14 +96,14 @@ int8_t android_app_read_cmd(struct android_app* android_app) {
 void android_app_pre_exec_cmd(struct android_app* android_app, int8_t cmd) {
     switch (cmd) {
         case APP_CMD_INPUT_CHANGED:
-            LOGD("%s: APP_CMD_INPUT_CHANGED", TAG);
+            LOGD(" APP_CMD_INPUT_CHANGED");
             pthread_mutex_lock(&android_app->mutex);
             if (android_app->inputQueue != NULL) {
                 AInputQueue_detachLooper(android_app->inputQueue);
             }
             android_app->inputQueue = android_app->pendingInputQueue;
             if (android_app->inputQueue != NULL) {
-                LOGD("%s: Attaching input queue to looper", TAG);
+                LOGD("Attaching input queue to looper");
                 AInputQueue_attachLooper(android_app->inputQueue,
                         android_app->looper, LOOPER_ID_INPUT, NULL,
                         &android_app->inputPollSource);
@@ -114,7 +113,7 @@ void android_app_pre_exec_cmd(struct android_app* android_app, int8_t cmd) {
             break;
 
         case APP_CMD_INIT_WINDOW:
-            LOGD("%s: APP_CMD_INIT_WINDOW", TAG);
+            LOGD("APP_CMD_INIT_WINDOW");
             pthread_mutex_lock(&android_app->mutex);
             android_app->window = android_app->pendingWindow;
             pthread_cond_broadcast(&android_app->cond);
@@ -122,7 +121,7 @@ void android_app_pre_exec_cmd(struct android_app* android_app, int8_t cmd) {
             break;
 
         case APP_CMD_TERM_WINDOW:
-            LOGD("%s: APP_CMD_TERM_WINDOW", TAG);
+            LOGD("APP_CMD_TERM_WINDOW");
             pthread_cond_broadcast(&android_app->cond);
             break;
 
@@ -130,7 +129,7 @@ void android_app_pre_exec_cmd(struct android_app* android_app, int8_t cmd) {
         case APP_CMD_START:
         case APP_CMD_PAUSE:
         case APP_CMD_STOP:
-            LOGD("%s: activityState=%d", TAG, cmd);
+            LOGD("activityState=%d", cmd);
             pthread_mutex_lock(&android_app->mutex);
             android_app->activityState = cmd;
             pthread_cond_broadcast(&android_app->cond);
@@ -138,14 +137,14 @@ void android_app_pre_exec_cmd(struct android_app* android_app, int8_t cmd) {
             break;
 
         case APP_CMD_CONFIG_CHANGED:
-            LOGD("%s: APP_CMD_CONFIG_CHANGED", TAG);
+            LOGD("APP_CMD_CONFIG_CHANGED");
             AConfiguration_fromAssetManager(android_app->config,
                     android_app->activity->assetManager);
             //print_cur_config(android_app);
             break;
 
         case APP_CMD_DESTROY:
-            LOGD("%s: APP_CMD_DESTROY", TAG);
+            LOGD("APP_CMD_DESTROY");
             android_app->destroyRequested = 1;
             break;
     }
@@ -154,7 +153,7 @@ void android_app_pre_exec_cmd(struct android_app* android_app, int8_t cmd) {
 void android_app_post_exec_cmd(struct android_app* android_app, int8_t cmd) {
     switch (cmd) {
         case APP_CMD_TERM_WINDOW:
-            LOGD("%s: Post APP_CMD_TERM_WINDOW", TAG);
+            LOGD("Post APP_CMD_TERM_WINDOW");
             pthread_mutex_lock(&android_app->mutex);
             android_app->window = NULL;
             pthread_cond_broadcast(&android_app->cond);
@@ -162,7 +161,7 @@ void android_app_post_exec_cmd(struct android_app* android_app, int8_t cmd) {
             break;
 
         case APP_CMD_SAVE_STATE:
-            LOGD("%s: Post APP_CMD_SAVE_STATE", TAG);
+            LOGD("Post APP_CMD_SAVE_STATE");
             pthread_mutex_lock(&android_app->mutex);
             android_app->stateSaved = 1;
             pthread_cond_broadcast(&android_app->cond);
@@ -170,7 +169,7 @@ void android_app_post_exec_cmd(struct android_app* android_app, int8_t cmd) {
             break;
 
         case APP_CMD_RESUME:
-            LOGD("%s: Post APP_CMD_RESUME", TAG);
+            LOGD("Post APP_CMD_RESUME");
             free_saved_state(android_app);
             break;
     }
@@ -180,7 +179,7 @@ void app_dummy() {
 }
 
 static void android_app_destroy(struct android_app* android_app) {
-    LOGD("%s: android_app_destroy!", TAG);
+    LOGD("android_app_destroy!");
     free_saved_state(android_app);
     pthread_mutex_lock(&android_app->mutex);
     if (android_app->inputQueue != NULL) {
@@ -196,7 +195,7 @@ static void android_app_destroy(struct android_app* android_app) {
 static void process_input(struct android_app* app, struct android_poll_source* source) {
     AInputEvent* event = NULL;
     while (AInputQueue_getEvent(app->inputQueue, &event) >= 0) {
-        LOGD("%s: New input event: type=%d", TAG, AInputEvent_getType(event));
+        LOGD("New input event: type=%d", AInputEvent_getType(event));
         if (AInputQueue_preDispatchEvent(app->inputQueue, event)) {
             continue;
         }
@@ -252,17 +251,17 @@ static void* android_app_entry(void* param) {
 
     if (mkfifo(fifo_file, 0666) == -1) {
         if (errno == EEXIST) {
-            LOGV("%s: User FIFO already exists at `%s`", TAG, fifo_file);
+            LOGV("User FIFO already exists at `%s`", fifo_file);
         } else {
-            LOGE("%s: Failed to create user FIFO at `%s`: %s", TAG, fifo_file, strerror(errno));
+            LOGE("Failed to create user FIFO at `%s`: %s", fifo_file, strerror(errno));
         }
     } else {
-        LOGV("%s: User FIFO created at `%s`", TAG, fifo_file);
+        LOGV("User FIFO created at `%s`", fifo_file);
     }
 
     int fifo_fd = open(fifo_file, O_RDWR | O_NONBLOCK | O_CLOEXEC);
     if (fifo_fd  == -1) {
-        LOGE("%s: Failed to open user FIFO at `%s`: %s", TAG, fifo_file, strerror(errno));
+        LOGE("Failed to open user FIFO at `%s`: %s", fifo_file, strerror(errno));
     } else {
         ALooper_addFd(looper, fifo_fd, LOOPER_ID_USER, ALOOPER_EVENT_INPUT, NULL, &android_app->cmdPollSource);
     }
@@ -299,7 +298,7 @@ static struct android_app* android_app_create(ANativeActivity* activity,
 
     int msgpipe[2];
     if (pipe(msgpipe)) {
-        LOGE("%s: Failed to create command pipe: %s", TAG, strerror(errno));
+        LOGE("Failed to create command pipe: %s", strerror(errno));
         return NULL;
     }
     // Because pipe2 has only been available as a bionic wrapper hilariously recently...
@@ -331,7 +330,7 @@ static struct android_app* android_app_create(ANativeActivity* activity,
 
 static void android_app_write_cmd(struct android_app* android_app, int8_t cmd) {
     if (write(android_app->msgwrite, &cmd, sizeof(cmd)) != sizeof(cmd)) {
-        LOGE("%s: Failed to write to command pipe: %s", TAG, strerror(errno));
+        LOGE("Failed to write to command pipe: %s", strerror(errno));
     }
 }
 
@@ -389,22 +388,22 @@ static struct android_app* ToApp(ANativeActivity* activity) {
 }
 
 static void onDestroy(ANativeActivity* activity) {
-    LOGD("%s: Destroy: %p", TAG, activity);
+    LOGD("Destroy: %p", activity);
     android_app_free(ToApp(activity));
 }
 
 static void onStart(ANativeActivity* activity) {
-    LOGD("%s: Start: %p", TAG, activity);
+    LOGD("Start: %p", activity);
     android_app_set_activity_state(ToApp(activity), APP_CMD_START);
 }
 
 static void onResume(ANativeActivity* activity) {
-    LOGD("%s: Resume: %p", TAG, activity);
+    LOGD("Resume: %p", activity);
     android_app_set_activity_state(ToApp(activity), APP_CMD_RESUME);
 }
 
 static void* onSaveInstanceState(ANativeActivity* activity, size_t* outLen) {
-    LOGD("%s: SaveInstanceState: %p", TAG, activity);
+    LOGD("SaveInstanceState: %p", activity);
 
     struct android_app* android_app = ToApp(activity);
     void* savedState = NULL;
@@ -428,22 +427,22 @@ static void* onSaveInstanceState(ANativeActivity* activity, size_t* outLen) {
 }
 
 static void onPause(ANativeActivity* activity) {
-    LOGD("%s: Pause: %p", TAG, activity);
+    LOGD("Pause: %p", activity);
     android_app_set_activity_state(ToApp(activity), APP_CMD_PAUSE);
 }
 
 static void onStop(ANativeActivity* activity) {
-    LOGD("%s: Stop: %p", TAG, activity);
+    LOGD("Stop: %p", activity);
     android_app_set_activity_state(ToApp(activity), APP_CMD_STOP);
 }
 
 static void onConfigurationChanged(ANativeActivity* activity) {
-    LOGD("%s: ConfigurationChanged: %p", TAG, activity);
+    LOGD("ConfigurationChanged: %p", activity);
     android_app_write_cmd(ToApp(activity), APP_CMD_CONFIG_CHANGED);
 }
 
 static void onContentRectChanged(ANativeActivity* activity, const ARect* r) {
-    LOGD("%s: ContentRectChanged: l=%d,t=%d,r=%d,b=%d", TAG, r->left, r->top, r->right, r->bottom);
+    LOGD("ContentRectChanged: l=%d,t=%d,r=%d,b=%d", r->left, r->top, r->right, r->bottom);
     struct android_app* android_app = ToApp(activity);
     pthread_mutex_lock(&android_app->mutex);
     android_app->contentRect = *r;
@@ -452,48 +451,48 @@ static void onContentRectChanged(ANativeActivity* activity, const ARect* r) {
 }
 
 static void onLowMemory(ANativeActivity* activity) {
-    LOGD("%s: LowMemory: %p", TAG, activity);
+    LOGD("LowMemory: %p", activity);
     android_app_write_cmd(ToApp(activity), APP_CMD_LOW_MEMORY);
 }
 
 static void onWindowFocusChanged(ANativeActivity* activity, int focused) {
-    LOGD("%s: WindowFocusChanged: %p -- %d", TAG, activity, focused);
+    LOGD("WindowFocusChanged: %p -- %d", activity, focused);
     android_app_write_cmd(ToApp(activity), focused ? APP_CMD_GAINED_FOCUS : APP_CMD_LOST_FOCUS);
 }
 
 static void onNativeWindowCreated(ANativeActivity* activity, ANativeWindow* window) {
-    LOGD("%s: NativeWindowCreated: %p -- %p", TAG, activity, window);
+    LOGD("NativeWindowCreated: %p -- %p", activity, window);
     android_app_set_window(ToApp(activity), window);
 }
 
 static void onNativeWindowDestroyed(ANativeActivity* activity, ANativeWindow* window) {
-    LOGD("%s: NativeWindowDestroyed: %p -- %p", TAG, activity, window);
+    LOGD("NativeWindowDestroyed: %p -- %p", activity, window);
     android_app_set_window(ToApp(activity), NULL);
 }
 
 static void onNativeWindowRedrawNeeded(ANativeActivity* activity, ANativeWindow* window) {
-    LOGD("%s: NativeWindowRedrawNeeded: %p -- %p", TAG, activity, window);
+    LOGD("NativeWindowRedrawNeeded: %p -- %p", activity, window);
     android_app_write_cmd(ToApp(activity), APP_CMD_WINDOW_REDRAW_NEEDED);
 }
 
 static void onNativeWindowResized(ANativeActivity* activity, ANativeWindow* window) {
-    LOGD("%s: NativeWindowResized: %p -- %p", TAG, activity, window);
+    LOGD("NativeWindowResized: %p -- %p", activity, window);
     android_app_write_cmd(ToApp(activity), APP_CMD_WINDOW_RESIZED);
 }
 
 static void onInputQueueCreated(ANativeActivity* activity, AInputQueue* queue) {
-    LOGD("%s: InputQueueCreated: %p -- %p", TAG, activity, queue);
+    LOGD("InputQueueCreated: %p -- %p", activity, queue);
     android_app_set_input(ToApp(activity), queue);
 }
 
 static void onInputQueueDestroyed(ANativeActivity* activity, AInputQueue* queue) {
-    LOGD("%s: InputQueueDestroyed: %p -- %p", TAG, activity, queue);
+    LOGD("InputQueueDestroyed: %p -- %p", activity, queue);
     android_app_set_input(ToApp(activity), NULL);
 }
 
 JNIEXPORT
 void ANativeActivity_onCreate(ANativeActivity* activity, void* savedState, size_t savedStateSize) {
-    LOGD("%s: Creating: %p", TAG, activity);
+    LOGD("Creating: %p", activity);
 
     activity->callbacks->onConfigurationChanged = onConfigurationChanged;
     activity->callbacks->onContentRectChanged = onContentRectChanged;

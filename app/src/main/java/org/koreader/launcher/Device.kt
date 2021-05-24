@@ -3,18 +3,22 @@ package org.koreader.launcher
 import android.app.Activity
 import android.app.AlertDialog
 import android.os.Build
+import android.util.Log
 import android.view.Gravity
 import android.view.Surface
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.SeekBar
 import android.widget.TextView
+import androidx.annotation.Keep
 import org.koreader.launcher.device.DeviceInfo
 import org.koreader.launcher.device.EPDFactory
 import org.koreader.launcher.device.LightsFactory
 import java.util.*
 
+@Keep
 class Device(activity: Activity) {
+    private val tag = this::class.java.simpleName
 
     val product = DeviceInfo.PRODUCT
     val hasEinkSupport = DeviceInfo.EINK_SUPPORT
@@ -60,7 +64,6 @@ class Device(activity: Activity) {
     private var screenIsLandscape: Boolean = false
 
     companion object {
-        private const val TAG = "DeviceHelper"
         private const val LIGHT_DIALOG_CLOSED = -1
         private const val LIGHT_DIALOG_OPENED = 0
         private const val LIGHT_DIALOG_CANCEL = 1
@@ -82,7 +85,7 @@ class Device(activity: Activity) {
     init {
         this.screenIsLandscape = isHwLandscape(activity)
 
-        Logger.v(TAG, String.format(Locale.US,
+        Log.v(tag, String.format(Locale.US,
             "native orientation: %s", if (this.screenIsLandscape) "landscape" else "portrait"))
     }
 
@@ -107,7 +110,7 @@ class Device(activity: Activity) {
         }
 
         if (modeName != "invalid") {
-            Logger.v(TAG, String.format(Locale.US,
+            Log.v(tag, String.format(Locale.US,
                 "requesting epd update, type: %s", modeName))
 
             epd.setEpdMode(view, 0, 0, 0, 0, 0, 0, modeName)
@@ -115,7 +118,7 @@ class Device(activity: Activity) {
     }
 
     fun einkUpdate(view: View, mode: Int, delay: Long, x: Int, y: Int, width: Int, height: Int) {
-        Logger.v(TAG, String.format(Locale.US,
+        Log.v(tag, String.format(Locale.US,
             "requesting epd update, mode:%d, delay:%d, [x:%d, y:%d, w:%d, h:%d]",
             mode, delay, x, y, width, height))
 

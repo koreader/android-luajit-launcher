@@ -1,10 +1,10 @@
 package org.koreader.launcher.utils
 
+import android.util.Log
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
 import org.apache.commons.compress.compressors.lzma.LZMACompressorInputStream
-import org.koreader.launcher.Logger
 import java.io.*
 
 object ArchiveUtils {
@@ -14,7 +14,7 @@ object ArchiveUtils {
         val success = try {
             untar(archive, extract_to)
         } catch (e: IOException) {
-            Logger.w(TAG, "exception uncompressing $archive: $e")
+            Log.w(TAG, "exception uncompressing $archive: $e")
             e.printStackTrace()
             false
         }
@@ -23,7 +23,7 @@ object ArchiveUtils {
             try {
                 File(archive).delete()
             } catch (e: IOException) {
-                Logger.w(TAG, "exception deleting $archive: $e")
+                Log.w(TAG, "exception deleting $archive: $e")
                 e.printStackTrace()
             }
         }
@@ -35,7 +35,7 @@ object ArchiveUtils {
         return getTarInput(archive)?.use {
             val output = File(extract_to)
             if (!output.exists()) {
-                Logger.i(TAG, "Creating destination dir: ${output.absolutePath}")
+                Log.i(TAG, "Creating destination dir: ${output.absolutePath}")
                 output.mkdir()
             }
             var tarEntry = it.nextTarEntry
@@ -61,10 +61,10 @@ object ArchiveUtils {
                         }
 
                         val mode = if (isOverride) "overwritten" else "created"
-                        Logger.v(TAG, "File ${destPath.absolutePath} $mode OK")
+                        Log.v(TAG, "File ${destPath.absolutePath} $mode OK")
                         bufferOutput.close()
                     } else {
-                        Logger.w(TAG, "Failed creating file ${destPath.absolutePath}")
+                        Log.w(TAG, "Failed creating file ${destPath.absolutePath}")
                     }
                 }
                 tarEntry = it.nextTarEntry
@@ -78,7 +78,7 @@ object ArchiveUtils {
         val input = File(archive)
         val validExtensions = arrayOf("bz2", "gz", "lz", "tgz")
         return if (validExtensions.contains(input.extension)) {
-            Logger.i(TAG, "uncompressing $archive with compression ${input.extension}")
+            Log.i(TAG, "uncompressing $archive with compression ${input.extension}")
             TarArchiveInputStream(
                 when (input.extension) {
                     "bz2" -> BZip2CompressorInputStream(BufferedInputStream(FileInputStream(input)))
@@ -89,7 +89,7 @@ object ArchiveUtils {
                 true
             )
         } else {
-            Logger.w(TAG, "invalid extension for $archive. Aborting")
+            Log.w(TAG, "invalid extension for $archive. Aborting")
             null
         }
     }

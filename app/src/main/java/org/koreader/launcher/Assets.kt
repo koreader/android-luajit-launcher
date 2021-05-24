@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.Dialog
 import android.content.Context
 import android.content.res.AssetManager
+import android.util.Log
 import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.ProgressBar
@@ -25,7 +26,7 @@ class Assets {
             val startTime = System.nanoTime()
             val result = bootstrap(activity)
             val elapsedTime = System.nanoTime() - startTime
-            Logger.i("update installed in ${elapsedTime / 1000000} milliseconds")
+            Log.i(tag, "update installed in ${elapsedTime / 1000000} milliseconds")
             result
         } else {
             true
@@ -36,7 +37,7 @@ class Assets {
         val path = "${context.filesDir.absolutePath}/git-rev"
         return try {
             if (!File(path).exists()) {
-                Logger.i("New install")
+                Log.i(tag, "New install")
                 return true
             }
             context.assets.open("module/version.txt").bufferedReader().use {
@@ -46,15 +47,15 @@ class Assets {
                 val installedVersion = bufferedReader.readLine()
                 bufferedReader.close()
                 return if (version == installedVersion) {
-                    Logger.i("Skip installation for revision $version")
+                    Log.i(tag, "Skip installation for revision $version")
                     false
                 } else  {
-                    Logger.i("Found new package revision $version")
+                    Log.i(tag, "Found new package revision $version")
                     true
                 }
             }
         } catch (e: Exception) {
-            Logger.i("New install")
+            Log.i(tag, "New install")
             true
         }
     }
@@ -71,19 +72,19 @@ class Assets {
                     when {
                         (asset.endsWith("7z")) -> {
                             /* Extract all 7z files in assets store */
-                            Logger.v(tag, "Uncompressing $assetName")
+                            Log.v(tag, "Uncompressing $assetName")
                             try {
                                 val ok = (extract(activity.assets, assetName, filesDir) == 0)
                                 if (!ok)
                                     return false
                             } catch (e: Exception) {
-                                Logger.e(tag, "Error extracting 7z file: %e")
+                                Log.e(tag, "Error extracting 7z file: $e")
                                 return false
                             }
                         }
                         else -> {
                             /* Copy all regular files in assets store */
-                            Logger.v(tag, "Extracting $assetName")
+                            Log.v(tag, "Extracting $assetName")
                             try {
                                 val file = File(filesDir, asset)
                                 val inputStream = activity.assets.open(assetName)
@@ -97,7 +98,7 @@ class Assets {
                                 outputStream.flush()
                                 outputStream.close()
                             } catch (e: IOException) {
-                                Logger.w(tag, "Error copying $assetName:\n$e")
+                                e.printStackTrace()
                             }
                         }
                     }
@@ -126,10 +127,10 @@ class Assets {
                     outputStream.flush()
                     outputStream.close()
                 } catch (e: Exception) {
-                    Logger.w(tag, "Error copying library: $lib:\n$e")
+                    e.printStackTrace()
                 }
             }
-        } ?: Logger.v(tag, "No libraries to copy")
+        } ?: Log.v(tag, "No libraries to copy")
 
         activity.runOnUiThread { dialog?.dismiss() }
         return true
@@ -151,7 +152,7 @@ class Assets {
                     ContextCompat.getDrawable(context, R.drawable.discrete_spinner)
                         ?.let { spinDrawable -> progressBar.indeterminateDrawable = spinDrawable }
                 } catch (e: Exception) {
-                    Logger.w("Failed to set progress drawable:\n$e")
+                    e.printStackTrace()
                 }
                 /* The next line will add the ProgressBar to the dialog. */
                 dialog.addContentView(progressBar, ViewGroup.LayoutParams(
