@@ -250,7 +250,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
                 intent?.let {
                     intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
                     if (!startActivityIfSafe(intent)) {
-                        Logger.e(tag, "invalid lookup: can't find a package able to resolve $lookupAction")
+                        Log.e(tag, "invalid lookup: can't find a package able to resolve $lookupAction")
                     }
                 }
             } ?: Log.e(tag, "invalid lookup: no action")
