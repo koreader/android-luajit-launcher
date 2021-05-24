@@ -13,6 +13,7 @@ import android.os.BatteryManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.annotation.Keep
@@ -57,24 +58,24 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     private var view: NativeSurfaceView? = null
     private class NativeSurfaceView(context: Context): SurfaceView(context),
         SurfaceHolder.Callback {
-        val tag = "NativeSurfaceView"
         init { holder.addCallback(this) }
         override fun surfaceCreated(holder: SurfaceHolder) {
-            Logger.v(tag, "surface created")
+            Log.v(TAG_SURFACE, "surface created")
             setWillNotDraw(false)
         }
         override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
-            Logger.v(tag, String.format(Locale.US,
+            Log.v(TAG_SURFACE, String.format(Locale.US,
                 "surface changed {\n  width:  %d\n  height: %d\n format: %s\n}",
                 width, height, ScreenUtils.pixelFormatName(format))
             )
         }
         override fun surfaceDestroyed(holder: SurfaceHolder) {
-            Logger.v(tag, "surface destroyed")
+            Log.v(TAG_SURFACE, "surface destroyed")
         }
     }
 
     companion object {
+        private const val TAG_SURFACE = "Surface"
         private const val ACTION_SAF_FILEPICKER = 2
         private val BATTERY_FILTER = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
         private val RUNTIME_VERSION = Build.VERSION.RELEASE
@@ -90,8 +91,8 @@ class MainActivity : NativeActivity(), JNILuaInterface,
 
     /* Called when the activity is first created. */
     override fun onCreate(savedInstanceState: Bundle?) {
-        Logger.v(String.format(Locale.US,
-            "Launching %s %s", MainApp.name, MainApp.info))
+        Log.v(tag, String.format(Locale.US,
+            "Launching %s\n%s", MainApp.name, MainApp.info))
 
         assets = Assets()
         clipboard = Clipboard(this)
@@ -116,7 +117,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
         } else {
             "Native Content"
         }
-        Logger.v(tag, "surface: $surfaceKind")
+        Log.v(TAG_SURFACE, "using $surfaceKind")
 
         registerReceiver(event, event.filter)
         if (!Permissions.hasStoragePermission(this)) {
@@ -145,7 +146,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     }
 
     override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
-        Logger.v(tag, String.format(Locale.US,
+        Log.v(TAG_SURFACE, String.format(Locale.US,
             "surface changed {\n  width:  %d\n  height: %d\n format: %s\n}",
             width, height, ScreenUtils.pixelFormatName(format))
         )
@@ -154,14 +155,14 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     }
 
     override fun onAttachedToWindow() {
-        Logger.d(tag, "onAttachedToWindow()")
+        Log.d(TAG_SURFACE, "onAttachedToWindow()")
         super.onAttachedToWindow()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             val cut: DisplayCutout? = window.decorView.rootWindowInsets.displayCutout
             if (cut != null) {
                 val cutPixels = cut.safeInsetTop
                 if (topInsetHeight != cutPixels) {
-                    Logger.v(tag,
+                    Log.v(TAG_SURFACE,
                         "top $cutPixels pixels are not available, reason: window inset")
                     topInsetHeight = cutPixels
                 }
@@ -172,7 +173,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     /* Called just before the activity is resumed by an intent */
     override fun onNewIntent(intent: Intent) {
         val scheme = intent.scheme
-        Logger.d(tag, "onNewIntent(): $scheme")
+        Log.d(tag, "onNewIntent(): $scheme")
         super.onNewIntent(intent)
         setIntent(intent)
     }
@@ -180,13 +181,13 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     /* Called on permission result */
     override fun onRequestPermissionsResult(requestCode: Int, permissions:
         Array<String>, grantResults: IntArray) {
-        Logger.d(tag, "onRequestPermissionResult()")
+        Log.d(tag, "onRequestPermissionResult()")
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (Permissions.hasStoragePermission(this)) {
-            Logger.i(tag, String.format(Locale.US,
+            Log.i(tag, String.format(Locale.US,
                     "Permission granted for request code: %d", requestCode))
         } else {
-            Logger.e(tag, String.format(Locale.US,
+            Log.e(tag, String.format(Locale.US,
                     "Permission rejected for request code: %d", requestCode))
         }
     }
@@ -216,7 +217,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
 
     /* Called when the activity is going to be destroyed */
     public override fun onDestroy() {
-        Logger.v(tag, "onDestroy()")
+        Log.v(tag, "onDestroy()")
         unregisterReceiver(event)
         super.onDestroy()
     }
@@ -235,12 +236,25 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     override fun dictLookup(text: String?, action: String?, nullablePackage: String?) {
         text?.let { lookupText ->
             action?.let { lookupAction ->
-                val lookupIntent = Intent(IntentUtils.getByAction(lookupText, lookupAction, nullablePackage))
-                if (!startActivityIfSafe(lookupIntent)) {
-                    Logger.e(tag, "invalid lookup: can't find a package able to resolve $action")
+                val intent: Intent? = when (lookupAction) {
+                    // generic actions used by a lot of apps
+                    "send" ->  Intent(IntentUtils.getSendTextIntent(lookupText, nullablePackage))
+                    "search" -> Intent(IntentUtils.getSearchTextIntent(text, nullablePackage))
+                    "text" ->  Intent(IntentUtils.getProcessTextIntent(text, nullablePackage))
+                    // actions for specific apps
+                    "aard2" ->  Intent(IntentUtils.getAard2Intent(text))
+                    "colordict" -> Intent(IntentUtils.getColordictIntent(text, nullablePackage))
+                    "quickdic" -> Intent(IntentUtils.getQuickdicIntent(text))
+                    else -> null
                 }
-            } ?: Logger.e(tag, "invalid lookup: no action")
-        } ?: Logger.e(tag, "invalid lookup: no text")
+                intent?.let {
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
+                    if (!startActivityIfSafe(intent)) {
+                        Logger.e(tag, "invalid lookup: can't find a package able to resolve $lookupAction")
+                    }
+                }
+            } ?: Log.e(tag, "invalid lookup: no action")
+        } ?: Log.e(tag, "invalid lookup: no text")
     }
 
     override fun download(url: String, name: String): Int {
@@ -552,29 +566,18 @@ class MainActivity : NativeActivity(), JNILuaInterface,
 
     override fun safFilePicker(path: String?): Boolean {
         lastImportedPath = path
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
-            intent.addCategory(Intent.CATEGORY_OPENABLE)
-            intent.type = "*/*"
-            intent.putExtra(Intent.EXTRA_MIME_TYPES, getSupportedMimetypes())
-            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
-            lastImportedPath?.let {
-                try {
-                    startActivityForResult(intent, ACTION_SAF_FILEPICKER)
-                    true
-                } catch (e: Exception) {
-                    false
-                }
-            } ?: false
-        } else {
-            false
-        }
+        return path?.let { _ ->
+            IntentUtils.safIntent?.let {
+                intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
+                startActivityForResult(it, ACTION_SAF_FILEPICKER)
+                true
+            }?: false
+        } ?: false
     }
 
     override fun sendText(text: String?) {
         text?.let {
-            startActivityIfSafe(IntentUtils.getSendIntent(it, null))
+            startActivityIfSafe(IntentUtils.getSendTextIntent(it, null))
         }
     }
 
@@ -653,7 +656,7 @@ class MainActivity : NativeActivity(), JNILuaInterface,
                         splashDrawable.draw(canvas)
                     }
                 } catch (e: Exception) {
-                    Logger.w(tag, "Failed to draw splash screen:\n$e")
+                    Log.w(tag, "Failed to draw splash screen:\n$e")
                 }
                 holder.unlockCanvasAndPost(canvas)
             }
@@ -681,49 +684,6 @@ class MainActivity : NativeActivity(), JNILuaInterface,
         }
     }
 
-    private fun getSupportedMimetypes(): Array<String> {
-        return arrayOf(
-            "application/epub+zip",
-            "application/fb2",
-            "application/fb3",
-            "application/msword",
-            "application/oxps",
-            "application/pdf",
-            "application/rtf",
-            "application/tcr",
-            "application/vnd.amazon.mobi8-ebook",
-            "application/vnd.comicbook+tar",
-            "application/vnd.comicbook+zip",
-            "application/vnd.ms-htmlhelp",
-            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-            "application/vnd.palm",
-            "application/x-cbz",
-            "application/x-chm",
-            "application/x-fb2",
-            "application/x-fb3",
-            "application/x-mobipocket-ebook",
-            "application/x-tar",
-            "application/xhtml+xml",
-            "application/xml",
-            "application/zip",
-            "image/djvu",
-            "image/gif",
-            "image/jp2",
-            "image/jpeg",
-            "image/jxr",
-            "image/png",
-            "image/svg+xml",
-            "image/tiff",
-            "image/vnd.djvu",
-            "image/vnd.ms-photo",
-            "image/x-djvu",
-            "image/x-portable-arbitrarymap",
-            "image/x-portable-bitmap",
-            "text/html",
-            "text/plain"
-        )
-    }
-
     @Suppress("DEPRECATION")
     private fun setFullscreenLayout() {
         val decorView = window.decorView
@@ -744,23 +704,20 @@ class MainActivity : NativeActivity(), JNILuaInterface,
 
     @SuppressLint("QueryPermissionsNeeded")
     private fun startActivityIfSafe(intent: Intent?): Boolean {
-        if (intent == null) return false
-        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
-        val intentStr = IntentUtils.intentToString(intent)
-        try {
-            val pm = packageManager
-            val act = pm.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY)
-            if (act.size > 0) {
-                Logger.d(tag, "starting activity with intent: $intentStr")
-                startActivity(intent)
-                return true
-            } else {
-                Logger.w(tag, "unable to find a package for $intentStr")
+        return intent?.let {
+            return try {
+                val pm = packageManager
+                val act = pm.queryIntentActivities(it, PackageManager.MATCH_DEFAULT_ONLY)
+                if (act.size > 0) {
+                    startActivity(it)
+                    true
+                } else {
+                    false
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                false
             }
-            return false
-        } catch (e: Exception) {
-            Logger.e(tag, "error opening $intentStr\nException: $e")
-            return false
-        }
+        } ?: false
     }
 }

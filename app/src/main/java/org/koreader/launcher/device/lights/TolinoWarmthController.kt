@@ -2,7 +2,7 @@ package org.koreader.launcher.device.lights
 
 import android.app.Activity
 import android.provider.Settings
-import org.koreader.launcher.Logger
+import android.util.Log
 import org.koreader.launcher.interfaces.LightInterface
 import java.io.File
 
@@ -14,7 +14,7 @@ import java.io.File
 
 class TolinoWarmthController : LightInterface {
     companion object {
-        private const val TAG = "lights"
+        private const val TAG = "Lights"
         private const val BRIGHTNESS_MAX = 255
         private const val WARMTH_MAX = 10
         private const val MIN = 0
@@ -49,7 +49,7 @@ class TolinoWarmthController : LightInterface {
         val startBrightnessFromFile = try {
             actualBrightnessFile.readText().trim().toInt()
         } catch (e: Exception) {
-            Logger.w(TAG, "$e")
+            Log.w(TAG, "$e")
             -1
         }
 
@@ -66,7 +66,7 @@ class TolinoWarmthController : LightInterface {
         val actualBrightnessFromFile = try {
             actualBrightnessFile.readText().trim().toInt()
         } catch (e: Exception) {
-            Logger.w(TAG, "$e")
+            Log.w(TAG, "$e")
             -1
         }
 
@@ -77,7 +77,7 @@ class TolinoWarmthController : LightInterface {
                 Runtime.getRuntime().exec("su -c input keyevent KEYCODE_BUTTON_A && echo OK")
                 1
             } catch (e: Exception) {
-                Logger.w("Exception in enableFrontlightSwitch", e.toString())
+                e.printStackTrace()
                 0
             }
         }
@@ -90,7 +90,7 @@ class TolinoWarmthController : LightInterface {
             Settings.System.getInt(activity.applicationContext.contentResolver,
                 "screen_brightness")
         } catch (e: Exception) {
-            Logger.w(TAG, e.toString())
+            Log.w(TAG, e.toString())
             0
         }
     }
@@ -100,40 +100,40 @@ class TolinoWarmthController : LightInterface {
         return try {
             WARMTH_MAX - colorFile.readText().toInt()
         } catch (e: Exception) {
-            Logger.w(TAG, "$e")
+            Log.w(TAG, "$e")
             0
         }
     }
 
     override fun setBrightness(activity: Activity, brightness: Int) {
         if (brightness < MIN || brightness > BRIGHTNESS_MAX) {
-            Logger.w(TAG, "brightness value of of range: $brightness")
+            Log.w(TAG, "brightness value of of range: $brightness")
             return
         }
-        Logger.v(TAG, "Setting brightness to $brightness")
+        Log.v(TAG, "Setting brightness to $brightness")
         try {
             Settings.System.putInt(activity.applicationContext.contentResolver,
                 "screen_brightness", brightness)
         } catch (e: Exception) {
-            Logger.w(TAG, "$e")
+            Log.w(TAG, "$e")
         }
     }
 
     override fun setWarmth(activity: Activity, warmth: Int) {
         if (warmth < MIN || warmth > WARMTH_MAX) {
-            Logger.w(TAG, "warmth value of of range: $warmth")
+            Log.w(TAG, "warmth value of of range: $warmth")
             return
         }
 
         val colorFile = File(COLOR_FILE)
-        Logger.v(TAG, "Setting warmth to $warmth")
+        Log.v(TAG, "Setting warmth to $warmth")
         try {
             if (!colorFile.canWrite()) {
                 Runtime.getRuntime().exec("su -c chmod 666 $COLOR_FILE")
             }
             colorFile.writeText((WARMTH_MAX - warmth).toString())
         } catch (e: Exception) {
-            Logger.w(TAG, "$e")
+            Log.w(TAG, "$e")
         }
     }
 

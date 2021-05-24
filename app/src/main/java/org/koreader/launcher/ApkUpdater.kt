@@ -6,10 +6,10 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
+import android.util.Log
 import androidx.core.content.FileProvider
 import java.io.File
 
-@Suppress("DEPRECATION")
 class ApkUpdater {
 
     companion object {
@@ -23,7 +23,7 @@ class ApkUpdater {
 
     fun download(context: Context, url: String, name: String): Int {
         return if (MainApp.has_ota_updates) {
-            val file = File(
+            @Suppress("DEPRECATION") val file = File(
                 Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_DOWNLOADS).toString() + File.separator + name)
             val result = try {
@@ -54,7 +54,7 @@ class ApkUpdater {
             }
             result
         } else {
-            Logger.w(tag, "Download APK is not supported in ${MainApp.flavor}")
+            Log.w(tag, "Download APK is not supported in ${MainApp.flavor}")
             DOWNLOAD_NOT_SUPPORTED
         }
     }
@@ -64,7 +64,7 @@ class ApkUpdater {
             downloadPath?.let { apk ->
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     val uri = FileProvider.getUriForFile(context, MainApp.provider, File(apk))
-                    val intent = Intent(Intent.ACTION_INSTALL_PACKAGE)
+                    @Suppress("DEPRECATION") val intent = Intent(Intent.ACTION_INSTALL_PACKAGE)
                     intent.data = uri
                     intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
                     context.startActivity(intent)
@@ -78,7 +78,7 @@ class ApkUpdater {
                 downloadPath = null
             }
         } else {
-            Logger.w(tag, "Install APK is not supported in ${MainApp.flavor}")
+            Log.w(tag, "Install APK is not supported in ${MainApp.flavor}")
         }
     }
 }

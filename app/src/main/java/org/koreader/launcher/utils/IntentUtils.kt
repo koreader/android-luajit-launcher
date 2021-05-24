@@ -5,45 +5,61 @@ import android.content.Intent
 import android.os.Build
 
 object IntentUtils {
-
-    /**
-     * get intent by action type, used to do dict lookups on 3rd party apps.
-     *
-     * @param text to search
-     * @param action associated to the package
-     * @param pkg - package that receives the query - null to show the app picker
-     *
-     * @return a Intent based on package/action ready to do a text lookup
-     */
-
-    fun getByAction(text: String, action: String, pkg: String?): Intent {
-        var intent = Intent()
-        when (action) {
-            // generic actions used by a lot of apps
-            "send" -> intent = Intent(getSendIntent(text, pkg))
-            "search" -> intent = Intent(getSearchIntent(text, pkg))
-            "text" -> intent = Intent(getTextIntent(text, pkg))
-            // actions for specific apps
-            "aard2" -> intent = Intent(getAard2Intent(text))
-            "colordict" -> intent = Intent(getColordictIntent(text, pkg))
-            "quickdic" -> intent = Intent(getQuickdicIntent(text))
+    // Intent.ACTION_OPEN_DOCUMENT (available on api19+)
+    val safIntent: Intent?
+        get() {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+                intent.addCategory(Intent.CATEGORY_OPENABLE)
+                intent.type = "*/*"
+                intent.putExtra(Intent.EXTRA_MIME_TYPES, arrayOf(
+                    "application/epub+zip",
+                    "application/fb2",
+                    "application/fb3",
+                    "application/msword",
+                    "application/oxps",
+                    "application/pdf",
+                    "application/rtf",
+                    "application/tcr",
+                    "application/vnd.amazon.mobi8-ebook",
+                    "application/vnd.comicbook+tar",
+                    "application/vnd.comicbook+zip",
+                    "application/vnd.ms-htmlhelp",
+                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    "application/vnd.palm",
+                    "application/x-cbz",
+                    "application/x-chm",
+                    "application/x-fb2",
+                    "application/x-fb3",
+                    "application/x-mobipocket-ebook",
+                    "application/x-tar",
+                    "application/xhtml+xml",
+                    "application/xml",
+                    "application/zip",
+                    "image/djvu",
+                    "image/gif",
+                    "image/jp2",
+                    "image/jpeg",
+                    "image/jxr",
+                    "image/png",
+                    "image/svg+xml",
+                    "image/tiff",
+                    "image/vnd.djvu",
+                    "image/vnd.ms-photo",
+                    "image/x-djvu",
+                    "image/x-portable-arbitrarymap",
+                    "image/x-portable-bitmap",
+                    "text/html",
+                    "text/plain"))
+                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+                return intent
+            } else {
+                return null
+            }
         }
-        return intent
-    }
-
-    /**
-     * intent to string, based on https://stackoverflow.com/a/36842135
-     *
-     * @param intent -
-     * @return String with action and dataString of the intent
-     */
-
-    fun intentToString(intent: Intent?): String {
-        return if (intent == null) "" else "\naction: " + intent.action + "\ndata: " + intent.dataString + "\n"
-    }
 
     // Intent.ACTION_SEND
-    fun getSendIntent(text: String, pkg: String? = null): Intent {
+    fun getSendTextIntent(text: String, pkg: String? = null): Intent {
         val intent = Intent(Intent.ACTION_SEND)
         intent.putExtra(Intent.EXTRA_TEXT, text)
         intent.type = "text/plain"
@@ -52,7 +68,7 @@ object IntentUtils {
     }
 
     // Intent.ACTION_SEARCH
-    private fun getSearchIntent(text: String, pkg: String? = null): Intent {
+    fun getSearchTextIntent(text: String, pkg: String? = null): Intent {
         val intent = Intent(Intent.ACTION_SEARCH)
         intent.putExtra(SearchManager.QUERY, text)
         intent.putExtra(Intent.EXTRA_TEXT, text)
@@ -61,7 +77,7 @@ object IntentUtils {
     }
 
     // Intent.ACTION_PROCESS_TEXT (available on api23+)
-    private fun getTextIntent(text: String, pkg: String? = null): Intent {
+    fun getProcessTextIntent(text: String, pkg: String? = null): Intent {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             val intent = Intent(Intent.ACTION_PROCESS_TEXT)
             intent.putExtra(Intent.EXTRA_TEXT, text)
@@ -72,18 +88,19 @@ object IntentUtils {
             intent
         } else {
             // fallback to ACTION_SEND
-            getSendIntent(text)
+            getSendTextIntent(text)
         }
     }
 
-    /* Android custom intents for some dict apps ------ */
-    private fun getAard2Intent(text: String): Intent {
+    // aard2.lookup
+    fun getAard2Intent(text: String): Intent {
         val intent = Intent("aard2.lookup")
         intent.putExtra(SearchManager.QUERY, text)
         return intent
     }
 
-    private fun getColordictIntent(text: String, pkg: String?): Intent {
+    // colordict.intent.action.SEARCH
+    fun getColordictIntent(text: String, pkg: String?): Intent {
         val intent = Intent("colordict.intent.action.SEARCH")
         intent.putExtra("EXTRA_QUERY", text)
         intent.putExtra("EXTRA_FULLSCREEN", true)
@@ -91,7 +108,8 @@ object IntentUtils {
         return intent
     }
 
-    private fun getQuickdicIntent(text: String): Intent {
+    // com.hughes.action.ACTION_SEARCH_DICT
+    fun getQuickdicIntent(text: String): Intent {
         val intent = Intent("com.hughes.action.ACTION_SEARCH_DICT")
         intent.putExtra(SearchManager.QUERY, text)
         return intent

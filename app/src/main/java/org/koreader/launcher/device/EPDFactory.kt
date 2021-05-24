@@ -3,7 +3,7 @@
 
 package org.koreader.launcher.device
 
-import org.koreader.launcher.Logger
+import android.util.Log
 import org.koreader.launcher.device.epd.freescale.NTXNewEPDController
 import org.koreader.launcher.device.epd.rockchip.RK3026EPDController
 import org.koreader.launcher.device.epd.rockchip.RK3368EPDController
@@ -12,6 +12,7 @@ import org.koreader.launcher.interfaces.EPDInterface
 import java.util.*
 
 object EPDFactory {
+    private const val TAG = "EPD"
     val epdController: EPDInterface
         get() {
             return when (DeviceInfo.EINK) {
@@ -40,7 +41,7 @@ object EPDFactory {
                 DeviceInfo.EinkDevice.JDREAD,
                 DeviceInfo.EinkDevice.TOLINO,
                 DeviceInfo.EinkDevice.NOOK_V520 -> {
-                    logController("Freescale NTX")
+                    logController("Freescale/NTX")
                     NTXNewEPDController()
                 }
                 DeviceInfo.EinkDevice.ONYX_NOVA2 -> {
@@ -54,8 +55,8 @@ object EPDFactory {
         }
 
     private fun logController(name: String?) {
-        Logger.i(String.format(Locale.US,
-            "[EPDFactory]: Using %s EPD Controller", name))
+        Log.i(TAG, String.format(Locale.US,
+            "Using %s driver", name))
     }
     private class FakeEPDController : EPDInterface {
         override fun resume() {}
@@ -63,7 +64,7 @@ object EPDFactory {
         override fun setEpdMode(targetView: android.view.View,
                                 mode: Int, delay: Long,
                                 x: Int, y: Int, width: Int, height: Int, epdMode: String?) {
-            Logger.w("[EPDController]: Unknown device, ignoring epd update")
+            Log.w(TAG, "Unknown device, ignoring update")
         }
     }
 }

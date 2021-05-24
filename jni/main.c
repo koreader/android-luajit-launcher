@@ -30,19 +30,18 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <android/asset_manager.h>
 
 #include "android_native_app_glue.h"
-#include "logger.h"
 
 #include "luajit-2.1/lua.h"
 #include "luajit-2.1/lualib.h"
 #include "luajit-2.1/lauxlib.h"
 
-#define  TAG "[NativeThread]"
+#define  TAG "NativeThread"
 
-#define LOGE(...) ((void)__android_log_print(ANDROID_LOG_ERROR, LOGGER_NAME, __VA_ARGS__))
-#define LOGV(...) ((void)__android_log_print(ANDROID_LOG_VERBOSE, LOGGER_NAME, __VA_ARGS__))
+#define LOGE(...) ((void)__android_log_print(ANDROID_LOG_ERROR, TAG, __VA_ARGS__))
+#define LOGV(...) ((void)__android_log_print(ANDROID_LOG_VERBOSE, TAG, __VA_ARGS__))
 
 #ifndef NDEBUG
-#  define LOGD(...) ((void)__android_log_print(ANDROID_LOG_DEBUG, LOGGER_NAME, __VA_ARGS__))
+#  define LOGD(...) ((void)__android_log_print(ANDROID_LOG_DEBUG, TAG, __VA_ARGS__))
 #else
 #  define LOGD(...) ((void)0)
 #endif
@@ -58,11 +57,11 @@ static void handle_cmd(struct android_app* app, int32_t cmd) {
         case APP_CMD_INIT_WINDOW:
             // The window is being shown, get it ready.
             window_ready = 1;
-            LOGV("%s: activity window ready.", TAG);
+            LOGV("Activity window ready.");
             break;
         case APP_CMD_GAINED_FOCUS:
             gained_focus = 1;
-            LOGV("%s: activity gained focus.", TAG);
+            LOGV("Activity gained focus.");
             break;
     }
 }
@@ -74,14 +73,14 @@ void android_main(struct android_app* state) {
     off_t bufsize;
     int status;
 
-    LOGD("%s: starting", TAG);
+    LOGD("Starting");
 
     // Shitty hack so that base can discriminate Android...
     setenv("IS_ANDROID", "true", 1);
 
     // wait until the activity is initialized before launching LuaJIT assets
     state->onAppCmd = handle_cmd;
-    LOGV("%s: waiting for activity", TAG);
+    LOGV("waiting for activity");
     int events;
     struct android_poll_source* source;
     // we block forever waiting for events.
@@ -99,17 +98,17 @@ void android_main(struct android_app* state) {
         }
     }
 
-    LOGV("%s: launching LuaJIT assets", TAG);
+    LOGV("Launching LuaJIT assets");
     luaCode = AAssetManager_open(state->activity->assetManager, LOADER_ASSET, AASSET_MODE_BUFFER);
     if (luaCode == NULL) {
-        LOGE("%s: error loading loader asset", TAG);
+        LOGE("Error loading loader asset");
         goto quit;
     }
 
     bufsize = AAsset_getLength(luaCode);
     buf = AAsset_getBuffer(luaCode);
     if (buf == NULL) {
-        LOGE("%s: error getting loader asset buffer", TAG);
+        LOGE("Error getting loader asset buffer");
         goto quit;
     }
 
@@ -123,7 +122,7 @@ void android_main(struct android_app* state) {
     const size_t map_size = 144U * 1024U * 1024U;
     void* p = mmap(NULL, map_size, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_NORESERVE, -1, 0);
     if (p == MAP_FAILED) {
-        LOGE("%s: error allocating mmap for mcode alloc workaround", TAG);
+        LOGE("Error allocating mmap for mcode alloc workaround");
         goto quit;
     }
 
@@ -133,7 +132,7 @@ void android_main(struct android_app* state) {
     // c.f., https://android.googlesource.com/platform/bionic/+/refs/heads/master/android-changes-for-ndk-developers.md)
     void* luajit = dlopen("libluajit.so", RTLD_NOW | RTLD_GLOBAL);
     if (!luajit) {
-        LOGE("%s: failed to load LuaJIT: %s", TAG, dlerror());
+        LOGE("Failed to load LuaJIT: %s", dlerror());
     } else {
         dlerror();
     }
@@ -151,11 +150,11 @@ void android_main(struct android_app* state) {
     void (*lj_lua_close)(lua_State*) = dlsym(luajit, "lua_close");
 
     // Recap where things end up for our mcode_alloc shenanigans...
-    LOGV("%s: mmap for mcode alloc workaround mmap was @ %p to %p", TAG, p, p + map_size);
+    LOGV("mmap for mcode alloc workaround mmap was @ %p to %p", p, p + map_size);
     uintptr_t lj_mcarea_target = (uintptr_t) lj_lua_pcall & ~(uintptr_t) 0xffff;
-    LOGV("%s: LuaJIT is mapped around %p", TAG, (void *) lj_mcarea_target);
+    LOGV("LuaJIT is mapped around %p", (void *) lj_mcarea_target);
     void* g_lj_mcarea_reserve = dlsym(luajit, "g_lj_mcarea_reserve");
-    LOGV("%s: LuaJIT reserved mcarea is @ %p", TAG, g_lj_mcarea_reserve);
+    LOGV("LuaJIT reserved mcarea is @ %p", g_lj_mcarea_reserve);
 
     // Load initial Lua loader from our asset store:
     L = (*lj_luaL_newstate)();
@@ -164,7 +163,7 @@ void android_main(struct android_app* state) {
     status = (*lj_luaL_loadbuffer)(L, (const char*) buf, (size_t) bufsize, LOADER_ASSET);
     AAsset_close(luaCode);
     if (status) {
-        LOGE("%s: error loading file: %s", TAG, (*lj_lua_tolstring)(L, -1, NULL));
+        LOGE("Error loading file: %s", (*lj_lua_tolstring)(L, -1, NULL));
         goto quit;
     }
 
@@ -173,7 +172,7 @@ void android_main(struct android_app* state) {
 
     status = (*lj_lua_pcall)(L, 1, LUA_MULTRET, 0);
     if (status) {
-        LOGE("%s: failed to run script: %s", TAG, (*lj_lua_tolstring)(L, -1, NULL));
+        LOGE("Failed to run script: %s", (*lj_lua_tolstring)(L, -1, NULL));
         goto quit;
     }
 
@@ -186,7 +185,7 @@ void android_main(struct android_app* state) {
     status = luaL_loadbuffer(L, (const char*) buf, (size_t) bufsize, LOADER_ASSET);
     AAsset_close(luaCode);
     if (status) {
-        LOGE("%s: error loading file: %s", TAG, lua_tostring(L, -1));
+        LOGE("Error loading file: %s", lua_tostring(L, -1));
         goto quit;
     }
 
@@ -195,7 +194,7 @@ void android_main(struct android_app* state) {
 
     status = lua_pcall(L, 1, LUA_MULTRET, 0);
     if (status) {
-        LOGE("%s: failed to run script: %s", TAG, lua_tostring(L, -1));
+        LOGE("Failed to run script: %s", lua_tostring(L, -1));
         goto quit;
     }
 
@@ -203,7 +202,7 @@ void android_main(struct android_app* state) {
 #endif
 
 quit:
-    LOGE("%s: Stopping due to previous errors", TAG);
+    LOGE("Stopping due to previous errors");
     ANativeActivity_finish(state->activity);
     exit(1);
 }

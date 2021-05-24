@@ -25,21 +25,24 @@ LOCAL_PATH := $(BASE_PATH)
 include $(LOCAL_PATH)/luajit/Android.mk
 include $(CLEAR_VARS)
 
-# Dummy target that will ensure we ship the LuaJIT shared library
-# NOTE: Only necessary if we want to dlopen LuaJIT, which isn't the default ;).
-#LOCAL_PATH := $(BASE_PATH)
-#include $(LOCAL_PATH)/foo/Android.mk
-#include $(CLEAR_VARS)
-
 # lib7z shared library
 LOCAL_PATH := $(BASE_PATH)
 include $(LOCAL_PATH)/lzma/Android.mk
 include $(CLEAR_VARS)
 
+# Dummy target that will ensure we ship the LuaJIT shared library
+# NOTE: Only necessary if we want to dlopen LuaJIT, which isn't the default ;).
+#LOCAL_PATH := $(BASE_PATH)
+#LOCAL_MODULE := dummy
+#LOCAL_SRC_FILES := dummy.c
+#LOCAL_SHARED_LIBRARIES := luajit
+#include $(BUILD_SHARED_LIBRARY)
+#include $(CLEAR_VARS)
+
 # final shared library to load via the NativeActivity framework.
 LOCAL_PATH := $(BASE_PATH)
 LOCAL_MODULE := luajit-launcher
-LOCAL_SRC_FILES := android-main.c
+LOCAL_SRC_FILES := main.c
 LOCAL_STATIC_LIBRARIES := android_native_app_glue
 # NOTE: By default, we link against the shared LuaJIT library directly.
 LOCAL_SHARED_LIBRARIES := luajit

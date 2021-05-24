@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.util.Log
 import androidx.annotation.Keep
 import java.io.File
 import java.io.FileWriter
@@ -33,7 +34,7 @@ class EventReceiver : BroadcastReceiver() {
                 filter.addAction(key)
             }
 
-            Logger.v(tag, "Filtering ${eventMap.size} events: \n$info")
+            Log.v(tag, "Filtering ${eventMap.size} events: \n$info")
             return filter
         }
 
@@ -50,15 +51,15 @@ class EventReceiver : BroadcastReceiver() {
                 writer.write(msg, 0, 4)
                 writer.close()
             } catch (e: Exception) {
-                Logger.e(tag, "Cannot write to file $fifoPath: \n$e")
+                Log.e(tag, "Cannot write to file $fifoPath: \n$e")
             }
-        } ?: Logger.e(tag, "Invalid code: must be a 32-bit integer")
+        } ?: Log.e(tag, "Invalid code: must be a 32-bit integer")
     }
 
     override fun onReceive(context: Context?, intent: Intent?) {
         intent?.let { event ->
             if (eventMap.containsKey(event.action)) {
-                Logger.v(tag, "Received event ${event.action}")
+                Log.v(tag, "Received event ${event.action}")
                 write(eventMap[event.action])
             }
         }
