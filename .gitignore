@@ -13,7 +13,6 @@ app/.*
 app/build
 assets/libs
 assets/module
-jni/logger.h
 jni/luajit/build
 tests/einkTest/build
 tests/einkTest/src/org/koreader/test/eink/*EPDController.java

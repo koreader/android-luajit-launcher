@@ -71,9 +71,7 @@ update:
 	git submodule init
 	git submodule sync
 	git submodule update
-	@echo "#define LOGGER_NAME \"$(APPNAME)\"" > jni/logger.h
 	@echo "sdk.dir=$(ANDROID_SDK_FULLPATH)" > local.properties
-	@echo "ndk.dir=$(ANDROID_NDK_FULLPATH)" >> local.properties
 	@echo "using sdk in path $(ANDROID_SDK_FULLPATH)"
 	@echo "using ndk in path $(ANDROID_NDK_FULLPATH)"
 
@@ -97,14 +95,16 @@ prepare: update
 
 debug: update build-luajit-debug
 	@echo "Building $(APPNAME) debug APK: Version $(NAME), release $(VERSION), flavor $(FLAVOR)"
-	./gradlew -PversName=$(NAME) -PversCode=$(VERSION) -PprojectName=$(APPNAME) app:$(BUILD_TASK)Debug
+	./gradlew -q -PversName=$(NAME) -PversCode=$(VERSION) -PprojectName=$(APPNAME) \
+		-PndkCustomPath=$(ANDROID_NDK_FULLPATH) app:$(BUILD_TASK)Debug
 	mkdir -p bin/
 	find app/build/outputs/apk/ -type f -name '*.apk' -exec mv -v {} bin/ \;
 	@echo "Application $(APPNAME) was built, type: debug (signed), flavor: $(FLAVOR), version: $(NAME), release $(VERSION)"
 
 release: update build-luajit
 	@echo "Building $(APPNAME) release APK: Version $(NAME), release $(VERSION), flavor $(FLAVOR)"
-	./gradlew -PversName=$(NAME) -PversCode=$(VERSION) -PprojectName=$(APPNAME) app:$(BUILD_TASK)Release
+	./gradlew -q -PversName=$(NAME) -PversCode=$(VERSION) -PprojectName=$(APPNAME) \
+		-PndkCustomPath=$(ANDROID_NDK_FULLPATH) app:$(BUILD_TASK)Release
 	mkdir -p bin/
 	find app/build/outputs/apk/ -type f -name '*.apk' -exec mv -v {} bin/ \;
 	@echo "Application $(APPNAME) was built, type: release (unsigned), flavor: $(FLAVOR), version: $(NAME), release $(VERSION)"
@@ -112,11 +112,10 @@ release: update build-luajit
 
 example: update clean build-luajit
 	@echo "Building HelloWorld example"
-	@echo "#define LOGGER_NAME \"HelloFromLua\"" > jni/logger.h
 	mkdir -p assets/module/
 	cp -pv examples/helloWorld/*.lua assets/module/
-	./gradlew -PversName=1.0 -PversCode=1 -PprojectName=HelloFromLua \
-		app:$(BUILD_TASK)Debug
+	./gradlew -q -PversName=1.0 -PversCode=1 -PprojectName=HelloFromLua \
+		-PndkCustomPath=$(ANDROID_NDK_FULLPATH) app:$(BUILD_TASK)Debug
 	mkdir -p bin/
 	find app/build/outputs/apk/ -type f -name '*.apk' -exec mv -v {} bin/ \;
 

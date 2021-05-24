@@ -6,8 +6,8 @@ import android.graphics.Point
 import android.graphics.Rect
 import android.os.Build
 import android.util.DisplayMetrics
+import android.util.Log
 import android.view.WindowManager
-import org.koreader.launcher.Logger
 import java.util.Locale
 import java.util.concurrent.CountDownLatch
 
@@ -55,14 +55,14 @@ object ScreenUtils {
                     window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
                 }
             } catch (e: Exception) {
-                Logger.w(TAG, e.toString())
+                Log.w(TAG, e.toString())
             }
             cd.countDown()
         }
         try {
             cd.await()
         } catch (ex: InterruptedException) {
-            Logger.e(TAG, ex.toString())
+            Log.e(TAG, ex.toString())
         }
     }
 

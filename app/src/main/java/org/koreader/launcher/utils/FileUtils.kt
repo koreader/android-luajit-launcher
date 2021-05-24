@@ -8,8 +8,8 @@ import android.os.Environment
 import android.os.ParcelFileDescriptor
 import android.provider.MediaStore
 import android.system.Os
+import android.util.Log
 import androidx.core.content.ContextCompat
-import org.koreader.launcher.Logger
 import java.io.*
 import java.util.*
 
@@ -46,7 +46,7 @@ object FileUtils {
                 }
                 ContentResolver.SCHEME_CONTENT == contentUri.scheme -> {
                     uri.authority?.let { domain ->
-                        Logger.v(TAG, "trying to resolve a file path from content delivered by $domain")
+                        Log.v(TAG, "trying to resolve a file path from content delivered by $domain")
                     }
                     try {
                         val fd = context.contentResolver.openFileDescriptor(contentUri, "r")
@@ -141,12 +141,12 @@ object FileUtils {
                     stream = context.contentResolver.openInputStream(uri)
                     file = getFileFromInputStream(stream, path, name)
                 } catch (e: IOException) {
-                    Logger.e(TAG, "I/O error: $e")
+                    Log.e(TAG, "I/O error: $e")
                 } finally {
                     try {
                         stream?.close()
                     } catch (e: IOException) {
-                        Logger.e(TAG, "I/O error: $e")
+                        Log.e(TAG, "I/O error: $e")
                     }
                 }
             }
@@ -167,7 +167,7 @@ object FileUtils {
         return stream?.let {
             try {
                 val file = File(path, name)
-                Logger.i(TAG, String.format(Locale.US,
+                Log.i(TAG, String.format(Locale.US,
                     "saving document: %s in %s", name, path))
                 FileOutputStream(file).use { target ->
                     val buffer = ByteArray(8 * 1024)
@@ -178,10 +178,10 @@ object FileUtils {
                     }
                     it.close()
                 }
-                Logger.v(TAG, file.absolutePath + " created without errors")
+                Log.v(TAG, file.absolutePath + " created without errors")
                 file
             } catch (e: IOException) {
-                Logger.e(TAG, "I/O error: $e")
+                Log.e(TAG, "I/O error: $e")
                 null
             }
         }
