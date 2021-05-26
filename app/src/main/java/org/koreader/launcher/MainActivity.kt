@@ -4,9 +4,7 @@ import android.annotation.SuppressLint
 import android.annotation.TargetApi
 import android.app.Activity
 import android.app.NativeActivity
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.content.*
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.BatteryManager
@@ -33,7 +31,6 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     private val tag = this::class.java.simpleName
 
     private lateinit var assets: Assets
-    private lateinit var clipboard: Clipboard
     private lateinit var device: Device
     private lateinit var event: EventReceiver
     private lateinit var timeout: Timeout
@@ -95,7 +92,6 @@ class MainActivity : NativeActivity(), JNILuaInterface,
             "Launching %s %s", MainApp.name, MainApp.info))
 
         assets = Assets()
-        clipboard = Clipboard(this)
         device = Device(this)
         timeout = Timeout()
         event = EventReceiver()
@@ -312,7 +308,9 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     }
 
     override fun getClipboardText(): String {
-        return clipboard.getClipboardText(this)
+        val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val text = clipboard.primaryClip?.getItemAt(0)?.text as String?
+        return text ?: ""
     }
 
     override fun getEinkPlatform(): String {
@@ -440,7 +438,10 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     }
 
     override fun hasClipboardText(): Boolean {
-        return clipboard.hasClipboardText()
+        val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        return clipboard.primaryClip?.let {
+            (it.itemCount > 0)
+        }?: false
     }
 
     override fun hasExternalStoragePermission(): Boolean {
@@ -582,7 +583,8 @@ class MainActivity : NativeActivity(), JNILuaInterface,
     }
 
     override fun setClipboardText(text: String) {
-        clipboard.setClipboardText(this, text)
+        val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        clipboard.setPrimaryClip(ClipData.newPlainText("KOReader_clipboard", text))
     }
 
     override fun setFullscreen(enabled: Boolean) {
