@@ -17,7 +17,7 @@ import android.widget.Toast
 import androidx.annotation.Keep
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import org.koreader.launcher.interfaces.JNILuaInterface
+import org.koreader.launcher.device.Device
 import org.koreader.launcher.utils.*
 import java.io.BufferedReader
 import java.io.File
@@ -25,7 +25,7 @@ import java.io.InputStreamReader
 import java.util.*
 
 @Keep
-class MainActivity : NativeActivity(), JNILuaInterface,
+class MainActivity : NativeActivity(), LuaInterface,
     ActivityCompat.OnRequestPermissionsResultCallback{
 
     private val tag = this::class.java.simpleName
@@ -88,9 +88,6 @@ class MainActivity : NativeActivity(), JNILuaInterface,
 
     /* Called when the activity is first created. */
     override fun onCreate(savedInstanceState: Bundle?) {
-        Log.v(tag, String.format(Locale.US,
-            "Launching %s %s", MainApp.name, MainApp.info))
-
         assets = Assets()
         device = Device(this)
         timeout = Timeout()

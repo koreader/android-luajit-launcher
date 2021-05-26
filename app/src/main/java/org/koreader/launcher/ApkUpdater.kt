@@ -7,10 +7,15 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.util.Log
+import androidx.annotation.Keep
 import androidx.core.content.FileProvider
 import java.io.File
 
+@Keep
 class ApkUpdater {
+
+    private val tag = this::class.java.simpleName
+    private var downloadPath: String? = null
 
     companion object {
         private const val DOWNLOAD_NOT_SUPPORTED = -2
@@ -18,8 +23,6 @@ class ApkUpdater {
         private const val DOWNLOAD_OK = 0
         private const val DOWNLOAD_EXISTS = 1
     }
-    private val tag = this::class.java.simpleName
-    private var downloadPath: String? = null
 
     fun download(context: Context, url: String, name: String): Int {
         return if (MainApp.has_ota_updates) {

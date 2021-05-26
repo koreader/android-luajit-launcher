@@ -1,7 +1,7 @@
 /* generic EPD Controller for Android devices,
  * based on https://github.com/unwmun/refreshU */
 
-package org.koreader.launcher.interfaces
+package org.koreader.launcher.device
 
 interface EPDInterface {
     fun resume()

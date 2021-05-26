@@ -1,9 +1,9 @@
-package org.koreader.launcher.interfaces
+package org.koreader.launcher
 
 /* Declares methods that are exposed to lua via JNI
  * See https://github.com/koreader/android-luajit-launcher/blob/master/assets/android.lua */
 
-interface JNILuaInterface {
+interface LuaInterface {
     fun canIgnoreBatteryOptimizations(): Boolean
     fun canWriteSystemSettings(): Boolean
     fun dictLookup(text: String?, action: String?, nullablePackage: String?)

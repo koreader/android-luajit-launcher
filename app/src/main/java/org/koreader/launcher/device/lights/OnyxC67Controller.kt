@@ -2,10 +2,10 @@ package org.koreader.launcher.device.lights
 
 import android.app.Activity
 import android.util.Log
-import org.koreader.launcher.interfaces.LightInterface
+import org.koreader.launcher.device.LightsInterface
 import java.io.File
 
-class OnyxC67Controller : LightInterface {
+class OnyxC67Controller : LightsInterface {
     companion object {
         private const val TAG = "Lights"
         private const val BRIGHTNESS_MAX = 255

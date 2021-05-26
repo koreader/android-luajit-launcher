@@ -25,7 +25,7 @@ import java.util.*
 
 abstract class RK33xxEPDController {
     companion object {
-        private const val TAG = "epd"
+        private const val TAG = "EPD"
         private const val EPD_FULL = 1
 
         fun requestEpdMode(epdMode: String): Boolean {

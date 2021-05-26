@@ -3,11 +3,11 @@ package org.koreader.launcher.device.lights
 import android.app.Activity
 import android.provider.Settings
 import android.util.Log
-import org.koreader.launcher.interfaces.LightInterface
+import org.koreader.launcher.device.LightsInterface
 
 /* handle frontlight within the activity, without affecting other activities */
 
-class GenericController : LightInterface {
+class GenericController : LightsInterface {
     companion object {
         private const val TAG = "Lights"
         private const val BRIGHTNESS_MAX = 255

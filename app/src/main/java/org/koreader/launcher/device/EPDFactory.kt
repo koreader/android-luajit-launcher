@@ -8,7 +8,6 @@ import org.koreader.launcher.device.epd.freescale.NTXNewEPDController
 import org.koreader.launcher.device.epd.rockchip.RK3026EPDController
 import org.koreader.launcher.device.epd.rockchip.RK3368EPDController
 import org.koreader.launcher.device.epd.qualcomm.QualcommOnyxEPDController
-import org.koreader.launcher.interfaces.EPDInterface
 import java.util.*
 
 object EPDFactory {

@@ -3,7 +3,7 @@
 
 package org.koreader.launcher.device.epd.rockchip
 
-import org.koreader.launcher.interfaces.EPDInterface
+import org.koreader.launcher.device.EPDInterface
 
 class RK3368EPDController : RK33xxEPDController(), EPDInterface {
     override fun resume() {}

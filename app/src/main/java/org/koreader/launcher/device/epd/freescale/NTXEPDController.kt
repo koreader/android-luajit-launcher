@@ -33,7 +33,7 @@ import java.util.*
 
 abstract class NTXEPDController {
     companion object {
-        private const val TAG = "epd"
+        private const val TAG = "EPD"
 
         fun requestEpdMode(view: android.view.View,
                            mode: Int, delay: Long,

@@ -1,8 +1,8 @@
-package org.koreader.launcher.interfaces
+package org.koreader.launcher.device
 
 import android.app.Activity
 
-interface LightInterface {
+interface LightsInterface {
     fun hasFallback(): Boolean
     fun hasWarmth(): Boolean
     fun needsPermission(): Boolean

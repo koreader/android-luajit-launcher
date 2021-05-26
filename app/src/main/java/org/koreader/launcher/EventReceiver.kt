@@ -15,6 +15,7 @@ import kotlin.collections.HashMap
 
 @Keep
 class EventReceiver : BroadcastReceiver() {
+
     private val tag = this::class.java.simpleName
     private val eventMap = HashMap<String, Int>()
     private val fifoPath: String = File(MainApp.assets_path, "alooper.fifo").path
