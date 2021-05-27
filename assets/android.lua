@@ -1414,14 +1414,9 @@ local android = {
     glue = android_glue_ok and android_glue or C,
 }
 
-function android.LOG(level, message)
-    android.log.__android_log_print(level, android.log_name, "%s", message)
+function android.LOG(level, message, tag)
+    android.log.__android_log_print(level, tag and tag or android.log_name, "%s", message)
 end
-
-function android.LOGVV(tag, message)
-    android.log.__android_log_print(C.ANDROID_LOG_VERBOSE, tag, "%s", message)
-end
-
 function android.LOGV(message)
     android.LOG(C.ANDROID_LOG_VERBOSE, message)
 end

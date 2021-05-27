@@ -57,13 +57,16 @@ local dl = {
 }
 
 local function sys_dlopen(library, global, padding)
-    A.LOGVV(log, string.format("%"..padding.."ssys_dlopen - loading library %s (in %s namespace)", "", library, global and "global" or "local"))
+    A.LOG(C.ANDROID_LOG_VERBOSE, string.format(
+        "%"..padding.."ssys_dlopen - loading library %s (in %s namespace)",
+        "", library, global and "global" or "local"), log)
+
     local p = C.dlopen(library, bit.bor(C.RTLD_NOW, global and C.RTLD_GLOBAL or C.RTLD_LOCAL))
     if p == nil then
         local err_msg = C.dlerror()
         if err_msg ~= nil then
             local err = "error dlopen'ing "..library..": "..ffi.string(err_msg)
-            A.LOGVV(log, err)
+            A.LOG(C.ANDROID_LOG_ERROR, err, log)
             error(err)
         end
     else
@@ -101,7 +104,8 @@ function dl.dlopen(library, load_func, depth)
             ok, lib = pcall(Elf.open, lname)
         end
         if ok then
-            A.LOGVV(log, string.format("%"..padding.."sdl.dlopen - %s => %s", "", library, lname))
+            local level = depth == 0 and C.ANDROID_LOG_INFO or C.ANDROID_LOG_VERBOSE
+            A.LOG(level, string.format("%"..padding.."sdl.dlopen - %s => %s", "", library, lname), log)
             -- Skip loading system libraries (unless we explicitly asked for one, in which case, that's on the caller ;)).
             -- c.f., https://github.com/koreader/android-luajit-launcher/pull/69
             -- Note that, technically, for Android >= 6.0, the list of safe system libraries is:
@@ -115,7 +119,7 @@ function dl.dlopen(library, load_func, depth)
                 -- (because this might have genuine use cases, as some early API levels do not put DT_NEEDED libraries into the global namespace)
                 -- pspec to reject system libs
                 -- secondary check on libdl, because apparently there are old ROMs out there where it isn't in /sytem/lib ?!
-                A.LOGVV(log, string.format("%"..padding.."sdl.dlopen - skipping %s (system lib)", "", lname))
+                A.LOG(C.ANDROID_LOG_VERBOSE, string.format("%"..padding.."sdl.dlopen - skipping %s (system lib)", "", lname), log)
                 -- We won't load it, so, we don't even need to look at its deps.
                 lib:close()
                 return nil
@@ -129,7 +133,7 @@ function dl.dlopen(library, load_func, depth)
             local lib_needs = lib:dlneeds()
             lib:close()
             for i, needed in ipairs(lib_needs) do
-                A.LOGVV(log, string.format("%"..padding.."sdl.dlopen - needed => %s (%d of %d) <= %s", "", needed, i, #lib_needs, lname))
+                A.LOG(C.ANDROID_LOG_VERBOSE, string.format("%"..padding.."sdl.dlopen - needed => %s (%d of %d) <= %s", "", needed, i, #lib_needs, lname), log)
                 dl.dlopen(needed, sys_dlopen, depth)
             end
             depth = depth - 1
@@ -137,7 +141,7 @@ function dl.dlopen(library, load_func, depth)
             if load_func == sys_dlopen then
                 return sys_dlopen(lname, false, padding)
             else
-                A.LOGVV(log, string.format("%"..padding.."sdl.dlopen - load_func -> %s", "", lname))
+                A.LOG(C.ANDROID_LOG_VERBOSE, string.format("%"..padding.."sdl.dlopen - load_func -> %s", "", lname), log)
                 return load_func(lname)
             end
         else
@@ -147,16 +151,16 @@ function dl.dlopen(library, load_func, depth)
             if type(lib) == "table" then
                 -- NOTE: #define ENOENT 2 @ /usr/include/asm-generic/errno-base.h ;).
                 if lib.num and lib.num ~= 2 then
-                    A.LOGVV(log, string.format("Failed to open %s", lib.str))
+                    A.LOG(C.ANDROID_LOG_WARN, string.format("Failed to open %s", lib.str), log)
                 end
             else
-                A.LOGVV(log, string.format("Failed to parse ELF binary %s: %s", lname, lib))
+                A.LOG(C.ANDROID_LOG_WARN, string.format("Failed to parse ELF binary %s: %s", lname, lib), log)
             end
         end
     end
 
     local err = "could not find library " .. library
-    A.LOGVV(log, err)
+    A.LOG(C.ANDROID_LOG_WARN, err, log)
     error(err)
 end
 
