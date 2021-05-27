@@ -1,0 +1,3 @@
+-dontobfuscate
+-keepattributes SourceFile,LineNumberTable
+-printusage /home/pazos/usage.txt
