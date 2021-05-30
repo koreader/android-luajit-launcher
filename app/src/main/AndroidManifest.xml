@@ -27,7 +27,6 @@
         android:icon="@mipmap/icon"
         android:banner="@mipmap/banner"
         android:label="${APP_NAME}"
-        android:vmSafeMode="true"
         android:allowBackup="false"
         android:fullBackupContent="false"
         android:usesCleartextTraffic="true"
@@ -39,7 +38,8 @@
             android:resizeableActivity="false"
             android:screenOrientation="nosensor"
             android:launchMode="singleInstance"
-            android:configChanges="colorMode|density|fontScale|keyboard|keyboardHidden|layoutDirection|locale|mcc|mnc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|touchscreen|uiMode" >
+            android:configChanges="colorMode|density|fontScale|keyboard|keyboardHidden|layoutDirection|locale|mcc|mnc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|touchscreen|uiMode"
+            tools:ignore="NonResizeableActivity">
             <meta-data android:name="android.app.lib_name" android:value="luajit-launcher" />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

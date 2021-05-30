@@ -2,7 +2,7 @@
 
 package org.koreader.launcher.device.epd.qualcomm
 
-import org.koreader.launcher.interfaces.EPDInterface
+import org.koreader.launcher.device.EPDInterface
 
 class QualcommOnyxEPDController : QualcommEPDController(), EPDInterface {
     override fun resume() {}

@@ -300,6 +300,6 @@ object DeviceInfo {
     }
 
     private fun lowerCase(text: String): String {
-        return text.toLowerCase(Locale.US)
+        return text.lowercase(Locale.US)
     }
 }

@@ -2,7 +2,7 @@
 
 package org.koreader.launcher.device.epd.freescale
 
-import org.koreader.launcher.interfaces.EPDInterface
+import org.koreader.launcher.device.EPDInterface
 
 class NTXNewEPDController : NTXEPDController(), EPDInterface {
     override fun resume() {}

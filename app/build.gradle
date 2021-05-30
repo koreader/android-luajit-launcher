@@ -3,37 +3,21 @@ apply plugin: 'kotlin-android'
 
 android {
     ndkPath ndkCustomPath
-    compileSdkVersion 30
+    compileSdkVersion rootProject.ext.compileSdk
+
     defaultConfig {
         applicationId "org.koreader.launcher"
-
-        // Required when setting minSdkVersion to 20 or lower
-        multiDexEnabled true
-
-        minSdkVersion 14
-
-        //noinspection ExpiredTargetSdkVersion
-        targetSdkVersion 28
-
         versionCode versCode as Integer
         versionName versName
+        minSdkVersion rootProject.ext.minSdk
+        targetSdkVersion rootProject.ext.targetSdk
+
+        multiDexEnabled true
         manifestPlaceholders.APP_NAME = projectName
-        buildConfigField 'String', 'APP_NAME', '"' + projectName + '"'
+
+        buildConfigField "String", "APP_NAME", '"' + projectName + '"'
         buildConfigField "boolean", "IN_APP_UPDATES", "false"
         buildConfigField "boolean", "SUPPORTS_RUNTIME_CHANGES", "false"
-    }
-
-    buildTypes {
-        release {
-            minifyEnabled true
-            shrinkResources true
-        }
-
-        debug {
-            applicationIdSuffix ".debug"
-            minifyEnabled false
-            debuggable true
-        }
     }
 
     sourceSets {
@@ -42,13 +26,24 @@ android {
         }
     }
 
-    compileOptions {
-        // Flag to enable support for the new language APIs
-        coreLibraryDesugaringEnabled true
+    externalNativeBuild {
+        ndkBuild {
+            path file('../jni/Android.mk')
+        }
+    }
 
-        // Sets Java compatibility to Java 8
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+
+        debug {
+            applicationIdSuffix ".debug"
+            minifyEnabled false
+            debuggable true
+        }
     }
 
     flavorDimensions 'ABI', 'CHANNEL'
@@ -60,7 +55,7 @@ android {
         x86_64 {
             ndk { abiFilters "x86_64" }
             dimension = 'ABI'
-            minSdkVersion 21
+            minSdkVersion rootProject.ext.minSdk64
         }
         arm {
             ndk { abiFilters "armeabi-v7a" }
@@ -69,7 +64,7 @@ android {
         arm64 {
             ndk { abiFilters "arm64-v8a" }
             dimension = 'ABI'
-            minSdkVersion 21
+            minSdkVersion rootProject.ext.minSdk64
         }
 
         fdroid {
@@ -82,10 +77,13 @@ android {
         }
     }
 
-    externalNativeBuild {
-        ndkBuild {
-            path file('../jni/Android.mk')
-        }
+    compileOptions {
+        coreLibraryDesugaringEnabled true
+        kotlinOptions.freeCompilerArgs += ['-module-name', projectName.toLowerCase()]
+    }
+
+    packagingOptions {
+        exclude 'META-INF/*.version'
     }
 
     applicationVariants.all { variant ->
@@ -106,8 +104,6 @@ dependencies {
     implementation "androidx.core:core-ktx:$androidx_core_version"
     implementation "androidx.appcompat:appcompat:$androidx_appcompat_version"
     implementation "androidx.legacy:legacy-support-v4:$androidx_supportv4_version"
-
-    //noinspection GradleDependency
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_plugin_version"
     implementation "org.apache.commons:commons-compress:$commons_compress_version"
 
