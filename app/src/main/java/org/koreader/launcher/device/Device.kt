@@ -1,8 +1,10 @@
-package org.koreader.launcher
+package org.koreader.launcher.device
 
 import android.app.Activity
 import android.app.AlertDialog
+import android.content.pm.PackageManager
 import android.os.Build
+import android.os.Environment
 import android.util.Log
 import android.view.Gravity
 import android.view.Surface
@@ -10,13 +12,8 @@ import android.view.View
 import android.widget.LinearLayout
 import android.widget.SeekBar
 import android.widget.TextView
-import androidx.annotation.Keep
-import org.koreader.launcher.device.DeviceInfo
-import org.koreader.launcher.device.EPDFactory
-import org.koreader.launcher.device.LightsFactory
 import java.util.*
 
-@Keep
 class Device(activity: Activity) {
     private val tag = this::class.java.simpleName
 
@@ -25,8 +22,15 @@ class Device(activity: Activity) {
     val hasFullEinkSupport = DeviceInfo.EINK_FULL_SUPPORT
     val needsWakelocks = DeviceInfo.BUG_WAKELOCKS
     val bugRotation = DeviceInfo.BUG_SCREEN_ROTATION
-    val externalStorage = MainApp.storage_path
-    val platform = MainApp.platform_type
+
+    val platform: String = if (activity.packageManager.hasSystemFeature("org.chromium.arc.device_management")) {
+        "chrome"
+    } else if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+        && activity.packageManager.hasSystemFeature(PackageManager.FEATURE_LEANBACK)) {
+        "android_tv"
+    } else {
+        "android"
+    }
 
     val einkPlatform: String = if (DeviceInfo.EINK_FREESCALE) {
         if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN)
@@ -42,15 +46,17 @@ class Device(activity: Activity) {
     } else {
         "none"
     }
-    val isTv = (platform == "android_tv")
-    val isChromeOS = (platform == "chrome")
 
+    val isTv: Boolean = (platform == "android_tv")
+    val isChromeOS: Boolean = (platform == "chrome")
     val needsView: Boolean = if (DeviceInfo.NEEDS_VIEW) {
         true
     } else {
         (isTv || isChromeOS)
     }
 
+    @Suppress("DEPRECATION")
+    val externalStorage: String = Environment.getExternalStorageDirectory().absolutePath
     var isResumed = false
 
     // EPD driver for this device

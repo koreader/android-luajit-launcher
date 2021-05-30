@@ -8,11 +8,9 @@ import android.util.Log
 import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.ProgressBar
-import androidx.annotation.Keep
 import androidx.core.content.ContextCompat
 import java.io.*
 
-@Keep
 class Assets {
 
     private val tag = this::class.java.simpleName

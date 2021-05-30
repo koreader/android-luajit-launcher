@@ -8,12 +8,10 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.util.Log
-import androidx.annotation.Keep
 import java.io.File
 import java.io.FileWriter
 import kotlin.collections.HashMap
 
-@Keep
 class EventReceiver : BroadcastReceiver() {
     private val tag = this::class.java.simpleName
     private val eventMap = HashMap<String, Int>()

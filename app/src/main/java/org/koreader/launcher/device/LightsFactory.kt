@@ -5,12 +5,11 @@ import org.koreader.launcher.device.lights.GenericController
 import org.koreader.launcher.device.lights.OnyxWarmthController
 import org.koreader.launcher.device.lights.OnyxC67Controller
 import org.koreader.launcher.device.lights.TolinoWarmthController
-import org.koreader.launcher.interfaces.LightInterface
 import java.util.*
 
 object LightsFactory {
     private const val TAG = "Lights"
-    val lightsController: LightInterface
+    val lightsController: LightsInterface
         get() {
             return when (DeviceInfo.LIGHTS) {
                 DeviceInfo.LightsDevice.TOLINO_EPOS -> {

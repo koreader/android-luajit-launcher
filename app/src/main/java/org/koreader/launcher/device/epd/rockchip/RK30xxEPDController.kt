@@ -32,7 +32,7 @@ import java.lang.reflect.Method
 
 abstract class RK30xxEPDController {
     companion object {
-        private const val TAG = "epd"
+        private const val TAG = "EPD"
         private var eInkEnum: Class<Enum<*>>? = null
         private var updateEpdMethod: Method? = null
 
