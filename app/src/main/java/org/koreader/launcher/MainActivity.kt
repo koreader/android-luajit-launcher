@@ -18,6 +18,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import org.koreader.launcher.device.Device
 import org.koreader.launcher.utils.*
+import org.koreader.launcher.extensions.*
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
@@ -70,6 +71,7 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     companion object {
+        private const val PERMISSION_ID_WRITE_STORAGE = 1001
         private const val TAG_SURFACE = "Surface"
         private const val ACTION_SAF_FILEPICKER = 2
         private val BATTERY_FILTER = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
@@ -111,8 +113,9 @@ class MainActivity : NativeActivity(), LuaInterface,
         Log.v(TAG_SURFACE, "Using $surfaceKind implementation")
 
         registerReceiver(event, event.filter)
-        if (!Permissions.hasStoragePermission(this)) {
-            Permissions.requestStoragePermission(this)
+        if (!hasStoragePermissionCompat()) {
+            requestStoragePermissionCompat(PERMISSION_ID_WRITE_STORAGE,
+                resources.getString(R.string.warning_manage_storage))
         }
     }
 
@@ -174,7 +177,7 @@ class MainActivity : NativeActivity(), LuaInterface,
         Array<String>, grantResults: IntArray) {
         Log.d(tag, "onRequestPermissionResult()")
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (Permissions.hasStoragePermission(this)) {
+        if (hasStoragePermissionCompat()) {
             Log.i(tag, String.format(Locale.US,
                     "Permission granted for request code: %d", requestCode))
         } else {
@@ -193,9 +196,9 @@ class MainActivity : NativeActivity(), LuaInterface,
                 if (clipData != null) {
                     for (i in 0 until clipData.itemCount) {
                         val path = clipData.getItemAt(i)
-                        FileUtils.saveAsFile(this, path.uri, importPath)
+                        path.uri.toFile(this, importPath)
                     }
-                } else FileUtils.saveAsFile(this, resultData.data, importPath)
+                } else resultData.data?.toFile(this, importPath)
             }
         }
     }
@@ -218,10 +221,10 @@ class MainActivity : NativeActivity(), LuaInterface,
      *--------------------------------------------------------------*/
 
     override fun canIgnoreBatteryOptimizations(): Boolean {
-        return Permissions.isIgnoringBatteryOptimizations(this)
+        return isIgnoringBatteryOptimizationCompat()
     }
     override fun canWriteSystemSettings(): Boolean {
-        return Permissions.hasWriteSettingsPermission(this)
+        return hasWriteSettingsPermissionCompat()
     }
 
     override fun dictLookup(text: String?, action: String?, nullablePackage: String?) {
@@ -317,13 +320,13 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun getExternalSdPath(): String {
-        return FileUtils.getExtSdcardPath(this)
+        return getSdcardPath() ?: "null"
     }
 
     override fun getFilePathFromIntent(): String? {
         return intent?.let {
             if (it.action == Intent.ACTION_VIEW) {
-                FileUtils.getPathFromUri(this, it.data)
+                it.data.absolutePath(this)
             } else null
         }
     }
@@ -440,7 +443,7 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun hasExternalStoragePermission(): Boolean {
-        return Permissions.hasStoragePermission(this)
+        return hasStoragePermissionCompat()
     }
 
     override fun hasNativeRotation(): Boolean {
@@ -553,11 +556,11 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun requestIgnoreBatteryOptimizations(rationale: String, okButton: String, cancelButton: String) {
-        Permissions.requestIgnoreBatteryOptimizations(this, rationale, okButton, cancelButton)
+        requestIgnoreBatteryOptimizationCompat(rationale, okButton, cancelButton)
     }
 
     override fun requestWriteSystemSettings(rationale: String, okButton: String, cancelButton: String) {
-        Permissions.requestWriteSettingsPermission(this, rationale, okButton, cancelButton)
+        requestWriteSettingsPermissionCompat(rationale, okButton, cancelButton)
     }
 
     override fun safFilePicker(path: String?): Boolean {
