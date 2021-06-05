@@ -2430,17 +2430,13 @@ local function run(android_app_state)
         end)
     end
 
-    android.dumpLogs = function(path)
+    android.dumpLogs = function()
         return JNI:context(android.app.activity.vm, function(jni)
-            local _path = jni.env[0].NewStringUTF(jni.env, path)
-            local ok = jni:callBooleanMethod(
+            jni:callVoidMethod(
                 android.app.activity.clazz,
                 "dumpLogs",
-                "(Ljava/lang/String;)Z",
-                _path
+                "()V"
             )
-            jni.env[0].DeleteLocalRef(jni.env, _path)
-            return ok
         end)
     end
 

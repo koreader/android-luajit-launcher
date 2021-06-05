@@ -19,6 +19,7 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+#include <jni.h>
 #include <stdlib.h>
 
 #ifdef KO_DLOPEN_LUAJIT
@@ -51,7 +52,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 static int window_ready = 0;
 static int gained_focus = 0;
 
-
 static void handle_cmd(struct android_app* app, int32_t cmd) {
     switch (cmd) {
         case APP_CMD_INIT_WINDOW:
@@ -69,6 +69,7 @@ static void handle_cmd(struct android_app* app, int32_t cmd) {
 void android_main(struct android_app* state) {
     lua_State *L;
     AAsset* luaCode;
+    JNIEnv* env;
     const void *buf;
     off_t bufsize;
     int status;
@@ -102,14 +103,14 @@ void android_main(struct android_app* state) {
     luaCode = AAssetManager_open(state->activity->assetManager, LOADER_ASSET, AASSET_MODE_BUFFER);
     if (luaCode == NULL) {
         LOGE("Error loading loader asset");
-        goto quit;
+        goto nativeError;
     }
 
     bufsize = AAsset_getLength(luaCode);
     buf = AAsset_getBuffer(luaCode);
     if (buf == NULL) {
         LOGE("Error getting loader asset buffer");
-        goto quit;
+        goto nativeError;
     }
 
 #ifdef KO_DLOPEN_LUAJIT
@@ -123,7 +124,7 @@ void android_main(struct android_app* state) {
     void* p = mmap(NULL, map_size, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_NORESERVE, -1, 0);
     if (p == MAP_FAILED) {
         LOGE("Error allocating mmap for mcode alloc workaround");
-        goto quit;
+        goto nativeError;
     }
 
     // Resolve everything *now*, and put the symbols in the global scope, much like if we had linked it statically.
@@ -164,7 +165,7 @@ void android_main(struct android_app* state) {
     AAsset_close(luaCode);
     if (status) {
         LOGE("Error loading file: %s", (*lj_lua_tolstring)(L, -1, NULL));
-        goto quit;
+        goto nativeError;
     }
 
     // pass the android_app state to Lua land:
@@ -173,7 +174,7 @@ void android_main(struct android_app* state) {
     status = (*lj_lua_pcall)(L, 1, LUA_MULTRET, 0);
     if (status) {
         LOGE("Failed to run script: %s", (*lj_lua_tolstring)(L, -1, NULL));
-        goto quit;
+        goto nativeError;
     }
 
     (*lj_lua_close)(L);
@@ -186,7 +187,7 @@ void android_main(struct android_app* state) {
     AAsset_close(luaCode);
     if (status) {
         LOGE("Error loading file: %s", lua_tostring(L, -1));
-        goto quit;
+        goto nativeError;
     }
 
     // pass the android_app state to Lua land:
@@ -195,14 +196,27 @@ void android_main(struct android_app* state) {
     status = lua_pcall(L, 1, LUA_MULTRET, 0);
     if (status) {
         LOGE("Failed to run script: %s", lua_tostring(L, -1));
-        goto quit;
+        goto nativeError;
     }
 
     lua_close(L);
 #endif
 
-quit:
+nativeError:
     LOGE("Stopping due to previous errors");
+    JavaVM* vm = state->activity->vm;
+    int jni_status = (*vm)->GetEnv(vm, (void **)&env, JNI_VERSION_1_6);
+    if ((jni_status == JNI_OK) || ((jni_status == JNI_EDETACHED)
+        && ((*vm)->AttachCurrentThread(vm, &env, NULL) == 0)))
+    {
+        jclass clazz = (*env)->GetObjectClass(env, state->activity->clazz);
+        jmethodID method = (*env)->GetMethodID(env, clazz, "onNativeCrash", "()V");
+        (*env)->CallVoidMethod(env, state->activity->clazz, method);
+        if ((*env)->ExceptionCheck(env)) {
+             (*env)->ExceptionClear(env);
+        }
+        (*vm)->DetachCurrentThread(vm);
+    }
     ANativeActivity_finish(state->activity);
     exit(1);
 }

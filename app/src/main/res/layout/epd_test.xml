@@ -9,14 +9,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical" >
-
         <TextView
-            android:id="@+id/readmeFirst"
+            android:layout_width="fill_parent"
+            android:layout_height="12dp" />
+        <TextView
+            android:id="@+id/title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textSize="24sp"
             android:gravity="center_horizontal"
-            android:textSize="26sp"
-            android:text="@string/epdtest_title" />
+            android:text="@string/epd_test_title" />
 
         <TextView
             android:layout_width="fill_parent"
@@ -27,14 +29,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
-            android:textSize="18sp" />
+            android:textSize="14sp"
+            android:text="@string/epd_test_rk30xx_info" />
 
         <Button
             android:id="@+id/rk30xxButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/epdtest_rk30xx_button"
-            android:textSize="28sp" />
+            android:text="@string/epd_test_rk30xx_button" />
 
         <TextView
             android:layout_width="fill_parent"
@@ -45,14 +47,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
-            android:textSize="18sp" />
+            android:textSize="14sp"
+            android:text="@string/epd_test_rk33xx_info" />
 
         <Button
             android:id="@+id/rk33xxButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/epdtest_rk33xx_button"
-            android:textSize="28sp" />
+            android:text="@string/epd_test_rk33xx_button" />
 
         <TextView
             android:layout_width="fill_parent"
@@ -63,14 +65,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
-            android:textSize="18sp" />
+            android:textSize="14sp"
+            android:text="@string/epd_test_ntx_info" />
 
         <Button
             android:id="@+id/ntxNewButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/epdtest_ntx_button"
-            android:textSize="28sp" />
+            android:text="@string/epd_test_ntx_button" />
 
         <TextView
             android:layout_width="fill_parent"
@@ -81,14 +83,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
-            android:textSize="18sp" />
+            android:textSize="14sp"
+            android:text="@string/epd_test_qualcomm_info" />
 
         <Button
             android:id="@+id/qualcommButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/epdtest_qualcomm_button"
-            android:textSize="28sp" />
+            android:text="@string/epd_test_qualcomm_button" />
 
         <TextView
             android:layout_width="fill_parent"
@@ -99,7 +101,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
-            android:textSize="22sp" />
+            android:textSize="14sp"
+            android:text="@string/epd_test_about" />
 
         <TextView
             android:layout_width="fill_parent"
@@ -107,7 +110,7 @@
 
         <ImageView
             android:src="@android:drawable/divider_horizontal_dark"
-            android:contentDescription="@string/epdtest_divisor"
+            android:contentDescription="@string/divisor"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:scaleType="fitXY"
@@ -122,13 +125,12 @@
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:text=""
-            android:textSize="20sp" />
+            android:textSize="16sp" />
 
         <Button
             android:id="@+id/shareButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/epdtest_share_results"
-            android:textSize="28sp" />
+            android:text="@string/epd_test_share_button" />
     </LinearLayout>
 </ScrollView>
