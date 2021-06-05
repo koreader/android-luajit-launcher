@@ -1,4 +1,5 @@
 # proguard is used to shrink and optimize dependencies.
+-dontobfuscate
 -keep class org.koreader.launcher.** { *; }
 
 # keep kotlin.Metadata annotations

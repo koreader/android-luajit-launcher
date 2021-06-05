@@ -43,7 +43,7 @@ object Permissions {
     fun requestStoragePermission(activity: Activity) {
         return if (newStoragePermissions(activity)) {
             val intent = Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
-            val rationale = activity.resources.getString(R.string.warning_manage_storage)
+            val rationale = activity.resources.getString(R.string.permission_manage_storage)
             requestSpecialPermission(activity, intent, rationale, null, null)
         } else {
             val perm = Manifest.permission.WRITE_EXTERNAL_STORAGE

@@ -18,6 +18,10 @@
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowFullscreen">true</item>
     </style>
+    <style name="NoTitle" parent="@style/Theme.AppCompat.Light">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
     <style name="SplashScreen" parent="Fullscreen">
         <item name="android:windowBackground">@drawable/splash_icon</item>
     </style>

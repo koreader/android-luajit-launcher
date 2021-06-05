@@ -7,11 +7,16 @@
 package org.koreader.launcher.device
 
 import android.os.Build
-import java.util.*
 import kotlin.collections.HashMap
+import java.util.Locale
 
 object DeviceInfo {
+    val MANUFACTURER: String
+    val BRAND: String
+    val MODEL: String
+    val DEVICE: String
     val PRODUCT: String
+    val HARDWARE: String
     val EINK_FREESCALE: Boolean
     val EINK_ROCKCHIP: Boolean
     val EINK_QCOM: Boolean
@@ -21,10 +26,6 @@ object DeviceInfo {
     val BUG_SCREEN_ROTATION: Boolean
     val NEEDS_VIEW: Boolean
 
-    private val MANUFACTURER: String
-    private val BRAND: String
-    private val MODEL: String
-    private val DEVICE: String
     private val BOYUE_T61: Boolean
     private val BOYUE_T62: Boolean
     private val BOYUE_T65S: Boolean
@@ -98,6 +99,7 @@ object DeviceInfo {
         MODEL = lowerCase(getBuildField("MODEL"))
         DEVICE = lowerCase(getBuildField("DEVICE"))
         PRODUCT = lowerCase(getBuildField("PRODUCT"))
+        HARDWARE = lowerCase(getBuildField("HARDWARE"))
         IS_BOYUE = MANUFACTURER.contentEquals("boeye") || MANUFACTURER.contentEquals("boyue")
 
         // --------------- device probe --------------- //

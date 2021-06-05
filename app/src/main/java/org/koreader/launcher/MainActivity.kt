@@ -4,7 +4,11 @@ import android.annotation.SuppressLint
 import android.annotation.TargetApi
 import android.app.Activity
 import android.app.NativeActivity
-import android.content.*
+import android.content.ClipboardManager
+import android.content.ClipData
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.BatteryManager
@@ -12,16 +16,22 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
-import android.view.*
+import android.view.DisplayCutout
+import android.view.SurfaceHolder
+import android.view.SurfaceView
+import android.view.View
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import org.koreader.launcher.device.Device
-import org.koreader.launcher.utils.*
-import java.io.BufferedReader
-import java.io.File
-import java.io.InputStreamReader
-import java.util.*
+import org.koreader.launcher.utils.ArchiveUtils
+import org.koreader.launcher.utils.FileUtils
+import org.koreader.launcher.utils.IntentUtils
+import org.koreader.launcher.utils.NetworkUtils
+import org.koreader.launcher.utils.Permissions
+import org.koreader.launcher.utils.ScreenUtils
+import java.util.Locale
 
 class MainActivity : NativeActivity(), LuaInterface,
     ActivityCompat.OnRequestPermissionsResultCallback{
@@ -86,13 +96,13 @@ class MainActivity : NativeActivity(), LuaInterface,
 
     /* Called when the activity is first created. */
     override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         assets = Assets()
         device = Device(this)
         timeout = Timeout()
         event = EventReceiver()
         updater = ApkUpdater()
 
-        super.onCreate(savedInstanceState)
         setTheme(R.style.Fullscreen)
 
         // Window background must be black for vertical and horizontal lines to be visible
@@ -214,6 +224,16 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     /*---------------------------------------------------------------
+     *                         native callbacks                     *
+     *--------------------------------------------------------------*/
+
+    /* Called when the main thread is about to exit because of an error */
+    @Suppress("unused")
+    fun onNativeCrash() {
+        MainApp.crashReport(this.applicationContext)
+    }
+
+    /*---------------------------------------------------------------
      *             override methods used by lua/JNI                *
      *--------------------------------------------------------------*/
 
@@ -252,22 +272,8 @@ class MainActivity : NativeActivity(), LuaInterface,
         return updater.download(this, url, name)
     }
 
-    override fun dumpLogs(path: String): Boolean {
-        return try {
-            File(path).printWriter().use { log ->
-                val proc = Runtime.getRuntime().exec("logcat -d")
-                val buffer = BufferedReader(InputStreamReader(proc.inputStream))
-                while (true) {
-                    buffer.readLine()?.let { line ->
-                        log.println(line)
-                    } ?: break
-                }
-            }
-            true
-        } catch (e: Exception) {
-            e.printStackTrace()
-            false
-        }
+    override fun dumpLogs() {
+        MainApp.dumpLogcat()
     }
 
     override fun einkUpdate(mode: Int) {

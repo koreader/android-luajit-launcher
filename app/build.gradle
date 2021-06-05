@@ -20,6 +20,10 @@ android {
         buildConfigField "boolean", "SUPPORTS_RUNTIME_CHANGES", "false"
     }
 
+    viewBinding {
+        enabled = true
+    }
+
     sourceSets {
         main {
             assets.srcDirs = [ '../assets' ]
