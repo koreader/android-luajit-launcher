@@ -10,6 +10,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.graphics.PixelFormat
 import android.net.Uri
 import android.os.BatteryManager
 import android.os.Build
@@ -25,12 +26,8 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import org.koreader.launcher.device.Device
-import org.koreader.launcher.utils.ArchiveUtils
-import org.koreader.launcher.utils.FileUtils
-import org.koreader.launcher.utils.IntentUtils
-import org.koreader.launcher.utils.NetworkUtils
-import org.koreader.launcher.utils.Permissions
-import org.koreader.launcher.utils.ScreenUtils
+import org.koreader.launcher.extensions.*
+import java.io.File
 import java.util.Locale
 
 class MainActivity : NativeActivity(), LuaInterface,
@@ -71,7 +68,7 @@ class MainActivity : NativeActivity(), LuaInterface,
         override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
             Log.v(TAG_SURFACE, String.format(Locale.US,
                 "surface changed {\n  width:  %d\n  height: %d\n format: %s\n}",
-                width, height, ScreenUtils.pixelFormatName(format))
+                width, height, pixelFormatName(format))
             )
         }
         override fun surfaceDestroyed(holder: SurfaceHolder) {
@@ -84,6 +81,22 @@ class MainActivity : NativeActivity(), LuaInterface,
         private const val ACTION_SAF_FILEPICKER = 2
         private val BATTERY_FILTER = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
         private val RUNTIME_VERSION = Build.VERSION.RELEASE
+
+        @JvmStatic
+        private fun pixelFormatName(format: Int): String {
+            return when(format) {
+                PixelFormat.OPAQUE -> "OPAQUE"
+                PixelFormat.RGBA_1010102 -> "RGBA_1010102"
+                PixelFormat.RGBA_8888 -> "RGBA_8888"
+                PixelFormat.RGBA_F16 -> "RGBA_F16"
+                PixelFormat.RGBX_8888 -> "RGBX_8888"
+                PixelFormat.RGB_888 -> "RGB_888"
+                PixelFormat.RGB_565 -> "RGB_565"
+                PixelFormat.TRANSLUCENT -> "TRANSLUCENT"
+                PixelFormat.TRANSPARENT -> "TRANSPARENT"
+                else -> String.format(Locale.US, "Unknown: %d", format)
+            }
+        }
     }
 
     init {
@@ -121,8 +134,8 @@ class MainActivity : NativeActivity(), LuaInterface,
         Log.v(TAG_SURFACE, "Using $surfaceKind implementation")
 
         registerReceiver(event, event.filter)
-        if (!Permissions.hasStoragePermission(this)) {
-            Permissions.requestStoragePermission(this)
+        if (!hasStoragePermissionCompat()) {
+            requestStoragePermissionCompat(resources.getString(R.string.permission_manage_storage))
         }
     }
 
@@ -149,7 +162,7 @@ class MainActivity : NativeActivity(), LuaInterface,
     override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
         Log.v(TAG_SURFACE, String.format(Locale.US,
             "surface changed {\n  width:  %d\n  height: %d\n format: %s\n}",
-            width, height, ScreenUtils.pixelFormatName(format))
+            width, height, pixelFormatName(format))
         )
         super.surfaceChanged(holder, format, width, height)
         drawSplashScreen(holder)
@@ -184,7 +197,7 @@ class MainActivity : NativeActivity(), LuaInterface,
         Array<String>, grantResults: IntArray) {
         Log.d(tag, "onRequestPermissionResult()")
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (Permissions.hasStoragePermission(this)) {
+        if (hasStoragePermissionCompat()) {
             Log.i(tag, String.format(Locale.US,
                     "Permission granted for request code: %d", requestCode))
         } else {
@@ -203,9 +216,9 @@ class MainActivity : NativeActivity(), LuaInterface,
                 if (clipData != null) {
                     for (i in 0 until clipData.itemCount) {
                         val path = clipData.getItemAt(i)
-                        FileUtils.saveAsFile(this, path.uri, importPath)
+                        path.uri.toFile(this, importPath)
                     }
-                } else FileUtils.saveAsFile(this, resultData.data, importPath)
+                } else resultData.data?.toFile(this, importPath)
             }
         }
     }
@@ -238,31 +251,23 @@ class MainActivity : NativeActivity(), LuaInterface,
      *--------------------------------------------------------------*/
 
     override fun canIgnoreBatteryOptimizations(): Boolean {
-        return Permissions.isIgnoringBatteryOptimizations(this)
+        return isIgnoringBatteryOptimizationCompat()
     }
     override fun canWriteSystemSettings(): Boolean {
-        return Permissions.hasWriteSettingsPermission(this)
+        return hasWriteSettingsPermissionCompat()
     }
 
     override fun dictLookup(text: String?, action: String?, nullablePackage: String?) {
         text?.let { lookupText ->
             action?.let { lookupAction ->
-                val intent: Intent? = when (lookupAction) {
-                    // generic actions used by a lot of apps
-                    "send" ->  Intent(IntentUtils.getSendTextIntent(lookupText, nullablePackage))
-                    "search" -> Intent(IntentUtils.getSearchTextIntent(text, nullablePackage))
-                    "text" ->  Intent(IntentUtils.getProcessTextIntent(text, nullablePackage))
-                    // actions for specific apps
-                    "aard2" ->  Intent(IntentUtils.getAard2Intent(text))
-                    "colordict" -> Intent(IntentUtils.getColordictIntent(text, nullablePackage))
-                    "quickdic" -> Intent(IntentUtils.getQuickdicIntent(text))
-                    else -> null
-                }
-                intent?.let {
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
-                    if (!startActivityIfSafe(intent)) {
-                        Log.e(tag, "invalid lookup: can't find a package able to resolve $lookupAction")
-                    }
+                when (lookupAction) {
+                    "aard2" ->  aardLookup(lookupText)
+                    "colordict" -> colordictLookup(lookupText, nullablePackage)
+                    "quickdic" ->  quickdicLookup(lookupText)
+                    "search" -> searchText(lookupText, nullablePackage)
+                    "send" ->  sendText(lookupText, nullablePackage)
+                    "text" ->  processText(lookupText, nullablePackage)
+                    else -> Log.w(tag, "Unsupported action $lookupAction")
                 }
             } ?: Log.e(tag, "invalid lookup: no action")
         } ?: Log.e(tag, "invalid lookup: no text")
@@ -323,13 +328,13 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun getExternalSdPath(): String {
-        return FileUtils.getExtSdcardPath(this)
+        return getSdcardPath() ?: "null"
     }
 
     override fun getFilePathFromIntent(): String? {
         return intent?.let {
             if (it.action == Intent.ACTION_VIEW) {
-                FileUtils.getPathFromUri(this, it.data)
+                it.data?.absolutePath(this)
             } else null
         }
     }
@@ -353,7 +358,7 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun getNetworkInfo(): String {
-        return NetworkUtils.getNetworkInfo(this)
+        return networkInfo()
     }
 
     override fun getPlatformName(): String {
@@ -365,11 +370,11 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun getScreenAvailableHeight(): Int {
-        return ScreenUtils.getScreenAvailableHeight(this)
+        return getAvailableHeight()
     }
 
     override fun getScreenAvailableWidth(): Int {
-        return ScreenUtils.getScreenAvailableWidth(this)
+        return getAvailableWidth()
     }
 
     override fun getScreenBrightness(): Int {
@@ -382,12 +387,12 @@ class MainActivity : NativeActivity(), LuaInterface,
             // NOTE: getScreenAvailableHeight does it automatically, but it also excludes the nav bar, when there's one :/
             if (device.getScreenOrientation(this).and(1) == 0) {
                 // getScreenOrientation returns LinuxFB rotation constants, Portrait rotations are always even
-                ScreenUtils.getScreenHeight(this) - topInsetHeight
+                getHeight() - topInsetHeight
             } else {
-                ScreenUtils.getScreenHeight(this)
+                getHeight()
             }
         } else {
-            ScreenUtils.getScreenHeight(this)
+            getHeight()
         }
     }
 
@@ -421,17 +426,17 @@ class MainActivity : NativeActivity(), LuaInterface,
             // NOTE: getScreenAvailableWidth does it automatically, but it also excludes the nav bar, when there's one :/
             if (device.getScreenOrientation(this).and(1) == 1) {
                 // getScreenOrientation returns LinuxFB rotation constants, Landscape rotations are always odd
-                ScreenUtils.getScreenWidth(this) - topInsetHeight
+                getWidth() - topInsetHeight
             } else {
-                ScreenUtils.getScreenWidth(this)
+                getWidth()
             }
         } else {
-            ScreenUtils.getScreenWidth(this)
+            getWidth()
         }
     }
 
     override fun getStatusBarHeight(): Int {
-        return ScreenUtils.getStatusBarHeight(this)
+        return getBarHeight()
     }
 
     override fun getVersion(): String {
@@ -446,7 +451,7 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun hasExternalStoragePermission(): Boolean {
-        return Permissions.hasStoragePermission(this)
+        return hasStoragePermissionCompat()
     }
 
     override fun hasNativeRotation(): Boolean {
@@ -494,7 +499,7 @@ class MainActivity : NativeActivity(), LuaInterface,
             Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR1) {
             fullscreen
         } else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.JELLY_BEAN) {
-            ScreenUtils.isFullscreenDeprecated(this)
+            isFullscreenDeprecated()
         } else {
             false
         }
@@ -536,10 +541,16 @@ class MainActivity : NativeActivity(), LuaInterface,
         return device.needsWakelocks
     }
 
-    override fun openLink(url: String): Int {
+    override fun openLink(url: String): Boolean {
         val webpage = Uri.parse(url)
         val intent = Intent(Intent.ACTION_VIEW, webpage)
-        return if (startActivityIfSafe(intent)) 0 else 1
+        return try {
+            startActivity(intent)
+            true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
     }
 
     override fun openWifiSettings() {
@@ -559,27 +570,23 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun requestIgnoreBatteryOptimizations(rationale: String, okButton: String, cancelButton: String) {
-        Permissions.requestIgnoreBatteryOptimizations(this, rationale, okButton, cancelButton)
+        requestIgnoreBatteryOptimizationCompat(rationale, okButton, cancelButton)
     }
 
     override fun requestWriteSystemSettings(rationale: String, okButton: String, cancelButton: String) {
-        Permissions.requestWriteSettingsPermission(this, rationale, okButton, cancelButton)
+        requestWriteSettingsPermissionCompat(rationale, okButton, cancelButton)
     }
 
     override fun safFilePicker(path: String?): Boolean {
         lastImportedPath = path
         return path?.let { _ ->
-            IntentUtils.safIntent?.let {
-                intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
-                startActivityForResult(it, ACTION_SAF_FILEPICKER)
-                true
-            }?: false
+            filePicker(ACTION_SAF_FILEPICKER)
         } ?: false
     }
 
     override fun sendText(text: String?) {
         text?.let {
-            startActivityIfSafe(IntentUtils.getSendTextIntent(it, null))
+            sendText(it, null, null)
         }
     }
 
@@ -593,7 +600,7 @@ class MainActivity : NativeActivity(), LuaInterface,
             Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR1) {
             fullscreen = enabled
         } else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.JELLY_BEAN) {
-            ScreenUtils.setFullscreenDeprecated(this, enabled)
+            setFullscreenDeprecated(enabled)
         }
     }
 
@@ -642,7 +649,7 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun untar(filePath: String, outputPath: String): Boolean {
-        return ArchiveUtils.untar(filePath, outputPath)
+        return File(filePath).uncompress(outputPath)
     }
 
     /*---------------------------------------------------------------

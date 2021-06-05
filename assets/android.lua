@@ -2394,14 +2394,14 @@ local function run(android_app_state)
     android.openLink = function(link)
         return JNI:context(android.app.activity.vm, function(jni)
             local uri_string = jni.env[0].NewStringUTF(jni.env, link)
-            local result = jni:callIntMethod(
+            local ok = jni:callBooleanMethod(
                 android.app.activity.clazz,
                 "openLink",
-                "(Ljava/lang/String;)I",
+                "(Ljava/lang/String;)Z",
                 uri_string
             )
             jni.env[0].DeleteLocalRef(jni.env, uri_string)
-            return result
+            return ok
         end)
     end
 
