@@ -9,6 +9,7 @@ import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import androidx.core.content.ContextCompat
+import org.koreader.launcher.extensions.symlink
 import java.io.*
 
 class Assets {
@@ -78,6 +79,25 @@ class Assets {
                             } catch (e: Exception) {
                                 Log.e(tag, "Error extracting 7z file: $e")
                                 return false
+                            }
+                        }
+                        (assetName == "module/map.txt") -> {
+                            /* Symlink binaries stored as shared libraries */
+                            val nativeLibsDir = activity.applicationInfo.nativeLibraryDir
+                            activity.assets.open(assetName).bufferedReader().use { text ->
+                                Log.v(tag, "Reading symlinks map from $assetName")
+                                text.forEachLine { line ->
+                                    try {
+                                        val array = line.split(" ").toTypedArray()
+                                        if (array.size == 2) {
+                                            val link = "$filesDir/${array[0]}"
+                                            val file = "$nativeLibsDir/${array[1]}"
+                                            File(file).symlink(link)
+                                        }
+                                    } catch (e: Exception) {
+                                        e.printStackTrace()
+                                    }
+                                }
                             }
                         }
                         else -> {

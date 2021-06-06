@@ -8,11 +8,10 @@ project.properties
 *.iml
 
 bin
+libs
 build
 app/.*
 app/build
 assets/libs
 assets/module
 jni/luajit/build
-tests/einkTest/build
-tests/einkTest/src/org/koreader/test/eink/*EPDController.java

@@ -5,34 +5,29 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
     <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="12dp" />
-    <TextView
         android:id="@+id/title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="24sp"
+        android:layout_marginTop="8sp"
+        android:textSize="@dimen/title"
         android:gravity="center_horizontal" />
     <TextView
         android:id="@+id/reason"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="16sp"
+        android:textSize="@dimen/subtitle"
         android:gravity="center_horizontal" />
     <TextView
         android:id="@+id/bomb"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/unicode_bomb"
-        android:textSize="60sp"
-        android:gravity="center_horizontal" />
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="12dp" />
+        android:textSize="@dimen/bomb"
+        android:gravity="top|center_horizontal"/>
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" >
+        android:layout_weight="1">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -43,7 +38,14 @@
                 android:layout_height="wrap_content"
                 android:textSize="12sp"
                 android:textAlignment="textStart"
-                android:gravity="start" />
+                android:gravity="start"
+                android:fontFamily="monospace"
+                android:layout_marginTop="8sp"
+                android:layout_marginBottom="8sp"
+                android:layout_marginLeft="4sp"
+                android:layout_marginStart="4sp"
+                android:layout_marginRight="4sp"
+                android:layout_marginEnd="4sp" />
         </LinearLayout>
     </ScrollView>
     <RelativeLayout
@@ -54,7 +56,7 @@
             android:id="@+id/shareReport"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/crash_report_share_button" />
+            android:text="@string/common_share_button" />
     </RelativeLayout>
 </LinearLayout>
 

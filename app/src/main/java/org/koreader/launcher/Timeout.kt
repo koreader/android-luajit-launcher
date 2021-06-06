@@ -7,13 +7,14 @@ import android.view.WindowManager
 import java.util.*
 
 class Timeout {
+    private val tag = this::class.java.simpleName
+
     private var appTimeout: Int = 0
     private var systemTimeout: Int = 0
     private var alwaysOn: Boolean = false
     private var customTimeout: Boolean = false
 
     companion object {
-        private const val TAG = "TimeoutHelper"
         private const val SCREEN_ON_ENABLED = -1
         private const val SCREEN_ON_DISABLED = 0
         private const val TIMEOUT_MIN = 2 * 60 * 1000
@@ -33,7 +34,7 @@ class Timeout {
             Settings.System.getInt(activity.applicationContext.contentResolver,
                 Settings.System.SCREEN_OFF_TIMEOUT)
         } catch (e: Exception) {
-            Log.w(TAG, e.toString())
+            Log.w(tag, e.toString())
             0
         }
     }
@@ -45,7 +46,7 @@ class Timeout {
                 customTimeout = true
                 appTimeout = safeTimeout(ms)
                 val mins = toMin(appTimeout)
-                Log.v(TAG, "applying activity custom timeout: $mins minutes")
+                Log.v(tag, "applying activity custom timeout: $mins minutes")
                 setSystemScreenOffTimeout(activity, appTimeout)
                 setScreenOn(activity, false)
             }
@@ -79,30 +80,30 @@ class Timeout {
         val logMsg = if (resumed) "onResume" else "onPause"
         if (resumed) {
             systemTimeout = getSystemScreenOffTimeout(activity)
-            Log.v(TAG, String.format(Locale.US,
+            Log.v(tag, String.format(Locale.US,
                 "%s: updating system timeout: %s", logMsg, toMin(systemTimeout)))
         }
         if (resumed && customTimeout) {
             if (appTimeout > 0) {
-                Log.v(TAG, String.format(Locale.US,
+                Log.v(tag, String.format(Locale.US,
                     "%s: applying custom timeout: %s", logMsg, toMin(appTimeout)))
 
                 val safe = safeTimeout(appTimeout)
                 setSystemScreenOffTimeout(activity, safe)
             } else {
-                Log.w(TAG, "$logMsg: custom timeout is 0, ignoring")
+                Log.w(tag, "$logMsg: custom timeout is 0, ignoring")
             }
         } else if (!resumed && customTimeout) {
             if (systemTimeout > 0) {
-                Log.v(TAG, String.format(Locale.US,
+                Log.v(tag, String.format(Locale.US,
                     "applying system timeout: %s", toMin(systemTimeout)))
 
                 setSystemScreenOffTimeout(activity, systemTimeout)
             } else {
-                Log.w(TAG, "$logMsg: system timeout is 0, ignoring")
+                Log.w(tag, "$logMsg: system timeout is 0, ignoring")
             }
         } else {
-            Log.v(TAG, logMsg)
+            Log.v(tag, logMsg)
         }
     }
 
@@ -116,12 +117,12 @@ class Timeout {
 
     private fun setScreenOn(activity: Activity, enable: Boolean) {
         if (enable != alwaysOn) {
-            Log.v(TAG, "screen on: switching to $enable")
+            Log.v(tag, "screen on: switching to $enable")
             alwaysOn = enable
             val flag = WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
             val action = if (enable) "add" else "clear"
             activity.runOnUiThread {
-                Log.v(TAG, "$action FLAG_KEEP_SCREEN_ON")
+                Log.v(tag, "$action FLAG_KEEP_SCREEN_ON")
                 if (enable) activity.window.addFlags(flag) else activity.window.clearFlags(flag)
             }
         }
@@ -133,7 +134,7 @@ class Timeout {
             Settings.System.putInt(activity.applicationContext.contentResolver,
                 Settings.System.SCREEN_OFF_TIMEOUT, timeout)
         } catch (e: Exception) {
-            Log.w(TAG, "$e")
+            Log.w(tag, "$e")
         }
     }
 

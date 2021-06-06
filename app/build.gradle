@@ -23,7 +23,12 @@ android {
     sourceSets {
         main {
             assets.srcDirs = [ '../assets' ]
+            jniLibs.srcDirs = [ '../libs' ]
         }
+    }
+
+    dependenciesInfo {
+        includeInApk = false
     }
 
     externalNativeBuild {
@@ -83,11 +88,19 @@ android {
 
     compileOptions {
         coreLibraryDesugaringEnabled true
-        kotlinOptions.freeCompilerArgs += ['-module-name', projectName.toLowerCase()]
     }
 
     packagingOptions {
-        exclude 'META-INF/*.version'
+        exclude '/kotlin/**.kotlin_builtins'
+        exclude '/kotlin/**.kotlin_metadata'
+        exclude '/META-INF/**.kotlin_module'
+        exclude '/META-INF/**.version'
+    }
+
+    lintOptions {
+        xmlReport false
+        htmlReport false
+        disable 'QueryAllPackagesPermission'
     }
 
     applicationVariants.all { variant ->
