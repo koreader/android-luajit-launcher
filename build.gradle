@@ -1,6 +1,6 @@
 buildscript {
     ext.compileSdk = 30
-    ext.targetSdk = 28
+    ext.targetSdk = 30
     ext.minSdk64 = 21
     ext.minSdk = 14
 

@@ -1,10 +1,33 @@
 package org.koreader.launcher.extensions
 
+import android.os.Build
+import android.system.Os
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
 import org.apache.commons.compress.compressors.lzma.LZMACompressorInputStream
 import java.io.*
+
+fun File.symlink(link: String): Boolean {
+    if (!this.exists()) return false
+    try {
+        File(link).delete()
+    } catch (e: IOException) {}
+    try {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Os.symlink(this.absolutePath, link)
+            return true
+        }
+        val os = Class.forName("libcore.io.Libcore").getDeclaredField("os")
+        os.isAccessible = true
+        os.get(null).javaClass.getMethod("symlink", String::class.java,
+            String::class.java).invoke(os, this.absolutePath, link)
+        return true
+    } catch (e: Exception) {
+        e.printStackTrace()
+        return false
+    }
+}
 
 fun File.uncompress(extract_to: String, deleteIfOk: Boolean = false): Boolean {
     val success = try {

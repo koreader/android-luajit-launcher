@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="crash_report_share_button">Share crash report</string>
-    <string name="divisor" translatable="false"> </string>
-    <string name="epd_test_about">Did you see a flashing black to white eink update? Cool
-        Go to github.com/koreader/koreader/issues/4551 and share the following information with us </string>
-    <string name="epd_test_ntx_info">This button should work on modern Tolinos/Nooks and other ntx boards</string>
-    <string name="epd_test_ntx_button">freescale/ntx update</string>
-    <string name="epd_test_qualcomm_info">This button should work on some Onyx Boox devices. At least qualcomm ones</string>
-    <string name="epd_test_qualcomm_button">qualcomm/onyx update</string>
-    <string name="epd_test_rk30xx_info">This button should invoke a full refresh of Boyue T61/T62 clones.</string>
-    <string name="epd_test_rk30xx_button">rk30xx update</string>
-    <string name="epd_test_rk33xx_info">This button should work on boyue rk3368 clones.</string>
-    <string name="epd_test_rk33xx_button">rk33xx update</string>
-    <string name="epd_test_share_button">Share EPD test results</string>
+    <!-- translate -->
+    <string name="common_share_button">Share</string>
+    <string name="common_share_rationale">Send report to</string>
     <string name="epd_test_title">EPD Test</string>
+    <string name="epd_test_question">Did you see a flashing black to white eink update?</string>
+    <string name="epd_test_instructions">Go to github.com/koreader/koreader/issues/4551 and share the following information with us</string>
+    <string name="epd_test_description">Supported platforms</string>
+    <string name="no_crash_attached">No crash report attached</string>
     <string name="permission_manage_storage">Please allow the app to manage all files.</string>
+
+    <!-- don't translate -->
+    <string name="epd_test_ntx_button" translatable="false">NTX</string>
+    <string name="epd_test_qualcomm_button" translatable="false">Qualcomm</string>
+    <string name="epd_test_rk30xx_button" translatable="false">Rockchip 30xx</string>
+    <string name="epd_test_rk33xx_button" translatable="false">Rockchip 33xx</string>
     <string name="unicode_bomb" translatable="false">💣</string>
 </resources>

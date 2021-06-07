@@ -120,7 +120,7 @@ example: update clean build-luajit
 	find app/build/outputs/apk/ -type f -name '*.apk' -exec mv -v {} bin/ \;
 
 lint:
-	./gradlew $(LINT_TASK)Release
+	./gradlew -PndkCustomPath=$(ANDROID_NDK_FULLPATH) $(LINT_TASK)Release
 
 clean:
 	@echo "Cleaning binaries, assets and LuaJIT build"

@@ -1,136 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true" >
-
-    <LinearLayout
+    android:orientation="vertical" >
+    <TextView
+        android:id="@+id/title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical" >
-        <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="12dp" />
-        <TextView
-            android:id="@+id/title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="24sp"
-            android:gravity="center_horizontal"
-            android:text="@string/epd_test_title" />
+        android:layout_marginTop="@dimen/title"
+        android:textSize="@dimen/title"
+        android:gravity="center_horizontal"
+        android:text="@string/epd_test_title" />
 
-        <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="12dp" />
+    <TextView
+        android:id="@+id/description"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/subtitle"
+        android:gravity="center_horizontal"
+        android:textSize="@dimen/subtitle"
+        android:text="@string/epd_test_description" />
 
-        <TextView
-            android:id="@+id/rk30xxText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:textSize="14sp"
-            android:text="@string/epd_test_rk30xx_info" />
+    <Button
+        android:id="@+id/ntxNewButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/epd_test_ntx_button" />
+    <Button
+        android:id="@+id/qualcommButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/epd_test_qualcomm_button" />
 
-        <Button
-            android:id="@+id/rk30xxButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/epd_test_rk30xx_button" />
+    <Button
+        android:id="@+id/rk30xxButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/epd_test_rk30xx_button" />
+    <Button
+        android:id="@+id/rk33xxButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/epd_test_rk33xx_button" />
 
-        <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="12dp" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/subtitle"
+        android:gravity="center_horizontal"
+        android:textSize="16sp"
+        android:text="@string/epd_test_question" />
 
-        <TextView
-            android:id="@+id/rk33xxText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:textSize="14sp"
-            android:text="@string/epd_test_rk33xx_info" />
+    <TextView
+        android:id="@+id/instructions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:layout_marginTop="10sp"
+        android:text="@string/epd_test_instructions" />
 
-        <Button
-            android:id="@+id/rk33xxButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/epd_test_rk33xx_button" />
-
-        <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="12dp" />
-
-        <TextView
-            android:id="@+id/ntxNewText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:textSize="14sp"
-            android:text="@string/epd_test_ntx_info" />
-
-        <Button
-            android:id="@+id/ntxNewButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/epd_test_ntx_button" />
-
-        <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="12dp" />
-
-        <TextView
-            android:id="@+id/qualcommText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:textSize="14sp"
-            android:text="@string/epd_test_qualcomm_info" />
-
-        <Button
-            android:id="@+id/qualcommButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/epd_test_qualcomm_button" />
-
-        <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="18dp" />
-
-        <TextView
-            android:id="@+id/readmeReport"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:textSize="14sp"
-            android:text="@string/epd_test_about" />
-
-        <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="12dp" />
-
-        <ImageView
-            android:src="@android:drawable/divider_horizontal_dark"
-            android:contentDescription="@string/divisor"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:scaleType="fitXY"
-            android:paddingLeft="5dp"
-            android:paddingRight="5dp"
-            android:paddingBottom="2dp"
-            android:paddingTop="2dp" />
-
-        <TextView
-            android:id="@+id/info"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:text=""
-            android:textSize="16sp" />
-
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" >
+            <TextView
+                android:id="@+id/info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text=""
+                android:textSize="16sp" />
+    </ScrollView>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0" >
         <Button
             android:id="@+id/shareButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/epd_test_share_button" />
-    </LinearLayout>
-</ScrollView>
+            android:text="@string/common_share_button" />
+    </RelativeLayout>
+</LinearLayout>
+
+
