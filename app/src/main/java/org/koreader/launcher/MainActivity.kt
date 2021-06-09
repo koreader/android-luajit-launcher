@@ -3,6 +3,7 @@ package org.koreader.launcher
 import android.annotation.SuppressLint
 import android.annotation.TargetApi
 import android.app.Activity
+import android.app.Dialog
 import android.app.NativeActivity
 import android.content.ClipboardManager
 import android.content.ClipData
@@ -17,11 +18,8 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
-import android.view.DisplayCutout
-import android.view.SurfaceHolder
-import android.view.SurfaceView
-import android.view.View
-import android.view.WindowManager
+import android.view.*
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -56,6 +54,9 @@ class MainActivity : NativeActivity(), LuaInterface,
     // Splashscreen is active
     private var splashScreen: Boolean = true
 
+    // Assets extracted
+    private var assetsOk: Boolean = false
+
     // surface used on devices that need a view
     private var view: NativeSurfaceView? = null
     private class NativeSurfaceView(context: Context): SurfaceView(context),
@@ -73,6 +74,37 @@ class MainActivity : NativeActivity(), LuaInterface,
         }
         override fun surfaceDestroyed(holder: SurfaceHolder) {
             Log.v(TAG_SURFACE, "surface destroyed")
+        }
+    }
+
+    /* dialog used while extracting assets from zip */
+    private var dialog: FramelessProgressDialog? = null
+    private class FramelessProgressDialog private constructor(context: Context):
+        Dialog(context, R.style.FramelessDialog) {
+        companion object {
+            fun show(context: Context, title: CharSequence): FramelessProgressDialog {
+                val dialog = FramelessProgressDialog(context)
+                dialog.setTitle(title)
+                dialog.setCancelable(false)
+                dialog.setOnCancelListener(null)
+                dialog.window?.setGravity(Gravity.BOTTOM)
+                val progressBar = ProgressBar(context)
+                try {
+                    ContextCompat.getDrawable(context, R.drawable.discrete_spinner)
+                        ?.let { spinDrawable -> progressBar.indeterminateDrawable = spinDrawable }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+                /* The next line will add the ProgressBar to the dialog. */
+                dialog.addContentView(
+                    progressBar, ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                    )
+                )
+                dialog.show()
+                return dialog
+            }
         }
     }
 
@@ -136,6 +168,8 @@ class MainActivity : NativeActivity(), LuaInterface,
         registerReceiver(event, event.filter)
         if (!hasStoragePermissionCompat()) {
             requestStoragePermissionCompat(resources.getString(R.string.permission_manage_storage))
+        } else {
+            extractAssets()
         }
     }
 
@@ -195,14 +229,14 @@ class MainActivity : NativeActivity(), LuaInterface,
     /* Called on permission result */
     override fun onRequestPermissionsResult(requestCode: Int, permissions:
         Array<String>, grantResults: IntArray) {
-        Log.d(tag, "onRequestPermissionResult()")
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (hasStoragePermissionCompat()) {
             Log.i(tag, String.format(Locale.US,
                     "Permission granted for request code: %d", requestCode))
+            extractAssets()
         } else {
-            Log.e(tag, String.format(Locale.US,
-                    "Permission rejected for request code: %d", requestCode))
+            Log.e(tag, "Permission rejected. Bye!")
+            showToastAndDie(resources.getString(R.string.error_no_permissions))
         }
     }
 
@@ -243,7 +277,17 @@ class MainActivity : NativeActivity(), LuaInterface,
     /* Called when the main thread is about to exit because of an error */
     @Suppress("unused")
     fun onNativeCrash() {
-        MainApp.crashReport(this.applicationContext)
+        MainApp.crashReport(applicationContext)
+    }
+
+    @Suppress("unused")
+    fun hasRequiredPermissions(): Boolean {
+        return hasStoragePermissionCompat()
+    }
+
+    @Suppress("unused")
+    fun hasAssetsExtracted(): Boolean {
+        return assetsOk
     }
 
     /*---------------------------------------------------------------
@@ -301,12 +345,6 @@ class MainActivity : NativeActivity(), LuaInterface,
 
     override fun enableFrontlightSwitch(): Boolean {
         return device.enableFrontlightSwitch(this)
-    }
-
-    override fun extractAssets(): Boolean {
-        val ok = assets.extract(this)
-        splashScreen = false
-        return ok
     }
 
     override fun getBatteryLevel(): Int {
@@ -448,10 +486,6 @@ class MainActivity : NativeActivity(), LuaInterface,
         return clipboard.primaryClip?.let {
             (it.itemCount > 0)
         }?: false
-    }
-
-    override fun hasExternalStoragePermission(): Boolean {
-        return hasStoragePermissionCompat()
     }
 
     override fun hasNativeRotation(): Boolean {
@@ -673,6 +707,22 @@ class MainActivity : NativeActivity(), LuaInterface,
         }
     }
 
+    private fun extractAssets() {
+        if (assets.isNewBundle(this)) {
+            val startTime = System.nanoTime()
+            runOnUiThread { dialog = FramelessProgressDialog.show(this, "") }
+            val ok = assets.bootstrap(this)
+            val elapsedTime = System.nanoTime() - startTime
+            Log.i(tag, "update installed in ${elapsedTime / 1000000} milliseconds")
+            runOnUiThread { dialog?.dismiss() }
+            if (!ok) {
+                showToastAndDie(resources.getString(R.string.error_extracting_assets))
+            }
+        }
+        splashScreen = false
+        assetsOk = true
+    }
+
     private fun getBatteryState(isPercent: Boolean): Int {
         val intent = applicationContext.registerReceiver(null, BATTERY_FILTER)
         if (intent != null) {
@@ -712,6 +762,10 @@ class MainActivity : NativeActivity(), LuaInterface,
         }
     }
 
+    private fun showToastAndDie(msg: String) {
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+        finish()
+    }
     @SuppressLint("QueryPermissionsNeeded")
     private fun startActivityIfSafe(intent: Intent?): Boolean {
         return intent?.let {

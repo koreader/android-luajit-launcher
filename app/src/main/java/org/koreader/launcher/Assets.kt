@@ -1,14 +1,9 @@
 package org.koreader.launcher
 
 import android.app.Activity
-import android.app.Dialog
 import android.content.Context
 import android.content.res.AssetManager
 import android.util.Log
-import android.view.Gravity
-import android.view.ViewGroup
-import android.widget.ProgressBar
-import androidx.core.content.ContextCompat
 import org.koreader.launcher.extensions.symlink
 import java.io.*
 
@@ -20,19 +15,7 @@ class Assets {
         System.loadLibrary("7z")
     }
 
-    fun extract(activity: Activity): Boolean {
-        return if (isNewBundle(activity)) {
-            val startTime = System.nanoTime()
-            val result = bootstrap(activity)
-            val elapsedTime = System.nanoTime() - startTime
-            Log.i(tag, "update installed in ${elapsedTime / 1000000} milliseconds")
-            result
-        } else {
-            true
-        }
-    }
-
-    private fun isNewBundle(context: Context): Boolean {
+    fun isNewBundle(context: Context): Boolean {
         val path = "${context.filesDir.absolutePath}/git-rev"
         return try {
             if (!File(path).exists()) {
@@ -59,9 +42,8 @@ class Assets {
         }
     }
 
-    private fun bootstrap(activity: Activity): Boolean {
+    fun bootstrap(activity: Activity): Boolean {
         val filesDir = activity.filesDir.absolutePath
-        activity.runOnUiThread { dialog = FramelessProgressDialog.show(activity, "") }
 
         /* copy regular files and extract 7z files from assets store */
         activity.assets.list("module")?.let { bundle ->
@@ -149,38 +131,7 @@ class Assets {
                 }
             }
         } ?: Log.v(tag, "No libraries to copy")
-
-        activity.runOnUiThread { dialog?.dismiss() }
         return true
-    }
-
-    /* dialog used while extracting assets from zip */
-    private var dialog: FramelessProgressDialog? = null
-    private class FramelessProgressDialog private constructor(context: Context):
-        Dialog(context, R.style.FramelessDialog) {
-        companion object {
-            fun show(context: Context, title: CharSequence): FramelessProgressDialog {
-                val dialog = FramelessProgressDialog(context)
-                dialog.setTitle(title)
-                dialog.setCancelable(false)
-                dialog.setOnCancelListener(null)
-                dialog.window?.setGravity(Gravity.BOTTOM)
-                val progressBar = ProgressBar(context)
-                try {
-                    ContextCompat.getDrawable(context, R.drawable.discrete_spinner)
-                        ?.let { spinDrawable -> progressBar.indeterminateDrawable = spinDrawable }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-                /* The next line will add the ProgressBar to the dialog. */
-                dialog.addContentView(progressBar, ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT)
-                )
-                dialog.show()
-                return dialog
-            }
-        }
     }
 
     private external fun extract(assetManager: AssetManager, payload: String, output: String): Int

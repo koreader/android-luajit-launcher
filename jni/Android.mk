@@ -42,7 +42,8 @@ include $(CLEAR_VARS)
 # final shared library to load via the NativeActivity framework.
 LOCAL_PATH := $(BASE_PATH)
 LOCAL_MODULE := luajit-launcher
-LOCAL_SRC_FILES := main.c
+LOCAL_C_INCLUDES := $(LOCAL_PATH)
+LOCAL_SRC_FILES := jni_helper.c main.c
 LOCAL_STATIC_LIBRARIES := android_native_app_glue
 # NOTE: By default, we link against the shared LuaJIT library directly.
 LOCAL_SHARED_LIBRARIES := luajit

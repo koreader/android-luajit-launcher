@@ -1540,16 +1540,6 @@ local function run(android_app_state)
                 jni:to_string(jni:getObjectField(app_info, "nativeLibraryDir", "Ljava/lang/String;"))
         end)
 
-    android.extractAssets = function()
-        return JNI:context(android.app.activity.vm, function(jni)
-            return jni:callBooleanMethod(
-                android.app.activity.clazz,
-                "extractAssets",
-                "()Z"
-            )
-        end)
-    end
-
     android.getIntent = function()
         return JNI:context(android.app.activity.vm, function(jni)
             local path = jni:callObjectMethod(
@@ -2307,17 +2297,6 @@ local function run(android_app_state)
         end)
     end
 
-    android.canWriteStorage = function()
-        android.DEBUG("checking write storage permission")
-        return JNI:context(android.app.activity.vm, function(jni)
-            return jni:callBooleanMethod(
-                android.app.activity.clazz,
-                "hasExternalStoragePermission",
-                "()Z"
-            )
-        end)
-    end
-
     android.getClipboardText = function()
         return JNI:context(android.app.activity.vm, function(jni)
             local text = jni:callObjectMethod(
@@ -2647,14 +2626,6 @@ local function run(android_app_state)
         return android.dl.dlopen(library, ffi_load)
     end
 
-    if not android.canWriteStorage() then
-        error("insufficient permissions")
-    end
-
-    local installed = android.extractAssets()
-    if not installed then
-        error("error extracting assets")
-    end
     local launch = android.asset_loader("launcher")
     if type(launch) == "function" then
         return launch()

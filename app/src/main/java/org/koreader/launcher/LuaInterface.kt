@@ -12,7 +12,6 @@ interface LuaInterface {
     fun einkUpdate(mode: Int)
     fun einkUpdate(mode: Int, delay: Long, x: Int, y: Int, width: Int, height: Int)
     fun enableFrontlightSwitch(): Boolean
-    fun extractAssets(): Boolean
     fun getBatteryLevel(): Int
     fun getClipboardText(): String
     fun getEinkPlatform(): String
@@ -40,7 +39,6 @@ interface LuaInterface {
     fun getStatusBarHeight(): Int
     fun getVersion(): String
     fun hasClipboardText(): Boolean
-    fun hasExternalStoragePermission(): Boolean
     fun hasNativeRotation(): Boolean
     fun hasOTAUpdates(): Boolean
     fun hasRuntimeChanges(): Boolean
