@@ -189,7 +189,9 @@ class MainActivity : NativeActivity(), LuaInterface,
                     "Permission granted for request code: %d", requestCode))
         } else {
             Log.e(tag, "Permission rejected. Bye!")
-            showToastAndDie(resources.getString(R.string.error_no_permissions))
+            Toast.makeText(this, resources.getString(R.string.error_no_permissions),
+                Toast.LENGTH_SHORT).show()
+            finish()
         }
     }
 
@@ -696,10 +698,5 @@ class MainActivity : NativeActivity(), LuaInterface,
                     View.SYSTEM_UI_FLAG_LOW_PROFILE
             else -> decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LOW_PROFILE
         }
-    }
-
-    private fun showToastAndDie(msg: String) {
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
-        finish()
     }
 }
