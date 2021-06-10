@@ -15,7 +15,6 @@ import android.net.Uri
 import android.os.BatteryManager
 import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
 import android.util.Log
 import android.view.DisplayCutout
 import android.view.SurfaceHolder
@@ -31,7 +30,7 @@ import java.io.File
 import java.util.Locale
 
 class MainActivity : NativeActivity(), LuaInterface,
-    ActivityCompat.OnRequestPermissionsResultCallback{
+    ActivityCompat.OnRequestPermissionsResultCallback {
 
     private val tag = this::class.java.simpleName
 
@@ -61,23 +60,12 @@ class MainActivity : NativeActivity(), LuaInterface,
     private class NativeSurfaceView(context: Context): SurfaceView(context),
         SurfaceHolder.Callback {
         init { holder.addCallback(this) }
-        override fun surfaceCreated(holder: SurfaceHolder) {
-            Log.v(TAG_SURFACE, "surface created")
-            setWillNotDraw(false)
-        }
-        override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
-            Log.v(TAG_SURFACE, String.format(Locale.US,
-                "surface changed {\n  width:  %d\n  height: %d\n format: %s\n}",
-                width, height, pixelFormatName(format))
-            )
-        }
-        override fun surfaceDestroyed(holder: SurfaceHolder) {
-            Log.v(TAG_SURFACE, "surface destroyed")
-        }
+        override fun surfaceCreated(holder: SurfaceHolder) { setWillNotDraw(false) }
+        override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {}
+        override fun surfaceDestroyed(holder: SurfaceHolder) {}
     }
 
     companion object {
-        private const val TAG_SURFACE = "Surface"
         private const val ACTION_SAF_FILEPICKER = 2
         private val BATTERY_FILTER = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
         private val RUNTIME_VERSION = Build.VERSION.RELEASE
@@ -131,7 +119,7 @@ class MainActivity : NativeActivity(), LuaInterface,
         } else {
             "Native Content"
         }
-        Log.v(TAG_SURFACE, "Using $surfaceKind implementation")
+        Log.v("Surface", "Using $surfaceKind implementation")
 
         registerReceiver(event, event.filter)
         if (!hasStoragePermissionCompat()) {
@@ -160,7 +148,7 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
-        Log.v(TAG_SURFACE, String.format(Locale.US,
+        Log.v("Surface", String.format(Locale.US,
             "surface changed {\n  width:  %d\n  height: %d\n format: %s\n}",
             width, height, pixelFormatName(format))
         )
@@ -169,14 +157,14 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun onAttachedToWindow() {
-        Log.d(TAG_SURFACE, "onAttachedToWindow()")
+        Log.d("Surface", "onAttachedToWindow()")
         super.onAttachedToWindow()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             val cut: DisplayCutout? = window.decorView.rootWindowInsets.displayCutout
             if (cut != null) {
                 val cutPixels = cut.safeInsetTop
                 if (topInsetHeight != cutPixels) {
-                    Log.v(TAG_SURFACE,
+                    Log.v("Surface",
                         "top $cutPixels pixels are not available, reason: window inset")
                     topInsetHeight = cutPixels
                 }
@@ -195,14 +183,13 @@ class MainActivity : NativeActivity(), LuaInterface,
     /* Called on permission result */
     override fun onRequestPermissionsResult(requestCode: Int, permissions:
         Array<String>, grantResults: IntArray) {
-        Log.d(tag, "onRequestPermissionResult()")
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (hasStoragePermissionCompat()) {
             Log.i(tag, String.format(Locale.US,
                     "Permission granted for request code: %d", requestCode))
         } else {
-            Log.e(tag, String.format(Locale.US,
-                    "Permission rejected for request code: %d", requestCode))
+            Log.e(tag, "Permission rejected. Bye!")
+            showToastAndDie(resources.getString(R.string.error_no_permissions))
         }
     }
 
@@ -243,7 +230,12 @@ class MainActivity : NativeActivity(), LuaInterface,
     /* Called when the main thread is about to exit because of an error */
     @Suppress("unused")
     fun onNativeCrash() {
-        MainApp.crashReport(this.applicationContext)
+        MainApp.crashReport(applicationContext)
+    }
+
+    @Suppress("unused")
+    fun hasRequiredPermissions(): Boolean {
+        return hasStoragePermissionCompat()
     }
 
     /*---------------------------------------------------------------
@@ -253,6 +245,7 @@ class MainActivity : NativeActivity(), LuaInterface,
     override fun canIgnoreBatteryOptimizations(): Boolean {
         return isIgnoringBatteryOptimizationCompat()
     }
+
     override fun canWriteSystemSettings(): Boolean {
         return hasWriteSettingsPermissionCompat()
     }
@@ -450,10 +443,6 @@ class MainActivity : NativeActivity(), LuaInterface,
         }?: false
     }
 
-    override fun hasExternalStoragePermission(): Boolean {
-        return hasStoragePermissionCompat()
-    }
-
     override fun hasNativeRotation(): Boolean {
         return if (device.platform == "android") {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -554,10 +543,7 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun openWifiSettings() {
-        val intent = Intent().apply {
-            action = Settings.ACTION_WIFI_SETTINGS
-        }
-        startActivityIfSafe(intent)
+        openWifi()
     }
 
     override fun performHapticFeedback(constant: Int, force: Int) {
@@ -712,22 +698,8 @@ class MainActivity : NativeActivity(), LuaInterface,
         }
     }
 
-    @SuppressLint("QueryPermissionsNeeded")
-    private fun startActivityIfSafe(intent: Intent?): Boolean {
-        return intent?.let {
-            return try {
-                val pm = packageManager
-                val act = pm.queryIntentActivities(it, PackageManager.MATCH_DEFAULT_ONLY)
-                if (act.size > 0) {
-                    startActivity(it)
-                    true
-                } else {
-                    false
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                false
-            }
-        } ?: false
+    private fun showToastAndDie(msg: String) {
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+        finish()
     }
 }

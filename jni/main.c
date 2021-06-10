@@ -19,7 +19,6 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#include <jni.h>
 #include <stdlib.h>
 
 #ifdef KO_DLOPEN_LUAJIT
@@ -31,6 +30,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <android/asset_manager.h>
 
 #include "android_native_app_glue.h"
+#include "jni_helper.h"
 
 #include "luajit-2.1/lua.h"
 #include "luajit-2.1/lualib.h"
@@ -69,7 +69,6 @@ static void handle_cmd(struct android_app* app, int32_t cmd) {
 void android_main(struct android_app* state) {
     lua_State *L;
     AAsset* luaCode;
-    JNIEnv* env;
     const void *buf;
     off_t bufsize;
     int status;
@@ -90,11 +89,12 @@ void android_main(struct android_app* state) {
         if (source != NULL) {
             source->process(state, source);
         }
-        if (window_ready && gained_focus) {
+        if (window_ready && gained_focus && has_permission(state)) {
             break;
         }
         // Check if we are exiting.
         if (state->destroyRequested != 0) {
+            LOGV("onDestroy()");
             return;
         }
     }
@@ -203,20 +203,7 @@ void android_main(struct android_app* state) {
 #endif
 
 nativeError:
-    LOGE("Stopping due to previous errors");
-    JavaVM* vm = state->activity->vm;
-    int jni_status = (*vm)->GetEnv(vm, (void **)&env, JNI_VERSION_1_6);
-    if ((jni_status == JNI_OK) || ((jni_status == JNI_EDETACHED)
-        && ((*vm)->AttachCurrentThread(vm, &env, NULL) == 0)))
-    {
-        jclass clazz = (*env)->GetObjectClass(env, state->activity->clazz);
-        jmethodID method = (*env)->GetMethodID(env, clazz, "onNativeCrash", "()V");
-        (*env)->CallVoidMethod(env, state->activity->clazz, method);
-        if ((*env)->ExceptionCheck(env)) {
-             (*env)->ExceptionClear(env);
-        }
-        (*vm)->DetachCurrentThread(vm);
-    }
+    crash_report(state);
     ANativeActivity_finish(state->activity);
     exit(1);
 }

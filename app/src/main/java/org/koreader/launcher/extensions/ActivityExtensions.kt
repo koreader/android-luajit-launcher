@@ -214,6 +214,13 @@ fun Activity.quickdicLookup(text: String) {
     startActivityCompat(this, quickdicIntent)
 }
 
+fun Activity.openWifi() {
+    val openWifiIntent = Intent().apply {
+        action = Settings.ACTION_WIFI_SETTINGS
+    }
+    startActivityCompat(this, openWifiIntent)
+}
+
 @SuppressLint("NewApi")
 fun Activity.requestIgnoreBatteryOptimizationCompat(rationale: String,
                                                     okButton: String?, cancelButton: String?) {
