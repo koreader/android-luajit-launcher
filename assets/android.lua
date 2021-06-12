@@ -2307,17 +2307,6 @@ local function run(android_app_state)
         end)
     end
 
-    android.canWriteStorage = function()
-        android.DEBUG("checking write storage permission")
-        return JNI:context(android.app.activity.vm, function(jni)
-            return jni:callBooleanMethod(
-                android.app.activity.clazz,
-                "hasExternalStoragePermission",
-                "()Z"
-            )
-        end)
-    end
-
     android.getClipboardText = function()
         return JNI:context(android.app.activity.vm, function(jni)
             local text = jni:callObjectMethod(
@@ -2645,10 +2634,6 @@ local function run(android_app_state)
     ffi.load = function(library, ...) -- luacheck: ignore 212
         android.DEBUG("ffi.load "..library)
         return android.dl.dlopen(library, ffi_load)
-    end
-
-    if not android.canWriteStorage() then
-        error("insufficient permissions")
     end
 
     local installed = android.extractAssets()

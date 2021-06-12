@@ -2,13 +2,13 @@ package org.koreader.launcher
 
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Environment
 import android.os.StrictMode
 import androidx.multidex.MultiDexApplication
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
-import java.lang.StringBuilder
 
 class MainApp : MultiDexApplication() {
     companion object {
@@ -16,8 +16,9 @@ class MainApp : MultiDexApplication() {
         const val flavor = BuildConfig.FLAVOR_CHANNEL
         const val has_ota_updates = BuildConfig.IN_APP_UPDATES
         const val supports_runtime_changes = BuildConfig.SUPPORTS_RUNTIME_CHANGES
-        const val provider = "${BuildConfig.APPLICATION_ID}.provider"
+
         val is_debug = BuildConfig.DEBUG
+        val provider = "${BuildConfig.APPLICATION_ID}.provider"
 
         // internal path for app files
         lateinit var assets_path: String
@@ -30,6 +31,8 @@ class MainApp : MultiDexApplication() {
         // app dir in external path
         lateinit var app_storage_path: String
             private set
+
+        private var targetSdk = 0
 
         // logcat to crash.log
         fun dumpLogcat() {
@@ -80,6 +83,14 @@ class MainApp : MultiDexApplication() {
                 }
             }
         }
+
+        fun isAtLeastApi(version: Int, runtimeOnly: Boolean = false): Boolean {
+            return if (runtimeOnly) {
+                (Build.VERSION.SDK_INT >= version)
+            } else {
+                ((Build.VERSION.SDK_INT >= version) and (targetSdk >= version))
+            }
+        }
     }
 
     @Suppress("DEPRECATION")
@@ -88,6 +99,7 @@ class MainApp : MultiDexApplication() {
         assets_path = filesDir.absolutePath
         storage_path = Environment.getExternalStorageDirectory().absolutePath
         app_storage_path = String.format("%s/%s", storage_path, name.lowercase())
+        targetSdk = applicationContext.applicationInfo.targetSdkVersion
 
         Thread.setDefaultUncaughtExceptionHandler { thread, _ ->
             val msg = "Uncaught exception in thread #${thread.id} (${thread.name})"

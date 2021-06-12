@@ -7,6 +7,7 @@
     <string name="epd_test_question">Did you see a flashing black to white eink update?</string>
     <string name="epd_test_instructions">Go to github.com/koreader/koreader/issues/4551 and share the following information with us</string>
     <string name="epd_test_description">Supported platforms</string>
+    <string name="error_no_permissions">Insufficient permissions</string>
     <string name="no_crash_attached">No crash report attached</string>
     <string name="permission_manage_storage">Please allow the app to manage all files.</string>
 

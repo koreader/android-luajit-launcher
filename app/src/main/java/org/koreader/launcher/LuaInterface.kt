@@ -1,8 +1,11 @@
 package org.koreader.launcher
 
+import androidx.annotation.WorkerThread
+
 /* Declares methods that are exposed to lua via JNI
  * See https://github.com/koreader/android-luajit-launcher/blob/master/assets/android.lua */
 
+@WorkerThread
 interface LuaInterface {
     fun canIgnoreBatteryOptimizations(): Boolean
     fun canWriteSystemSettings(): Boolean
@@ -40,7 +43,6 @@ interface LuaInterface {
     fun getStatusBarHeight(): Int
     fun getVersion(): String
     fun hasClipboardText(): Boolean
-    fun hasExternalStoragePermission(): Boolean
     fun hasNativeRotation(): Boolean
     fun hasOTAUpdates(): Boolean
     fun hasRuntimeChanges(): Boolean

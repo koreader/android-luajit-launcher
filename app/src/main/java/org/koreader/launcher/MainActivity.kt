@@ -1,5 +1,6 @@
 package org.koreader.launcher
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.annotation.TargetApi
 import android.app.Activity
@@ -12,16 +13,10 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.graphics.PixelFormat
 import android.net.Uri
-import android.os.BatteryManager
-import android.os.Build
-import android.os.Bundle
+import android.os.*
 import android.provider.Settings
 import android.util.Log
-import android.view.DisplayCutout
-import android.view.SurfaceHolder
-import android.view.SurfaceView
-import android.view.View
-import android.view.WindowManager
+import android.view.*
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -31,7 +26,7 @@ import java.io.File
 import java.util.Locale
 
 class MainActivity : NativeActivity(), LuaInterface,
-    ActivityCompat.OnRequestPermissionsResultCallback{
+    ActivityCompat.OnRequestPermissionsResultCallback {
 
     private val tag = this::class.java.simpleName
 
@@ -61,26 +56,15 @@ class MainActivity : NativeActivity(), LuaInterface,
     private class NativeSurfaceView(context: Context): SurfaceView(context),
         SurfaceHolder.Callback {
         init { holder.addCallback(this) }
-        override fun surfaceCreated(holder: SurfaceHolder) {
-            Log.v(TAG_SURFACE, "surface created")
-            setWillNotDraw(false)
-        }
-        override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
-            Log.v(TAG_SURFACE, String.format(Locale.US,
-                "surface changed {\n  width:  %d\n  height: %d\n format: %s\n}",
-                width, height, pixelFormatName(format))
-            )
-        }
-        override fun surfaceDestroyed(holder: SurfaceHolder) {
-            Log.v(TAG_SURFACE, "surface destroyed")
-        }
+        override fun surfaceCreated(holder: SurfaceHolder) { setWillNotDraw(false) }
+        override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {}
+        override fun surfaceDestroyed(holder: SurfaceHolder) {}
     }
 
     companion object {
-        private const val TAG_SURFACE = "Surface"
-        private const val ACTION_SAF_FILEPICKER = 2
+        private const val MANDATORY_PERMISSIONS_ID = 1
+        private const val ACTION_SAF_FILEPICKER_ID = 2
         private val BATTERY_FILTER = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
-        private val RUNTIME_VERSION = Build.VERSION.RELEASE
 
         @JvmStatic
         private fun pixelFormatName(format: Int): String {
@@ -131,11 +115,12 @@ class MainActivity : NativeActivity(), LuaInterface,
         } else {
             "Native Content"
         }
-        Log.v(TAG_SURFACE, "Using $surfaceKind implementation")
+        Log.v("Surface", "Using $surfaceKind implementation")
 
         registerReceiver(event, event.filter)
-        if (!hasStoragePermissionCompat()) {
-            requestStoragePermissionCompat(resources.getString(R.string.permission_manage_storage))
+
+        if (!hasMandatoryPermissions()) {
+            requestMandatoryPermissions()
         }
     }
 
@@ -160,7 +145,7 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
-        Log.v(TAG_SURFACE, String.format(Locale.US,
+        Log.v("Surface", String.format(Locale.US,
             "surface changed {\n  width:  %d\n  height: %d\n format: %s\n}",
             width, height, pixelFormatName(format))
         )
@@ -169,14 +154,14 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun onAttachedToWindow() {
-        Log.d(TAG_SURFACE, "onAttachedToWindow()")
+        Log.d("Surface", "onAttachedToWindow()")
         super.onAttachedToWindow()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             val cut: DisplayCutout? = window.decorView.rootWindowInsets.displayCutout
             if (cut != null) {
                 val cutPixels = cut.safeInsetTop
                 if (topInsetHeight != cutPixels) {
-                    Log.v(TAG_SURFACE,
+                    Log.v("Surface",
                         "top $cutPixels pixels are not available, reason: window inset")
                     topInsetHeight = cutPixels
                 }
@@ -195,21 +180,23 @@ class MainActivity : NativeActivity(), LuaInterface,
     /* Called on permission result */
     override fun onRequestPermissionsResult(requestCode: Int, permissions:
         Array<String>, grantResults: IntArray) {
-        Log.d(tag, "onRequestPermissionResult()")
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (hasStoragePermissionCompat()) {
-            Log.i(tag, String.format(Locale.US,
-                    "Permission granted for request code: %d", requestCode))
-        } else {
-            Log.e(tag, String.format(Locale.US,
-                    "Permission rejected for request code: %d", requestCode))
+        if (requestCode == MANDATORY_PERMISSIONS_ID) {
+            for (i in permissions.indices) {
+                if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
+                    Log.e(tag, "mandatory permission rejected: ${permissions[i]}. Bye!")
+                    Toast.makeText(this, resources.getString(R.string.error_no_permissions),
+                        Toast.LENGTH_SHORT).show()
+                    finish()
+                }
+            }
         }
     }
 
     /* Called on activity result, available from KitKat onwards */
     @TargetApi(19)
     override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
-        if (requestCode == ACTION_SAF_FILEPICKER && resultCode == Activity.RESULT_OK) {
+        if (requestCode == ACTION_SAF_FILEPICKER_ID && resultCode == Activity.RESULT_OK) {
             val importPath = lastImportedPath ?: return
             resultData?.let {
                 val clipData = it.clipData
@@ -243,18 +230,31 @@ class MainActivity : NativeActivity(), LuaInterface,
     /* Called when the main thread is about to exit because of an error */
     @Suppress("unused")
     fun onNativeCrash() {
-        MainApp.crashReport(this.applicationContext)
+        MainApp.crashReport(applicationContext)
+    }
+
+    @Suppress("unused")
+    fun hasRequiredPermissions(): Boolean {
+        return hasMandatoryPermissions()
     }
 
     /*---------------------------------------------------------------
      *             override methods used by lua/JNI                *
      *--------------------------------------------------------------*/
 
+    @Suppress("NewApi")
     override fun canIgnoreBatteryOptimizations(): Boolean {
-        return isIgnoringBatteryOptimizationCompat()
+        return if (MainApp.isAtLeastApi(Build.VERSION_CODES.M)) {
+            val pm = applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager
+            pm.isIgnoringBatteryOptimizations(packageName)
+        } else false
     }
+
+    @Suppress("NewApi")
     override fun canWriteSystemSettings(): Boolean {
-        return hasWriteSettingsPermissionCompat()
+        return if (MainApp.isAtLeastApi(Build.VERSION_CODES.M)) {
+            Settings.System.canWrite(this)
+        } else true
     }
 
     override fun dictLookup(text: String?, action: String?, nullablePackage: String?) {
@@ -440,7 +440,7 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun getVersion(): String {
-        return RUNTIME_VERSION
+        return Build.VERSION.RELEASE
     }
 
     override fun hasClipboardText(): Boolean {
@@ -448,10 +448,6 @@ class MainActivity : NativeActivity(), LuaInterface,
         return clipboard.primaryClip?.let {
             (it.itemCount > 0)
         }?: false
-    }
-
-    override fun hasExternalStoragePermission(): Boolean {
-        return hasStoragePermissionCompat()
     }
 
     override fun hasNativeRotation(): Boolean {
@@ -554,10 +550,7 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun openWifiSettings() {
-        val intent = Intent().apply {
-            action = Settings.ACTION_WIFI_SETTINGS
-        }
-        startActivityIfSafe(intent)
+        openWifi()
     }
 
     override fun performHapticFeedback(constant: Int, force: Int) {
@@ -569,18 +562,26 @@ class MainActivity : NativeActivity(), LuaInterface,
         }
     }
 
+    @Suppress("NewApi")
     override fun requestIgnoreBatteryOptimizations(rationale: String, okButton: String, cancelButton: String) {
-        requestIgnoreBatteryOptimizationCompat(rationale, okButton, cancelButton)
+        if (MainApp.isAtLeastApi(Build.VERSION_CODES.M)) {
+            val intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+            requestSpecialPermission(this, intent, rationale, okButton, cancelButton)
+        }
     }
 
+    @Suppress("NewApi")
     override fun requestWriteSystemSettings(rationale: String, okButton: String, cancelButton: String) {
-        requestWriteSettingsPermissionCompat(rationale, okButton, cancelButton)
+        if (MainApp.isAtLeastApi(Build.VERSION_CODES.M)) {
+            val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS)
+            requestSpecialPermission(this, intent, rationale, okButton, cancelButton)
+        }
     }
 
     override fun safFilePicker(path: String?): Boolean {
         lastImportedPath = path
         return path?.let { _ ->
-            filePicker(ACTION_SAF_FILEPICKER)
+            filePicker(ACTION_SAF_FILEPICKER_ID)
         } ?: false
     }
 
@@ -694,6 +695,30 @@ class MainActivity : NativeActivity(), LuaInterface,
         }
     }
 
+    @Suppress("NewApi")
+    private fun hasMandatoryPermissions(): Boolean {
+        return if (MainApp.isAtLeastApi(Build.VERSION_CODES.R)) {
+            Environment.isExternalStorageManager()
+        } else {
+            (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
+        }
+    }
+
+    @Suppress("NewApi")
+    private fun requestMandatoryPermissions() {
+        if (MainApp.isAtLeastApi(Build.VERSION_CODES.R)) {
+            requestSpecialPermission(this, intent,
+                resources.getString(R.string.permission_manage_storage),
+                null, null)
+
+        } else {
+            ActivityCompat.requestPermissions(this,
+                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                MANDATORY_PERMISSIONS_ID)
+        }
+    }
+
     @Suppress("DEPRECATION")
     private fun setFullscreenLayout() {
         val decorView = window.decorView
@@ -710,24 +735,5 @@ class MainActivity : NativeActivity(), LuaInterface,
                     View.SYSTEM_UI_FLAG_LOW_PROFILE
             else -> decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LOW_PROFILE
         }
-    }
-
-    @SuppressLint("QueryPermissionsNeeded")
-    private fun startActivityIfSafe(intent: Intent?): Boolean {
-        return intent?.let {
-            return try {
-                val pm = packageManager
-                val act = pm.queryIntentActivities(it, PackageManager.MATCH_DEFAULT_ONLY)
-                if (act.size > 0) {
-                    startActivity(it)
-                    true
-                } else {
-                    false
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                false
-            }
-        } ?: false
     }
 }
