@@ -193,6 +193,25 @@ fun Activity.openWifi() {
     startActivityCompat(this, openWifiIntent)
 }
 
+fun Activity.requestSpecialPermission(intent: Intent, rationale: String,
+                             okButton: String?, cancelButton: String?) {
+    runOnUiThread {
+        val ok = okButton ?: "OK"
+        val builder = AlertDialog.Builder(this)
+            .setMessage(rationale)
+            .setCancelable(false)
+            .setPositiveButton(ok) { _, _ ->
+                startActivity(intent)
+                finish()
+            }
+
+        if (cancelButton != null) {
+            builder.setNegativeButton(cancelButton) { _, _ -> }
+        }
+        builder.create().show()
+    }
+}
+
 fun Activity.searchText(text: String, domain: String? = null, title: String? = null) {
     val searchIntent: Intent = Intent().apply {
         action = Intent.ACTION_SEARCH
@@ -258,25 +277,6 @@ private fun getScreenSizeWithConstraints(activity: Activity): Point {
     display.getMetrics(metrics)
     size.set(metrics.widthPixels, metrics.heightPixels)
     return size
-}
-
-fun requestSpecialPermission(activity: Activity, intent: Intent, rationale: String,
-                                     okButton: String?, cancelButton: String?) {
-    activity.runOnUiThread {
-        val ok = okButton ?: "OK"
-        val builder = AlertDialog.Builder(activity)
-            .setMessage(rationale)
-            .setCancelable(false)
-            .setPositiveButton(ok) { _, _ ->
-                activity.startActivity(intent)
-                activity.finish()
-            }
-
-        if (cancelButton != null) {
-            builder.setNegativeButton(cancelButton) { _, _ -> }
-        }
-        builder.create().show()
-    }
 }
 
 @SuppressLint("QueryPermissionsNeeded")

@@ -566,7 +566,7 @@ class MainActivity : NativeActivity(), LuaInterface,
     override fun requestIgnoreBatteryOptimizations(rationale: String, okButton: String, cancelButton: String) {
         if (MainApp.isAtLeastApi(Build.VERSION_CODES.M)) {
             val intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
-            requestSpecialPermission(this, intent, rationale, okButton, cancelButton)
+            requestSpecialPermission(intent, rationale, okButton, cancelButton)
         }
     }
 
@@ -574,7 +574,7 @@ class MainActivity : NativeActivity(), LuaInterface,
     override fun requestWriteSystemSettings(rationale: String, okButton: String, cancelButton: String) {
         if (MainApp.isAtLeastApi(Build.VERSION_CODES.M)) {
             val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS)
-            requestSpecialPermission(this, intent, rationale, okButton, cancelButton)
+            requestSpecialPermission(intent, rationale, okButton, cancelButton)
         }
     }
 
@@ -708,7 +708,11 @@ class MainActivity : NativeActivity(), LuaInterface,
     @Suppress("NewApi")
     private fun requestMandatoryPermissions() {
         if (MainApp.isAtLeastApi(Build.VERSION_CODES.R)) {
-            requestSpecialPermission(this, intent,
+            val intent = Intent().apply {
+                action = Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION
+                data = Uri.fromParts("package", packageName, null)
+            }
+            requestSpecialPermission(intent,
                 resources.getString(R.string.permission_manage_storage),
                 null, null)
 
