@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="icon_release">#1976d2</color>
+    <color name="icon_debug">#e95353</color>
+</resources>
