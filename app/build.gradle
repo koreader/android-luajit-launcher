@@ -78,6 +78,7 @@ android {
 
         fdroid {
             dimension = 'CHANNEL'
+            applicationIdSuffix = '.fdroid'
         }
         rocks {
             dimension = 'CHANNEL'
