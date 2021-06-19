@@ -36,6 +36,7 @@ object DeviceInfo {
     private val BOYUE_K103: Boolean
     private val BOYUE_K78W: Boolean
     private val BOYUE_P6: Boolean
+    private val BOYUE_P78: Boolean
     private val CREMA: Boolean
     private val CREMA_0650L: Boolean
     private val FIDIBOOK: Boolean
@@ -68,6 +69,7 @@ object DeviceInfo {
         BOYUE_K103,
         BOYUE_K78W,
         BOYUE_P6,
+        BOYUE_P78,
         CREMA,
         CREMA_0650L,
         FIDIBOOK,
@@ -155,6 +157,10 @@ object DeviceInfo {
         // Boyue Likebook P6
         BOYUE_P6 = IS_BOYUE && PRODUCT.contentEquals("p6")
         deviceMap[EinkDevice.BOYUE_P6] = BOYUE_P6
+
+        // Boyue Likebook P78
+        BOYUE_P78 = IS_BOYUE && PRODUCT.contentEquals("p78")
+        deviceMap[EinkDevice.BOYUE_P78] = BOYUE_P78
 
         // Crema Note (1010P)
         CREMA = BRAND.contentEquals("crema") && PRODUCT.contentEquals("note")
