@@ -24,6 +24,7 @@ object DeviceInfo {
     val EINK_FULL_SUPPORT: Boolean
     val BUG_WAKELOCKS: Boolean
     val BUG_SCREEN_ROTATION: Boolean
+    val BUG_BROKEN_LIFECYCLE: Boolean
     val NEEDS_VIEW: Boolean
 
     private val BOYUE_T61: Boolean
@@ -42,6 +43,7 @@ object DeviceInfo {
     private val FIDIBOOK: Boolean
     private val ONYX_C67: Boolean
     private val ONYX_NOVA2: Boolean
+    private val ONYX_POKE2: Boolean
     private val ENERGY: Boolean
     private val INKBOOK: Boolean
     private val TOLINO: Boolean
@@ -92,7 +94,8 @@ object DeviceInfo {
     enum class BugDevice {
         NONE,
         SONY_RP1,
-        EMULATOR
+        ONYX_POKE2,
+        EMULATOR,
     }
 
     init {
@@ -183,6 +186,11 @@ object DeviceInfo {
                 && DEVICE.startsWith("c67"))
         lightsMap[LightsDevice.ONYX_C67] = ONYX_C67
         deviceMap[EinkDevice.ONYX_C67] = ONYX_C67
+
+        // Onyx Poke 2
+        ONYX_POKE2 = MANUFACTURER.contentEquals("onyx")
+            && PRODUCT.contentEquals("poke2")
+        bugMap[BugDevice.ONYX_POKE2] = ONYX_POKE2
 
         // Energy Sistem eReaders. Tested on Energy Ereader Pro 4
         ENERGY = (BRAND.contentEquals("energysistem") || BRAND.contentEquals("energy_sistem"))
@@ -291,6 +299,9 @@ object DeviceInfo {
 
         // need wakelocks
         BUG_WAKELOCKS = BUG == BugDevice.SONY_RP1
+
+        // has broken lifecycle
+        BUG_BROKEN_LIFECYCLE = BUG == BugDevice.ONYX_POKE2
 
         // 4.4+ device without native surface rotation
         BUG_SCREEN_ROTATION = BUG == BugDevice.EMULATOR
