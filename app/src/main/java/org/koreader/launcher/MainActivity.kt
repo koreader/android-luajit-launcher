@@ -315,8 +315,8 @@ class MainActivity : NativeActivity(), LuaInterface,
 
     override fun getClipboardText(): String {
         val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        val text = clipboard.primaryClip?.getItemAt(0)?.text as String?
-        return text ?: ""
+        val clipData: ClipData? = clipboard.primaryClip
+        return clipData?.getItemAt(0)?.text?.toString()?.trim() ?: ""
     }
 
     override fun getEinkPlatform(): String {
