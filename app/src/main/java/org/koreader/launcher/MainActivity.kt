@@ -443,6 +443,10 @@ class MainActivity : NativeActivity(), LuaInterface,
         return Build.VERSION.RELEASE
     }
 
+    override fun hasBrokenLifecycle(): Boolean {
+        return device.bugLifecycle
+    }
+
     override fun hasClipboardText(): Boolean {
         val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         return clipboard.primaryClip?.let {

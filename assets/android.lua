@@ -1848,6 +1848,16 @@ local function run(android_app_state)
         end)
     end
 
+    android.hasBrokenLifecycle = function()
+        return JNI:context(android.app.activity.vm, function(jni)
+            return jni:callBooleanMethod(
+                android.app.activity.clazz,
+                "hasBrokenLifecycle",
+                "()Z"
+            )
+        end)
+    end
+
     android.setHapticOverride = function(enable)
         android.hapticOverride = enable or false
     end
@@ -1875,6 +1885,7 @@ local function run(android_app_state)
     -- device properties
     android.prop.product = android.getProduct()
     android.prop.version = android.getVersion()
+    android.prop.brokenLifecycle = android.hasBrokenLifecycle()
 
     -- update logger name
     android.log_name = android.prop.name

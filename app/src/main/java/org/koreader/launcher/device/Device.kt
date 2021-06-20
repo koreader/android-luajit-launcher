@@ -22,6 +22,7 @@ class Device(activity: Activity) {
     val hasFullEinkSupport = DeviceInfo.EINK_FULL_SUPPORT
     val needsWakelocks = DeviceInfo.BUG_WAKELOCKS
     val bugRotation = DeviceInfo.BUG_SCREEN_ROTATION
+    val bugLifecycle = DeviceInfo.BUG_BROKEN_LIFECYCLE
 
     val platform: String = if (activity.packageManager.hasSystemFeature("org.chromium.arc.device_management")) {
         "chrome"

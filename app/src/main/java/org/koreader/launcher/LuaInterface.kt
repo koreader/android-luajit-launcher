@@ -42,6 +42,7 @@ interface LuaInterface {
     fun getScreenWidth(): Int
     fun getStatusBarHeight(): Int
     fun getVersion(): String
+    fun hasBrokenLifecycle(): Boolean
     fun hasClipboardText(): Boolean
     fun hasNativeRotation(): Boolean
     fun hasOTAUpdates(): Boolean
