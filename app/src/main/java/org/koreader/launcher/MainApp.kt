@@ -15,10 +15,10 @@ class MainApp : MultiDexApplication() {
         const val name = BuildConfig.APP_NAME
         const val flavor = BuildConfig.FLAVOR_CHANNEL
         const val has_ota_updates = BuildConfig.IN_APP_UPDATES
+        const val provider = "${BuildConfig.APPLICATION_ID}.provider"
         const val supports_runtime_changes = BuildConfig.SUPPORTS_RUNTIME_CHANGES
 
         val is_debug = BuildConfig.DEBUG
-        val provider = "${BuildConfig.APPLICATION_ID}.provider"
 
         // internal path for app files
         lateinit var assets_path: String
@@ -101,9 +101,10 @@ class MainApp : MultiDexApplication() {
         app_storage_path = String.format("%s/%s", storage_path, name.lowercase())
         targetSdk = applicationContext.applicationInfo.targetSdkVersion
 
-        Thread.setDefaultUncaughtExceptionHandler { thread, _ ->
-            val msg = "Uncaught exception in thread #${thread.id} (${thread.name})"
-            crashReport(applicationContext, msg)
+        Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
+            throwable.printStackTrace()
+            crashReport(applicationContext,
+                "Uncaught exception in thread #${thread.id} (${thread.name})")
             kotlin.system.exitProcess(1)
         }
 
