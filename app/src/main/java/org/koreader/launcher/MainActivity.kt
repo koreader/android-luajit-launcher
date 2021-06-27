@@ -24,6 +24,7 @@ import org.koreader.launcher.device.Device
 import org.koreader.launcher.extensions.*
 import java.io.File
 import java.util.Locale
+import java.util.concurrent.CountDownLatch
 
 class MainActivity : NativeActivity(), LuaInterface,
     ActivityCompat.OnRequestPermissionsResultCallback {
@@ -314,9 +315,28 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun getClipboardText(): String {
-        val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        val clipData: ClipData? = clipboard.primaryClip
-        return clipData?.getItemAt(0)?.text?.toString()?.trim() ?: ""
+        val cd = CountDownLatch(1)
+        val result = Box<String>()
+        runOnUiThread {
+            result.value = try {
+                val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                val clipData: ClipData? = clipboard.primaryClip
+                clipData?.getItemAt(0)?.text?.toString()?.trim() ?: ""
+            } catch (e: Exception) {
+                e.printStackTrace()
+                ""
+            } finally {
+                cd.countDown()
+            }
+        }
+
+        return try {
+            cd.await()
+            result.value ?: ""
+        } catch (ex: InterruptedException) {
+            ex.printStackTrace()
+            ""
+        }
     }
 
     override fun getEinkPlatform(): String {
@@ -596,8 +616,10 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun setClipboardText(text: String) {
-        val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        clipboard.setPrimaryClip(ClipData.newPlainText("KOReader_clipboard", text))
+        runOnUiThread {
+            val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            clipboard.setPrimaryClip(ClipData.newPlainText("KOReader_clipboard", text))
+        }
     }
 
     override fun setFullscreen(enabled: Boolean) {
@@ -743,5 +765,9 @@ class MainActivity : NativeActivity(), LuaInterface,
                     View.SYSTEM_UI_FLAG_LOW_PROFILE
             else -> decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LOW_PROFILE
         }
+    }
+
+    private class Box<T> {
+        var value: T? = null
     }
 }
