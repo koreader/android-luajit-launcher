@@ -24,6 +24,10 @@ class MainApp : MultiDexApplication() {
         lateinit var assets_path: String
             private set
 
+        // internal path for crash logs, used by crash reporter
+        lateinit var crash_report_path: String
+            private set
+
         // external path
         lateinit var storage_path: String
             private set
@@ -34,54 +38,23 @@ class MainApp : MultiDexApplication() {
 
         private var targetSdk = 0
 
-        // logcat to crash.log
+        // logcat to crash.log - requested by the user, keep in external app path
         fun dumpLogcat() {
-            writeLog()
+            val path = String.format("%s%s%s", app_storage_path, File.pathSeparator, "crash.log")
+            writeLogToFile(path)
         }
 
         // crash report
         fun crashReport(context: Context, reason: String? = null) {
+            writeLogToFile(crash_report_path, true)
             val reportIntent = Intent(context, CrashReportActivity::class.java)
             reportIntent.putExtra("title", "$name crashed")
             reportIntent.putExtra("reason", reason ?: "")
-            reportIntent.putExtra("logs", getLog(true).toString())
             reportIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or
                 Intent.FLAG_ACTIVITY_TASK_ON_HOME or
                 Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS or
                 Intent.FLAG_ACTIVITY_NO_HISTORY
             context.startActivity(reportIntent)
-        }
-
-        // logcat -> stringBuilder
-        private fun getLog(clearAfterDump: Boolean = false): StringBuilder {
-            val log = StringBuilder()
-            val proc = Runtime.getRuntime().exec("logcat -d -v time")
-            val buffer = BufferedReader(InputStreamReader(proc.inputStream))
-            while (true) {
-                buffer.readLine()?.let { line ->
-                    log.append("$line\n")
-                } ?: break
-            }
-            if (clearAfterDump) {
-                Runtime.getRuntime().exec("logcat -c")
-            }
-            return log
-        }
-
-        // stringBuilder -> file
-        private fun writeLog(sb: StringBuilder? = getLog(),
-                             path: String = app_storage_path,
-                             name: String = "crash.log")
-        {
-            File(String.format("%s/%s", path, name)).let {
-                try {
-                    it.printWriter().use { log ->
-                        log.print(sb.toString())
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }
         }
 
         fun isAtLeastApi(version: Int, runtimeOnly: Boolean = false): Boolean {
@@ -91,6 +64,30 @@ class MainApp : MultiDexApplication() {
                 ((Build.VERSION.SDK_INT >= version) and (targetSdk >= version))
             }
         }
+
+        private fun getLogBuffer(cleanAfterDump: Boolean = false): BufferedReader {
+            val proc = Runtime.getRuntime().exec("logcat -d -v time")
+            if (cleanAfterDump) Runtime.getRuntime().exec("logcat -c")
+            return BufferedReader(InputStreamReader(proc.inputStream))
+        }
+
+        private fun writeLogToFile(path: String, cleanAfterDump: Boolean = false) {
+            File(path).let {
+                if (it.exists()) it.delete()
+                try {
+                    it.printWriter().use { log ->
+                        val buffer = getLogBuffer(cleanAfterDump)
+                        while (true) {
+                            buffer.readLine()?.let { line ->
+                                log.append("$line\n")
+                            } ?: break
+                        }
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+        }
     }
 
     @Suppress("DEPRECATION")
@@ -98,7 +95,8 @@ class MainApp : MultiDexApplication() {
         super.onCreate()
         assets_path = filesDir.absolutePath
         storage_path = Environment.getExternalStorageDirectory().absolutePath
-        app_storage_path = String.format("%s/%s", storage_path, name.lowercase())
+        app_storage_path = String.format("%s%s%s", storage_path, File.pathSeparator, name.lowercase())
+        crash_report_path = String.format("%s%s%s", cacheDir, File.pathSeparator, "crash.log")
         targetSdk = applicationContext.applicationInfo.targetSdkVersion
 
         Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
