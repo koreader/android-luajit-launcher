@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import org.koreader.launcher.databinding.CrashReportBinding
+import java.io.File
 
 class CrashReportActivity : AppCompatActivity() {
     private lateinit var binding: CrashReportBinding
@@ -14,18 +15,21 @@ class CrashReportActivity : AppCompatActivity() {
         intent?.extras?.let { bundle ->
             binding = CrashReportBinding.inflate(layoutInflater)
             setContentView(binding.root)
-            val log = StringBuilder().append(bundle.get("logs").toString())
-            binding.logs.text = log.toString()
             binding.title.text = bundle.get("title").toString()
             binding.reason.text = bundle.get("reason").toString()
             if (binding.reason.text.equals("")) {
                 binding.reason.visibility = View.GONE
             }
+
+            File(MainApp.crash_report_path).inputStream().bufferedReader().use {
+                binding.logs.text = it.readText()
+            }
+
             binding.shareReport.setOnClickListener {
                 val intent: Intent = Intent().apply {
                     action = Intent.ACTION_SEND
                     type = "text/plain"
-                    putExtra(Intent.EXTRA_TEXT, log.toString())
+                    putExtra(Intent.EXTRA_TEXT, binding.logs.text.toString())
                 }
                 startActivity(Intent.createChooser(intent,
                     resources.getString(R.string.common_share_rationale)))
