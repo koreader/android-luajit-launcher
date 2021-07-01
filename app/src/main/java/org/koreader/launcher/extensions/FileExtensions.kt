@@ -18,9 +18,11 @@ fun File.symlink(link: String): Boolean {
             Os.symlink(this.absolutePath, link)
             return true
         }
-        val os = Class.forName("libcore.io.Libcore").getDeclaredField("os")
-        os.isAccessible = true
-        os.get(null).javaClass.getMethod("symlink", String::class.java,
+        val libcore = Class.forName("libcore.io.Libcore")
+        val field = libcore.getDeclaredField("os")
+        field.isAccessible = true
+        val os = field.get(null)
+        os.javaClass.getMethod("symlink", String::class.java,
             String::class.java).invoke(os, this.absolutePath, link)
         return true
     } catch (e: Exception) {
