@@ -41,7 +41,6 @@ fun Uri.absolutePath(context: Context): String? {
         }
         else -> null
     }
-
 }
 
 fun Uri.toFile(context: Context, path: String) {

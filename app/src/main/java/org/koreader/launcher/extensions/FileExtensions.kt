@@ -12,7 +12,10 @@ fun File.symlink(link: String): Boolean {
     if (!this.exists()) return false
     try {
         File(link).delete()
-    } catch (e: IOException) {}
+    } catch (e: IOException) {
+        e.printStackTrace()
+    }
+
     try {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Os.symlink(this.absolutePath, link)
@@ -31,9 +34,9 @@ fun File.symlink(link: String): Boolean {
     }
 }
 
-fun File.uncompress(extract_to: String, deleteIfOk: Boolean = false): Boolean {
+fun File.uncompress(extractTo: String, deleteIfOk: Boolean = false): Boolean {
     val success = try {
-        uncompress(this.absolutePath, extract_to)
+        uncompress(this.absolutePath, extractTo)
     } catch (e: IOException) {
         e.printStackTrace()
         false
@@ -50,15 +53,15 @@ fun File.uncompress(extract_to: String, deleteIfOk: Boolean = false): Boolean {
 }
 
 @Throws(IOException::class)
-private fun uncompress(archive: String, extract_to: String): Boolean {
+private fun uncompress(archive: String, extractTo: String): Boolean {
     return getTarInput(archive)?.use {
-        val output = File(extract_to)
+        val output = File(extractTo)
         if (!output.exists()) {
             output.mkdir()
         }
         var tarEntry = it.nextTarEntry
         while (tarEntry != null) {
-            val destPath = File(extract_to, tarEntry.name)
+            val destPath = File(extractTo, tarEntry.name)
             destPath.parentFile?.let { parent ->
                 if (!parent.exists()) {
                     parent.mkdirs()

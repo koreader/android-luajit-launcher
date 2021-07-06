@@ -7,13 +7,13 @@ import java.util.*
 // More information including epd mode values
 // https://github.com/koreader/android-luajit-launcher/pull/250#issuecomment-711443457
 abstract class QualcommEPDController {
-    companion object  {
+    companion object {
         private const val TAG = "EPD"
 
         private fun preventSystemRefresh() : Boolean{
             // Sets UpdateMode and UpdateScheme to None
             // this function is called EpdController.setSystemUpdateModeAndScheme in onyxsdk
-            return try{
+            return try {
                 Class.forName("android.view.View").getMethod("setWaveformAndScheme",
                     Integer.TYPE,
                     Integer.TYPE,
@@ -29,7 +29,7 @@ abstract class QualcommEPDController {
                                 mode: Int, delay: Long,
                                 x: Int, y: Int, width: Int, height: Int) : Boolean
         {
-            return try{
+            return try {
                 // We need to always call this, not sure why, if it's not called before
                 // system will refresh after us, it'll refresh anyway if user set
                 // Normal mode, or Regal mode works flawlessly otherwise
@@ -55,7 +55,7 @@ abstract class QualcommEPDController {
                     }
                 }.start()
                 true
-            } catch(e: Exception) {
+            } catch (e: Exception) {
                 false
             }
         }

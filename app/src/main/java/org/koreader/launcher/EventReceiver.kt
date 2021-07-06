@@ -40,7 +40,7 @@ class EventReceiver : BroadcastReceiver() {
         code?.let {
             try {
                 // 32-bit event code, low byte first
-                val msg  = CharArray(4)
+                val msg = CharArray(4)
                 msg[0] = (it and 0xFF).toChar()
                 msg[1] = ((it ushr 8) and 0xFF).toChar()
                 msg[2] = ((it ushr 16) and 0xFF).toChar()

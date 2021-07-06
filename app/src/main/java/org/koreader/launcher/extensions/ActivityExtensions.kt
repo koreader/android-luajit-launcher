@@ -230,8 +230,6 @@ fun Activity.sendText(text: String, domain: String? = null, title: String? = nul
     startActivityCompat(this, sendIntent, domain, title)
 }
 
-
-
 @Suppress("DEPRECATION")
 fun Activity.setFullscreenDeprecated(fullscreen: Boolean) {
     val cd = CountDownLatch(1)
