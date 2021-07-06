@@ -18,8 +18,17 @@ class Device(activity: Activity) {
     private val tag = this::class.java.simpleName
 
     val product = DeviceInfo.PRODUCT
-    val hasEinkSupport = DeviceInfo.EINK_SUPPORT
-    val hasFullEinkSupport = DeviceInfo.EINK_FULL_SUPPORT
+
+    val hasEinkSupport: Boolean
+        get() {
+            return epd.getPlatform() != "none"
+        }
+
+    val hasFullEinkSupport: Boolean
+        get() {
+            return epd.getMode() == "all"
+        }
+
     val needsWakelocks = DeviceInfo.BUG_WAKELOCKS
     val bugRotation = DeviceInfo.BUG_SCREEN_ROTATION
     val bugLifecycle = DeviceInfo.BUG_BROKEN_LIFECYCLE
@@ -33,28 +42,29 @@ class Device(activity: Activity) {
         "android"
     }
 
-    val einkPlatform: String = if (DeviceInfo.EINK_FREESCALE) {
-        if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN)
-            || (DeviceInfo.EINK == DeviceInfo.EinkDevice.CREMA)) {
-            "freescale"
-        } else {
-            "freescale-legacy"
+    val einkPlatform: String
+        get() {
+            return when (val platform = epd.getPlatform()) {
+                "freescale" -> {
+                    if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN)
+                        || (DeviceInfo.EINK == DeviceInfo.EinkDevice.CREMA)) {
+                         platform
+                    } else {
+                        "$platform-legacy"
+                    }
+                }
+                else -> {
+                    platform
+                }
+            }
         }
-    } else if (DeviceInfo.EINK_ROCKCHIP) {
-        "rockchip"
-    } else if (DeviceInfo.EINK_QCOM) {
-        "qualcomm"
-    } else {
-        "none"
-    }
 
     val isTv: Boolean = (platform == "android_tv")
     val isChromeOS: Boolean = (platform == "chrome")
-    val needsView: Boolean = if (DeviceInfo.NEEDS_VIEW) {
-        true
-    } else {
-        (isTv || isChromeOS)
-    }
+    val needsView: Boolean
+        get() {
+            return epd.needsView() || isTv || isChromeOS
+        }
 
     @Suppress("DEPRECATION")
     val externalStorage: String = Environment.getExternalStorageDirectory().absolutePath

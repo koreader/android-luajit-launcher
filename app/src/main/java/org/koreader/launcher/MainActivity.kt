@@ -40,9 +40,6 @@ class MainActivity : NativeActivity(), LuaInterface,
     // Path of last file imported
     private var lastImportedPath: String? = null
 
-    // Some devices need to take control of the native window
-    private var takesWindowOwnership: Boolean = false
-
     // Device cutout - only used on API 28+
     private var topInsetHeight: Int = 0
 
@@ -111,7 +108,6 @@ class MainActivity : NativeActivity(), LuaInterface,
             window.takeSurface(null)
             view?.holder?.addCallback(this)
             setContentView(view)
-            takesWindowOwnership = true
             "SurfaceView"
         } else {
             "Native Content"
@@ -283,21 +279,13 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun einkUpdate(mode: Int) {
-        if (takesWindowOwnership) {
-            device.einkUpdate(view as View, mode)
-        } else {
-            val rootView = window.decorView.findViewById<View>(android.R.id.content)
-            device.einkUpdate(rootView, mode)
-        }
+        val rootView = view ?: window.decorView.findViewById<View>(android.R.id.content)
+        device.einkUpdate(rootView, mode)
     }
 
     override fun einkUpdate(mode: Int, delay: Long, x: Int, y: Int, width: Int, height: Int) {
-        if (takesWindowOwnership) {
-            device.einkUpdate(view as View, mode, delay, x, y, width, height)
-        } else {
-            val rootView = window.decorView.findViewById<View>(android.R.id.content)
-            device.einkUpdate(rootView, mode, delay, x, y, width, height)
-        }
+        val rootView = view ?: window.decorView.findViewById<View>(android.R.id.content)
+        device.einkUpdate(rootView, mode, delay, x, y, width, height)
     }
 
     override fun enableFrontlightSwitch(): Boolean {
@@ -578,12 +566,8 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun performHapticFeedback(constant: Int, force: Int) {
-        if (takesWindowOwnership) {
-            device.hapticFeedback(this, constant, force > 0, view as View)
-        } else {
-            val rootView = window.decorView.findViewById<View>(android.R.id.content)
-            device.hapticFeedback(this, constant, force > 0, rootView)
-        }
+        val rootView = view ?: window.decorView.findViewById<View>(android.R.id.content)
+        device.hapticFeedback(this, constant, force > 0, rootView)
     }
 
     @Suppress("NewApi")
