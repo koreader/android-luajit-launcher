@@ -47,7 +47,6 @@ class OnyxC67Controller : LightsInterface {
         return 0
     }
 
-
     override fun setBrightness(activity: Activity, brightness: Int) {
         if (brightness < BRIGHTNESS_MIN || brightness > BRIGHTNESS_MAX) {
             Log.w(TAG, "brightness value of of range: $brightness")

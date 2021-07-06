@@ -60,13 +60,14 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     companion object {
+        private const val TAG_SURFACE = "Surface"
         private const val MANDATORY_PERMISSIONS_ID = 1
         private const val ACTION_SAF_FILEPICKER_ID = 2
         private val BATTERY_FILTER = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
 
         @JvmStatic
         private fun pixelFormatName(format: Int): String {
-            return when(format) {
+            return when (format) {
                 PixelFormat.OPAQUE -> "OPAQUE"
                 PixelFormat.RGBA_1010102 -> "RGBA_1010102"
                 PixelFormat.RGBA_8888 -> "RGBA_8888"
@@ -112,7 +113,7 @@ class MainActivity : NativeActivity(), LuaInterface,
         } else {
             "Native Content"
         }
-        Log.v("Surface", "Using $surfaceKind implementation")
+        Log.v(TAG_SURFACE, "Using $surfaceKind implementation")
 
         registerReceiver(event, event.filter)
 
@@ -142,7 +143,7 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
-        Log.v("Surface", String.format(Locale.US,
+        Log.v(TAG_SURFACE, String.format(Locale.US,
             "surface changed {\n  width:  %d\n  height: %d\n format: %s\n}",
             width, height, pixelFormatName(format))
         )
@@ -151,14 +152,14 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun onAttachedToWindow() {
-        Log.d("Surface", "onAttachedToWindow()")
+        Log.d(TAG_SURFACE, "onAttachedToWindow()")
         super.onAttachedToWindow()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             val cut: DisplayCutout? = window.decorView.rootWindowInsets.displayCutout
             if (cut != null) {
                 val cutPixels = cut.safeInsetTop
                 if (topInsetHeight != cutPixels) {
-                    Log.v("Surface",
+                    Log.v(TAG_SURFACE,
                         "top $cutPixels pixels are not available, reason: window inset")
                     topInsetHeight = cutPixels
                 }
@@ -258,12 +259,12 @@ class MainActivity : NativeActivity(), LuaInterface,
         text?.let { lookupText ->
             action?.let { lookupAction ->
                 when (lookupAction) {
-                    "aard2" ->  aardLookup(lookupText)
+                    "aard2" -> aardLookup(lookupText)
                     "colordict" -> colordictLookup(lookupText, nullablePackage)
-                    "quickdic" ->  quickdicLookup(lookupText)
+                    "quickdic" -> quickdicLookup(lookupText)
                     "search" -> searchText(lookupText, nullablePackage)
-                    "send" ->  sendText(lookupText, nullablePackage)
-                    "text" ->  processText(lookupText, nullablePackage)
+                    "send" -> sendText(lookupText, nullablePackage)
+                    "text" -> processText(lookupText, nullablePackage)
                     else -> Log.w(tag, "Unsupported action $lookupAction")
                 }
             } ?: Log.e(tag, "invalid lookup: no action")
@@ -725,7 +726,6 @@ class MainActivity : NativeActivity(), LuaInterface,
             requestSpecialPermission(intent,
                 resources.getString(R.string.permission_manage_storage),
                 null, null)
-
         } else {
             ActivityCompat.requestPermissions(this,
                 arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),

@@ -48,7 +48,7 @@ class Assets {
                 return if (version == installedVersion) {
                     Log.i(tag, "Skip installation for revision $version")
                     false
-                } else  {
+                } else {
                     Log.i(tag, "Found new package revision $version")
                     true
                 }
