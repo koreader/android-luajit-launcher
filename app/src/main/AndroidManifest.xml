@@ -38,6 +38,7 @@
         <meta-data android:name="android.max_aspect" android:value="3.1" />
         <activity
             android:name=".MainActivity"
+            android:exported="true"
             android:theme="@style/SplashScreen"
             android:resizeableActivity="false"
             android:screenOrientation="nosensor"
@@ -96,15 +97,14 @@
         <activity
             android:label="CrashReport"
             android:theme="@style/NoTitle"
-            android:name=".CrashReportActivity" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-            </intent-filter>
+            android:name=".CrashReportActivity"
+            android:exported="false">
         </activity>
         <activity
             android:label="EPDTest"
             android:theme="@style/NoTitle"
-            android:name=".EPDTestActivity" >
+            android:name=".EPDTestActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>

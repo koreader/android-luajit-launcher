@@ -1,5 +1,6 @@
 package org.koreader.launcher.extensions
 
+import android.annotation.SuppressLint
 import android.os.Build
 import android.system.Os
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream
@@ -8,6 +9,7 @@ import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
 import org.apache.commons.compress.compressors.lzma.LZMACompressorInputStream
 import java.io.*
 
+@SuppressLint("DiscouragedPrivateApi")
 fun File.symlink(link: String): Boolean {
     if (!this.exists()) return false
     try {
