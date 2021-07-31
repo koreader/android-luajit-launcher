@@ -29,10 +29,6 @@ class Device(activity: Activity) {
             return epd.getMode() == "all"
         }
 
-    val needsWakelocks = DeviceInfo.BUG_WAKELOCKS
-    val bugRotation = DeviceInfo.BUG_SCREEN_ROTATION
-    val bugLifecycle = DeviceInfo.BUG_BROKEN_LIFECYCLE
-
     val platform: String = if (activity.packageManager.hasSystemFeature("org.chromium.arc.device_management")) {
         "chrome"
     } else if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
@@ -40,6 +36,14 @@ class Device(activity: Activity) {
         "android_tv"
     } else {
         "android"
+    }
+
+    val needsWakelocks = DeviceInfo.QUIRK_NEEDS_WAKELOCKS
+    val bugRotation = DeviceInfo.QUIRK_NO_HW_ROTATION
+    val bugLifecycle = DeviceInfo.QUIRK_BROKEN_LIFECYCLE
+    val hasLights = when (platform) {
+        "android" -> !DeviceInfo.QUIRK_NO_LIGHTS
+        else -> false
     }
 
     val einkPlatform: String

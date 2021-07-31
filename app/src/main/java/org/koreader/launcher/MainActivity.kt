@@ -463,6 +463,10 @@ class MainActivity : NativeActivity(), LuaInterface,
         }?: false
     }
 
+    override fun hasLights(): Boolean {
+        return device.hasLights
+    }
+
     override fun hasNativeRotation(): Boolean {
         return if (device.platform == "android") {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -472,7 +476,10 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun hasOTAUpdates(): Boolean {
-        return MainApp.has_ota_updates
+        return when (device.platform) {
+            "chrome" -> false
+            else -> MainApp.has_ota_updates
+        }
     }
 
     override fun hasRuntimeChanges(): Boolean {
