@@ -74,5 +74,4 @@ fun Uri.toFile(context: Context, path: String) {
             e.printStackTrace()
         }
     }
-
 }
