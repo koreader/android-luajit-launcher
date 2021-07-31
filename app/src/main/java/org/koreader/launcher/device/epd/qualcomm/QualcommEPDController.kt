@@ -49,7 +49,7 @@ abstract class QualcommEPDController {
                             Log.i(TAG, String.format(Locale.US,
                                 "requested eink refresh, type: %d x:%d y:%d w:%d h:%d",
                                 mode, x, y, width, height))
-                        } catch(e: Exception) {
+                        } catch (e: Exception) {
                             Log.e(TAG, e.toString())
                         }
                     }
