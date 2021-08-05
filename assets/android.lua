@@ -2141,6 +2141,16 @@ local function run(android_app_state)
         end)
     end
 
+    android.hasLights = function()
+        return JNI:context(android.app.activity.vm, function(jni)
+            return jni:callBooleanMethod(
+                android.app.activity.clazz,
+                "hasLights",
+                "()Z"
+            )
+        end)
+    end
+
     android.hasNativeRotation = function()
         return JNI:context(android.app.activity.vm, function(jni)
             return jni:callBooleanMethod(

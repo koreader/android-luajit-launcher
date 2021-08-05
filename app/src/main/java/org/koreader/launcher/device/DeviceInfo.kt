@@ -18,10 +18,12 @@ object DeviceInfo {
     val PRODUCT: String
     val HARDWARE: String
 
-    // known bugs
-    val BUG_WAKELOCKS: Boolean
-    val BUG_SCREEN_ROTATION: Boolean
-    val BUG_BROKEN_LIFECYCLE: Boolean
+    // known quirks
+    val QUIRK_BROKEN_LIFECYCLE: Boolean
+    val QUIRK_NEEDS_WAKELOCKS: Boolean
+    val QUIRK_NO_HW_ROTATION: Boolean
+    val QUIRK_NO_LIGHTS: Boolean
+
 
     enum class EinkDevice {
         NONE,
@@ -57,7 +59,7 @@ object DeviceInfo {
         TOLINO_EPOS
     }
 
-    enum class BugDevice {
+    enum class QuirkDevice {
         NONE,
         EMULATOR,
         ONYX_POKE2,
@@ -67,7 +69,7 @@ object DeviceInfo {
     // default values for generic devices.
     internal var EINK = EinkDevice.NONE
     internal var LIGHTS = LightsDevice.NONE
-    private var BUG = BugDevice.NONE
+    private var QUIRK = QuirkDevice.NONE
 
     // device probe
     private val IS_BOYUE: Boolean
@@ -225,17 +227,17 @@ object DeviceInfo {
             && DEVICE.contentEquals("ntx_6sl")
 
         // devices with known bugs
-        val bugMap = HashMap<BugDevice, Boolean>()
-        bugMap[BugDevice.EMULATOR] = EMULATOR_X86
-        bugMap[BugDevice.ONYX_POKE2] = ONYX_POKE2
-        bugMap[BugDevice.SONY_RP1] = SONY_RP1
+        val bugMap = HashMap<QuirkDevice, Boolean>()
+        bugMap[QuirkDevice.EMULATOR] = EMULATOR_X86
+        bugMap[QuirkDevice.ONYX_POKE2] = ONYX_POKE2
+        bugMap[QuirkDevice.SONY_RP1] = SONY_RP1
 
         bugMap.keys.iterator().run {
             while (this.hasNext()) {
                 val bug = this.next()
                 val flag = bugMap[bug]
                 if (flag != null && flag) {
-                    BUG = bug
+                    QUIRK = bug
                 }
             }
         }
@@ -291,21 +293,27 @@ object DeviceInfo {
             }
         }
 
-        // need wakelocks
-        BUG_WAKELOCKS = when (BUG) {
-            BugDevice.SONY_RP1 -> true
+        // has broken lifecycle
+        QUIRK_BROKEN_LIFECYCLE = when (QUIRK) {
+            QuirkDevice.ONYX_POKE2 -> true
             else -> false
         }
 
-        // has broken lifecycle
-        BUG_BROKEN_LIFECYCLE = when (BUG) {
-            BugDevice.ONYX_POKE2 -> true
+        // need wakelocks
+        QUIRK_NEEDS_WAKELOCKS = when (QUIRK) {
+            QuirkDevice.SONY_RP1 -> true
             else -> false
         }
 
         // 4.4+ device without native surface rotation
-        BUG_SCREEN_ROTATION = when (BUG) {
-            BugDevice.EMULATOR -> true
+        QUIRK_NO_HW_ROTATION = when (QUIRK) {
+            QuirkDevice.EMULATOR -> true
+            else -> false
+        }
+
+        // Android devices without lights
+        QUIRK_NO_LIGHTS = when (QUIRK) {
+            QuirkDevice.SONY_RP1 -> true
             else -> false
         }
     }

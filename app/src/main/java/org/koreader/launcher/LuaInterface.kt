@@ -44,6 +44,7 @@ interface LuaInterface {
     fun getVersion(): String
     fun hasBrokenLifecycle(): Boolean
     fun hasClipboardText(): Boolean
+    fun hasLights(): Boolean
     fun hasNativeRotation(): Boolean
     fun hasOTAUpdates(): Boolean
     fun hasRuntimeChanges(): Boolean
