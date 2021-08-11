@@ -54,6 +54,7 @@ object EPDFactory {
                     TolinoEPDController()
                 }
 
+                DeviceInfo.EinkDevice.ONYX_KON_TIKI2,
                 DeviceInfo.EinkDevice.ONYX_NOVA2 -> {
                     logController("Onyx/Qualcomm")
                     OnyxEPDController()
