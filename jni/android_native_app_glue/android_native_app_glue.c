@@ -388,22 +388,22 @@ static struct android_app* ToApp(ANativeActivity* activity) {
 }
 
 static void onDestroy(ANativeActivity* activity) {
-    LOGD("Destroy: %p", activity);
+    LOGV("Destroy: %p", activity);
     android_app_free(ToApp(activity));
 }
 
 static void onStart(ANativeActivity* activity) {
-    LOGD("Start: %p", activity);
+    LOGV("Start: %p", activity);
     android_app_set_activity_state(ToApp(activity), APP_CMD_START);
 }
 
 static void onResume(ANativeActivity* activity) {
-    LOGD("Resume: %p", activity);
+    LOGV("Resume: %p", activity);
     android_app_set_activity_state(ToApp(activity), APP_CMD_RESUME);
 }
 
 static void* onSaveInstanceState(ANativeActivity* activity, size_t* outLen) {
-    LOGD("SaveInstanceState: %p", activity);
+    LOGV("SaveInstanceState: %p", activity);
 
     struct android_app* android_app = ToApp(activity);
     void* savedState = NULL;
@@ -427,22 +427,22 @@ static void* onSaveInstanceState(ANativeActivity* activity, size_t* outLen) {
 }
 
 static void onPause(ANativeActivity* activity) {
-    LOGD("Pause: %p", activity);
+    LOGV("Pause: %p", activity);
     android_app_set_activity_state(ToApp(activity), APP_CMD_PAUSE);
 }
 
 static void onStop(ANativeActivity* activity) {
-    LOGD("Stop: %p", activity);
+    LOGV("Stop: %p", activity);
     android_app_set_activity_state(ToApp(activity), APP_CMD_STOP);
 }
 
 static void onConfigurationChanged(ANativeActivity* activity) {
-    LOGD("ConfigurationChanged: %p", activity);
+    LOGV("ConfigurationChanged: %p", activity);
     android_app_write_cmd(ToApp(activity), APP_CMD_CONFIG_CHANGED);
 }
 
 static void onContentRectChanged(ANativeActivity* activity, const ARect* r) {
-    LOGD("ContentRectChanged: l=%d,t=%d,r=%d,b=%d", r->left, r->top, r->right, r->bottom);
+    LOGV("ContentRectChanged: l=%d,t=%d,r=%d,b=%d", r->left, r->top, r->right, r->bottom);
     struct android_app* android_app = ToApp(activity);
     pthread_mutex_lock(&android_app->mutex);
     android_app->contentRect = *r;
@@ -451,42 +451,42 @@ static void onContentRectChanged(ANativeActivity* activity, const ARect* r) {
 }
 
 static void onLowMemory(ANativeActivity* activity) {
-    LOGD("LowMemory: %p", activity);
+    LOGV("LowMemory: %p", activity);
     android_app_write_cmd(ToApp(activity), APP_CMD_LOW_MEMORY);
 }
 
 static void onWindowFocusChanged(ANativeActivity* activity, int focused) {
-    LOGD("WindowFocusChanged: %p -- %d", activity, focused);
+    LOGV("WindowFocusChanged: %p -- %d", activity, focused);
     android_app_write_cmd(ToApp(activity), focused ? APP_CMD_GAINED_FOCUS : APP_CMD_LOST_FOCUS);
 }
 
 static void onNativeWindowCreated(ANativeActivity* activity, ANativeWindow* window) {
-    LOGD("NativeWindowCreated: %p -- %p", activity, window);
+    LOGV("NativeWindowCreated: %p -- %p", activity, window);
     android_app_set_window(ToApp(activity), window);
 }
 
 static void onNativeWindowDestroyed(ANativeActivity* activity, ANativeWindow* window) {
-    LOGD("NativeWindowDestroyed: %p -- %p", activity, window);
+    LOGV("NativeWindowDestroyed: %p -- %p", activity, window);
     android_app_set_window(ToApp(activity), NULL);
 }
 
 static void onNativeWindowRedrawNeeded(ANativeActivity* activity, ANativeWindow* window) {
-    LOGD("NativeWindowRedrawNeeded: %p -- %p", activity, window);
+    LOGV("NativeWindowRedrawNeeded: %p -- %p", activity, window);
     android_app_write_cmd(ToApp(activity), APP_CMD_WINDOW_REDRAW_NEEDED);
 }
 
 static void onNativeWindowResized(ANativeActivity* activity, ANativeWindow* window) {
-    LOGD("NativeWindowResized: %p -- %p", activity, window);
+    LOGV("NativeWindowResized: %p -- %p", activity, window);
     android_app_write_cmd(ToApp(activity), APP_CMD_WINDOW_RESIZED);
 }
 
 static void onInputQueueCreated(ANativeActivity* activity, AInputQueue* queue) {
-    LOGD("InputQueueCreated: %p -- %p", activity, queue);
+    LOGV("InputQueueCreated: %p -- %p", activity, queue);
     android_app_set_input(ToApp(activity), queue);
 }
 
 static void onInputQueueDestroyed(ANativeActivity* activity, AInputQueue* queue) {
-    LOGD("InputQueueDestroyed: %p -- %p", activity, queue);
+    LOGV("InputQueueDestroyed: %p -- %p", activity, queue);
     android_app_set_input(ToApp(activity), NULL);
 }
 
