@@ -40,7 +40,7 @@ class MainApp : MultiDexApplication() {
 
         // logcat to crash.log - requested by the user, keep in external app path
         fun dumpLogcat() {
-            val path = String.format("%s%s%s", app_storage_path, File.pathSeparator, "crash.log")
+            val path = String.format("%s%s%s", app_storage_path, File.separator, "crash.log")
             writeLogToFile(path)
         }
 
@@ -95,8 +95,8 @@ class MainApp : MultiDexApplication() {
         super.onCreate()
         assets_path = filesDir.absolutePath
         storage_path = Environment.getExternalStorageDirectory().absolutePath
-        app_storage_path = String.format("%s%s%s", storage_path, File.pathSeparator, name.lowercase())
-        crash_report_path = String.format("%s%s%s", cacheDir, File.pathSeparator, "crash.log")
+        app_storage_path = String.format("%s%s%s", storage_path, File.separator, name.lowercase())
+        crash_report_path = String.format("%s%s%s", cacheDir, File.separator, "crash.log")
         targetSdk = applicationContext.applicationInfo.targetSdkVersion
 
         Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
