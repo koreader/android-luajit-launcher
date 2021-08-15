@@ -2236,7 +2236,7 @@ local function run(android_app_state)
             delay_fast = 0
             fast, partial = wf_du + mode_partial, wf_gc16 + mode_partial
             if platform == "freescale" then
-                local wf_regal = 7
+                local wf_regal = android.prop.product == "nabukreg_hd" and 6 or 7
                 full = wf_gc16 + mode_full
                 full_ui = wf_regal + mode_full
                 partial_ui = wf_regal + mode_partial
