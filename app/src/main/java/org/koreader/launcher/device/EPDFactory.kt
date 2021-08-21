@@ -49,6 +49,7 @@ object EPDFactory {
 
                 DeviceInfo.EinkDevice.CREMA,
                 DeviceInfo.EinkDevice.HANVON_960,
+                DeviceInfo.EinkDevice.NABUK,
                 DeviceInfo.EinkDevice.TOLINO -> {
                     logController("Tolino/NTX")
                     TolinoEPDController()

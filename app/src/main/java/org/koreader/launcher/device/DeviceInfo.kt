@@ -46,6 +46,7 @@ object DeviceInfo {
         HANVON_960,
         INKBOOK,
         JDREAD,
+        NABUK,
         NOOK,
         ONYX_C67,
         ONYX_KON_TIKI2,
@@ -95,6 +96,7 @@ object DeviceInfo {
     private val HANVON_960: Boolean
     private val INKBOOK: Boolean
     private val JDREAD: Boolean
+    private val NABUK_REGAL_HD: Boolean
     private val NOOK: Boolean
     private val ONYX_C67: Boolean
     private val ONYX_KON_TIKI2: Boolean
@@ -196,6 +198,10 @@ object DeviceInfo {
         JDREAD = MANUFACTURER.contentEquals("onyx")
             && MODEL.contentEquals("jdread")
 
+        // Nabuk Regal HD
+        NABUK_REGAL_HD = MANUFACTURER.contentEquals("onyx")
+            && MODEL.contentEquals("nabukreg_hd")
+
         // Nook (catch them all)
         NOOK = (MANUFACTURER.contentEquals("barnesandnoble") || MANUFACTURER.contentEquals("freescale"))
             && (MODEL.contentEquals("bnrv510") || MODEL.contentEquals("bnrv520") || MODEL.contentEquals("bnrv700")
@@ -270,6 +276,7 @@ object DeviceInfo {
         deviceMap[EinkDevice.FIDIBOOK] = FIDIBOOK
         deviceMap[EinkDevice.INKBOOK] = INKBOOK
         deviceMap[EinkDevice.JDREAD] = JDREAD
+        deviceMap[EinkDevice.NABUK] = NABUK_REGAL_HD
         deviceMap[EinkDevice.NOOK] = NOOK
         deviceMap[EinkDevice.ONYX_C67] = ONYX_C67
         deviceMap[EinkDevice.ONYX_KON_TIKI2] = ONYX_KON_TIKI2
