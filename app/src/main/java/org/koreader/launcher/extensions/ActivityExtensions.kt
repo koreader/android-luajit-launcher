@@ -74,9 +74,9 @@ fun Activity.getHeight(): Int {
 fun Activity.getSdcardPath(): String? {
     val context = this.applicationContext
     val packageName = context.packageName
-    val volumes: Array<out java.io.File> = ContextCompat.getExternalFilesDirs(context, null)
     return if (Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED) {
         try {
+            val volumes: Array<out java.io.File> = ContextCompat.getExternalFilesDirs(context, null)
             volumes[1].absolutePath.replace("/Android/data/$packageName/files", "")
         } catch (e: Exception) {
             null
