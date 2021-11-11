@@ -21,6 +21,7 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import org.koreader.launcher.device.Device
+import org.koreader.launcher.dialog.LightDialog
 import org.koreader.launcher.extensions.*
 import java.io.File
 import java.util.Locale
@@ -36,6 +37,9 @@ class MainActivity : NativeActivity(), LuaInterface,
     private lateinit var event: EventReceiver
     private lateinit var timeout: Timeout
     private lateinit var updater: ApkUpdater
+    private lateinit var lightDialog: LightDialog
+
+    private var isResumed = false
 
     // Path of last file imported
     private var lastImportedPath: String? = null
@@ -58,6 +62,9 @@ class MainActivity : NativeActivity(), LuaInterface,
         override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {}
         override fun surfaceDestroyed(holder: SurfaceHolder) {}
     }
+
+    // Hardware orientation for this device (usually match android boot logo)
+    private var screenIsLandscape: Boolean = false
 
     companion object {
         private const val TAG_SURFACE = "Surface"
@@ -98,6 +105,7 @@ class MainActivity : NativeActivity(), LuaInterface,
         timeout = Timeout()
         event = EventReceiver()
         updater = ApkUpdater()
+        lightDialog = LightDialog()
 
         setTheme(R.style.Fullscreen)
 
@@ -115,6 +123,12 @@ class MainActivity : NativeActivity(), LuaInterface,
         }
         Log.v(TAG_SURFACE, "Using $surfaceKind implementation")
 
+        @Suppress("DEPRECATION")
+        screenIsLandscape =  windowManager.defaultDisplay.width > windowManager.defaultDisplay.height
+
+        Log.v(tag, String.format(Locale.US,
+            "native orientation: %s", if (this.screenIsLandscape) "landscape" else "portrait"))
+
         registerReceiver(event, event.filter)
 
         if (!hasMandatoryPermissions()) {
@@ -125,15 +139,17 @@ class MainActivity : NativeActivity(), LuaInterface,
     /* Called when the activity has become visible. */
     override fun onResume() {
         super.onResume()
-        device.onResume()
+        device.epd.resume()
         timeout.onResume(this)
+        isResumed = true
     }
 
     /* Called when another activity is taking focus. */
     override fun onPause() {
         super.onPause()
-        device.onPause()
+        device.epd.pause()
         timeout.onPause(this)
+        isResumed = false
         intent = null
     }
 
@@ -281,16 +297,33 @@ class MainActivity : NativeActivity(), LuaInterface,
 
     override fun einkUpdate(mode: Int) {
         val rootView = view ?: window.decorView.findViewById<View>(android.R.id.content)
-        device.einkUpdate(rootView, mode)
+        val modeName = when (mode) {
+            1 -> "EPD_FULL"
+            2 -> "EPD_PART"
+            3 -> "EPD_A2"
+            4 -> "EPD_AUTO"
+            else -> "invalid"
+        }
+
+        if (modeName != "invalid") {
+            Log.v(tag, String.format(Locale.US,
+                "requesting epd update, type: %s", modeName))
+
+            device.epd.setEpdMode(rootView, 0, 0, 0, 0, 0, 0, modeName)
+        }
     }
 
     override fun einkUpdate(mode: Int, delay: Long, x: Int, y: Int, width: Int, height: Int) {
         val rootView = view ?: window.decorView.findViewById<View>(android.R.id.content)
-        device.einkUpdate(rootView, mode, delay, x, y, width, height)
+        Log.v(tag, String.format(Locale.US,
+            "requesting epd update, mode:%d, delay:%d, [x:%d, y:%d, w:%d, h:%d]",
+            mode, delay, x, y, width, height))
+
+        device.epd.setEpdMode(rootView, mode, delay, x, y, width, height, null)
     }
 
     override fun enableFrontlightSwitch(): Boolean {
-        return device.enableFrontlightSwitch(this)
+        return device.lights.enableFrontlightSwitch(this) == 1
     }
 
     override fun extractAssets(): Boolean {
@@ -333,7 +366,7 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun getExternalPath(): String {
-        return device.externalStorage
+        return MainApp.storage_path
     }
 
     override fun getExternalSdPath(): String {
@@ -359,7 +392,7 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun getLightDialogState(): Int {
-        return device.getLightDialogState()
+        return lightDialog.state
     }
 
     override fun getName(): String {
@@ -371,7 +404,7 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun getPlatformName(): String {
-        return device.platform
+        return platform
     }
 
     override fun getProduct(): String {
@@ -387,14 +420,14 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun getScreenBrightness(): Int {
-        return device.getScreenBrightness(this)
+        return device.lights.getBrightness(this)
     }
 
     override fun getScreenHeight(): Int {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             // We need to handle the notch in Portrait
             // NOTE: getScreenAvailableHeight does it automatically, but it also excludes the nav bar, when there's one :/
-            if (device.getScreenOrientation(this).and(1) == 0) {
+            if (getOrientationCompat(screenIsLandscape).and(1) == 0) {
                 // getScreenOrientation returns LinuxFB rotation constants, Portrait rotations are always even
                 getHeight() - topInsetHeight
             } else {
@@ -406,34 +439,34 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun getScreenMaxBrightness(): Int {
-        return device.getScreenMaxBrightness()
+        return device.lights.getMaxBrightness()
     }
 
     override fun getScreenMinBrightness(): Int {
-        return device.getScreenMinBrightness()
+        return device.lights.getMinBrightness()
     }
 
     override fun getScreenMaxWarmth(): Int {
-        return device.getScreenMaxWarmth()
+        return device.lights.getMaxBrightness()
     }
 
     override fun getScreenMinWarmth(): Int {
-        return device.getScreenMinWarmth()
+        return device.lights.getMinWarmth()
     }
 
     override fun getScreenOrientation(): Int {
-        return device.getScreenOrientation(this)
+        return getOrientationCompat(screenIsLandscape)
     }
 
     override fun getScreenWarmth(): Int {
-        return device.getScreenWarmth(this)
+        return device.lights.getWarmth(this)
     }
 
     override fun getScreenWidth(): Int {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             // We need to handle the notch in Landscape
             // NOTE: getScreenAvailableWidth does it automatically, but it also excludes the nav bar, when there's one :/
-            if (device.getScreenOrientation(this).and(1) == 1) {
+            if (getOrientationCompat(screenIsLandscape).and(1) == 1) {
                 // getScreenOrientation returns LinuxFB rotation constants, Landscape rotations are always odd
                 getWidth() - topInsetHeight
             } else {
@@ -468,7 +501,7 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun hasNativeRotation(): Boolean {
-        return if (device.platform == "android") {
+        return if (platform == "android") {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 !(device.bugRotation)
             } else false
@@ -476,7 +509,7 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun hasOTAUpdates(): Boolean {
-        return when (device.platform) {
+        return when (platform) {
             "chrome" -> false
             else -> MainApp.has_ota_updates
         }
@@ -495,7 +528,10 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun isChromeOS(): Boolean {
-        return device.isChromeOS
+        return when (platform) {
+            "chrome" -> true
+            else -> false
+        }
     }
 
     override fun isDebuggable(): Boolean {
@@ -536,21 +572,24 @@ class MainActivity : NativeActivity(), LuaInterface,
     override fun isPathInsideSandbox(path: String): Boolean {
         return when {
             path.startsWith("/sdcard") -> true
-            path.startsWith(device.externalStorage) -> true
+            path.startsWith(MainApp.storage_path) -> true
             else -> false
         }
     }
 
     override fun isActivityResumed(): Boolean {
-        return device.isResumed
+        return isResumed
     }
 
     override fun isTv(): Boolean {
-        return device.isTv
+        return when (platform) {
+            "android_tv" -> true
+            else -> false
+        }
     }
 
     override fun isWarmthDevice(): Boolean {
-        return device.isWarmthDevice()
+        return device.lights.hasWarmth()
     }
 
     override fun needsWakelocks(): Boolean {
@@ -575,7 +614,7 @@ class MainActivity : NativeActivity(), LuaInterface,
 
     override fun performHapticFeedback(constant: Int, force: Int) {
         val rootView = view ?: window.decorView.findViewById<View>(android.R.id.content)
-        device.hapticFeedback(this, constant, force > 0, rootView)
+        hapticFeedback(constant, force > 0, rootView)
     }
 
     @Suppress("NewApi")
@@ -634,7 +673,7 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun setScreenBrightness(brightness: Int) {
-        device.setScreenBrightness(this, brightness)
+        device.lights.setBrightness(this, brightness)
     }
 
     override fun setScreenOffTimeout(ms: Int) {
@@ -642,16 +681,16 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun setScreenOrientation(orientation: Int) {
-        device.setScreenOrientation(this, orientation)
+        setOrientationCompat(screenIsLandscape, orientation)
     }
 
     override fun setScreenWarmth(warmth: Int) {
-        device.setScreenWarmth(this, warmth)
+        device.lights.setWarmth(this, warmth)
     }
 
     override fun showFrontlightDialog(title: String, dim: String, warmth: String,
                                       okButton: String, cancelButton: String) {
-        device.showDialog(this, title, dim, warmth, okButton, cancelButton)
+        lightDialog.show(this, device.lights, title, dim, warmth, okButton, cancelButton)
     }
 
     override fun showToast(message: String, longTimeout: Boolean) {
