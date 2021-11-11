@@ -24,7 +24,6 @@ object DeviceInfo {
     val QUIRK_NO_HW_ROTATION: Boolean
     val QUIRK_NO_LIGHTS: Boolean
 
-
     enum class EinkDevice {
         NONE,
         BOYUE_K78W,
