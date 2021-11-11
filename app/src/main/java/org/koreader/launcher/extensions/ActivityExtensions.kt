@@ -14,11 +14,34 @@ import android.os.Build
 import android.os.Environment
 import android.provider.Settings
 import android.util.DisplayMetrics
+import android.view.Surface
+import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import org.koreader.launcher.device.Device
 import java.util.*
 import java.util.concurrent.CountDownLatch
+
+val Activity.platform: String
+    get() = if (packageManager.hasSystemFeature("org.chromium.arc.device_management")) {
+        "chrome"
+    } else if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+        && packageManager.hasSystemFeature(PackageManager.FEATURE_LEANBACK)) {
+        "android_tv"
+    } else {
+        "android"
+    }
+/* Haptic feedback */
+fun Activity.hapticFeedback(constant: Int, force: Boolean, view: View) {
+    runOnUiThread {
+        if (force) {
+            view.performHapticFeedback(constant, 2)
+        } else {
+            view.performHapticFeedback(constant)
+        }
+    }
+}
 
 fun Activity.aardLookup(text: String) {
     val aardIntent: Intent = Intent().apply {
@@ -294,12 +317,55 @@ private fun startActivityCompat(context: Context, intent: Intent,
     } ?: context.startActivity(Intent.createChooser(intent, rationale))
 }
 
+/* Orientation */
+@Suppress("DEPRECATION")
+fun Activity.getOrientationCompat(isLandscape: Boolean): Int {
+    return when (windowManager.defaultDisplay.rotation) {
+        Surface.ROTATION_90 -> if (isLandscape) LINUX_PORTRAIT else LINUX_REVERSE_LANDSCAPE
+        Surface.ROTATION_180 -> if (isLandscape) LINUX_REVERSE_LANDSCAPE else LINUX_REVERSE_PORTRAIT
+        Surface.ROTATION_270 -> if (isLandscape) LINUX_REVERSE_PORTRAIT else LINUX_LANDSCAPE
+        else -> if (isLandscape) LINUX_LANDSCAPE else LINUX_PORTRAIT
+    }
+}
+
+fun Activity.setOrientationCompat(isLandscape: Boolean, orientation: Int) {
+    val newOrientation = if (isLandscape) {
+        when (orientation) {
+            ANDROID_LANDSCAPE -> ANDROID_PORTRAIT
+            ANDROID_PORTRAIT -> ANDROID_LANDSCAPE
+            ANDROID_REVERSE_LANDSCAPE -> ANDROID_REVERSE_PORTRAIT
+            ANDROID_REVERSE_PORTRAIT -> ANDROID_REVERSE_LANDSCAPE
+            else -> orientation
+        }
+    } else {
+        when (orientation) {
+            ANDROID_LANDSCAPE -> ANDROID_REVERSE_LANDSCAPE
+            ANDROID_REVERSE_LANDSCAPE -> ANDROID_LANDSCAPE
+            else -> orientation
+        }
+    }
+    requestedOrientation = newOrientation
+}
+
+
 private const val ACTIVE_NETWORK_NONE = 0
 private const val ACTIVE_NETWORK_WIFI = 1
 private const val ACTIVE_NETWORK_MOBILE = 2
 private const val ACTIVE_NETWORK_ETHERNET = 3
 private const val ACTIVE_NETWORK_BLUETOOTH = 4
 private const val ACTIVE_NETWORK_VPN = 5
+
+// constants from https://developer.android.com/reference/android/content/res/Configuration
+private const val ANDROID_LANDSCAPE = 0
+private const val ANDROID_PORTRAIT = 1
+private const val ANDROID_REVERSE_LANDSCAPE = 8
+private const val ANDROID_REVERSE_PORTRAIT = 9
+
+// constants from https://github.com/koreader/koreader-base/blob/master/ffi/framebuffer.lua
+private const val LINUX_PORTRAIT = 0
+private const val LINUX_LANDSCAPE = 1
+private const val LINUX_REVERSE_PORTRAIT = 2
+private const val LINUX_REVERSE_LANDSCAPE = 3
 
 private val supported_extensions = arrayOf(
     "application/epub+zip",
