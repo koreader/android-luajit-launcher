@@ -124,7 +124,7 @@ class MainActivity : NativeActivity(), LuaInterface,
         Log.v(TAG_SURFACE, "Using $surfaceKind implementation")
 
         @Suppress("DEPRECATION")
-        screenIsLandscape =  windowManager.defaultDisplay.width > windowManager.defaultDisplay.height
+        screenIsLandscape = windowManager.defaultDisplay.width > windowManager.defaultDisplay.height
 
         Log.v(tag, String.format(Locale.US,
             "native orientation: %s", if (this.screenIsLandscape) "landscape" else "portrait"))

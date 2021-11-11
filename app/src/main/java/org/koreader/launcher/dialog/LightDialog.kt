@@ -8,7 +8,6 @@ import android.widget.SeekBar
 import android.widget.TextView
 import org.koreader.launcher.device.LightsInterface
 
-
 class LightDialog {
 
     companion object {

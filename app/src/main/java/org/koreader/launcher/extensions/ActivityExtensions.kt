@@ -19,7 +19,6 @@ import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
-import org.koreader.launcher.device.Device
 import java.util.*
 import java.util.concurrent.CountDownLatch
 
@@ -347,7 +346,7 @@ fun Activity.setOrientationCompat(isLandscape: Boolean, orientation: Int) {
     requestedOrientation = newOrientation
 }
 
-
+// constants from https://github.com/koreader/android-luajit-launcher/blob/master/assets/android.lua
 private const val ACTIVE_NETWORK_NONE = 0
 private const val ACTIVE_NETWORK_WIFI = 1
 private const val ACTIVE_NETWORK_MOBILE = 2
