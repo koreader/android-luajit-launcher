@@ -8,7 +8,6 @@ import android.widget.SeekBar
 import android.widget.TextView
 import org.koreader.launcher.device.LightsInterface
 
-
 class LightDialog {
 
     companion object {
@@ -32,8 +31,13 @@ class LightDialog {
         val hasWarmth = controller.hasWarmth()
         state = LIGHT_DIALOG_OPENED
         activity.runOnUiThread {
+            val titleText = TextView(activity)
             val dimText = TextView(activity)
             val dimSeekBar = SeekBar(activity)
+            titleText.text = title
+            titleText.gravity = Gravity.CENTER_HORIZONTAL
+            titleText.height = 30
+            titleText.textSize = 18f
             dimText.text = dim
             dimText.gravity = Gravity.CENTER_HORIZONTAL
             dimText.textSize = 18f
@@ -70,7 +74,7 @@ class LightDialog {
             }
 
             val builder = AlertDialog.Builder(activity)
-            builder.setTitle(title)
+            builder.setCustomTitle(titleText)
                 .setCancelable(false)
                 .setPositiveButton(okButton) {
                         _, _ -> state = LIGHT_DIALOG_OK

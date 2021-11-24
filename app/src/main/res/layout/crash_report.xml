@@ -9,13 +9,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8sp"
-        android:textSize="@dimen/title"
+        android:textSize="@dimen/section"
         android:gravity="center_horizontal" />
     <TextView
         android:id="@+id/reason"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="@dimen/subtitle"
+        android:textSize="@dimen/text"
         android:gravity="center_horizontal" />
     <TextView
         android:id="@+id/bomb"
@@ -56,7 +56,7 @@
             android:id="@+id/shareReport"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/common_share_button" />
+            android:text="@string/test_share_button" />
     </RelativeLayout>
 </LinearLayout>
 

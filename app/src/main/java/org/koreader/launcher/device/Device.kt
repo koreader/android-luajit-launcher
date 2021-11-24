@@ -4,7 +4,6 @@ import android.app.Activity
 import android.os.Build
 import org.koreader.launcher.extensions.platform
 
-
 class Device(activity: Activity) {
     val epd = EPDFactory.epdController
     val lights = LightsFactory.lightsController
@@ -41,6 +40,4 @@ class Device(activity: Activity) {
             platform
         }
     }
-
-
 }

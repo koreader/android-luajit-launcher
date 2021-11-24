@@ -75,7 +75,7 @@ interface LuaInterface {
     fun setScreenWarmth(warmth: Int)
     fun setScreenOffTimeout(ms: Int)
     fun setScreenOrientation(orientation: Int)
-    fun startEPDTestActivity()
+    fun startTestActivity()
     fun showFrontlightDialog(title: String, dim: String, warmth: String, okButton: String, cancelButton: String)
     fun showToast(message: String, longTimeout: Boolean)
     fun untar(filePath: String, outputPath: String): Boolean
