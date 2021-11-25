@@ -2305,11 +2305,11 @@ local function run(android_app_state)
         end
     end
 
-    android.einkTest = function()
+    android.runTest = function()
         JNI:context(android.app.activity.vm, function(jni)
             jni:callVoidMethod(
                 android.app.activity.clazz,
-                "startEPDTestActivity",
+                "startTestActivity",
                 "()V"
             )
         end)

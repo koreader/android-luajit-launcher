@@ -32,7 +32,7 @@ class CrashReportActivity : AppCompatActivity() {
                     putExtra(Intent.EXTRA_TEXT, binding.logs.text.toString())
                 }
                 startActivity(Intent.createChooser(intent,
-                    resources.getString(R.string.common_share_rationale)))
+                    resources.getString(R.string.test_share_rationale)))
             }
         } ?: noCrashReportAttachedError()
     }

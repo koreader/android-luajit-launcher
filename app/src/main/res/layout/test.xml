@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/border"
+                android:layout_marginLeft="@dimen/border"
+                android:layout_marginTop="@dimen/section"
+                android:layout_marginEnd="@dimen/border"
+                android:layout_marginRight="@dimen/border"
+                android:gravity="center_horizontal"
+                android:text="@string/test_how_it_works"
+                android:textSize="@dimen/text" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/border"
+                android:layout_marginLeft="@dimen/border"
+                android:layout_marginTop="@dimen/section"
+                android:layout_marginEnd="@dimen/border"
+                android:layout_marginRight="@dimen/border"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/buttonTryLights"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:minWidth="@dimen/button"
+                    android:text="@string/test_button_lights" />
+
+                <Spinner
+                    android:id="@+id/spinnerLights"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="48dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/border"
+                android:layout_marginLeft="@dimen/border"
+                android:layout_marginTop="@dimen/section"
+                android:layout_marginEnd="@dimen/border"
+                android:layout_marginRight="@dimen/border"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/buttonTryEpd"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:minWidth="@dimen/button"
+                    android:text="@string/test_button_epd" />
+
+                <Spinner
+                    android:id="@+id/spinnerEpd"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="48dp" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/section"
+                android:gravity="center_horizontal"
+                android:text="@string/test_questions"
+                android:textSize="@dimen/text" />
+
+            <TextView
+                android:id="@+id/instructions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/section"
+                android:layout_marginBottom="@dimen/border"
+                android:gravity="center_horizontal|bottom"
+                android:text="@string/test_instructions"
+                android:textSize="@dimen/text" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/section"
+                android:layout_marginBottom="@dimen/border"
+                android:gravity="center_horizontal|bottom"
+                android:text="@string/test_device_id"
+                android:textSize="@dimen/section" />
+
+            <TextView
+                android:id="@+id/info"
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                android:gravity="center_horizontal"
+                android:textSize="@dimen/text" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0" >
+        <Button
+            android:id="@+id/shareButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:text="@string/test_share_button"/>
+
+    </RelativeLayout>
+</LinearLayout>

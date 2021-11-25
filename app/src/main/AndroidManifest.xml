@@ -101,9 +101,9 @@
             android:exported="false">
         </activity>
         <activity
-            android:label="EPDTest"
-            android:theme="@style/NoTitle"
-            android:name=".EPDTestActivity"
+            android:label="Test"
+            android:theme="@style/Theme.AppCompat.Light"
+            android:name=".TestActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
