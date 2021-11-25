@@ -20,6 +20,7 @@ buildscript {
 
     dependencies {
         classpath "com.android.tools.build:gradle:$gradle_plugin_version"
+        //noinspection DifferentKotlinGradleVersion
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_plugin_version"
     }
 }

@@ -1,20 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- translate -->
-    <string name="common_share_button">Share</string>
-    <string name="common_share_rationale">Send report to</string>
-    <string name="epd_test_title">EPD Test</string>
-    <string name="epd_test_question">Did you see a flashing black to white eink update?</string>
-    <string name="epd_test_instructions">Go to github.com/koreader/koreader/issues/4551 and share the following information with us</string>
-    <string name="epd_test_description">Supported platforms</string>
     <string name="error_no_permissions">Insufficient permissions</string>
     <string name="no_crash_attached">No crash report attached</string>
     <string name="permission_manage_storage">Please allow the app to manage all files.</string>
+    <string name="test_button_epd">test e-ink</string>
+    <string name="test_button_lights">test lights</string>
+    <string name="test_device_id">Device info</string>
+    <string name="test_how_it_works">Select a driver from the dropdown menu and press the button to test it.</string>
+    <string name="test_questions">Do light controls work?\nDoes the screen refresh when you press the button?</string>
+    <string name="test_instructions">Please <a href="https://github.com/koreader/koreader/issues/8482#issue-1063797731">follow instructions</a> to report new devices.</string>
+    <string name="test_share_button">Save report</string>
+    <string name="test_share_rationale">Send report to</string>
 
     <!-- don't translate -->
-    <string name="epd_test_ntx_button" translatable="false">NTX</string>
-    <string name="epd_test_qualcomm_button" translatable="false">Qualcomm</string>
-    <string name="epd_test_rk30xx_button" translatable="false">Rockchip 30xx</string>
-    <string name="epd_test_rk33xx_button" translatable="false">Rockchip 33xx</string>
     <string name="unicode_bomb" translatable="false">💣</string>
 </resources>
