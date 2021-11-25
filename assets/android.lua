@@ -2305,8 +2305,7 @@ local function run(android_app_state)
         end
     end
 
-    -- TODO: rename me
-    android.einkTest = function()
+    android.runTest = function()
         JNI:context(android.app.activity.vm, function(jni)
             jni:callVoidMethod(
                 android.app.activity.clazz,
