@@ -18,6 +18,7 @@ interface LuaInterface {
     fun extractAssets(): Boolean
     fun getBatteryLevel(): Int
     fun getClipboardText(): String
+    fun getEinkConstants(): String
     fun getEinkPlatform(): String
     fun getExternalPath(): String
     fun getExternalSdPath(): String

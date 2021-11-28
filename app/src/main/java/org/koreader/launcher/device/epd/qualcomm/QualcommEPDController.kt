@@ -9,6 +9,16 @@ import java.util.*
 abstract class QualcommEPDController {
     companion object {
         private const val TAG = "EPD"
+        const val EINK_WAVEFORM_UPDATE_FULL = 32
+        const val EINK_WAVEFORM_UPDATE_PARTIAL = 0
+        const val EINK_WAVEFORM_MODE_WAIT = 64
+        const val EINK_WAVEFORM_MODE_DU = 1
+        const val EINK_WAVEFORM_MODE_GC16 = 2
+        const val EINK_WAVEFORM_MODE_REAGL = 6
+        const val EINK_WAVEFORM_DELAY = 250
+        const val EINK_WAVEFORM_DELAY_UI = 100
+        const val EINK_WAVEFORM_DELAY_FAST = 0
+
 
         private fun preventSystemRefresh() : Boolean{
             // Sets UpdateMode and UpdateScheme to None

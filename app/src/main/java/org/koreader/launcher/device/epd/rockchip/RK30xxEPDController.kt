@@ -36,6 +36,13 @@ abstract class RK30xxEPDController {
         private var eInkEnum: Class<Enum<*>>? = null
         private var updateEpdMethod: Method? = null
 
+        const val EINK_MODE_FULL = 1
+        const val EINK_MODE_PARTIAL = 2
+        const val EINK_MODE_FULL_UI = 4
+        const val EINK_MODE_PARTIAL_UI = 4
+        const val EINK_MODE_FAST = 3
+        const val EINK_WAVEFORM_DELAY = 0
+
         init {
             try {
                 @Suppress("UNCHECKED_CAST")

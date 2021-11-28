@@ -6,6 +6,16 @@ package org.koreader.launcher.device
 interface EPDInterface {
     fun getMode(): String
     fun getPlatform(): String
+
+    fun getWaveformFull(): Int
+    fun getWaveformPartial(): Int
+    fun getWaveformFullUi(): Int
+    fun getWaveformPartialUi(): Int
+    fun getWaveformFast(): Int
+    fun getWaveformDelay(): Int
+    fun getWaveformDelayUi(): Int
+    fun getWaveformDelayFast(): Int
+
     fun needsView(): Boolean
 
     fun setEpdMode(targetView: android.view.View,

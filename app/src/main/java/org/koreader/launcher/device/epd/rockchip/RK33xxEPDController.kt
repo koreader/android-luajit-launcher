@@ -26,7 +26,13 @@ import java.util.*
 abstract class RK33xxEPDController {
     companion object {
         private const val TAG = "EPD"
-        private const val EPD_FULL = 1
+
+        const val EINK_MODE_FULL = 1
+        const val EINK_MODE_PARTIAL = 2
+        const val EINK_MODE_FULL_UI = 4
+        const val EINK_MODE_PARTIAL_UI = 4
+        const val EINK_MODE_FAST = 3
+        const val EINK_WAVEFORM_DELAY = 0
 
         fun requestEpdMode(epdMode: String): Boolean {
             return try {
@@ -40,7 +46,7 @@ abstract class RK33xxEPDController {
         }
 
         private fun getEpdMode(epdMode: String): Int {
-            val mode = EPD_FULL
+            val mode = EINK_MODE_FULL
             Log.v(TAG, String.format(Locale.US, "Requesting %s: %d", epdMode, mode))
             return mode
         }
