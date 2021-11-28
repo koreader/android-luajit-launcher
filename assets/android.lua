@@ -2350,8 +2350,14 @@ local function run(android_app_state)
                 "getEinkConstants",
                 "()Ljava/lang/String;"
             )
-            return string.match(jni:to_string(constants),
-                "(.*);(.*);(.*);(.*);(.*);(.*);(.*);(.*)")
+
+            local full, partial, full_ui, partial_ui, fast, delay, delay_ui, delay_fast = string.match(
+                jni:to_string(constants),
+                "(.*);(.*);(.*);(.*);(.*);(.*);(.*);(.*)"
+            )
+            return tonumber(full), tonumber(partial), tonumber(full_ui), tonumber(partial_ui),
+                tonumber(fast), tonumber(delay), tonumber(delay_ui), tonumber(delay_fast)
+
         end)
     end
 
