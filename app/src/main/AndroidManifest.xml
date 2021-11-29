@@ -28,6 +28,7 @@
         android:name=".MainApp"
         android:icon="@mipmap/icon"
         android:banner="@mipmap/banner"
+        tools:replace="android:label,android:allowBackup"
         android:label="${APP_NAME}"
         android:allowBackup="false"
         android:fullBackupContent="false"

@@ -1,10 +1,7 @@
 package org.koreader.launcher.device
 
 import android.util.Log
-import org.koreader.launcher.device.lights.GenericController
-import org.koreader.launcher.device.lights.OnyxWarmthController
-import org.koreader.launcher.device.lights.OnyxC67Controller
-import org.koreader.launcher.device.lights.TolinoWarmthController
+import org.koreader.launcher.device.lights.*
 import java.util.*
 
 object LightsFactory {
@@ -24,6 +21,10 @@ object LightsFactory {
                 DeviceInfo.LightsDevice.ONYX_C67 -> {
                     logController("ONYX C67")
                     OnyxC67Controller()
+                }
+                DeviceInfo.LightsDevice.ONYX_NOTEAIR2 -> {
+                    logController("ONYX CoolWarm")
+                    OnyxSDKCoolWarmController()
                 }
                 else -> {
                     logController("Generic")

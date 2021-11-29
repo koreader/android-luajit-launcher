@@ -114,6 +114,11 @@ android {
 repositories {
     google()
     mavenCentral()
+    maven { url "https://jitpack.io" }
+
+	maven {
+            url "https://repo.boox.com/repository/maven-public/"
+    }
 }
 
 dependencies {
@@ -128,6 +133,8 @@ dependencies {
     //noinspection GradleDependency
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_plugin_version"
     implementation "org.apache.commons:commons-compress:$commons_compress_version"
+
+    implementation "com.onyx.android.sdk:onyxsdk-device:1.2.0"
 
     // add Leak Canary on debug variants.
     debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakcanary_version"
