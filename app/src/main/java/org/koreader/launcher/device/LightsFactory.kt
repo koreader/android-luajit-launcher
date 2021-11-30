@@ -23,8 +23,8 @@ object LightsFactory {
                     OnyxC67Controller()
                 }
                 DeviceInfo.LightsDevice.ONYX_NOTEAIR2 -> {
-                    logController("ONYX CoolWarm")
-                    OnyxSDKCoolWarmController()
+                    logController("ONYX SDM")
+                    OnyxSDMController()
                 }
                 else -> {
                     logController("Generic")

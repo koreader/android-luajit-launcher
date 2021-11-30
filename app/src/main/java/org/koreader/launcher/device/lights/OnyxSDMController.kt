@@ -4,20 +4,23 @@ import android.app.Activity
 import android.util.Log
 import org.koreader.launcher.device.LightsInterface
 import android.content.Context
-import com.onyx.android.sdk.api.device.FrontLightController
+import java.lang.Class.forName
+import java.lang.reflect.Method
+import kotlin.math.*
+
 
 data class WarmColdSetting(val warm: Int = 0, val cold: Int = 0)
-data class WarmthBrightnessSetting(val warmth: Int = 0, val brightness: Int = 0)
+data class WarmthBrightnessSetting(var warmth: Int = 0, var brightness: Int = 0)
 
-class OnyxSDKCoolWarmController : LightsInterface {
+class OnyxSDMController : LightsInterface {
     companion object {
         private const val TAG = "Lights"
         private const val BRIGHTNESS_MAX = 100
-        private const val MAX_BRIGHTNESS_LUX = 112
         private const val WARMTH_MAX = 100
         private const val MIN = 0
-        var currentWarmCold = WarmColdSetting()
-        var currentWarmthBrightness = WarmthBrightnessSetting()
+
+        private var currentWarmCold = WarmColdSetting()
+        private var currentWarmthBrightness = WarmthBrightnessSetting()
     }
 
     override fun hasFallback(): Boolean {
@@ -60,10 +63,7 @@ class OnyxSDKCoolWarmController : LightsInterface {
             return
         }
         try {
-//            val warmth = currentWarmthBrightness?.warmth ?: 50
-            val warmth = currentWarmthBrightness.warmth
-
-            currentWarmthBrightness = WarmthBrightnessSetting(warmth, brightness)
+            currentWarmthBrightness.brightness = brightness
             currentWarmCold = Adapter.convertWarmthBrightnessToWarmCold(currentWarmthBrightness)
             Log.v(TAG, "Setting brightness to $brightness")
             FrontLight.setWarmCold(currentWarmCold, activity)
@@ -79,13 +79,9 @@ class OnyxSDKCoolWarmController : LightsInterface {
         }
         Log.v(TAG, "Setting warmth to $warmth")
         try {
-//            val brightness = currentWarmthBrightness?.brightness ?: 50
-            val brightness = currentWarmthBrightness.brightness
-
-            currentWarmthBrightness= WarmthBrightnessSetting(warmth, brightness)
+            currentWarmthBrightness.warmth = warmth
             currentWarmCold = Adapter.convertWarmthBrightnessToWarmCold(currentWarmthBrightness)
             FrontLight.setWarmCold(currentWarmCold, activity)
-
         } catch (e: Exception) {
             Log.w(TAG, "$e")
         }
@@ -129,7 +125,7 @@ object Adapter{
         val warmBrightnessLux = convertWarmOrColdSettingToLux(warmCold.warm)
         val coldBrightnessLux = convertWarmOrColdSettingToLux(warmCold.cold)
         val brightnessLux = warmBrightnessLux + coldBrightnessLux
-        val warmthPercent = Math.round(Math.min(100.0, warmBrightnessLux * 100 / brightnessLux)).toInt()
+        val warmthPercent = min(100.0, warmBrightnessLux * 100 / brightnessLux).roundToInt()
         val brightness = convertLuxToBrigthnessSetting(brightnessLux)
         return WarmthBrightnessSetting(warmthPercent, brightness)
     }
@@ -137,27 +133,27 @@ object Adapter{
     private fun convertLuxToWarmOrColdSetting(brightnessLux: Double, maxResult: Int): Int {
         if (brightnessLux <= 0.05) return 0
         val minNonZeroResult = 1
-        return Math.max(minNonZeroResult, Math.min(maxResult, Math.round(34 * Math.log(17 * brightnessLux)).toInt()))
+        return Math.max(minNonZeroResult, min(maxResult, (34 * ln(17 * brightnessLux)).roundToInt()))
     }
 
     private fun convertWarmOrColdSettingToLux(setting: Int): Double {
-        return if (setting == 0) 0.0 else Math.pow(Math.E, setting.toDouble() / 34) / 17
+        return if (setting == 0) 0.0 else Math.E.pow(setting.toDouble() / 34) / 17
     }
 
     private fun convertBrightnessSettingToLux(slider: Int): Double {
         if (slider == 0) return 0.0
         return if (slider <= 5) {
-            Math.max(0.0, 0.0223609 * Math.pow(slider.toDouble(), 2.0) - 0.0406061 * slider + 0.0861964)
-        } else Math.min(MAX_BRIGHTNESS_LUX.toDouble(), 0.5 * Math.pow(Math.E, 0.0535 * slider))
+            max(0.0, 0.0223609 * slider.toDouble().pow(2.0) - 0.0406061 * slider + 0.0861964)
+        } else min(MAX_BRIGHTNESS_LUX.toDouble(), 0.5 * Math.E.pow(0.0535 * slider))
     }
 
     private fun convertLuxToBrigthnessSetting(lux: Double): Int {
         if (lux == 0.0) return 0
         if (lux <= 0.5) {
-            return Math.round(0.90797 + 0.214277 * Math.sqrt(Math.max(0.0, 974 * lux - 66))).toInt()
+            return (0.90797 + 0.214277 * sqrt(max(0.0, 974 * lux - 66))).roundToInt()
         }
         val MAX_BRIGHTNESS_SETTING = 100.0
-        return Math.round(Math.max(1.0, Math.min(MAX_BRIGHTNESS_SETTING, Math.round(18.6916 * Math.log(2 * lux)).toDouble()))).toInt()
+        return max(1.0, min(MAX_BRIGHTNESS_SETTING, (18.6916 * ln(2 * lux)).roundToInt().toDouble())).roundToInt()
     }
 
 }
@@ -165,17 +161,39 @@ object Adapter{
 
 object FrontLight {
 
-    fun getWarmCold(context: Context?): WarmColdSetting {
-        return WarmColdSetting(
-            FrontLightController.getWarmLightConfigValue(context),
-            FrontLightController.getColdLightConfigValue(context)
+    private val fLController = forName("android.onyx.hardware.DeviceController")
 
-        )
+    private val setWarmBrightness: Method = fLController.getMethod("setWarmLightDeviceValue", Context::class.java, Integer.TYPE)
+    private val setColdBrightness: Method = fLController.getMethod("setColdLightDeviceValue", Context::class.java, Integer.TYPE)
+
+    private val getCoolWarmBrightness: Method = fLController.getMethod("getBrightnessConfig", Context::class.java, Integer.TYPE)
+    private const val BRIGHTNESS_CONFIG_WARM_IDX: Int = 2
+    private const val BRIGHTNESS_CONFIG_COLD_IDX: Int = 3
+
+    private const val TAG = "lights"
+
+
+    fun getWarmCold(context: Context?): WarmColdSetting {
+        try {
+            return WarmColdSetting(
+                getCoolWarmBrightness.invoke(fLController, context, BRIGHTNESS_CONFIG_WARM_IDX) as Int,
+                getCoolWarmBrightness.invoke(fLController, context, BRIGHTNESS_CONFIG_COLD_IDX) as Int
+            )
+        } catch (e: Exception) {
+            Log.w(TAG, "$e")
+            return WarmColdSetting()
+        }
     }
 
     fun setWarmCold(setting: WarmColdSetting, context: Context?) {
-        FrontLightController.setWarmLightDeviceValue(context, setting.warm)
-        FrontLightController.setColdLightDeviceValue(context, setting.cold)
+        try {
+            setWarmBrightness.invoke(fLController, context, setting.warm)
+            setColdBrightness.invoke(fLController, context, setting.cold)
+        } catch (e: Exception) {
+            Log.w(TAG, "$e")
+        }
+
+
     }
 
 
