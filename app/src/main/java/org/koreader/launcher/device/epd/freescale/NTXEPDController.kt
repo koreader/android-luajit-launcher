@@ -32,8 +32,16 @@ import android.util.Log
 import java.util.*
 
 abstract class NTXEPDController {
+
     companion object {
         private const val TAG = "EPD"
+        const val EINK_WAVEFORM_UPDATE_FULL = 32
+        const val EINK_WAVEFORM_UPDATE_PARTIAL = 0
+        const val EINK_WAVEFORM_MODE_DU = 1
+        const val EINK_WAVEFORM_MODE_GC16 = 2
+        const val EINK_WAVEFORM_MODE_GL16 = 6
+        const val EINK_WAVEFORM_MODE_GLR16 = 7
+        const val EINK_WAVEFORM_DELAY = 0
 
         fun requestEpdMode(view: android.view.View,
                            mode: Int, delay: Long,

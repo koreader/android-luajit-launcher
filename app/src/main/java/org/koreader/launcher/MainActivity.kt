@@ -361,6 +361,18 @@ class MainActivity : NativeActivity(), LuaInterface,
         }
     }
 
+    override fun getEinkConstants(): String {
+        return String.format(Locale.US, "%d;%d;%d;%d;%d;%d;%d;%d",
+            device.epd.getWaveformFull(),
+            device.epd.getWaveformPartial(),
+            device.epd.getWaveformFullUi(),
+            device.epd.getWaveformPartialUi(),
+            device.epd.getWaveformFast(),
+            device.epd.getWaveformDelay(),
+            device.epd.getWaveformDelayUi(),
+            device.epd.getWaveformDelayFast())
+    }
+
     override fun getEinkPlatform(): String {
         return device.einkPlatform
     }

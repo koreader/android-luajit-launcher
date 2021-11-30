@@ -1,22 +1,22 @@
-/* Tested on Nook Glowlight 3. */
+/* Tolino-like without REGAL */
 
 package org.koreader.launcher.device.epd
 
 import org.koreader.launcher.device.EPDInterface
 import org.koreader.launcher.device.epd.freescale.NTXEPDController
 
-class NookEPDController : NTXEPDController(), EPDInterface {
+class OldTolinoEPDController : NTXEPDController(), EPDInterface {
 
     override fun getPlatform(): String {
         return "freescale"
     }
 
     override fun getMode(): String {
-        return "full-only"
+        return "all"
     }
 
     override fun getWaveformFull(): Int {
-        return EINK_WAVEFORM_UPDATE_FULL + EINK_WAVEFORM_MODE_GC16
+       return EINK_WAVEFORM_UPDATE_FULL + EINK_WAVEFORM_MODE_GC16
     }
 
     override fun getWaveformPartial(): Int {
@@ -24,11 +24,11 @@ class NookEPDController : NTXEPDController(), EPDInterface {
     }
 
     override fun getWaveformFullUi(): Int {
-        return EINK_WAVEFORM_UPDATE_FULL + EINK_WAVEFORM_MODE_GLR16
+        return EINK_WAVEFORM_UPDATE_FULL + EINK_WAVEFORM_MODE_GL16
     }
 
     override fun getWaveformPartialUi(): Int {
-        return EINK_WAVEFORM_UPDATE_PARTIAL + EINK_WAVEFORM_MODE_GLR16
+        return EINK_WAVEFORM_UPDATE_PARTIAL + EINK_WAVEFORM_MODE_GL16
     }
 
     override fun getWaveformFast(): Int {

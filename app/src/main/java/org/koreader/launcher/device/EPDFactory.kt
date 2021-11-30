@@ -9,6 +9,8 @@ import org.koreader.launcher.device.epd.TolinoEPDController
 import org.koreader.launcher.device.epd.RK3026EPDController
 import org.koreader.launcher.device.epd.RK3368EPDController
 import org.koreader.launcher.device.epd.OnyxEPDController
+import org.koreader.launcher.device.epd.OldTolinoEPDController
+
 import java.util.*
 
 object EPDFactory {
@@ -49,7 +51,6 @@ object EPDFactory {
 
                 DeviceInfo.EinkDevice.CREMA,
                 DeviceInfo.EinkDevice.HANVON_960,
-                DeviceInfo.EinkDevice.NABUK,
                 DeviceInfo.EinkDevice.TOLINO -> {
                     logController("Tolino/NTX")
                     TolinoEPDController()
@@ -59,6 +60,11 @@ object EPDFactory {
                 DeviceInfo.EinkDevice.ONYX_NOVA2 -> {
                     logController("Onyx/Qualcomm")
                     OnyxEPDController()
+                }
+
+                DeviceInfo.EinkDevice.NABUK -> {
+                    logController("Old Tolino/NTX")
+                    OldTolinoEPDController()
                 }
 
                 else -> {
@@ -73,6 +79,38 @@ object EPDFactory {
 
         override fun getPlatform(): String {
             return "none"
+        }
+
+        override fun getWaveformFull(): Int {
+            return 0
+        }
+
+        override fun getWaveformPartial(): Int {
+            return 0
+        }
+
+        override fun getWaveformFullUi(): Int {
+            return 0
+        }
+
+        override fun getWaveformPartialUi(): Int {
+            return 0
+        }
+
+        override fun getWaveformFast(): Int {
+            return 0
+        }
+
+        override fun getWaveformDelay(): Int {
+            return 0
+        }
+
+        override fun getWaveformDelayUi(): Int {
+            return 0
+        }
+
+        override fun getWaveformDelayFast(): Int {
+            return 0
         }
 
         override fun getMode(): String {

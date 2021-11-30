@@ -15,6 +15,38 @@ class TolinoEPDController : NTXEPDController(), EPDInterface {
         return "all"
     }
 
+    override fun getWaveformFull(): Int {
+       return EINK_WAVEFORM_UPDATE_FULL + EINK_WAVEFORM_MODE_GC16
+    }
+
+    override fun getWaveformPartial(): Int {
+        return EINK_WAVEFORM_UPDATE_PARTIAL + EINK_WAVEFORM_MODE_GC16
+    }
+
+    override fun getWaveformFullUi(): Int {
+        return EINK_WAVEFORM_UPDATE_FULL + EINK_WAVEFORM_MODE_GLR16
+    }
+
+    override fun getWaveformPartialUi(): Int {
+        return EINK_WAVEFORM_UPDATE_PARTIAL + EINK_WAVEFORM_MODE_GLR16
+    }
+
+    override fun getWaveformFast(): Int {
+        return EINK_WAVEFORM_UPDATE_PARTIAL + EINK_WAVEFORM_MODE_DU
+    }
+
+    override fun getWaveformDelay(): Int {
+        return EINK_WAVEFORM_DELAY
+    }
+
+    override fun getWaveformDelayUi(): Int {
+        return EINK_WAVEFORM_DELAY
+    }
+
+    override fun getWaveformDelayFast(): Int {
+        return EINK_WAVEFORM_DELAY
+    }
+
     override fun needsView(): Boolean {
         return true
     }
