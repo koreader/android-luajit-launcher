@@ -22,7 +22,7 @@ object LightsFactory {
                     logController("ONYX C67")
                     OnyxC67Controller()
                 }
-                DeviceInfo.LightsDevice.ONYX_NOTEAIR2 -> {
+                DeviceInfo.LightsDevice.ONYX_NOTE_AIR2 -> {
                     logController("ONYX SDM")
                     OnyxSDMController()
                 }
