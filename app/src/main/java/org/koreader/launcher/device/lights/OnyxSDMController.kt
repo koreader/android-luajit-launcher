@@ -138,5 +138,4 @@ object FrontLight {
             Log.w(TAG, "$e")
         }
     }
-
 }
