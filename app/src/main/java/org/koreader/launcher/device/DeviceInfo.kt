@@ -107,7 +107,7 @@ object DeviceInfo {
     private val SONY_RP1: Boolean
     private val TOLINO: Boolean
     private val TOLINO_EPOS: Boolean
-    
+
     init {
         MANUFACTURER = lowerCase(getBuildField("MANUFACTURER"))
         BRAND = lowerCase(getBuildField("BRAND"))

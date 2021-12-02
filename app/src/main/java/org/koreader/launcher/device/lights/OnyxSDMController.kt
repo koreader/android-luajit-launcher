@@ -13,7 +13,6 @@ class OnyxSDMController : LightsInterface {
         private const val BRIGHTNESS_MAX = 255
         private const val WARMTH_MAX = 255
         private const val MIN = 0
-
     }
 
     override fun hasFallback(): Boolean {
