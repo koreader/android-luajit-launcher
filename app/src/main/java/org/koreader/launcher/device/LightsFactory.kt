@@ -14,6 +14,7 @@ object LightsFactory {
                     TolinoWarmthController()
                 }
                 DeviceInfo.LightsDevice.ONYX_KON_TIKI2,
+                DeviceInfo.LightsDevice.ONYX_NOTE_AIR2,
                 DeviceInfo.LightsDevice.ONYX_NOVA2 -> {
                     logController("Onyx/Qualcomm")
                     OnyxWarmthController()
@@ -21,10 +22,6 @@ object LightsFactory {
                 DeviceInfo.LightsDevice.ONYX_C67 -> {
                     logController("ONYX C67")
                     OnyxC67Controller()
-                }
-                DeviceInfo.LightsDevice.ONYX_NOTE_AIR2 -> {
-                    logController("ONYX SDM")
-                    OnyxSDMController()
                 }
                 else -> {
                     logController("Generic")
