@@ -16,7 +16,6 @@ import org.koreader.launcher.device.epd.RK3026EPDController
 import org.koreader.launcher.device.epd.RK3368EPDController
 import org.koreader.launcher.device.epd.TolinoEPDController
 import org.koreader.launcher.device.lights.OnyxC67Controller
-import org.koreader.launcher.device.lights.OnyxSDMController
 import org.koreader.launcher.device.lights.OnyxWarmthController
 import org.koreader.launcher.device.lights.TolinoWarmthController
 import org.koreader.launcher.dialog.LightDialog
@@ -51,7 +50,6 @@ class TestActivity: AppCompatActivity() {
         lightsMap["Tolino (warmth)"] = TolinoWarmthController()
         lightsMap["Onyx (warmth)"] = OnyxWarmthController()
         lightsMap["Onyx C67"] = OnyxC67Controller()
-        lightsMap["Onyx SDM (warmth)"] = OnyxSDMController()
 
         // Device ID
         binding.info.append("Manufacturer: ${DeviceInfo.MANUFACTURER}\n")
