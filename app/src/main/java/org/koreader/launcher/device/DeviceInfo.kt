@@ -222,8 +222,8 @@ object DeviceInfo {
         // ONYX DARWIN 7
         ONYX_DARWIN7 = (MANUFACTURER.contentEquals("onyx")
             && PRODUCT.contentEquals("mc_darwin7")
-            && DEVICE.contentEquals("mc_darwin7")) 
-    
+            && DEVICE.contentEquals("mc_darwin7"))
+
         // Onyx Kon-Tiki 2
         ONYX_KON_TIKI2 = (MANUFACTURER.contentEquals("onyx")
             && PRODUCT.contentEquals("kon_tiki2")
