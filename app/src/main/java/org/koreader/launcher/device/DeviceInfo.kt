@@ -48,6 +48,7 @@ object DeviceInfo {
         NABUK,
         NOOK,
         ONYX_C67,
+        ONYX_DARWIN7,
         ONYX_KON_TIKI2,
         ONYX_NOVA2,
         TOLINO
@@ -56,6 +57,7 @@ object DeviceInfo {
     enum class LightsDevice {
         NONE,
         ONYX_C67,
+        ONYX_DARWIN7,
         ONYX_NOVA2,
         ONYX_KON_TIKI2,
         TOLINO_EPOS
@@ -98,6 +100,7 @@ object DeviceInfo {
     private val NABUK_REGAL_HD: Boolean
     private val NOOK: Boolean
     private val ONYX_C67: Boolean
+    private val ONYX_DARWIN7: Boolean
     private val ONYX_KON_TIKI2: Boolean
     private val ONYX_NOVA2: Boolean
     private val ONYX_POKE2: Boolean
@@ -216,6 +219,11 @@ object DeviceInfo {
             && (PRODUCT.startsWith("c67") || MODEL.contentEquals("rk30sdk"))
             && DEVICE.startsWith("c67"))
 
+        // ONYX DARWIN 7
+        ONYX_DARWIN7 = (MANUFACTURER.contentEquals("onyx")
+            && PRODUCT.contentEquals("mc_darwin7")
+            && DEVICE.contentEquals("mc_darwin7")) 
+    
         // Onyx Kon-Tiki 2
         ONYX_KON_TIKI2 = (MANUFACTURER.contentEquals("onyx")
             && PRODUCT.contentEquals("kon_tiki2")
@@ -278,6 +286,7 @@ object DeviceInfo {
         deviceMap[EinkDevice.NABUK] = NABUK_REGAL_HD
         deviceMap[EinkDevice.NOOK] = NOOK
         deviceMap[EinkDevice.ONYX_C67] = ONYX_C67
+        deviceMap[EinkDevice.ONYX_DARWIN7] = ONYX_DARWIN7
         deviceMap[EinkDevice.ONYX_KON_TIKI2] = ONYX_KON_TIKI2
         deviceMap[EinkDevice.ONYX_NOVA2] = ONYX_NOVA2
 
@@ -296,6 +305,7 @@ object DeviceInfo {
         // devices with custom lights
         val lightsMap = HashMap<LightsDevice, Boolean>()
         lightsMap[LightsDevice.ONYX_C67] = ONYX_C67
+        lightsMap[LightsDevice.ONYX_DARWIN7] = ONYX_DARWIN7
         lightsMap[LightsDevice.ONYX_KON_TIKI2] = ONYX_KON_TIKI2
         lightsMap[LightsDevice.ONYX_NOVA2] = ONYX_NOVA2
         lightsMap[LightsDevice.TOLINO_EPOS] = TOLINO_EPOS
