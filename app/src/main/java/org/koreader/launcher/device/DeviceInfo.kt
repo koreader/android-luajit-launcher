@@ -51,6 +51,7 @@ object DeviceInfo {
         ONYX_DARWIN7,
         ONYX_KON_TIKI2,
         ONYX_NOVA2,
+        ONYX_NOTE_AIR2,
         TOLINO
     }
 
@@ -59,6 +60,7 @@ object DeviceInfo {
         ONYX_C67,
         ONYX_DARWIN7,
         ONYX_NOVA2,
+        ONYX_NOTE_AIR2,
         ONYX_KON_TIKI2,
         TOLINO_EPOS
     }
@@ -103,6 +105,7 @@ object DeviceInfo {
     private val ONYX_DARWIN7: Boolean
     private val ONYX_KON_TIKI2: Boolean
     private val ONYX_NOVA2: Boolean
+    private val ONYX_NOTE_AIR2: Boolean
     private val ONYX_POKE2: Boolean
     private val SONY_RP1: Boolean
     private val TOLINO: Boolean
@@ -214,6 +217,11 @@ object DeviceInfo {
             && PRODUCT.contentEquals("nova2")
             && DEVICE.contentEquals("nova2"))
 
+        // Onyx Note Air 2
+        ONYX_NOTE_AIR2 = (BRAND.contentEquals("onyx")
+            && PRODUCT.contentEquals("noteair2")
+            && MODEL.contentEquals("noteair2"))
+
         // Onyx C67
         ONYX_C67 = (MANUFACTURER.contentEquals("onyx")
             && (PRODUCT.startsWith("c67") || MODEL.contentEquals("rk30sdk"))
@@ -289,6 +297,7 @@ object DeviceInfo {
         deviceMap[EinkDevice.ONYX_DARWIN7] = ONYX_DARWIN7
         deviceMap[EinkDevice.ONYX_KON_TIKI2] = ONYX_KON_TIKI2
         deviceMap[EinkDevice.ONYX_NOVA2] = ONYX_NOVA2
+        deviceMap[EinkDevice.ONYX_NOTE_AIR2] = ONYX_NOTE_AIR2
 
         deviceMap[EinkDevice.TOLINO] = TOLINO
 
@@ -308,6 +317,7 @@ object DeviceInfo {
         lightsMap[LightsDevice.ONYX_DARWIN7] = ONYX_DARWIN7
         lightsMap[LightsDevice.ONYX_KON_TIKI2] = ONYX_KON_TIKI2
         lightsMap[LightsDevice.ONYX_NOVA2] = ONYX_NOVA2
+        lightsMap[LightsDevice.ONYX_NOTE_AIR2] = ONYX_NOTE_AIR2
         lightsMap[LightsDevice.TOLINO_EPOS] = TOLINO_EPOS
 
         lightsMap.keys.iterator().run {
