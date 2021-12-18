@@ -51,6 +51,8 @@ object DeviceInfo {
         ONYX_DARWIN7,
         ONYX_KON_TIKI2,
         ONYX_NOVA2,
+        ONYX_NOVA3_COLOR,
+        ONYX_NOVA_AIR,
         ONYX_NOTE_AIR2,
         TOLINO
     }
@@ -60,6 +62,7 @@ object DeviceInfo {
         ONYX_C67,
         ONYX_DARWIN7,
         ONYX_NOVA2,
+        ONYX_NOVA_AIR,
         ONYX_NOTE_AIR2,
         ONYX_KON_TIKI2,
         TOLINO_EPOS
@@ -105,6 +108,8 @@ object DeviceInfo {
     private val ONYX_DARWIN7: Boolean
     private val ONYX_KON_TIKI2: Boolean
     private val ONYX_NOVA2: Boolean
+    private val ONYX_NOVA3_COLOR: Boolean
+    private val ONYX_NOVA_AIR: Boolean
     private val ONYX_NOTE_AIR2: Boolean
     private val ONYX_POKE2: Boolean
     private val SONY_RP1: Boolean
@@ -212,10 +217,18 @@ object DeviceInfo {
             && (MODEL.contentEquals("bnrv510") || MODEL.contentEquals("bnrv520") || MODEL.contentEquals("bnrv700")
             || MODEL.contentEquals("evk_mx6sl") || MODEL.startsWith("ereader"))
 
-        // Onyx NOVA 2
+        // Onyx Nova 2
         ONYX_NOVA2 = (MANUFACTURER.contentEquals("onyx")
             && PRODUCT.contentEquals("nova2")
             && DEVICE.contentEquals("nova2"))
+
+        // Onyx Nova 3 Color
+        ONYX_NOVA3_COLOR = MANUFACTURER.contentEquals("onyx")
+            && MODEL.contentEquals("nova3color")
+
+        // Onyx Nova Air
+        ONYX_NOVA_AIR = MANUFACTURER.contentEquals("onyx")
+            && MODEL.contentEquals("novaair")
 
         // Onyx Note Air 2
         ONYX_NOTE_AIR2 = (BRAND.contentEquals("onyx")
@@ -297,8 +310,9 @@ object DeviceInfo {
         deviceMap[EinkDevice.ONYX_DARWIN7] = ONYX_DARWIN7
         deviceMap[EinkDevice.ONYX_KON_TIKI2] = ONYX_KON_TIKI2
         deviceMap[EinkDevice.ONYX_NOVA2] = ONYX_NOVA2
+        deviceMap[EinkDevice.ONYX_NOVA3_COLOR] = ONYX_NOVA3_COLOR
+        deviceMap[EinkDevice.ONYX_NOVA_AIR] = ONYX_NOVA_AIR
         deviceMap[EinkDevice.ONYX_NOTE_AIR2] = ONYX_NOTE_AIR2
-
         deviceMap[EinkDevice.TOLINO] = TOLINO
 
         deviceMap.keys.iterator().run {
@@ -317,6 +331,7 @@ object DeviceInfo {
         lightsMap[LightsDevice.ONYX_DARWIN7] = ONYX_DARWIN7
         lightsMap[LightsDevice.ONYX_KON_TIKI2] = ONYX_KON_TIKI2
         lightsMap[LightsDevice.ONYX_NOVA2] = ONYX_NOVA2
+        lightsMap[LightsDevice.ONYX_NOVA_AIR] = ONYX_NOVA_AIR
         lightsMap[LightsDevice.ONYX_NOTE_AIR2] = ONYX_NOTE_AIR2
         lightsMap[LightsDevice.TOLINO_EPOS] = TOLINO_EPOS
 
