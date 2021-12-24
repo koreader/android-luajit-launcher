@@ -23,9 +23,7 @@ class ApkUpdater {
 
     fun download(context: Context, url: String, name: String): Int {
         return if (MainApp.has_ota_updates) {
-            @Suppress("DEPRECATION") val file = File(
-                Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_DOWNLOADS).toString() + File.separator + name)
+            val file = File(context.getExternalFilesDir(null), name)
             val result = try {
                 if (file.exists()) {
                     DOWNLOAD_EXISTS
@@ -33,7 +31,7 @@ class ApkUpdater {
                     val request = DownloadManager.Request(Uri.parse(url))
                     request.setMimeType("application/vnd.android.package-archive")
                     request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_HIDDEN)
-                    request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, name)
+                    request.setDestinationInExternalFilesDir(context, null, name)
                     val manager = context.getSystemService(Context.DOWNLOAD_SERVICE)
                         as DownloadManager
                     manager.enqueue(request)
