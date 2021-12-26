@@ -215,6 +215,18 @@ fun Activity.openWifi() {
     startActivityCompat(this, openWifiIntent)
 }
 
+fun Activity.pruneCacheDir() {
+    try {
+        getExternalFilesDir(null)?.let {
+            it.listFiles()?.forEach { file ->
+                file.delete()
+            }
+        }
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
+}
+
 fun Activity.requestSpecialPermission(intent: Intent, rationale: String,
                              okButton: String?, cancelButton: String?) {
     runOnUiThread {
