@@ -3,9 +3,7 @@ package org.koreader.launcher.device.lights
 import android.app.Activity
 import android.util.Log
 import org.koreader.launcher.device.LightsInterface
-import android.content.Context
-import java.lang.Class.forName
-import java.lang.reflect.Method
+import java.io.File
 
 class OnyxWarmthController : LightsInterface {
     companion object {
@@ -13,6 +11,8 @@ class OnyxWarmthController : LightsInterface {
         private const val BRIGHTNESS_MAX = 255
         private const val WARMTH_MAX = 255
         private const val MIN = 0
+        private const val WHITE_FILE = "/sys/class/backlight/white/brightness"
+        private const val WARMTH_FILE = "/sys/class/backlight/warm/brightness"
     }
 
     override fun hasFallback(): Boolean {
@@ -28,8 +28,12 @@ class OnyxWarmthController : LightsInterface {
     }
 
     override fun getBrightness(activity: Activity): Int {
+        val brightnessFile = File(WHITE_FILE)
         return try {
-            FrontLight.getCold(activity)
+            // .replace("\n", "") is needed, since it's automatically appended
+            // without it exception is thrown
+            // java.lang.NumberFormatException: For input string: "125\n"
+            return brightnessFile.readText().replace("\n", "").toInt()
         } catch (e: Exception) {
             Log.w(TAG, Log.getStackTraceString(e))
             0
@@ -37,8 +41,12 @@ class OnyxWarmthController : LightsInterface {
     }
 
     override fun getWarmth(activity: Activity): Int {
+        val warmthFile = File(WARMTH_FILE)
         return try {
-            FrontLight.getWarm(activity)
+            // .replace("\n", "") is needed, since it's automatically appended
+            // without it exception is thrown
+            // java.lang.NumberFormatException: For input string: "125\n"
+            return warmthFile.readText().replace("\n", "").toInt()
         } catch (e: Exception) {
             Log.w(TAG, Log.getStackTraceString(e))
             0
@@ -51,8 +59,9 @@ class OnyxWarmthController : LightsInterface {
             return
         }
         Log.v(TAG, "Setting brightness to $brightness")
+        val brightnessFile = File(WHITE_FILE)
         try {
-            FrontLight.setCold(brightness, activity)
+            brightnessFile.writeText(brightness.toString())
         } catch (e: Exception) {
             Log.w(TAG, "$e")
         }
@@ -63,9 +72,10 @@ class OnyxWarmthController : LightsInterface {
             Log.w(TAG, "warmth value of of range: $warmth")
             return
         }
+        val warmthFile = File(WARMTH_FILE)
         Log.v(TAG, "Setting warmth to $warmth")
         try {
-            FrontLight.setWarm(warmth, activity)
+            warmthFile.writeText(warmth.toString())
         } catch (e: Exception) {
             Log.w(TAG, "$e")
         }
@@ -89,52 +99,5 @@ class OnyxWarmthController : LightsInterface {
 
     override fun enableFrontlightSwitch(activity: Activity): Int {
         return 1
-    }
-}
-
-object FrontLight {
-    private val flController = forName("android.onyx.hardware.DeviceController")
-
-    private val setWarmBrightness: Method = flController.getMethod("setWarmLightDeviceValue", Context::class.java, Integer.TYPE)
-    private val setColdBrightness: Method = flController.getMethod("setColdLightDeviceValue", Context::class.java, Integer.TYPE)
-
-    private val getCoolWarmBrightness: Method = flController.getMethod("getBrightnessConfig", Context::class.java, Integer.TYPE)
-    private const val BRIGHTNESS_CONFIG_WARM_IDX: Int = 2
-    private const val BRIGHTNESS_CONFIG_COLD_IDX: Int = 3
-
-    private const val TAG = "lights"
-
-    fun getWarm(context: Context?): Int {
-        return try {
-            getCoolWarmBrightness.invoke(flController, context, BRIGHTNESS_CONFIG_WARM_IDX) as Int
-        } catch (e: Exception) {
-            Log.w(TAG, "$e")
-            0
-        }
-    }
-
-    fun getCold(context: Context?): Int {
-        return try {
-            getCoolWarmBrightness.invoke(flController, context, BRIGHTNESS_CONFIG_COLD_IDX) as Int
-        } catch (e: Exception) {
-            Log.w(TAG, "$e")
-            0
-        }
-    }
-
-    fun setWarm(value: Int, context: Context?) {
-        try {
-            setWarmBrightness.invoke(flController, context, value)
-        } catch (e: Exception) {
-            Log.w(TAG, "$e")
-        }
-    }
-
-    fun setCold(value: Int, context: Context?) {
-        try {
-            setColdBrightness.invoke(flController, context, value)
-        } catch (e: Exception) {
-            Log.w(TAG, "$e")
-        }
     }
 }
