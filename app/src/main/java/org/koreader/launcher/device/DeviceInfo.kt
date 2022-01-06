@@ -50,6 +50,7 @@ object DeviceInfo {
         ONYX_C67,
         ONYX_DARWIN7,
         ONYX_KON_TIKI2,
+        ONYX_MAX,
         ONYX_NOVA2,
         ONYX_NOVA3_COLOR,
         ONYX_NOVA_AIR,
@@ -69,6 +70,7 @@ object DeviceInfo {
     enum class QuirkDevice {
         NONE,
         EMULATOR,
+        ONYX_MAX,
         ONYX_POKE2,
         SONY_RP1
     }
@@ -105,6 +107,7 @@ object DeviceInfo {
     private val ONYX_C67: Boolean
     private val ONYX_DARWIN7: Boolean
     private val ONYX_KON_TIKI2: Boolean
+    private val ONYX_MAX: Boolean
     private val ONYX_NOVA2: Boolean
     private val ONYX_NOVA3_COLOR: Boolean
     private val ONYX_NOVA_AIR: Boolean
@@ -214,6 +217,11 @@ object DeviceInfo {
             && (MODEL.contentEquals("bnrv510") || MODEL.contentEquals("bnrv520") || MODEL.contentEquals("bnrv700")
             || MODEL.contentEquals("evk_mx6sl") || MODEL.startsWith("ereader"))
 
+        // Onyx Max
+        ONYX_MAX = (MANUFACTURER.contentEquals("onyx")
+            && PRODUCT.contentEquals("max")
+            && DEVICE.contentEquals("max"))
+
         // Onyx Nova 2
         ONYX_NOVA2 = (MANUFACTURER.contentEquals("onyx")
             && PRODUCT.contentEquals("nova2")
@@ -263,6 +271,7 @@ object DeviceInfo {
         // devices with known bugs
         val bugMap = HashMap<QuirkDevice, Boolean>()
         bugMap[QuirkDevice.EMULATOR] = EMULATOR_X86
+        bugMap[QuirkDevice.ONYX_MAX] = ONYX_MAX
         bugMap[QuirkDevice.ONYX_POKE2] = ONYX_POKE2
         bugMap[QuirkDevice.SONY_RP1] = SONY_RP1
 
@@ -301,6 +310,7 @@ object DeviceInfo {
         deviceMap[EinkDevice.ONYX_C67] = ONYX_C67
         deviceMap[EinkDevice.ONYX_DARWIN7] = ONYX_DARWIN7
         deviceMap[EinkDevice.ONYX_KON_TIKI2] = ONYX_KON_TIKI2
+        deviceMap[EinkDevice.ONYX_MAX] = ONYX_MAX
         deviceMap[EinkDevice.ONYX_NOVA2] = ONYX_NOVA2
         deviceMap[EinkDevice.ONYX_NOVA3_COLOR] = ONYX_NOVA3_COLOR
         deviceMap[EinkDevice.ONYX_NOVA_AIR] = ONYX_NOVA_AIR
@@ -355,6 +365,7 @@ object DeviceInfo {
 
         // Android devices without lights
         QUIRK_NO_LIGHTS = when (QUIRK) {
+            QuirkDevice.ONYX_MAX,
             QuirkDevice.SONY_RP1 -> true
             else -> false
         }
