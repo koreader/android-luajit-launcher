@@ -58,6 +58,8 @@ object EPDFactory {
 
                 DeviceInfo.EinkDevice.ONYX_KON_TIKI2,
                 DeviceInfo.EinkDevice.ONYX_MAX,
+                DeviceInfo.EinkDevice.ONYX_NOTE3,
+                DeviceInfo.EinkDevice.ONYX_NOTE5,
                 DeviceInfo.EinkDevice.ONYX_NOVA2,
                 DeviceInfo.EinkDevice.ONYX_NOVA3_COLOR,
                 DeviceInfo.EinkDevice.ONYX_NOVA_AIR -> {
