@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import java.io.*
 import org.koreader.launcher.databinding.TestBinding
+import org.koreader.launcher.device.Device
 import org.koreader.launcher.device.DeviceInfo
 import org.koreader.launcher.device.EPDInterface
 import org.koreader.launcher.device.LightsInterface
@@ -28,6 +29,8 @@ class TestActivity: AppCompatActivity() {
     private val reportPath = String.format("%s%s%s", MainApp.storage_path, File.separator, "test.log")
 
     private lateinit var binding: TestBinding
+    private lateinit var device: Device
+    private var supported = false
 
     companion object {
         private const val MARKER_BEGIN = "kotest begin"
@@ -39,6 +42,16 @@ class TestActivity: AppCompatActivity() {
         binding = TestBinding.inflate(layoutInflater)
         setContentView(binding.root)
         Log.i(tag, MARKER_BEGIN)
+        device = Device(this)
+        supported = device.epd.getPlatform() != "none" || device.lights.getPlatform() != "generic"
+
+        if (supported) {
+            binding.currentState.append("Device already supported\n")
+            binding.currentState.append("EPD: ${device.epd.getPlatform()}\n")
+            binding.currentState.append("Lights: ${device.lights.getPlatform()}\n")
+        } else {
+            binding.currentState.append("Unsupported device\n")
+        }
 
         // EPD drivers
         epdMap["Rockchip RK3368"] = RK3368EPDController()
