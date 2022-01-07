@@ -16,6 +16,18 @@
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/currentState"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/border"
+                android:layout_marginLeft="@dimen/border"
+                android:layout_marginTop="@dimen/section"
+                android:layout_marginEnd="@dimen/border"
+                android:layout_marginRight="@dimen/border"
+                android:gravity="center_horizontal"
+                android:textSize="@dimen/text" />
+
+            <TextView
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/border"
