@@ -2,8 +2,12 @@ package org.koreader.launcher.dialog
 
 import android.app.Activity
 import android.app.AlertDialog
+import android.graphics.Color
 import android.view.Gravity
+import android.view.View
+import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.RelativeLayout
 import android.widget.SeekBar
 import android.widget.TextView
 import org.koreader.launcher.device.LightsInterface
@@ -31,13 +35,17 @@ class LightDialog {
         val hasWarmth = controller.hasWarmth()
         state = LIGHT_DIALOG_OPENED
         activity.runOnUiThread {
+            val divider = View(activity)
             val titleText = TextView(activity)
             val dimText = TextView(activity)
             val dimSeekBar = SeekBar(activity)
-            titleText.text = title
-            titleText.gravity = Gravity.CENTER_HORIZONTAL
-            titleText.height = 30
-            titleText.textSize = 18f
+            val hasTitle: Boolean = if (title.isNotEmpty()) {
+                titleText.text = title
+                titleText.gravity = Gravity.CENTER_HORIZONTAL
+                titleText.textSize = 20f
+                true
+            } else false
+
             dimText.text = dim
             dimText.gravity = Gravity.CENTER_HORIZONTAL
             dimText.textSize = 18f
@@ -52,6 +60,13 @@ class LightDialog {
             })
             val linearLayout = LinearLayout(activity)
             linearLayout.orientation = LinearLayout.VERTICAL
+            if (hasTitle) {
+                divider.setBackgroundColor(Color.parseColor("#B3B3B3"))
+                val param = RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 3)
+                param.setMargins(0, 0, 0, 10)
+                divider.layoutParams = param
+                linearLayout.addView(divider)
+            }
             linearLayout.addView(dimText)
             linearLayout.addView(dimSeekBar)
             if (hasWarmth) {
