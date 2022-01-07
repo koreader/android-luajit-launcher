@@ -15,6 +15,10 @@ class OnyxWarmthController : LightsInterface {
         private const val WARMTH_FILE = "/sys/class/backlight/warm/brightness"
     }
 
+    override fun getPlatform(): String {
+        return "onyx-warmth"
+    }
+
     override fun hasFallback(): Boolean {
         return false
     }

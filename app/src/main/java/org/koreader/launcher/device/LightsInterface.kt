@@ -3,6 +3,8 @@ package org.koreader.launcher.device
 import android.app.Activity
 
 interface LightsInterface {
+    fun getPlatform(): String
+
     fun hasFallback(): Boolean
     fun hasWarmth(): Boolean
     fun needsPermission(): Boolean

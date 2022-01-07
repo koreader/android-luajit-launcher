@@ -13,6 +13,10 @@ class OnyxC67Controller : LightsInterface {
         private const val BRIGHTNESS_FILE = "/sys/class/backlight/rk28_bl/brightness"
     }
 
+    override fun getPlatform(): String {
+        return "onyx-c67"
+    }
+
     override fun hasFallback(): Boolean {
         return true
     }
