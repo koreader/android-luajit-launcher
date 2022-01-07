@@ -14,6 +14,10 @@ class GenericController : LightsInterface {
         private const val BRIGHTNESS_MIN = 1 // zero would mean system-settings
     }
 
+    override fun getPlatform(): String {
+        return "generic"
+    }
+
     override fun hasFallback(): Boolean {
         return true
     }

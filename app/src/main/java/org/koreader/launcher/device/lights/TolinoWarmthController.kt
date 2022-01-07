@@ -27,6 +27,10 @@ class TolinoWarmthController : LightsInterface {
             COLOR_FILE_EPOS2
     }
 
+    override fun getPlatform(): String {
+        return "tolino"
+    }
+
     override fun hasFallback(): Boolean {
         return false
     }
