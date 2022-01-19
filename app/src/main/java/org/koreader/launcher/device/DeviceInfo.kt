@@ -54,6 +54,7 @@ object DeviceInfo {
         ONYX_NOTE3,
         ONYX_NOTE5,
         ONYX_NOVA2,
+        ONYX_NOVA3,
         ONYX_NOVA3_COLOR,
         ONYX_NOVA_AIR,
         TOLINO
@@ -65,6 +66,7 @@ object DeviceInfo {
         ONYX_DARWIN7,
         ONYX_NOTE3,
         ONYX_NOVA2,
+        ONYX_NOVA3,
         ONYX_NOVA_AIR,
         ONYX_KON_TIKI2,
         TOLINO_EPOS
@@ -114,6 +116,7 @@ object DeviceInfo {
     private val ONYX_NOTE3: Boolean
     private val ONYX_NOTE5: Boolean
     private val ONYX_NOVA2: Boolean
+    private val ONYX_NOVA3: Boolean
     private val ONYX_NOVA3_COLOR: Boolean
     private val ONYX_NOVA_AIR: Boolean
     private val ONYX_POKE2: Boolean
@@ -233,7 +236,7 @@ object DeviceInfo {
             && DEVICE.contentEquals("note3"))
 
         // Onyx Note 5
-        ONYX_NOTE5 = (MANUFACTURER.contentEquals("onyx")
+        ONYX_NOTE5 = (BRAND.contentEquals("onyx")
             && PRODUCT.contentEquals("note5")
             && DEVICE.contentEquals("note5"))
 
@@ -241,6 +244,11 @@ object DeviceInfo {
         ONYX_NOVA2 = (MANUFACTURER.contentEquals("onyx")
             && PRODUCT.contentEquals("nova2")
             && DEVICE.contentEquals("nova2"))
+
+        // Onyx Nova 3
+        ONYX_NOVA3 = (MANUFACTURER.contentEquals("onyx")
+            && PRODUCT.contentEquals("nova3")
+            && DEVICE.contentEquals("nova3"))
 
         // Onyx Nova 3 Color
         ONYX_NOVA3_COLOR = MANUFACTURER.contentEquals("onyx")
