@@ -398,7 +398,7 @@ object DeviceInfo {
             else -> false
         }
 
-        HAS_COLOR_SCREEN = when(EINK) {
+        HAS_COLOR_SCREEN = when (EINK) {
             EinkDevice.NONE,
             EinkDevice.ONYX_NOVA3_COLOR -> true
             else -> false
