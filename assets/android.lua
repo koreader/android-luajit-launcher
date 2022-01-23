@@ -2194,6 +2194,16 @@ local function run(android_app_state)
         end)
     end
 
+    android.isColorScreen = function()
+        return JNI:context(android.app.activity.vm, function(jni)
+            return jni:callBooleanMethod(
+                android.app.activity.clazz,
+                "isColorScreen",
+                "()Z"
+            )
+        end)
+    end
+
     android.isEink = function()
         return JNI:context(android.app.activity.vm, function(jni)
             local is_supported = jni:callBooleanMethod(

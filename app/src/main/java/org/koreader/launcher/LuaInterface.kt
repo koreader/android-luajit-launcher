@@ -52,6 +52,7 @@ interface LuaInterface {
     fun installApk()
     fun isCharging(): Boolean
     fun isChromeOS(): Boolean
+    fun isColorScreen(): Boolean
     fun isDebuggable(): Boolean
     fun isEink(): Boolean
     fun isEinkFull(): Boolean
