@@ -546,6 +546,10 @@ class MainActivity : NativeActivity(), LuaInterface,
         }
     }
 
+    override fun isColorScreen(): Boolean {
+        return device.hasColorScreen
+    }
+
     override fun isDebuggable(): Boolean {
         return MainApp.is_debug
     }

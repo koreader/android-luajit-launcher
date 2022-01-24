@@ -24,6 +24,8 @@ object DeviceInfo {
     val QUIRK_NO_HW_ROTATION: Boolean
     val QUIRK_NO_LIGHTS: Boolean
 
+    val HAS_COLOR_SCREEN: Boolean
+
     enum class EinkDevice {
         NONE,
         BOYUE_K78W,
@@ -393,6 +395,12 @@ object DeviceInfo {
         QUIRK_NO_LIGHTS = when (QUIRK) {
             QuirkDevice.ONYX_MAX,
             QuirkDevice.SONY_RP1 -> true
+            else -> false
+        }
+
+        HAS_COLOR_SCREEN = when (EINK) {
+            EinkDevice.NONE,
+            EinkDevice.ONYX_NOVA3_COLOR -> true
             else -> false
         }
     }

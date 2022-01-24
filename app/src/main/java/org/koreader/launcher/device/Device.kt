@@ -12,6 +12,7 @@ class Device(activity: Activity) {
     val needsWakelocks = DeviceInfo.QUIRK_NEEDS_WAKELOCKS
     val bugRotation = DeviceInfo.QUIRK_NO_HW_ROTATION
     val bugLifecycle = DeviceInfo.QUIRK_BROKEN_LIFECYCLE
+    val hasColorScreen = DeviceInfo.HAS_COLOR_SCREEN
 
     val hasEinkSupport = epd.getPlatform() != "none"
     val hasFullEinkSupport = epd.getMode() == "all"
