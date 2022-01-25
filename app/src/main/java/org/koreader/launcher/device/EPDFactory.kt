@@ -63,7 +63,8 @@ object EPDFactory {
                 DeviceInfo.EinkDevice.ONYX_NOVA2,
                 DeviceInfo.EinkDevice.ONYX_NOVA3,
                 DeviceInfo.EinkDevice.ONYX_NOVA3_COLOR,
-                DeviceInfo.EinkDevice.ONYX_NOVA_AIR -> {
+                DeviceInfo.EinkDevice.ONYX_NOVA_AIR,
+                DeviceInfo.EinkDevice.ONYX_POKE_PRO -> {
                     logController("Onyx/Qualcomm")
                     OnyxEPDController()
                 }

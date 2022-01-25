@@ -59,6 +59,7 @@ object DeviceInfo {
         ONYX_NOVA3,
         ONYX_NOVA3_COLOR,
         ONYX_NOVA_AIR,
+        ONYX_POKE_PRO,
         TOLINO
     }
 
@@ -71,6 +72,7 @@ object DeviceInfo {
         ONYX_NOVA3,
         ONYX_NOVA_AIR,
         ONYX_KON_TIKI2,
+        ONYX_POKE_PRO,
         TOLINO_EPOS
     }
 
@@ -122,6 +124,7 @@ object DeviceInfo {
     private val ONYX_NOVA3_COLOR: Boolean
     private val ONYX_NOVA_AIR: Boolean
     private val ONYX_POKE2: Boolean
+    private val ONYX_POKE_PRO: Boolean
     private val SONY_RP1: Boolean
     private val TOLINO: Boolean
     private val TOLINO_EPOS: Boolean
@@ -279,6 +282,10 @@ object DeviceInfo {
         ONYX_POKE2 = MANUFACTURER.contentEquals("onyx")
             && PRODUCT.contentEquals("poke2")
 
+        // Onyx Poke Pro
+        ONYX_POKE_PRO = MANUFACTURER.contentEquals("onyx")
+            && PRODUCT.contentEquals("poke_pro")
+
         // Sony DPT-RP1
         SONY_RP1 = MANUFACTURER.contentEquals("sony")
             && MODEL.contentEquals("dpt-rp1")
@@ -341,6 +348,7 @@ object DeviceInfo {
         deviceMap[EinkDevice.ONYX_NOVA2] = ONYX_NOVA2
         deviceMap[EinkDevice.ONYX_NOVA3_COLOR] = ONYX_NOVA3_COLOR
         deviceMap[EinkDevice.ONYX_NOVA_AIR] = ONYX_NOVA_AIR
+        deviceMap[EinkDevice.ONYX_POKE_PRO] = ONYX_POKE_PRO
         deviceMap[EinkDevice.TOLINO] = TOLINO
 
         deviceMap.keys.iterator().run {
@@ -361,6 +369,7 @@ object DeviceInfo {
         lightsMap[LightsDevice.ONYX_NOTE3] = ONYX_NOTE3
         lightsMap[LightsDevice.ONYX_NOVA2] = ONYX_NOVA2
         lightsMap[LightsDevice.ONYX_NOVA_AIR] = ONYX_NOVA_AIR
+        lightsMap[LightsDevice.ONYX_POKE_PRO] = ONYX_POKE_PRO
         lightsMap[LightsDevice.TOLINO_EPOS] = TOLINO_EPOS
 
         lightsMap.keys.iterator().run {
