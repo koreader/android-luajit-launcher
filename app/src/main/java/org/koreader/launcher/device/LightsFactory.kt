@@ -16,6 +16,7 @@ object LightsFactory {
                 DeviceInfo.LightsDevice.ONYX_KON_TIKI2,
                 DeviceInfo.LightsDevice.ONYX_DARWIN7,
                 DeviceInfo.LightsDevice.ONYX_NOTE3,
+                DeviceInfo.LightsDevice.ONYX_NOTE_AIR,
                 DeviceInfo.LightsDevice.ONYX_NOVA2,
                 DeviceInfo.LightsDevice.ONYX_NOVA3,
                 DeviceInfo.LightsDevice.ONYX_NOVA_AIR,
