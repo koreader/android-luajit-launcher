@@ -55,6 +55,7 @@ object DeviceInfo {
         ONYX_MAX,
         ONYX_NOTE3,
         ONYX_NOTE5,
+        ONYX_NOTE_AIR,
         ONYX_NOVA2,
         ONYX_NOVA3,
         ONYX_NOVA3_COLOR,
@@ -68,6 +69,7 @@ object DeviceInfo {
         ONYX_C67,
         ONYX_DARWIN7,
         ONYX_NOTE3,
+        ONYX_NOTE_AIR,
         ONYX_NOVA2,
         ONYX_NOVA3,
         ONYX_NOVA_AIR,
@@ -119,6 +121,7 @@ object DeviceInfo {
     private val ONYX_MAX: Boolean
     private val ONYX_NOTE3: Boolean
     private val ONYX_NOTE5: Boolean
+    private val ONYX_NOTE_AIR: Boolean
     private val ONYX_NOVA2: Boolean
     private val ONYX_NOVA3: Boolean
     private val ONYX_NOVA3_COLOR: Boolean
@@ -245,6 +248,11 @@ object DeviceInfo {
             && PRODUCT.contentEquals("note5")
             && DEVICE.contentEquals("note5"))
 
+        // Onyx Note Air
+        ONYX_NOTE_AIR = (MANUFACTURER.contentEquals("onyx")
+            && PRODUCT.contentEquals("noteair")
+            && DEVICE.contentEquals("noteair"))
+
         // Onyx Nova 2
         ONYX_NOVA2 = (MANUFACTURER.contentEquals("onyx")
             && PRODUCT.contentEquals("nova2")
@@ -345,6 +353,7 @@ object DeviceInfo {
         deviceMap[EinkDevice.ONYX_MAX] = ONYX_MAX
         deviceMap[EinkDevice.ONYX_NOTE3] = ONYX_NOTE3
         deviceMap[EinkDevice.ONYX_NOTE5] = ONYX_NOTE5
+        deviceMap[EinkDevice.ONYX_NOTE_AIR] = ONYX_NOTE_AIR
         deviceMap[EinkDevice.ONYX_NOVA2] = ONYX_NOVA2
         deviceMap[EinkDevice.ONYX_NOVA3_COLOR] = ONYX_NOVA3_COLOR
         deviceMap[EinkDevice.ONYX_NOVA_AIR] = ONYX_NOVA_AIR
@@ -367,6 +376,7 @@ object DeviceInfo {
         lightsMap[LightsDevice.ONYX_DARWIN7] = ONYX_DARWIN7
         lightsMap[LightsDevice.ONYX_KON_TIKI2] = ONYX_KON_TIKI2
         lightsMap[LightsDevice.ONYX_NOTE3] = ONYX_NOTE3
+        lightsMap[LightsDevice.ONYX_NOTE_AIR] = ONYX_NOTE_AIR
         lightsMap[LightsDevice.ONYX_NOVA2] = ONYX_NOVA2
         lightsMap[LightsDevice.ONYX_NOVA_AIR] = ONYX_NOVA_AIR
         lightsMap[LightsDevice.ONYX_POKE_PRO] = ONYX_POKE_PRO
