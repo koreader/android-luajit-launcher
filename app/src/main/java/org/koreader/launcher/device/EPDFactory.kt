@@ -71,6 +71,7 @@ object EPDFactory {
                 }
 
                 DeviceInfo.EinkDevice.NABUK,
+                DeviceInfo.EinkDevice.ONYX_FAUST3,
                 DeviceInfo.EinkDevice.ONYX_DARWIN7 -> {
                     logController("Old Tolino/NTX")
                     OldTolinoEPDController()
