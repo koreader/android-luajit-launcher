@@ -51,6 +51,7 @@ object DeviceInfo {
         NOOK,
         ONYX_C67,
         ONYX_DARWIN7,
+        ONYX_FAUST3,
         ONYX_KON_TIKI2,
         ONYX_MAX,
         ONYX_NOTE3,
@@ -68,6 +69,7 @@ object DeviceInfo {
         NONE,
         ONYX_C67,
         ONYX_DARWIN7,
+        ONYX_FAUST3,
         ONYX_NOTE3,
         ONYX_NOTE_AIR,
         ONYX_NOVA2,
@@ -117,6 +119,7 @@ object DeviceInfo {
     private val NOOK: Boolean
     private val ONYX_C67: Boolean
     private val ONYX_DARWIN7: Boolean
+    private val ONYX_FAUST3: Boolean
     private val ONYX_KON_TIKI2: Boolean
     private val ONYX_MAX: Boolean
     private val ONYX_NOTE3: Boolean
@@ -253,6 +256,11 @@ object DeviceInfo {
             && PRODUCT.contentEquals("noteair")
             && DEVICE.contentEquals("noteair"))
 
+        // Onyx Faust 3
+        ONYX_FAUST3 = (MANUFACTURER.contentEquals("onyx")
+            && PRODUCT.contentEquals("mc_faust3")
+            && DEVICE.contentEquals("mc_faust3"))
+
         // Onyx Nova 2
         ONYX_NOVA2 = (MANUFACTURER.contentEquals("onyx")
             && PRODUCT.contentEquals("nova2")
@@ -349,6 +357,7 @@ object DeviceInfo {
         deviceMap[EinkDevice.NOOK] = NOOK
         deviceMap[EinkDevice.ONYX_C67] = ONYX_C67
         deviceMap[EinkDevice.ONYX_DARWIN7] = ONYX_DARWIN7
+        deviceMap[EinkDevice.ONYX_FAUST3] = ONYX_FAUST3
         deviceMap[EinkDevice.ONYX_KON_TIKI2] = ONYX_KON_TIKI2
         deviceMap[EinkDevice.ONYX_MAX] = ONYX_MAX
         deviceMap[EinkDevice.ONYX_NOTE3] = ONYX_NOTE3
@@ -373,6 +382,7 @@ object DeviceInfo {
         // devices with custom lights
         val lightsMap = HashMap<LightsDevice, Boolean>()
         lightsMap[LightsDevice.ONYX_C67] = ONYX_C67
+        lightsMap[LightsDevice.ONYX_FAUST3] = ONYX_FAUST3
         lightsMap[LightsDevice.ONYX_DARWIN7] = ONYX_DARWIN7
         lightsMap[LightsDevice.ONYX_KON_TIKI2] = ONYX_KON_TIKI2
         lightsMap[LightsDevice.ONYX_NOTE3] = ONYX_NOTE3
