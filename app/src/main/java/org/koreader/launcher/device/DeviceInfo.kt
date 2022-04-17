@@ -53,14 +53,17 @@ object DeviceInfo {
         ONYX_DARWIN7,
         ONYX_FAUST3,
         ONYX_KON_TIKI2,
+        ONYX_LEAF,
         ONYX_MAX,
         ONYX_NOTE3,
         ONYX_NOTE5,
         ONYX_NOTE_AIR,
+        ONYX_NOTE_PRO,
         ONYX_NOVA2,
         ONYX_NOVA3,
         ONYX_NOVA3_COLOR,
         ONYX_NOVA_AIR,
+        ONYX_POKE3,
         ONYX_POKE_PRO,
         TOLINO
     }
@@ -70,12 +73,15 @@ object DeviceInfo {
         ONYX_C67,
         ONYX_DARWIN7,
         ONYX_FAUST3,
+        ONYX_LEAF,
         ONYX_NOTE3,
         ONYX_NOTE_AIR,
+        ONYX_NOTE_PRO,
         ONYX_NOVA2,
         ONYX_NOVA3,
         ONYX_NOVA_AIR,
         ONYX_KON_TIKI2,
+        ONYX_POKE3,
         ONYX_POKE_PRO,
         TOLINO_EPOS
     }
@@ -121,15 +127,18 @@ object DeviceInfo {
     private val ONYX_DARWIN7: Boolean
     private val ONYX_FAUST3: Boolean
     private val ONYX_KON_TIKI2: Boolean
+    private val ONYX_LEAF: Boolean
     private val ONYX_MAX: Boolean
     private val ONYX_NOTE3: Boolean
     private val ONYX_NOTE5: Boolean
     private val ONYX_NOTE_AIR: Boolean
+    private val ONYX_NOTE_PRO: Boolean
     private val ONYX_NOVA2: Boolean
     private val ONYX_NOVA3: Boolean
     private val ONYX_NOVA3_COLOR: Boolean
     private val ONYX_NOVA_AIR: Boolean
     private val ONYX_POKE2: Boolean
+    private val ONYX_POKE3: Boolean
     private val ONYX_POKE_PRO: Boolean
     private val SONY_RP1: Boolean
     private val TOLINO: Boolean
@@ -236,6 +245,11 @@ object DeviceInfo {
             && (MODEL.contentEquals("bnrv510") || MODEL.contentEquals("bnrv520") || MODEL.contentEquals("bnrv700")
             || MODEL.contentEquals("evk_mx6sl") || MODEL.startsWith("ereader"))
 
+        // Onyx Leaf
+        ONYX_LEAF = (MANUFACTURER.contentEquals("onyx")
+            && PRODUCT.contentEquals("leaf")
+            && DEVICE.contentEquals("leaf"))
+
         // Onyx Max
         ONYX_MAX = (MANUFACTURER.contentEquals("onyx")
             && PRODUCT.contentEquals("max")
@@ -255,6 +269,11 @@ object DeviceInfo {
         ONYX_NOTE_AIR = (MANUFACTURER.contentEquals("onyx")
             && PRODUCT.contentEquals("noteair")
             && DEVICE.contentEquals("noteair"))
+
+        // Onyx Note Pro
+        ONYX_NOTE_PRO = (MANUFACTURER.contentEquals("onyx")
+            && PRODUCT.contentEquals("notepro")
+            && DEVICE.contentEquals("notepro"))
 
         // Onyx Faust 3
         ONYX_FAUST3 = (MANUFACTURER.contentEquals("onyx")
@@ -297,6 +316,11 @@ object DeviceInfo {
         // Onyx Poke 2
         ONYX_POKE2 = MANUFACTURER.contentEquals("onyx")
             && PRODUCT.contentEquals("poke2")
+
+        // Onyx Poke 3
+        ONYX_POKE3 = (MANUFACTURER.contentEquals("onyx")
+            && PRODUCT.contentEquals("poke3")
+            && DEVICE.contentEquals("poke3"))
 
         // Onyx Poke Pro
         ONYX_POKE_PRO = MANUFACTURER.contentEquals("onyx")
@@ -359,13 +383,16 @@ object DeviceInfo {
         deviceMap[EinkDevice.ONYX_DARWIN7] = ONYX_DARWIN7
         deviceMap[EinkDevice.ONYX_FAUST3] = ONYX_FAUST3
         deviceMap[EinkDevice.ONYX_KON_TIKI2] = ONYX_KON_TIKI2
+        deviceMap[EinkDevice.ONYX_LEAF] = ONYX_LEAF
         deviceMap[EinkDevice.ONYX_MAX] = ONYX_MAX
         deviceMap[EinkDevice.ONYX_NOTE3] = ONYX_NOTE3
         deviceMap[EinkDevice.ONYX_NOTE5] = ONYX_NOTE5
         deviceMap[EinkDevice.ONYX_NOTE_AIR] = ONYX_NOTE_AIR
+        deviceMap[EinkDevice.ONYX_NOTE_PRO] = ONYX_NOTE_PRO
         deviceMap[EinkDevice.ONYX_NOVA2] = ONYX_NOVA2
         deviceMap[EinkDevice.ONYX_NOVA3_COLOR] = ONYX_NOVA3_COLOR
         deviceMap[EinkDevice.ONYX_NOVA_AIR] = ONYX_NOVA_AIR
+        deviceMap[EinkDevice.ONYX_POKE3] = ONYX_POKE3
         deviceMap[EinkDevice.ONYX_POKE_PRO] = ONYX_POKE_PRO
         deviceMap[EinkDevice.TOLINO] = TOLINO
 

@@ -16,11 +16,14 @@ object LightsFactory {
                 DeviceInfo.LightsDevice.ONYX_KON_TIKI2,
                 DeviceInfo.LightsDevice.ONYX_DARWIN7,
                 DeviceInfo.LightsDevice.ONYX_FAUST3,
+                DeviceInfo.LightsDevice.ONYX_LEAF,
                 DeviceInfo.LightsDevice.ONYX_NOTE3,
                 DeviceInfo.LightsDevice.ONYX_NOTE_AIR,
+                DeviceInfo.LightsDevice.ONYX_NOTE_PRO,
                 DeviceInfo.LightsDevice.ONYX_NOVA2,
                 DeviceInfo.LightsDevice.ONYX_NOVA3,
                 DeviceInfo.LightsDevice.ONYX_NOVA_AIR,
+                DeviceInfo.LightsDevice.ONYX_POKE3,
                 DeviceInfo.LightsDevice.ONYX_POKE_PRO -> {
                     logController("Onyx/Qualcomm")
                     OnyxWarmthController()
