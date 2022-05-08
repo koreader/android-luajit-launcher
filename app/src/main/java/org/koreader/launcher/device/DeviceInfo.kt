@@ -390,6 +390,7 @@ object DeviceInfo {
         deviceMap[EinkDevice.ONYX_NOTE_AIR] = ONYX_NOTE_AIR
         deviceMap[EinkDevice.ONYX_NOTE_PRO] = ONYX_NOTE_PRO
         deviceMap[EinkDevice.ONYX_NOVA2] = ONYX_NOVA2
+        deviceMap[EinkDevice.ONYX_NOVA3] = ONYX_NOVA3
         deviceMap[EinkDevice.ONYX_NOVA3_COLOR] = ONYX_NOVA3_COLOR
         deviceMap[EinkDevice.ONYX_NOVA_AIR] = ONYX_NOVA_AIR
         deviceMap[EinkDevice.ONYX_POKE3] = ONYX_POKE3
@@ -415,6 +416,7 @@ object DeviceInfo {
         lightsMap[LightsDevice.ONYX_NOTE3] = ONYX_NOTE3
         lightsMap[LightsDevice.ONYX_NOTE_AIR] = ONYX_NOTE_AIR
         lightsMap[LightsDevice.ONYX_NOVA2] = ONYX_NOVA2
+        lightsMap[LightsDevice.ONYX_NOVA3] = ONYX_NOVA3
         lightsMap[LightsDevice.ONYX_NOVA_AIR] = ONYX_NOVA_AIR
         lightsMap[LightsDevice.ONYX_POKE_PRO] = ONYX_POKE_PRO
         lightsMap[LightsDevice.TOLINO_EPOS] = TOLINO_EPOS
