@@ -55,6 +55,7 @@ object DeviceInfo {
         ONYX_KON_TIKI2,
         ONYX_LEAF,
         ONYX_MAX,
+        ONYX_NOTE,
         ONYX_NOTE3,
         ONYX_NOTE5,
         ONYX_NOTE_AIR,
@@ -90,6 +91,7 @@ object DeviceInfo {
         NONE,
         EMULATOR,
         ONYX_MAX,
+        ONYX_NOTE,
         ONYX_POKE2,
         SONY_RP1
     }
@@ -129,6 +131,7 @@ object DeviceInfo {
     private val ONYX_KON_TIKI2: Boolean
     private val ONYX_LEAF: Boolean
     private val ONYX_MAX: Boolean
+    private val ONYX_NOTE: Boolean
     private val ONYX_NOTE3: Boolean
     private val ONYX_NOTE5: Boolean
     private val ONYX_NOTE_AIR: Boolean
@@ -255,6 +258,11 @@ object DeviceInfo {
             && PRODUCT.contentEquals("max")
             && DEVICE.contentEquals("max"))
 
+        // Onyx Note
+        ONYX_NOTE = (MANUFACTURER.contentEquals("onyx")
+            && PRODUCT.contentEquals("note")
+            && DEVICE.contentEquals("note"))
+
         // Onyx Note 3
         ONYX_NOTE3 = (MANUFACTURER.contentEquals("onyx")
             && PRODUCT.contentEquals("note3")
@@ -344,6 +352,7 @@ object DeviceInfo {
         val bugMap = HashMap<QuirkDevice, Boolean>()
         bugMap[QuirkDevice.EMULATOR] = EMULATOR_X86
         bugMap[QuirkDevice.ONYX_MAX] = ONYX_MAX
+        bugMap[QuirkDevice.ONYX_NOTE] = ONYX_NOTE
         bugMap[QuirkDevice.ONYX_POKE2] = ONYX_POKE2
         bugMap[QuirkDevice.SONY_RP1] = SONY_RP1
 
@@ -385,6 +394,7 @@ object DeviceInfo {
         deviceMap[EinkDevice.ONYX_KON_TIKI2] = ONYX_KON_TIKI2
         deviceMap[EinkDevice.ONYX_LEAF] = ONYX_LEAF
         deviceMap[EinkDevice.ONYX_MAX] = ONYX_MAX
+        deviceMap[EinkDevice.ONYX_NOTE] = ONYX_NOTE
         deviceMap[EinkDevice.ONYX_NOTE3] = ONYX_NOTE3
         deviceMap[EinkDevice.ONYX_NOTE5] = ONYX_NOTE5
         deviceMap[EinkDevice.ONYX_NOTE_AIR] = ONYX_NOTE_AIR
@@ -452,6 +462,7 @@ object DeviceInfo {
         // Android devices without lights
         QUIRK_NO_LIGHTS = when (QUIRK) {
             QuirkDevice.ONYX_MAX,
+            QuirkDevice.ONYX_NOTE,
             QuirkDevice.SONY_RP1 -> true
             else -> false
         }
