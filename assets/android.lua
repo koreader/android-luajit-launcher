@@ -2466,16 +2466,23 @@ local function run(android_app_state)
         end)
     end
 
-    android.sendText = function(text)
+    android.sendText = function(text, reason, title, mimetype)
+        if not text then return end
         JNI:context(android.app.activity.vm, function(jni)
             local _text = jni.env[0].NewStringUTF(jni.env, text)
+            local _reason = jni.env[0].NewStringUTF(jni.env, reason)
+            local _title = jni.env[0].NewStringUTF(jni.env, title)
+            local _mimetype = jni.env[0].NewStringUTF(jni.env, mimetype)
             jni:callVoidMethod(
                 android.app.activity.clazz,
                 "sendText",
-                "(Ljava/lang/String;)V",
-                _text
+                "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V",
+                _text, _reason, _title, _mimetype
             )
             jni.env[0].DeleteLocalRef(jni.env, _text)
+            jni.env[0].DeleteLocalRef(jni.env, _reason)
+            jni.env[0].DeleteLocalRef(jni.env, _title)
+            jni.env[0].DeleteLocalRef(jni.env, _mimetype)
         end)
     end
 
