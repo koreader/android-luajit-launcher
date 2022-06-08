@@ -19,7 +19,6 @@ abstract class QualcommEPDController {
         const val EINK_WAVEFORM_DELAY_UI = 100
         const val EINK_WAVEFORM_DELAY_FAST = 0
 
-
         private fun preventSystemRefresh() : Boolean{
             // Sets UpdateMode and UpdateScheme to None
             // this function is called EpdController.setSystemUpdateModeAndScheme in onyxsdk
