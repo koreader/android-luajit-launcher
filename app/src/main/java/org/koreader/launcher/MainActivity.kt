@@ -275,12 +275,12 @@ class MainActivity : NativeActivity(), LuaInterface,
         text?.let { lookupText ->
             action?.let { lookupAction ->
                 when (lookupAction) {
-                    "aard2" -> aardLookup(lookupText)
-                    "colordict" -> colordictLookup(lookupText, nullablePackage)
-                    "quickdic" -> quickdicLookup(lookupText)
-                    "search" -> searchText(lookupText, nullablePackage)
-                    "send" -> sendText(lookupText, nullablePackage)
-                    "text" -> processText(lookupText, nullablePackage)
+                    "aard2" -> aardAction(lookupText)
+                    "colordict" -> colordictAction(lookupText, nullablePackage)
+                    "quickdic" -> quickdicAction(lookupText)
+                    "search" -> searchAction(lookupText, nullablePackage)
+                    "send" -> sendAction(lookupText, nullablePackage)
+                    "text" -> processTextAction(lookupText, nullablePackage)
                     else -> Log.w(tag, "Unsupported action $lookupAction")
                 }
             } ?: Log.e(tag, "invalid lookup: no action")
@@ -656,9 +656,21 @@ class MainActivity : NativeActivity(), LuaInterface,
         } ?: false
     }
 
-    override fun sendText(text: String?) {
-        text?.let {
-            sendText(it, null, null)
+    override fun sendText(text: String, reason: String?, title: String?, mimetype: String?) {
+        val sendIntent: Intent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, text)
+            type = mimetype ?: "text/plain"
+        }
+        title?.let {
+            sendIntent.putExtra(Intent.EXTRA_TITLE, it)
+        }
+
+        val chooser = Intent.createChooser(sendIntent, reason)
+        try {
+            startActivity(chooser)
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 

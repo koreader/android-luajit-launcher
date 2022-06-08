@@ -69,7 +69,7 @@ interface LuaInterface {
     fun requestIgnoreBatteryOptimizations(rationale: String, okButton: String, cancelButton: String)
     fun requestWriteSystemSettings(rationale: String, okButton: String, cancelButton: String)
     fun safFilePicker(path: String?): Boolean
-    fun sendText(text: String?)
+    fun sendText(text: String, reason: String? = null, title: String? = null, mimetype: String? = null)
     fun setFullscreen(enabled: Boolean)
     fun setClipboardText(text: String)
     fun setIgnoreInput(enabled: Boolean)

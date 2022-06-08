@@ -42,21 +42,21 @@ fun Activity.hapticFeedback(constant: Int, force: Boolean, view: View) {
     }
 }
 
-fun Activity.aardLookup(text: String) {
+fun Activity.aardAction(text: String) {
     val aardIntent: Intent = Intent().apply {
         action = "aard2.lookup"
         putExtra(SearchManager.QUERY, text)
     }
-    startActivityCompat(this, aardIntent)
+    startDictionaryActivity(this, aardIntent)
 }
 
-fun Activity.colordictLookup(text: String, domain: String? = null) {
+fun Activity.colordictAction(text: String, domain: String? = null) {
     val colordictIntent: Intent = Intent().apply {
         action = "aard2.lookup"
         putExtra("EXTRA_QUERY", text)
         putExtra("EXTRA_FULLSCREEN", true)
     }
-    startActivityCompat(this, colordictIntent, domain)
+    startDictionaryActivity(this, colordictIntent, domain)
 }
 
 fun Activity.filePicker(id: Int): Boolean {
@@ -185,9 +185,9 @@ fun Activity.networkInfo(): String {
     return String.format(Locale.US, "%d;%d", if (connected) 1 else 0, connectionType)
 }
 
-fun Activity.processText(text: String, domain: String? = null, title: String? = null) {
+fun Activity.processTextAction(text: String, domain: String? = null) {
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-        sendText(text, domain, title)
+        sendAction(text, domain)
     } else {
         val processTextIntent: Intent = Intent().apply {
             action = Intent.ACTION_PROCESS_TEXT
@@ -196,16 +196,16 @@ fun Activity.processText(text: String, domain: String? = null, title: String? = 
             putExtra(Intent.EXTRA_PROCESS_TEXT_READONLY, text)
             type = "text/plain"
         }
-        startActivityCompat(this, processTextIntent, domain, title)
+        startDictionaryActivity(this, processTextIntent, domain)
     }
 }
 
-fun Activity.quickdicLookup(text: String) {
+fun Activity.quickdicAction(text: String) {
     val quickdicIntent: Intent = Intent().apply {
         action = "com.hughes.action.ACTION_SEARCH_DICT"
         putExtra(SearchManager.QUERY, text)
     }
-    startActivityCompat(this, quickdicIntent)
+    startDictionaryActivity(this, quickdicIntent)
 }
 
 fun Activity.openWifi() {
@@ -246,22 +246,22 @@ fun Activity.requestSpecialPermission(intent: Intent, rationale: String,
     }
 }
 
-fun Activity.searchText(text: String, domain: String? = null, title: String? = null) {
+fun Activity.searchAction(text: String, domain: String? = null) {
     val searchIntent: Intent = Intent().apply {
         action = Intent.ACTION_SEARCH
         putExtra(SearchManager.QUERY, text)
         putExtra(Intent.EXTRA_TEXT, text)
     }
-    startActivityCompat(this, searchIntent, domain, title)
+    startDictionaryActivity(this, searchIntent, domain)
 }
 
-fun Activity.sendText(text: String, domain: String? = null, title: String? = null) {
+fun Activity.sendAction(text: String, domain: String? = null) {
     val sendIntent: Intent = Intent().apply {
         action = Intent.ACTION_SEND
         putExtra(Intent.EXTRA_TEXT, text)
         type = "text/plain"
     }
-    startActivityCompat(this, sendIntent, domain, title)
+    startDictionaryActivity(this, sendIntent, domain)
 }
 
 @Suppress("DEPRECATION")
@@ -312,8 +312,7 @@ private fun getScreenSizeWithConstraints(activity: Activity): Point {
 }
 
 @SuppressLint("QueryPermissionsNeeded")
-private fun startActivityCompat(context: Context, intent: Intent,
-                                domain: String? = null, rationale: String? = null) {
+private fun startDictionaryActivity(context: Context, intent: Intent, domain: String? = null) {
     domain?.let {
         intent.setPackage(it)
         try {
@@ -325,7 +324,17 @@ private fun startActivityCompat(context: Context, intent: Intent,
         } catch (e: Exception) {
             e.printStackTrace()
         }
-    } ?: context.startActivity(Intent.createChooser(intent, rationale))
+    } ?: run {
+        startActivityCompat(context, intent)
+    }
+}
+
+private fun startActivityCompat(context: Context, intent: Intent) {
+    try {
+        context.startActivity(intent)
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
 }
 
 /* Orientation */
