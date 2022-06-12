@@ -54,15 +54,15 @@ class TestActivity: AppCompatActivity() {
         }
 
         // EPD drivers
-        epdMap["Rockchip RK3368"] = RK3368EPDController()
-        epdMap["Rockchip RK3026"] = RK3026EPDController()
-        epdMap["Freescale/NTX"] = TolinoEPDController()
         epdMap["Onyx/Qualcomm"] = OnyxEPDController()
+        epdMap["Rockchip RK3026"] = RK3026EPDController()
+        epdMap["Rockchip RK3368"] = RK3368EPDController()
+        epdMap["Freescale/NTX"] = TolinoEPDController()
 
         // Lights drivers
-        lightsMap["Tolino (warmth)"] = TolinoWarmthController()
-        lightsMap["Onyx (warmth)"] = OnyxWarmthController()
         lightsMap["Onyx C67"] = OnyxC67Controller()
+        lightsMap["Onyx (warmth)"] = OnyxWarmthController()
+        lightsMap["Tolino (warmth)"] = TolinoWarmthController()
 
         // Device ID
         binding.info.append("Manufacturer: ${DeviceInfo.MANUFACTURER}\n")
