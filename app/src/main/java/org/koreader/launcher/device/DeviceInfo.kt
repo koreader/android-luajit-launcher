@@ -74,6 +74,7 @@ object DeviceInfo {
         ONYX_C67,
         ONYX_DARWIN7,
         ONYX_FAUST3,
+        ONYX_KON_TIKI2,
         ONYX_LEAF,
         ONYX_NOTE3,
         ONYX_NOTE_AIR,
@@ -81,7 +82,6 @@ object DeviceInfo {
         ONYX_NOVA2,
         ONYX_NOVA3,
         ONYX_NOVA_AIR,
-        ONYX_KON_TIKI2,
         ONYX_POKE3,
         ONYX_POKE_PRO,
         TOLINO_EPOS
@@ -248,55 +248,70 @@ object DeviceInfo {
             && (MODEL.contentEquals("bnrv510") || MODEL.contentEquals("bnrv520") || MODEL.contentEquals("bnrv700")
             || MODEL.contentEquals("evk_mx6sl") || MODEL.startsWith("ereader"))
 
-        // Onyx Leaf
-        ONYX_LEAF = (MANUFACTURER.contentEquals("onyx")
-            && PRODUCT.contentEquals("leaf")
-            && DEVICE.contentEquals("leaf"))
+        // Onyx C67
+        ONYX_C67 = MANUFACTURER.contentEquals("onyx")
+            && (PRODUCT.startsWith("c67") || MODEL.contentEquals("rk30sdk"))
+            && DEVICE.startsWith("c67")
 
-        // Onyx Max
-        ONYX_MAX = (MANUFACTURER.contentEquals("onyx")
-            && PRODUCT.contentEquals("max")
-            && DEVICE.contentEquals("max"))
-
-        // Onyx Note
-        ONYX_NOTE = (MANUFACTURER.contentEquals("onyx")
-            && PRODUCT.contentEquals("note")
-            && DEVICE.contentEquals("note"))
-
-        // Onyx Note 3
-        ONYX_NOTE3 = (MANUFACTURER.contentEquals("onyx")
-            && PRODUCT.contentEquals("note3")
-            && DEVICE.contentEquals("note3"))
-
-        // Onyx Note 5
-        ONYX_NOTE5 = (BRAND.contentEquals("onyx")
-            && PRODUCT.contentEquals("note5")
-            && DEVICE.contentEquals("note5"))
-
-        // Onyx Note Air
-        ONYX_NOTE_AIR = (MANUFACTURER.contentEquals("onyx")
-            && PRODUCT.contentEquals("noteair")
-            && DEVICE.contentEquals("noteair"))
-
-        // Onyx Note Pro
-        ONYX_NOTE_PRO = (MANUFACTURER.contentEquals("onyx")
-            && PRODUCT.contentEquals("notepro")
-            && DEVICE.contentEquals("notepro"))
+        // ONYX DARWIN 7
+        ONYX_DARWIN7 = MANUFACTURER.contentEquals("onyx")
+            && PRODUCT.contentEquals("mc_darwin7")
+            && DEVICE.contentEquals("mc_darwin7")
 
         // Onyx Faust 3
-        ONYX_FAUST3 = (MANUFACTURER.contentEquals("onyx")
+        ONYX_FAUST3 = MANUFACTURER.contentEquals("onyx")
             && PRODUCT.contentEquals("mc_faust3")
-            && DEVICE.contentEquals("mc_faust3"))
+            && DEVICE.contentEquals("mc_faust3")
+
+        // Onyx Kon-Tiki 2
+        ONYX_KON_TIKI2 = MANUFACTURER.contentEquals("onyx")
+            && PRODUCT.contentEquals("kon_tiki2")
+            && DEVICE.contentEquals("kon_tiki2")
+
+        // Onyx Leaf
+        ONYX_LEAF = MANUFACTURER.contentEquals("onyx")
+            && PRODUCT.contentEquals("leaf")
+            && DEVICE.contentEquals("leaf")
+
+        // Onyx Max
+        ONYX_MAX = MANUFACTURER.contentEquals("onyx")
+            && PRODUCT.contentEquals("max")
+            && DEVICE.contentEquals("max")
+
+        // Onyx Note
+        ONYX_NOTE = MANUFACTURER.contentEquals("onyx")
+            && PRODUCT.contentEquals("note")
+            && DEVICE.contentEquals("note")
+
+        // Onyx Note 3
+        ONYX_NOTE3 = MANUFACTURER.contentEquals("onyx")
+            && PRODUCT.contentEquals("note3")
+            && DEVICE.contentEquals("note3")
+
+        // Onyx Note 5
+        ONYX_NOTE5 = BRAND.contentEquals("onyx")
+            && PRODUCT.contentEquals("note5")
+            && DEVICE.contentEquals("note5")
+
+        // Onyx Note Air
+        ONYX_NOTE_AIR = MANUFACTURER.contentEquals("onyx")
+            && PRODUCT.contentEquals("noteair")
+            && DEVICE.contentEquals("noteair")
+
+        // Onyx Note Pro
+        ONYX_NOTE_PRO = MANUFACTURER.contentEquals("onyx")
+            && PRODUCT.contentEquals("notepro")
+            && DEVICE.contentEquals("notepro")
 
         // Onyx Nova 2
-        ONYX_NOVA2 = (MANUFACTURER.contentEquals("onyx")
+        ONYX_NOVA2 = MANUFACTURER.contentEquals("onyx")
             && PRODUCT.contentEquals("nova2")
-            && DEVICE.contentEquals("nova2"))
+            && DEVICE.contentEquals("nova2")
 
         // Onyx Nova 3
-        ONYX_NOVA3 = (MANUFACTURER.contentEquals("onyx")
+        ONYX_NOVA3 = MANUFACTURER.contentEquals("onyx")
             && PRODUCT.contentEquals("nova3")
-            && DEVICE.contentEquals("nova3"))
+            && DEVICE.contentEquals("nova3")
 
         // Onyx Nova 3 Color
         ONYX_NOVA3_COLOR = MANUFACTURER.contentEquals("onyx")
@@ -306,29 +321,14 @@ object DeviceInfo {
         ONYX_NOVA_AIR = MANUFACTURER.contentEquals("onyx")
             && MODEL.contentEquals("novaair")
 
-        // Onyx C67
-        ONYX_C67 = (MANUFACTURER.contentEquals("onyx")
-            && (PRODUCT.startsWith("c67") || MODEL.contentEquals("rk30sdk"))
-            && DEVICE.startsWith("c67"))
-
-        // ONYX DARWIN 7
-        ONYX_DARWIN7 = (MANUFACTURER.contentEquals("onyx")
-            && PRODUCT.contentEquals("mc_darwin7")
-            && DEVICE.contentEquals("mc_darwin7"))
-
-        // Onyx Kon-Tiki 2
-        ONYX_KON_TIKI2 = (MANUFACTURER.contentEquals("onyx")
-            && PRODUCT.contentEquals("kon_tiki2")
-            && DEVICE.contentEquals("kon_tiki2"))
-
         // Onyx Poke 2
         ONYX_POKE2 = MANUFACTURER.contentEquals("onyx")
             && PRODUCT.contentEquals("poke2")
 
         // Onyx Poke 3
-        ONYX_POKE3 = (MANUFACTURER.contentEquals("onyx")
+        ONYX_POKE3 = MANUFACTURER.contentEquals("onyx")
             && PRODUCT.contentEquals("poke3")
-            && DEVICE.contentEquals("poke3"))
+            && DEVICE.contentEquals("poke3")
 
         // Onyx Poke Pro
         ONYX_POKE_PRO = MANUFACTURER.contentEquals("onyx")
@@ -420,8 +420,8 @@ object DeviceInfo {
         // devices with custom lights
         val lightsMap = HashMap<LightsDevice, Boolean>()
         lightsMap[LightsDevice.ONYX_C67] = ONYX_C67
-        lightsMap[LightsDevice.ONYX_FAUST3] = ONYX_FAUST3
         lightsMap[LightsDevice.ONYX_DARWIN7] = ONYX_DARWIN7
+        lightsMap[LightsDevice.ONYX_FAUST3] = ONYX_FAUST3
         lightsMap[LightsDevice.ONYX_KON_TIKI2] = ONYX_KON_TIKI2
         lightsMap[LightsDevice.ONYX_NOTE3] = ONYX_NOTE3
         lightsMap[LightsDevice.ONYX_NOTE_AIR] = ONYX_NOTE_AIR

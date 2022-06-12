@@ -17,15 +17,14 @@ object EPDFactory {
     val epdController: EPDInterface
         get() {
             return when (DeviceInfo.EINK) {
-
                 DeviceInfo.EinkDevice.BOYUE_T61,
                 DeviceInfo.EinkDevice.BOYUE_T62,
                 DeviceInfo.EinkDevice.BOYUE_T80S,
                 DeviceInfo.EinkDevice.CREMA_0650L,
-                DeviceInfo.EinkDevice.FIDIBOOK,
-                DeviceInfo.EinkDevice.ONYX_C67,
                 DeviceInfo.EinkDevice.ENERGY,
-                DeviceInfo.EinkDevice.INKBOOK -> {
+                DeviceInfo.EinkDevice.FIDIBOOK,
+                DeviceInfo.EinkDevice.INKBOOK,
+                DeviceInfo.EinkDevice.ONYX_C67 -> {
                     logController("Rockchip RK3026")
                     RK3026EPDController()
                 }
@@ -75,8 +74,8 @@ object EPDFactory {
                 }
 
                 DeviceInfo.EinkDevice.NABUK,
-                DeviceInfo.EinkDevice.ONYX_FAUST3,
-                DeviceInfo.EinkDevice.ONYX_DARWIN7 -> {
+                DeviceInfo.EinkDevice.ONYX_DARWIN7,
+                DeviceInfo.EinkDevice.ONYX_FAUST3 -> {
                     logController("Old Tolino/NTX")
                     OldTolinoEPDController()
                 }
