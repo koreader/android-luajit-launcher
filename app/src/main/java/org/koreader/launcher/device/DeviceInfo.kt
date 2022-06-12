@@ -59,11 +59,13 @@ object DeviceInfo {
         ONYX_NOTE3,
         ONYX_NOTE5,
         ONYX_NOTE_AIR,
+        ONYX_NOTE_AIR2,
         ONYX_NOTE_PRO,
         ONYX_NOVA2,
         ONYX_NOVA3,
         ONYX_NOVA3_COLOR,
         ONYX_NOVA_AIR,
+        ONYX_NOVA_AIR_C,
         ONYX_POKE3,
         ONYX_POKE_PRO,
         TOLINO
@@ -78,10 +80,12 @@ object DeviceInfo {
         ONYX_LEAF,
         ONYX_NOTE3,
         ONYX_NOTE_AIR,
+        ONYX_NOTE_AIR2,
         ONYX_NOTE_PRO,
         ONYX_NOVA2,
         ONYX_NOVA3,
         ONYX_NOVA_AIR,
+        ONYX_NOVA_AIR_C,
         ONYX_POKE3,
         ONYX_POKE_PRO,
         TOLINO_EPOS
@@ -135,11 +139,13 @@ object DeviceInfo {
     private val ONYX_NOTE3: Boolean
     private val ONYX_NOTE5: Boolean
     private val ONYX_NOTE_AIR: Boolean
+    private val ONYX_NOTE_AIR2: Boolean
     private val ONYX_NOTE_PRO: Boolean
     private val ONYX_NOVA2: Boolean
     private val ONYX_NOVA3: Boolean
     private val ONYX_NOVA3_COLOR: Boolean
     private val ONYX_NOVA_AIR: Boolean
+    private val ONYX_NOVA_AIR_C: Boolean
     private val ONYX_POKE2: Boolean
     private val ONYX_POKE3: Boolean
     private val ONYX_POKE_PRO: Boolean
@@ -298,6 +304,11 @@ object DeviceInfo {
             && PRODUCT.contentEquals("noteair")
             && DEVICE.contentEquals("noteair")
 
+        // Onyx Note Air 2
+        ONYX_NOTE_AIR2 = BRAND.contentEquals("onyx")
+            && PRODUCT.contentEquals("noteair2")
+            && MODEL.contentEquals("noteair2")
+
         // Onyx Note Pro
         ONYX_NOTE_PRO = MANUFACTURER.contentEquals("onyx")
             && PRODUCT.contentEquals("notepro")
@@ -320,6 +331,10 @@ object DeviceInfo {
         // Onyx Nova Air
         ONYX_NOVA_AIR = MANUFACTURER.contentEquals("onyx")
             && MODEL.contentEquals("novaair")
+
+        // Onyx Nova Air C
+        ONYX_NOVA_AIR_C = BRAND.contentEquals("onyx")
+            && MODEL.contentEquals("novaairc")
 
         // Onyx Poke 2
         ONYX_POKE2 = MANUFACTURER.contentEquals("onyx")
@@ -398,11 +413,13 @@ object DeviceInfo {
         deviceMap[EinkDevice.ONYX_NOTE3] = ONYX_NOTE3
         deviceMap[EinkDevice.ONYX_NOTE5] = ONYX_NOTE5
         deviceMap[EinkDevice.ONYX_NOTE_AIR] = ONYX_NOTE_AIR
+        deviceMap[EinkDevice.ONYX_NOTE_AIR2] = ONYX_NOTE_AIR2
         deviceMap[EinkDevice.ONYX_NOTE_PRO] = ONYX_NOTE_PRO
         deviceMap[EinkDevice.ONYX_NOVA2] = ONYX_NOVA2
         deviceMap[EinkDevice.ONYX_NOVA3] = ONYX_NOVA3
         deviceMap[EinkDevice.ONYX_NOVA3_COLOR] = ONYX_NOVA3_COLOR
         deviceMap[EinkDevice.ONYX_NOVA_AIR] = ONYX_NOVA_AIR
+        deviceMap[EinkDevice.ONYX_NOVA_AIR_C] = ONYX_NOVA_AIR_C
         deviceMap[EinkDevice.ONYX_POKE3] = ONYX_POKE3
         deviceMap[EinkDevice.ONYX_POKE_PRO] = ONYX_POKE_PRO
         deviceMap[EinkDevice.TOLINO] = TOLINO
@@ -425,9 +442,11 @@ object DeviceInfo {
         lightsMap[LightsDevice.ONYX_KON_TIKI2] = ONYX_KON_TIKI2
         lightsMap[LightsDevice.ONYX_NOTE3] = ONYX_NOTE3
         lightsMap[LightsDevice.ONYX_NOTE_AIR] = ONYX_NOTE_AIR
+        lightsMap[LightsDevice.ONYX_NOTE_AIR2] = ONYX_NOTE_AIR2
         lightsMap[LightsDevice.ONYX_NOVA2] = ONYX_NOVA2
         lightsMap[LightsDevice.ONYX_NOVA3] = ONYX_NOVA3
         lightsMap[LightsDevice.ONYX_NOVA_AIR] = ONYX_NOVA_AIR
+        lightsMap[LightsDevice.ONYX_NOVA_AIR_C] = ONYX_NOVA_AIR_C
         lightsMap[LightsDevice.ONYX_POKE_PRO] = ONYX_POKE_PRO
         lightsMap[LightsDevice.TOLINO_EPOS] = TOLINO_EPOS
 
@@ -469,7 +488,8 @@ object DeviceInfo {
 
         HAS_COLOR_SCREEN = when (EINK) {
             EinkDevice.NONE,
-            EinkDevice.ONYX_NOVA3_COLOR -> true
+            EinkDevice.ONYX_NOVA3_COLOR,
+            EinkDevice.ONYX_NOVA_AIR_C -> true
             else -> false
         }
     }
