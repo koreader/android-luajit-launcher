@@ -46,6 +46,7 @@ object DeviceInfo {
         FIDIBOOK,
         HANVON_960,
         INKBOOK,
+        IREADER_R6800,
         JDREAD,
         NABUK,
         NOOK,
@@ -126,6 +127,7 @@ object DeviceInfo {
     private val FIDIBOOK: Boolean
     private val HANVON_960: Boolean
     private val INKBOOK: Boolean
+    private val IREADER_R6800: Boolean
     private val JDREAD: Boolean
     private val NABUK_REGAL_HD: Boolean
     private val NOOK: Boolean
@@ -240,6 +242,10 @@ object DeviceInfo {
         INKBOOK = (MANUFACTURER.contentEquals("artatech")
             && BRAND.contentEquals("inkbook")
             && MODEL.startsWith("prime"))
+
+        // iReader r6800
+        IREADER_R6800 = MANUFACTURER.contentEquals("ireader")
+            && MODEL.contentEquals("r6800")
 
         // JDRead1
         JDREAD = MANUFACTURER.contentEquals("onyx")
@@ -400,6 +406,7 @@ object DeviceInfo {
         deviceMap[EinkDevice.ENERGY] = ENERGY
         deviceMap[EinkDevice.FIDIBOOK] = FIDIBOOK
         deviceMap[EinkDevice.INKBOOK] = INKBOOK
+        deviceMap[EinkDevice.IREADER_R6800] = IREADER_R6800
         deviceMap[EinkDevice.JDREAD] = JDREAD
         deviceMap[EinkDevice.NABUK] = NABUK_REGAL_HD
         deviceMap[EinkDevice.NOOK] = NOOK

@@ -42,6 +42,7 @@ object EPDFactory {
                 }
 
                 DeviceInfo.EinkDevice.BOYUE_T65S,
+                DeviceInfo.EinkDevice.IREADER_R6800,
                 DeviceInfo.EinkDevice.JDREAD,
                 DeviceInfo.EinkDevice.NOOK -> {
                     logController("Nook/NTX")
