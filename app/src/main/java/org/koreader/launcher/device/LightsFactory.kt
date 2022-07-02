@@ -33,7 +33,8 @@ object LightsFactory {
                     logController("Onyx/Sdk")
                     OnyxSdkLightsController()
                 }
-                DeviceInfo.LightsDevice.ONYX_C67 -> {
+                DeviceInfo.LightsDevice.ONYX_C67,
+                DeviceInfo.LightsDevice.ONYX_MAGICBOOK -> {
                     logController("ONYX C67")
                     OnyxC67Controller()
                 }
