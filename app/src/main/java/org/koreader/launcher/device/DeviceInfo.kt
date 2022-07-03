@@ -70,6 +70,7 @@ object DeviceInfo {
         ONYX_NOVA_AIR_C,
         ONYX_POKE3,
         ONYX_POKE_PRO,
+        SONY_CP1,
         TOLINO
     }
 
@@ -100,6 +101,7 @@ object DeviceInfo {
         ONYX_MAX,
         ONYX_NOTE,
         ONYX_POKE2,
+        SONY_CP1,
         SONY_RP1
     }
 
@@ -154,6 +156,7 @@ object DeviceInfo {
     private val ONYX_POKE2: Boolean
     private val ONYX_POKE3: Boolean
     private val ONYX_POKE_PRO: Boolean
+    private val SONY_CP1: Boolean
     private val SONY_RP1: Boolean
     private val TOLINO: Boolean
     private val TOLINO_EPOS: Boolean
@@ -362,6 +365,10 @@ object DeviceInfo {
         ONYX_POKE_PRO = MANUFACTURER.contentEquals("onyx")
             && PRODUCT.contentEquals("poke_pro")
 
+        // Sony DPT-CP1
+        SONY_CP1 = MANUFACTURER.contentEquals("sony")
+            && MODEL.contentEquals("dpt-cp1")
+
         // Sony DPT-RP1
         SONY_RP1 = MANUFACTURER.contentEquals("sony")
             && MODEL.contentEquals("dpt-rp1")
@@ -382,6 +389,7 @@ object DeviceInfo {
         bugMap[QuirkDevice.ONYX_MAX] = ONYX_MAX
         bugMap[QuirkDevice.ONYX_NOTE] = ONYX_NOTE
         bugMap[QuirkDevice.ONYX_POKE2] = ONYX_POKE2
+        bugMap[QuirkDevice.SONY_CP1] = SONY_CP1
         bugMap[QuirkDevice.SONY_RP1] = SONY_RP1
 
         bugMap.keys.iterator().run {
@@ -437,6 +445,7 @@ object DeviceInfo {
         deviceMap[EinkDevice.ONYX_NOVA_AIR_C] = ONYX_NOVA_AIR_C
         deviceMap[EinkDevice.ONYX_POKE3] = ONYX_POKE3
         deviceMap[EinkDevice.ONYX_POKE_PRO] = ONYX_POKE_PRO
+        deviceMap[EinkDevice.SONY_CP1] = SONY_CP1
         deviceMap[EinkDevice.TOLINO] = TOLINO
 
         deviceMap.keys.iterator().run {
@@ -498,6 +507,7 @@ object DeviceInfo {
         QUIRK_NO_LIGHTS = when (QUIRK) {
             QuirkDevice.ONYX_MAX,
             QuirkDevice.ONYX_NOTE,
+            QuirkDevice.SONY_CP1,
             QuirkDevice.SONY_RP1 -> true
             else -> false
         }
