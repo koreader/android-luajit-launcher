@@ -312,7 +312,6 @@ object DeviceInfo {
 
         // Onyx Note Air 2
         ONYX_NOTE_AIR2 = BRAND.contentEquals("onyx")
-            && PRODUCT.contentEquals("noteair2")
             && MODEL.contentEquals("noteair2")
 
         // Onyx Note Pro
