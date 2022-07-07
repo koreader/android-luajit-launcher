@@ -45,7 +45,8 @@ object EPDFactory {
                 DeviceInfo.EinkDevice.BOYUE_T65S,
                 DeviceInfo.EinkDevice.JDREAD,
                 DeviceInfo.EinkDevice.NOOK,
-                DeviceInfo.EinkDevice.SONY_CP1 -> {
+                DeviceInfo.EinkDevice.SONY_CP1,
+                DeviceInfo.EinkDevice.SONY_RP1 -> {
                     logController("Nook/NTX")
                     NookEPDController()
                 }
