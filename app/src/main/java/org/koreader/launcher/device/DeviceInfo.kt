@@ -71,6 +71,7 @@ object DeviceInfo {
         ONYX_POKE4,
         ONYX_POKE_PRO,
         SONY_CP1,
+        SONY_RP1,
         TOLINO
     }
 
@@ -446,6 +447,7 @@ object DeviceInfo {
         deviceMap[EinkDevice.ONYX_POKE4] = ONYX_POKE4
         deviceMap[EinkDevice.ONYX_POKE_PRO] = ONYX_POKE_PRO
         deviceMap[EinkDevice.SONY_CP1] = SONY_CP1
+        deviceMap[EinkDevice.SONY_RP1] = SONY_RP1
         deviceMap[EinkDevice.TOLINO] = TOLINO
 
         deviceMap.keys.iterator().run {
