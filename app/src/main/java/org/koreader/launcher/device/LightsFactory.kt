@@ -29,7 +29,8 @@ object LightsFactory {
                 }
                 DeviceInfo.LightsDevice.ONYX_NOTE_AIR2,
                 DeviceInfo.LightsDevice.ONYX_NOVA2,
-                DeviceInfo.LightsDevice.ONYX_NOVA_AIR_C -> {
+                DeviceInfo.LightsDevice.ONYX_NOVA_AIR_C,
+                DeviceInfo.LightsDevice.ONYX_POKE4 -> {
                     logController("Onyx/Sdk")
                     OnyxSdkLightsController()
                 }
