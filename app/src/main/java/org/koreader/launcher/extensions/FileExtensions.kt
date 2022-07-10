@@ -36,6 +36,23 @@ fun File.symlink(link: String): Boolean {
     }
 }
 
+fun File.read(): Int {
+    return try {
+        this.readText().replace("\n", "").toInt()
+    } catch (e: Exception) {
+        e.printStackTrace()
+        0
+    }
+}
+
+fun File.write(value: Int) {
+    try {
+        writeText(value.toString())
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
+}
+
 fun File.uncompress(extractTo: String, deleteIfOk: Boolean = false): Boolean {
     val success = try {
         uncompress(this.absolutePath, extractTo)

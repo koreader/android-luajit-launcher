@@ -89,6 +89,7 @@ object DeviceInfo {
         ONYX_NOTE_PRO,
         ONYX_NOVA2,
         ONYX_NOVA3,
+        ONYX_NOVA3_COLOR,
         ONYX_NOVA_AIR,
         ONYX_NOVA_AIR_C,
         ONYX_POKE3,
@@ -472,6 +473,7 @@ object DeviceInfo {
         lightsMap[LightsDevice.ONYX_NOTE_AIR2] = ONYX_NOTE_AIR2
         lightsMap[LightsDevice.ONYX_NOVA2] = ONYX_NOVA2
         lightsMap[LightsDevice.ONYX_NOVA3] = ONYX_NOVA3
+        lightsMap[LightsDevice.ONYX_NOVA3_COLOR] = ONYX_NOVA3_COLOR
         lightsMap[LightsDevice.ONYX_NOVA_AIR] = ONYX_NOVA_AIR
         lightsMap[LightsDevice.ONYX_NOVA_AIR_C] = ONYX_NOVA_AIR_C
         lightsMap[LightsDevice.ONYX_POKE4] = ONYX_POKE4

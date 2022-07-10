@@ -7,20 +7,27 @@ import org.koreader.launcher.extensions.read
 import org.koreader.launcher.extensions.write
 import java.io.File
 
-class OnyxC67Controller : LightsInterface {
+/* Controller for some Onyx Color devices.
+ * Tested on a Onyx Nova3 Color.
+ *
+ * Thanks to @ilyats
+ */
+
+class OnyxColorController : LightsInterface {
     companion object {
         private const val TAG = "Lights"
         private const val BRIGHTNESS_MAX = 255
         private const val BRIGHTNESS_MIN = 0
-        private const val BRIGHTNESS_FILE = "/sys/class/backlight/rk28_bl/brightness"
+        private const val BRIGHTNESS_FILE = "/sys/class/backlight/pwm-backlight.0/brightness"
+        private const val ACTUAL_BRIGHTNESS_FILE = "/sys/class/backlight/pwm-backlight.0/actual_brightness"
     }
 
     override fun getPlatform(): String {
-        return "onyx-c67"
+        return "onyx-color"
     }
 
     override fun hasFallback(): Boolean {
-        return true
+        return false
     }
 
     override fun hasWarmth(): Boolean {
@@ -36,7 +43,7 @@ class OnyxC67Controller : LightsInterface {
     }
 
     override fun getBrightness(activity: Activity): Int {
-        return File(BRIGHTNESS_FILE).read()
+        return File(ACTUAL_BRIGHTNESS_FILE).read()
     }
 
     override fun getWarmth(activity: Activity): Int {
