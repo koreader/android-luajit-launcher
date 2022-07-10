@@ -3,6 +3,8 @@ package org.koreader.launcher.device.lights
 import android.app.Activity
 import android.util.Log
 import org.koreader.launcher.device.LightsInterface
+import org.koreader.launcher.extensions.read
+import org.koreader.launcher.extensions.write
 import java.io.File
 
 class OnyxWarmthController : LightsInterface {
@@ -32,29 +34,11 @@ class OnyxWarmthController : LightsInterface {
     }
 
     override fun getBrightness(activity: Activity): Int {
-        val brightnessFile = File(WHITE_FILE)
-        return try {
-            // .replace("\n", "") is needed, since it's automatically appended
-            // without it exception is thrown
-            // java.lang.NumberFormatException: For input string: "125\n"
-            return brightnessFile.readText().replace("\n", "").toInt()
-        } catch (e: Exception) {
-            Log.w(TAG, Log.getStackTraceString(e))
-            0
-        }
+        return File(WHITE_FILE).read()
     }
 
     override fun getWarmth(activity: Activity): Int {
-        val warmthFile = File(WARMTH_FILE)
-        return try {
-            // .replace("\n", "") is needed, since it's automatically appended
-            // without it exception is thrown
-            // java.lang.NumberFormatException: For input string: "125\n"
-            return warmthFile.readText().replace("\n", "").toInt()
-        } catch (e: Exception) {
-            Log.w(TAG, Log.getStackTraceString(e))
-            0
-        }
+        return File(WARMTH_FILE).read()
     }
 
     override fun setBrightness(activity: Activity, brightness: Int) {
@@ -63,12 +47,7 @@ class OnyxWarmthController : LightsInterface {
             return
         }
         Log.v(TAG, "Setting brightness to $brightness")
-        val brightnessFile = File(WHITE_FILE)
-        try {
-            brightnessFile.writeText(brightness.toString())
-        } catch (e: Exception) {
-            Log.w(TAG, "$e")
-        }
+        File(WHITE_FILE).write(brightness)
     }
 
     override fun setWarmth(activity: Activity, warmth: Int) {
@@ -76,13 +55,9 @@ class OnyxWarmthController : LightsInterface {
             Log.w(TAG, "warmth value of of range: $warmth")
             return
         }
-        val warmthFile = File(WARMTH_FILE)
+
         Log.v(TAG, "Setting warmth to $warmth")
-        try {
-            warmthFile.writeText(warmth.toString())
-        } catch (e: Exception) {
-            Log.w(TAG, "$e")
-        }
+        File(WARMTH_FILE).write(warmth)
     }
 
     override fun getMinWarmth(): Int {

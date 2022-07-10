@@ -4,6 +4,8 @@ import android.app.Activity
 import android.provider.Settings
 import android.util.Log
 import org.koreader.launcher.device.LightsInterface
+import org.koreader.launcher.extensions.read
+import org.koreader.launcher.extensions.write
 import java.io.File
 
 /* Special controller for Tolino Epos/Epos2.
@@ -100,13 +102,7 @@ class TolinoWarmthController : LightsInterface {
     }
 
     override fun getWarmth(activity: Activity): Int {
-        val colorFile = File(COLOR_FILE)
-        return try {
-            WARMTH_MAX - colorFile.readText().toInt()
-        } catch (e: Exception) {
-            Log.w(TAG, "$e")
-            0
-        }
+        return WARMTH_MAX - File(COLOR_FILE).read()
     }
 
     override fun setBrightness(activity: Activity, brightness: Int) {
@@ -128,14 +124,13 @@ class TolinoWarmthController : LightsInterface {
             Log.w(TAG, "warmth value of of range: $warmth")
             return
         }
-
         val colorFile = File(COLOR_FILE)
         Log.v(TAG, "Setting warmth to $warmth")
         try {
             if (!colorFile.canWrite()) {
                 Runtime.getRuntime().exec("su -c chmod 666 $COLOR_FILE")
             }
-            colorFile.writeText((WARMTH_MAX - warmth).toString())
+            colorFile.write(WARMTH_MAX - warmth)
         } catch (e: Exception) {
             Log.w(TAG, "$e")
         }
