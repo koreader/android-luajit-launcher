@@ -1,14 +1,14 @@
 local ffi = require("ffi")
 
 ffi.cdef[[
-    unsigned int sleep(unsigned int seconds);
+    int poll(struct pollfd *fds, unsigned long nfds, int timeout);
 ]]
 
 local utils = {}
 
 function utils.sleep(seconds)
     if type(seconds) == "number" then
-        ffi.C.sleep(ffi.new("unsigned int", seconds))
+        ffi.C.poll(nil, 0, seconds * 1000)
     end
 end
 
