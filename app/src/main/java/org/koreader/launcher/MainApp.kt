@@ -107,9 +107,13 @@ class MainApp : MultiDexApplication() {
         }
 
         if (is_debug) {
-            // detect and log any potential issue within the vm.
-            val threadPolicy = StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build()
-            val vmPolicy = StrictMode.VmPolicy.Builder().detectAll().penaltyLog().build()
+            val threadPolicy = StrictMode.ThreadPolicy.Builder().detectCustomSlowCalls()
+                .penaltyLog().build()
+
+            val vmPolicy = StrictMode.VmPolicy.Builder().detectActivityLeaks()
+                .detectLeakedClosableObjects()
+                .penaltyLog().build()
+
             StrictMode.setThreadPolicy(threadPolicy)
             StrictMode.setVmPolicy(vmPolicy)
         }
