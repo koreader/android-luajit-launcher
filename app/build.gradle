@@ -129,6 +129,4 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_plugin_version"
     implementation "org.apache.commons:commons-compress:$commons_compress_version"
 
-    // add Leak Canary on debug variants.
-    debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakcanary_version"
 }
