@@ -11,7 +11,6 @@ buildscript {
     ext.androidx_supportv4_version = '1.0.0'
     ext.android_desugar_jdk = '1.1.5'
     ext.commons_compress_version = '1.20'
-    ext.leakcanary_version = '2.7'
 
     repositories {
         google()
