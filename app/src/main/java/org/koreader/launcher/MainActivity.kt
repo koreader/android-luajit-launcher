@@ -20,6 +20,8 @@ import android.view.*
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import org.koreader.launcher.device.Device
 import org.koreader.launcher.dialog.LightDialog
 import org.koreader.launcher.extensions.*
@@ -568,6 +570,8 @@ class MainActivity : NativeActivity(), LuaInterface,
             fullscreen
         } else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.JELLY_BEAN) {
             isFullscreenDeprecated()
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            fullscreen
         } else {
             false
         }
@@ -681,12 +685,39 @@ class MainActivity : NativeActivity(), LuaInterface,
         }
     }
 
+    fun setFullscreenImmersive(enabled: Boolean) {
+        val windowInsetsController = ViewCompat.getWindowInsetsController(window.decorView) ?: return
+
+        val cd = CountDownLatch(1)
+        runOnUiThread {
+            try {
+                if (enabled) {
+                    windowInsetsController.hide(WindowInsetsCompat.Type.navigationBars())
+                } else {
+                    windowInsetsController.show(WindowInsetsCompat.Type.navigationBars())
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+            cd.countDown()
+        }
+
+        try {
+            cd.await()
+            fullscreen = enabled
+        } catch (ex: InterruptedException) {
+            ex.printStackTrace()
+        }
+    }
+
     override fun setFullscreen(enabled: Boolean) {
         if (Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR2 ||
             Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR1) {
             fullscreen = enabled
         } else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.JELLY_BEAN) {
             setFullscreenDeprecated(enabled)
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            setFullscreenImmersive(enabled)
         }
     }
 
@@ -811,13 +842,15 @@ class MainActivity : NativeActivity(), LuaInterface,
     private fun setFullscreenLayout() {
         val decorView = window.decorView
         when {
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT ->
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT -> {
                 decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN or
                     View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
                     View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or
                     View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
                     View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
                     View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                setFullscreenImmersive(fullscreen)
+            }
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN ->
                 decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN or
                     View.SYSTEM_UI_FLAG_LOW_PROFILE
