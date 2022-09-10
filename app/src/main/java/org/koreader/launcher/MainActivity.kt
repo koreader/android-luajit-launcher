@@ -497,6 +497,14 @@ class MainActivity : NativeActivity(), LuaInterface,
         return Build.VERSION.RELEASE
     }
 
+    override fun getHardwareType(): String {
+        return Build.HARDWARE;
+    }
+
+    override fun getModel(): String {
+        return Build.MODEL;
+    }
+
     override fun hasBrokenLifecycle(): Boolean {
         return device.bugLifecycle
     }

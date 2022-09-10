@@ -1659,6 +1659,28 @@ local function run(android_app_state)
         end)
     end
 
+    android.getHardwareType = function()
+        return JNI:context(android.app.activity.vm, function(jni)
+            local hardwaretype = jni:callObjectMethod(
+                android.app.activity.clazz,
+                "getHardwareType",
+                "()Ljava/lang/String;"
+            )
+            return jni:to_string(hardwaretype) or "unknown"
+        end)
+    end
+
+    android.getModel = function()
+        return JNI:context(android.app.activity.vm, function(jni)
+            local model = jni:callObjectMethod(
+                android.app.activity.clazz,
+                "getModel",
+                "()Ljava/lang/String;"
+            )
+            return jni:to_string(model) or "unknown"
+        end)
+    end
+
     --- Build identification.
     -- @treturn string flavor
     android.getFlavor = function()
@@ -1885,6 +1907,8 @@ local function run(android_app_state)
     -- device properties
     android.prop.product = android.getProduct()
     android.prop.version = android.getVersion()
+    android.prop.hardwareType = android.getHardwareType()
+    android.prop.model = android.getModel()
     android.prop.brokenLifecycle = android.hasBrokenLifecycle()
 
     -- update logger name
