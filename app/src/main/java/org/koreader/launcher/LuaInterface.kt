@@ -24,8 +24,10 @@ interface LuaInterface {
     fun getExternalSdPath(): String
     fun getFilePathFromIntent(): String?
     fun getFlavor(): String
+    fun getHardwareType(): String
     fun getLastImportedPath(): String?
     fun getLightDialogState(): Int
+    fun getModel(): String
     fun getName(): String
     fun getNetworkInfo(): String
     fun getPlatformName(): String
@@ -35,16 +37,14 @@ interface LuaInterface {
     fun getScreenBrightness(): Int
     fun getScreenHeight(): Int
     fun getScreenMaxBrightness(): Int
-    fun getScreenMinBrightness(): Int
     fun getScreenMaxWarmth(): Int
+    fun getScreenMinBrightness(): Int
     fun getScreenMinWarmth(): Int
     fun getScreenOrientation(): Int
     fun getScreenWarmth(): Int
     fun getScreenWidth(): Int
     fun getStatusBarHeight(): Int
     fun getVersion(): String
-    fun getHardwareType(): String
-    fun getModel(): String
     fun hasBrokenLifecycle(): Boolean
     fun hasClipboardText(): Boolean
     fun hasLights(): Boolean
