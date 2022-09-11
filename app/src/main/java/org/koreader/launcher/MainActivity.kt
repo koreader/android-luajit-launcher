@@ -21,6 +21,7 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import org.koreader.launcher.device.Device
+import org.koreader.launcher.device.DeviceInfo
 import org.koreader.launcher.dialog.LightDialog
 import org.koreader.launcher.extensions.*
 import java.io.File
@@ -498,11 +499,11 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun getHardwareType(): String {
-        return Build.HARDWARE;
+        return DeviceInfo.HARDWARE;
     }
 
     override fun getModel(): String {
-        return Build.MODEL;
+        return DeviceInfo.MODEL;
     }
 
     override fun hasBrokenLifecycle(): Boolean {
