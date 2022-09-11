@@ -95,7 +95,8 @@ object DeviceInfo {
         ONYX_POKE3,
         ONYX_POKE4,
         ONYX_POKE_PRO,
-        TOLINO_EPOS
+        TOLINO_EPOS,
+        TOLINO_VISION5
     }
 
     enum class QuirkDevice {
@@ -163,6 +164,7 @@ object DeviceInfo {
     private val SONY_RP1: Boolean
     private val TOLINO: Boolean
     private val TOLINO_EPOS: Boolean
+    private val TOLINO_VISION5: Boolean
 
     init {
         MANUFACTURER = lowerCase(getBuildField("MANUFACTURER"))
@@ -385,6 +387,12 @@ object DeviceInfo {
             && MODEL.contentEquals("tolino")
             && DEVICE.contentEquals("ntx_6sl")
 
+        // Tolino Vision 5 also has warmth lights, but with ntx_io file
+        TOLINO_VISION5 = BRAND.contentEquals("rakutenkobo")
+            && MODEL.contentEquals("tolino")
+            && DEVICE.contentEquals("ntx_6sl")
+            && HARDWARE.contentEquals("e70k00")
+
         // devices with known bugs
         val bugMap = HashMap<QuirkDevice, Boolean>()
         bugMap[QuirkDevice.EMULATOR] = EMULATOR_X86
@@ -479,6 +487,7 @@ object DeviceInfo {
         lightsMap[LightsDevice.ONYX_POKE4] = ONYX_POKE4
         lightsMap[LightsDevice.ONYX_POKE_PRO] = ONYX_POKE_PRO
         lightsMap[LightsDevice.TOLINO_EPOS] = TOLINO_EPOS
+        lightsMap[LightsDevice.TOLINO_VISION5] = TOLINO_VISION5
 
         lightsMap.keys.iterator().run {
             while (this.hasNext()) {

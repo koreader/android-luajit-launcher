@@ -13,6 +13,10 @@ object LightsFactory {
                     logController("Tolino")
                     TolinoWarmthController()
                 }
+                DeviceInfo.LightsDevice.TOLINO_VISION5 -> {
+                    logController("Tolino")
+                    TolinoVision5WarmthController()
+                }
                 DeviceInfo.LightsDevice.ONYX_DARWIN7,
                 DeviceInfo.LightsDevice.ONYX_FAUST3,
                 DeviceInfo.LightsDevice.ONYX_KON_TIKI2,

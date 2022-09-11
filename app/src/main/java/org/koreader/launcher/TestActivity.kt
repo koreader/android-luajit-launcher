@@ -21,6 +21,7 @@ import org.koreader.launcher.device.lights.OnyxColorController
 import org.koreader.launcher.device.lights.OnyxSdkLightsController
 import org.koreader.launcher.device.lights.OnyxWarmthController
 import org.koreader.launcher.device.lights.TolinoWarmthController
+import org.koreader.launcher.device.lights.TolinoVision5WarmthController
 import org.koreader.launcher.dialog.LightDialog
 
 class TestActivity: AppCompatActivity() {
@@ -67,6 +68,7 @@ class TestActivity: AppCompatActivity() {
         lightsMap["Onyx SDK (lights)"] = OnyxSdkLightsController()
         lightsMap["Onyx (warmth)"] = OnyxWarmthController()
         lightsMap["Tolino (warmth)"] = TolinoWarmthController()
+        lightsMap["Tolino Vision5 (warmth)"] = TolinoVision5WarmthController()
 
         // Device ID
         binding.info.append("Manufacturer: ${DeviceInfo.MANUFACTURER}\n")
