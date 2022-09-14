@@ -3,9 +3,9 @@ package org.koreader.launcher.device.lights
 import android.app.Activity
 import android.provider.Settings
 import android.util.Log
+import org.koreader.launcher.device.Ioctl
 import org.koreader.launcher.device.LightsInterface
 import org.koreader.launcher.extensions.read
-import org.koreader.launcher.extensions.write
 import java.io.File
 
 /* Special controller for Tolino Epos/Epos2.
@@ -14,7 +14,8 @@ import java.io.File
  * Thanks to @zwim
  */
 
-class TolinoVision5WarmthController : LightsInterface {
+class TolinoVision5WarmthController : Ioctl(), LightsInterface {
+
     companion object {
         private const val TAG = "Lights"
         private const val BRIGHTNESS_MAX = 255
@@ -22,11 +23,11 @@ class TolinoVision5WarmthController : LightsInterface {
         private const val MIN = 0
         private const val NTX_IO_FILE = "/dev/ntx_io"
         private const val NTX_WARMTH_ID = 248
-        private const val NTX_IO_LUA_FILE = "frontend/device/kobo/ntx_io.lua"
         private const val ACTUAL_BRIGHTNESS_FILE = "/sys/class/backlight/mxc_msp430_fl.0/actual_brightness" // always readable, same for Epos2 and Vision4
         private const val COLOR_FILE = "/sys/class/backlight/lm3630a_led/color"
-        private var currentWarmth: Int? = null
     }
+
+    private var currentWarmth: Int? = null
 
     override fun getPlatform(): String {
         return "tolino"
@@ -129,47 +130,8 @@ class TolinoVision5WarmthController : LightsInterface {
 
         Log.v(TAG, "Setting warmth to $warmth of $WARMTH_MAX")
 
-        try {
-            val ntxFile = File(NTX_IO_FILE)
-            // check that the ntx_io file exists
-            if (ntxFile.canWrite()) {
-                // invert, because 0 is the "warmest"(red) and 10 is the "coldest"(blue)
-                // this makes the bar for "warmth" most left blue while the right most is red
-                val invertedWarmth = (warmth - WARMTH_MAX) * -1
-                val luajitBinFile = File("./luajit")
-                // check and fix the "luajit" binary file
-                if (!luajitBinFile.canExecute()) {
-                    val chmodProcess = Runtime.getRuntime().exec("chmod 775 $luajitBinFile")
-                    val chmodProcessExitStatus = chmodProcess.waitFor()
-                    Log.v(TAG, "\"chmod 775 $luajitBinFile\" exit status $chmodProcessExitStatus")
-                }
-
-                // execute ntx_io.lua script from kobo
-                val luaBinProcess = Runtime.getRuntime().exec("$luajitBinFile $NTX_IO_LUA_FILE $NTX_WARMTH_ID $invertedWarmth")
-                val luaBinProcessExitStatus = luaBinProcess.waitFor()
-                Log.v(TAG, "\"$luajitBinFile $ntxFile $NTX_WARMTH_ID $invertedWarmth\" exit status $luaBinProcessExitStatus")
-                currentWarmth = warmth
-                return
-            } else {
-                Log.w(TAG, "\"/dev/ntx_io\" is not writeable")
-            }
-        } catch (e: Exception) {
-            Log.w(TAG, "$e")
-        }
-
-        // fallback to the original "su" way
-
-        val colorFile = File(COLOR_FILE)
-
-        try {
-            if (!colorFile.canWrite()) {
-                Runtime.getRuntime().exec("su -c chmod 666 $COLOR_FILE")
-            }
-            colorFile.write(WARMTH_MAX - warmth)
+        if (io(NTX_IO_FILE, NTX_WARMTH_ID, (warmth - WARMTH_MAX) * -1))
             currentWarmth = warmth
-        } catch (e: Exception) {
-            Log.w(TAG, "$e")
-        }
     }
 
     override fun getMinWarmth(): Int {
