@@ -30,6 +30,11 @@ LOCAL_PATH := $(BASE_PATH)
 include $(LOCAL_PATH)/lzma/Android.mk
 include $(CLEAR_VARS)
 
+# ioctl shared library
+LOCAL_PATH := $(BASE_PATH)
+include $(LOCAL_PATH)/ioctl/Android.mk
+include $(CLEAR_VARS)
+
 # Dummy target that will ensure we ship the LuaJIT shared library
 # NOTE: Only necessary if we want to dlopen LuaJIT, which isn't the default ;).
 #LOCAL_PATH := $(BASE_PATH)
