@@ -29,7 +29,7 @@ open class Ioctl {
             Log.v(tag, "$device: ioctl ok, code $status")
             true
         } else {
-            val err = when(abs(status)) {
+            val err = when (abs(status)) {
                 ENOENT -> "no such file or directory"
                 EBADF -> "bad file number"
                 EACCES -> "permission denied"
