@@ -1635,19 +1635,6 @@ local function run(android_app_state)
         end)
     end
 
-    --- Device identification.
-    -- @treturn string product
-    android.getProduct = function()
-        return JNI:context(android.app.activity.vm, function(jni)
-            local product = jni:callObjectMethod(
-                android.app.activity.clazz,
-                "getProduct",
-                "()Ljava/lang/String;"
-            )
-            return jni:to_string(product) or "unknown"
-        end)
-    end
-
     android.getVersion =  function()
         return JNI:context(android.app.activity.vm, function(jni)
             local version = jni:callObjectMethod(
@@ -1873,8 +1860,29 @@ local function run(android_app_state)
         end)
     end
 
+    local manufacturer, brand, model, device, product, hardware, is_boyue, is_tolino =
+        JNI:context(android.app.activity.vm, function(jni)
+            local properties = jni:callObjectMethod(
+                android.app.activity.clazz,
+                "getDeviceProperties",
+                "()Ljava/lang/String;"
+            )
+
+            return string.match(jni:to_string(properties),
+                "(.*);(.*);(.*);(.*);(.*);(.*);(.*);(.*)")
+        end)
+
     -- properties that don't change during the execution of the program.
-    android.prop = {}
+    android.prop = {
+        manufacturer = manufacturer,
+        brand = brand,
+        model = model,
+        device = device,
+        product = product,
+        hardware = hardware,
+        is_boyue = is_boyue == "true",
+        is_tolino = is_tolino == "true",
+    }
 
     -- build properties
     android.prop.name = android.getName()
@@ -1883,7 +1891,6 @@ local function run(android_app_state)
     android.prop.runtimeChanges = android.supportsRuntimeChanges()
 
     -- device properties
-    android.prop.product = android.getProduct()
     android.prop.version = android.getVersion()
     android.prop.brokenLifecycle = android.hasBrokenLifecycle()
 

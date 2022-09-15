@@ -18,6 +18,7 @@ interface LuaInterface {
     fun extractAssets(): Boolean
     fun getBatteryLevel(): Int
     fun getClipboardText(): String
+    fun getDeviceProperties(): String
     fun getEinkConstants(): String
     fun getEinkPlatform(): String
     fun getExternalPath(): String
@@ -29,7 +30,6 @@ interface LuaInterface {
     fun getName(): String
     fun getNetworkInfo(): String
     fun getPlatformName(): String
-    fun getProduct(): String
     fun getScreenAvailableHeight(): Int
     fun getScreenAvailableWidth(): Int
     fun getScreenBrightness(): Int

@@ -361,6 +361,10 @@ class MainActivity : NativeActivity(), LuaInterface,
         }
     }
 
+    override fun getDeviceProperties(): String {
+        return device.properties
+    }
+
     override fun getEinkConstants(): String {
         return String.format(Locale.US, "%d;%d;%d;%d;%d;%d;%d;%d",
             device.epd.getWaveformFull(),
@@ -417,10 +421,6 @@ class MainActivity : NativeActivity(), LuaInterface,
 
     override fun getPlatformName(): String {
         return platform
-    }
-
-    override fun getProduct(): String {
-        return device.product
     }
 
     override fun getScreenAvailableHeight(): Int {
