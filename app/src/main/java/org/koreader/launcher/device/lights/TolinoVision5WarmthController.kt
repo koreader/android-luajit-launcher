@@ -26,6 +26,7 @@ class TolinoVision5WarmthController : Ioctl(), LightsInterface {
         private const val COLOR_FILE = "/sys/class/backlight/lm3630a_led/color" // only readable by "system" in Vision5
     }
 
+    // store the current warmth value, because in some models (Vision5) it cannot be fetched
     private var currentWarmth: Int? = null
 
     override fun getPlatform(): String {
