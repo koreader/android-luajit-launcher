@@ -11,13 +11,13 @@ import java.io.File
 /* Special controller for Tolino Vision5
  * see https://github.com/koreader/android-luajit-launcher/pull/382
  *
- * Original Controller by @zwim, see "./TolinoWarmthController.kt"
+ * Original Controller by @zwim, see "./TolinoRootController.kt"
  */
 
-class TolinoVision5WarmthController : Ioctl(), LightsInterface {
+class TolinoNtxController : Ioctl(), LightsInterface {
 
     companion object {
-        private const val TAG = "Lights TolinoVision5Warmth"
+        private const val TAG = "Lights TolinoNtx"
         private const val BRIGHTNESS_MAX = 255
         private const val WARMTH_MAX = 10 // can also be read by "/sys/class/backlight/lm3630a_led/max_color" on Vision5
         private const val MIN = 0
