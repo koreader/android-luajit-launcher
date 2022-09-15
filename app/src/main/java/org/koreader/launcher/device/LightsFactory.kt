@@ -11,11 +11,11 @@ object LightsFactory {
             return when (DeviceInfo.LIGHTS) {
                 DeviceInfo.LightsDevice.TOLINO_EPOS -> {
                     logController("Tolino")
-                    TolinoWarmthController()
+                    TolinoRootController()
                 }
                 DeviceInfo.LightsDevice.TOLINO_VISION5 -> {
                     logController("Tolino")
-                    TolinoVision5WarmthController()
+                    TolinoNtxController()
                 }
                 DeviceInfo.LightsDevice.ONYX_DARWIN7,
                 DeviceInfo.LightsDevice.ONYX_FAUST3,
