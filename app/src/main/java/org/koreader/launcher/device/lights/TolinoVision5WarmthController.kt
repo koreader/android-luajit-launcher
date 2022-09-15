@@ -8,10 +8,10 @@ import org.koreader.launcher.device.LightsInterface
 import org.koreader.launcher.extensions.read
 import java.io.File
 
-/* Special controller for Tolino Epos/Epos2.
- * see https://github.com/koreader/koreader/pull/6332
+/* Special controller for Tolino Vision5
+ * see https://github.com/koreader/android-luajit-launcher/pull/382
  *
- * Thanks to @zwim
+ * Original Controller by @zwim, see "./TolinoWarmthController.kt"
  */
 
 class TolinoVision5WarmthController : Ioctl(), LightsInterface {
