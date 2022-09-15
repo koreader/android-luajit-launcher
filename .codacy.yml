@@ -1,0 +1,6 @@
+---
+engines:
+  duplication:
+    exclude_paths:
+      - "app/src/main/java/org/koreader/launcher/device/epd/**"
+      - "app/src/main/java/org/koreader/launcher/device/lights/**"
