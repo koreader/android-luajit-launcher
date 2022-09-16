@@ -10,11 +10,11 @@ object LightsFactory {
         get() {
             return when (DeviceInfo.LIGHTS) {
                 DeviceInfo.LightsDevice.TOLINO_EPOS -> {
-                    logController("Tolino")
+                    logController("TolinoRoot")
                     TolinoRootController()
                 }
                 DeviceInfo.LightsDevice.TOLINO_VISION5 -> {
-                    logController("Tolino")
+                    logController("TolinoNTX")
                     TolinoNtxController()
                 }
                 DeviceInfo.LightsDevice.ONYX_DARWIN7,
