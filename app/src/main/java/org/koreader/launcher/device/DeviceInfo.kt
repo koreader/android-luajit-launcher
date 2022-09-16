@@ -386,6 +386,7 @@ object DeviceInfo {
         TOLINO_EPOS = BRAND.contentEquals("rakutenkobo")
             && MODEL.contentEquals("tolino")
             && DEVICE.contentEquals("ntx_6sl")
+            && !HARDWARE.contentEquals("e70k00")
 
         // Tolino Vision 5 also has warmth lights, but with ntx_io file
         TOLINO_VISION5 = BRAND.contentEquals("rakutenkobo")
