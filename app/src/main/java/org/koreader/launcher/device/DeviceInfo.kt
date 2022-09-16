@@ -113,8 +113,10 @@ object DeviceInfo {
     internal var LIGHTS = LightsDevice.NONE
     private var QUIRK = QuirkDevice.NONE
 
+    internal val BOYUE: Boolean
+    internal val TOLINO: Boolean
+
     // device probe
-    private val IS_BOYUE: Boolean
     private val BOYUE_K78W: Boolean
     private val BOYUE_K103: Boolean
     private val BOYUE_P6: Boolean
@@ -161,7 +163,6 @@ object DeviceInfo {
     private val ONYX_POKE_PRO: Boolean
     private val SONY_CP1: Boolean
     private val SONY_RP1: Boolean
-    private val TOLINO: Boolean
     private val TOLINO_EPOS: Boolean
 
     init {
@@ -171,57 +172,52 @@ object DeviceInfo {
         DEVICE = lowerCase(getBuildField("DEVICE"))
         PRODUCT = lowerCase(getBuildField("PRODUCT"))
         HARDWARE = lowerCase(getBuildField("HARDWARE"))
-        IS_BOYUE = MANUFACTURER.contentEquals("boeye")
+        BOYUE = MANUFACTURER.contentEquals("boeye")
             || MANUFACTURER.contentEquals("boyue")
 
         // Boyue Likebook Ares
-        BOYUE_K78W = IS_BOYUE
+        BOYUE_K78W = BOYUE
             && (PRODUCT.contentEquals("k78w") || PRODUCT.contentEquals("ares"))
 
         // Boyue Likebook Alita
-        BOYUE_K103 = IS_BOYUE
+        BOYUE_K103 = BOYUE
             && (PRODUCT.contentEquals("k103") || PRODUCT.contentEquals("alita"))
 
         // Boyue Likebook P6
-        BOYUE_P6 = IS_BOYUE
-            && PRODUCT.contentEquals("p6")
+        BOYUE_P6 = BOYUE && PRODUCT.contentEquals("p6")
 
         // Boyue Lemon
-        BOYUE_P61 = IS_BOYUE
-            && PRODUCT.contentEquals("p61-k12-l")
+        BOYUE_P61 = BOYUE && PRODUCT.contentEquals("p61-k12-l")
 
         // Boyue Likebook P78
-        BOYUE_P78 = IS_BOYUE
-            && PRODUCT.contentEquals("p78")
+        BOYUE_P78 = BOYUE && PRODUCT.contentEquals("p78")
 
         // Boyue T61
-        BOYUE_T61 = (IS_BOYUE
+        BOYUE_T61 = (BOYUE
             && (PRODUCT.startsWith("t61") || MODEL.contentEquals("rk30sdk"))
             && DEVICE.startsWith("t61"))
 
         // Boyue T62
-        BOYUE_T62 = (IS_BOYUE
+        BOYUE_T62 = (BOYUE
             && (PRODUCT.startsWith("t62") || MODEL.contentEquals("rk30sdk"))
             && DEVICE.startsWith("t62"))
 
         // Boyue/JDRead T65S
-        BOYUE_T65S = IS_BOYUE
-            && PRODUCT.contentEquals("t65s")
+        BOYUE_T65S = BOYUE && PRODUCT.contentEquals("t65s")
 
         // Boyue Likebook Muses
-        BOYUE_T78D = IS_BOYUE
+        BOYUE_T78D = BOYUE
             && (PRODUCT.contentEquals("t78d") || PRODUCT.contentEquals("muses"))
 
         // Boyue Likebook Mars
-        BOYUE_T80D = IS_BOYUE
+        BOYUE_T80D = BOYUE
             && (PRODUCT.contentEquals("t80d") || PRODUCT.contentEquals("mars"))
 
         // Boyue Likebook Plus
-        BOYUE_T80S = IS_BOYUE
-            && PRODUCT.contentEquals("t80s")
+        BOYUE_T80S = BOYUE && PRODUCT.contentEquals("t80s")
 
         // Boyue Likebook Mimas
-        BOYUE_T103D = IS_BOYUE
+        BOYUE_T103D = BOYUE
             && (PRODUCT.contentEquals("t103d") || PRODUCT.contentEquals("mimas"))
 
         // Crema Note (1010P)

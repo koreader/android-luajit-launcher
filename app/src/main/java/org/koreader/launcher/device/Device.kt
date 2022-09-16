@@ -41,4 +41,15 @@ class Device(activity: Activity) {
             platform
         }
     }
+
+    val properties: String
+      get() = String.format("%s;%s;%s;%s;%s;%s;%b;%b",
+          DeviceInfo.MANUFACTURER,
+          DeviceInfo.BRAND,
+          DeviceInfo.MODEL,
+          DeviceInfo.DEVICE,
+          DeviceInfo.PRODUCT,
+          DeviceInfo.HARDWARE,
+          DeviceInfo.BOYUE,
+          DeviceInfo.TOLINO)
 }
