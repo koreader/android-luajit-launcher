@@ -54,6 +54,7 @@ object DeviceInfo {
         ONYX_FAUST3,
         ONYX_KON_TIKI2,
         ONYX_LEAF,
+        ONYX_LOMONOSOV,
         ONYX_MAGICBOOK,
         ONYX_MAX,
         ONYX_NOTE,
@@ -82,6 +83,7 @@ object DeviceInfo {
         ONYX_FAUST3,
         ONYX_KON_TIKI2,
         ONYX_LEAF,
+        ONYX_LOMONOSOV,
         ONYX_MAGICBOOK,
         ONYX_NOTE3,
         ONYX_NOTE_AIR,
@@ -145,6 +147,7 @@ object DeviceInfo {
     private val ONYX_FAUST3: Boolean
     private val ONYX_KON_TIKI2: Boolean
     private val ONYX_LEAF: Boolean
+    private val ONYX_LOMONOSOV: Boolean
     private val ONYX_MAGICBOOK: Boolean
     private val ONYX_MAX: Boolean
     private val ONYX_NOTE: Boolean
@@ -288,6 +291,14 @@ object DeviceInfo {
             && PRODUCT.contentEquals("leaf")
             && DEVICE.contentEquals("leaf")
 
+        // Onyx Lomonosov
+        ONYX_LOMONOSOV = MANUFACTURER.contentEquals("onyx")
+            && DEVICE.contentEquals("lomonosov")
+
+        // Onyx MagicBook
+        ONYX_MAGICBOOK = MANUFACTURER.contentEquals("onyx")
+            && BRAND.contentEquals("magicbook")
+
         // Onyx Max
         ONYX_MAX = MANUFACTURER.contentEquals("onyx")
             && PRODUCT.contentEquals("max")
@@ -321,10 +332,6 @@ object DeviceInfo {
         ONYX_NOTE_PRO = MANUFACTURER.contentEquals("onyx")
             && PRODUCT.contentEquals("notepro")
             && DEVICE.contentEquals("notepro")
-
-        // Onyx MagicBook
-        ONYX_MAGICBOOK = MANUFACTURER.contentEquals("onyx")
-            && BRAND.contentEquals("magicbook")
 
         // Onyx Nova 2
         ONYX_NOVA2 = MANUFACTURER.contentEquals("onyx")
@@ -436,6 +443,7 @@ object DeviceInfo {
         deviceMap[EinkDevice.ONYX_FAUST3] = ONYX_FAUST3
         deviceMap[EinkDevice.ONYX_KON_TIKI2] = ONYX_KON_TIKI2
         deviceMap[EinkDevice.ONYX_LEAF] = ONYX_LEAF
+        deviceMap[EinkDevice.ONYX_LOMONOSOV] = ONYX_LOMONOSOV
         deviceMap[EinkDevice.ONYX_MAGICBOOK] = ONYX_MAGICBOOK
         deviceMap[EinkDevice.ONYX_MAX] = ONYX_MAX
         deviceMap[EinkDevice.ONYX_NOTE] = ONYX_NOTE
@@ -472,6 +480,7 @@ object DeviceInfo {
         lightsMap[LightsDevice.ONYX_DARWIN7] = ONYX_DARWIN7
         lightsMap[LightsDevice.ONYX_FAUST3] = ONYX_FAUST3
         lightsMap[LightsDevice.ONYX_KON_TIKI2] = ONYX_KON_TIKI2
+        lightsMap[LightsDevice.ONYX_LOMONOSOV] = ONYX_LOMONOSOV
         lightsMap[LightsDevice.ONYX_MAGICBOOK] = ONYX_MAGICBOOK
         lightsMap[LightsDevice.ONYX_NOTE3] = ONYX_NOTE3
         lightsMap[LightsDevice.ONYX_NOTE_AIR] = ONYX_NOTE_AIR

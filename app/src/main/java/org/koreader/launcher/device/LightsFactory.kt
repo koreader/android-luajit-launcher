@@ -21,6 +21,7 @@ object LightsFactory {
                 DeviceInfo.LightsDevice.ONYX_FAUST3,
                 DeviceInfo.LightsDevice.ONYX_KON_TIKI2,
                 DeviceInfo.LightsDevice.ONYX_LEAF,
+                DeviceInfo.LightsDevice.ONYX_LOMONOSOV,
                 DeviceInfo.LightsDevice.ONYX_NOTE3,
                 DeviceInfo.LightsDevice.ONYX_NOTE_AIR,
                 DeviceInfo.LightsDevice.ONYX_NOTE_PRO,
