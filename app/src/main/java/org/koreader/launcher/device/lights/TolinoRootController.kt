@@ -14,7 +14,7 @@ import java.io.File
  * Thanks to @zwim
  */
 
-class TolinoWarmthController : LightsInterface {
+class TolinoRootController : LightsInterface {
     companion object {
         private const val TAG = "Lights"
         private const val BRIGHTNESS_MAX = 255
