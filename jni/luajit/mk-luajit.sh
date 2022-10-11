@@ -24,6 +24,7 @@ function do_patch() {
 }
 
 do_patch "koreader-luajit-makefile-tweaks.patch"
+do_patch "koreader-luajit-enable-table_pack.patch"
 do_patch "koreader-luajit-mcode-reserve-hack.patch"
 
 # In debug builds, we patch LuaJIT some more to grok what happens with mcode allocations
