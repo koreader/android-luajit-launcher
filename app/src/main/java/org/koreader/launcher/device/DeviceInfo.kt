@@ -56,6 +56,7 @@ object DeviceInfo {
         ONYX_LEAF,
         ONYX_LOMONOSOV,
         ONYX_MAGICBOOK,
+        ONYX_MONTECRISTO3,
         ONYX_MAX,
         ONYX_NOTE,
         ONYX_NOTE3,
@@ -85,6 +86,7 @@ object DeviceInfo {
         ONYX_LEAF,
         ONYX_LOMONOSOV,
         ONYX_MAGICBOOK,
+        ONYX_MONTECRISTO3,
         ONYX_NOTE3,
         ONYX_NOTE_AIR,
         ONYX_NOTE_AIR2,
@@ -149,6 +151,7 @@ object DeviceInfo {
     private val ONYX_LEAF: Boolean
     private val ONYX_LOMONOSOV: Boolean
     private val ONYX_MAGICBOOK: Boolean
+    private val ONYX_MONTECRISTO3: Boolean
     private val ONYX_MAX: Boolean
     private val ONYX_NOTE: Boolean
     private val ONYX_NOTE3: Boolean
@@ -304,6 +307,11 @@ object DeviceInfo {
             && PRODUCT.contentEquals("max")
             && DEVICE.contentEquals("max")
 
+        // Onyx Montecristo 3
+        ONYX_MONTECRISTO3 = MANUFACTURER.contentEquals("onyx")
+            && PRODUCT.contentEquals("mc_kepler_c")
+            && DEVICE.contentEquals("mc_kepler_c")
+
         // Onyx Note
         ONYX_NOTE = MANUFACTURER.contentEquals("onyx")
             && PRODUCT.contentEquals("note")
@@ -446,6 +454,7 @@ object DeviceInfo {
         deviceMap[EinkDevice.ONYX_LOMONOSOV] = ONYX_LOMONOSOV
         deviceMap[EinkDevice.ONYX_MAGICBOOK] = ONYX_MAGICBOOK
         deviceMap[EinkDevice.ONYX_MAX] = ONYX_MAX
+        deviceMap[EinkDevice.ONYX_MONTECRISTO3] = ONYX_MONTECRISTO3
         deviceMap[EinkDevice.ONYX_NOTE] = ONYX_NOTE
         deviceMap[EinkDevice.ONYX_NOTE3] = ONYX_NOTE3
         deviceMap[EinkDevice.ONYX_NOTE5] = ONYX_NOTE5
@@ -482,6 +491,7 @@ object DeviceInfo {
         lightsMap[LightsDevice.ONYX_KON_TIKI2] = ONYX_KON_TIKI2
         lightsMap[LightsDevice.ONYX_LOMONOSOV] = ONYX_LOMONOSOV
         lightsMap[LightsDevice.ONYX_MAGICBOOK] = ONYX_MAGICBOOK
+        lightsMap[LightsDevice.ONYX_MONTECRISTO3] = ONYX_MONTECRISTO3
         lightsMap[LightsDevice.ONYX_NOTE3] = ONYX_NOTE3
         lightsMap[LightsDevice.ONYX_NOTE_AIR] = ONYX_NOTE_AIR
         lightsMap[LightsDevice.ONYX_NOTE_AIR2] = ONYX_NOTE_AIR2

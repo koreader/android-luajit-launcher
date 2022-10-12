@@ -44,7 +44,8 @@ object LightsFactory {
                     OnyxColorController()
                 }
                 DeviceInfo.LightsDevice.ONYX_C67,
-                DeviceInfo.LightsDevice.ONYX_MAGICBOOK -> {
+                DeviceInfo.LightsDevice.ONYX_MAGICBOOK,
+                DeviceInfo.LightsDevice.ONYX_MONTECRISTO3 -> {
                     logController("Onyx C67")
                     OnyxC67Controller()
                 }
