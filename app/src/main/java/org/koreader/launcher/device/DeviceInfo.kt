@@ -500,6 +500,7 @@ object DeviceInfo {
         lightsMap[LightsDevice.ONYX_NOVA3_COLOR] = ONYX_NOVA3_COLOR
         lightsMap[LightsDevice.ONYX_NOVA_AIR] = ONYX_NOVA_AIR
         lightsMap[LightsDevice.ONYX_NOVA_AIR_C] = ONYX_NOVA_AIR_C
+        lightsMap[LightsDevice.ONYX_POKE3] = ONYX_POKE3
         lightsMap[LightsDevice.ONYX_POKE4] = ONYX_POKE4
         lightsMap[LightsDevice.ONYX_POKE_PRO] = ONYX_POKE_PRO
         lightsMap[LightsDevice.TOLINO_EPOS] = TOLINO_EPOS
