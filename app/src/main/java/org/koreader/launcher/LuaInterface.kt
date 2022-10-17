@@ -25,6 +25,7 @@ interface LuaInterface {
     fun getExternalSdPath(): String
     fun getFilePathFromIntent(): String?
     fun getFlavor(): String
+    fun getArch(): String
     fun getLastImportedPath(): String?
     fun getLightDialogState(): Int
     fun getName(): String

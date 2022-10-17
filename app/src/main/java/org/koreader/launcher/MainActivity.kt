@@ -401,6 +401,10 @@ class MainActivity : NativeActivity(), LuaInterface,
         return MainApp.flavor
     }
 
+    override fun getArch(): String {
+        return MainApp.arch
+    }
+
     override fun getLastImportedPath(): String? {
         val current = lastImportedPath
         lastImportedPath = null
