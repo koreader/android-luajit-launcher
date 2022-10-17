@@ -14,7 +14,6 @@ class MainApp : MultiDexApplication() {
     companion object {
         const val name = BuildConfig.APP_NAME
         const val flavor = BuildConfig.FLAVOR_CHANNEL
-        const val arch = BuildConfig.APP_ARCH
         const val has_ota_updates = BuildConfig.IN_APP_UPDATES
         const val provider = "${BuildConfig.APPLICATION_ID}.provider"
         const val supports_runtime_changes = BuildConfig.SUPPORTS_RUNTIME_CHANGES

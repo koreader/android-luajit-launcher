@@ -1659,17 +1659,6 @@ local function run(android_app_state)
         end)
     end
 
-    android.getArch = function()
-        return JNI:context(android.app.activity.vm, function(jni)
-            local arch = jni:callObjectMethod(
-                android.app.activity.clazz,
-                "getArch",
-                "()Ljava/lang/String;"
-            )
-            return jni:to_string(arch)
-        end)
-    end
-
     android.getName = function()
         return JNI:context(android.app.activity.vm, function(jni)
             local name = jni:callObjectMethod(
@@ -1898,7 +1887,6 @@ local function run(android_app_state)
     -- build properties
     android.prop.name = android.getName()
     android.prop.flavor = android.getFlavor()
-    android.prop.arch = android.getArch()
     android.prop.isDebuggable = android.isDebuggable()
     android.prop.runtimeChanges = android.supportsRuntimeChanges()
 
