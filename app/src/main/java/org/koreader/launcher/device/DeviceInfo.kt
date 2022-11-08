@@ -54,6 +54,7 @@ object DeviceInfo {
         ONYX_FAUST3,
         ONYX_KON_TIKI2,
         ONYX_LEAF,
+        ONYX_LEAF2,
         ONYX_LOMONOSOV,
         ONYX_MAGICBOOK,
         ONYX_MAX,
@@ -85,6 +86,7 @@ object DeviceInfo {
         ONYX_FAUST3,
         ONYX_KON_TIKI2,
         ONYX_LEAF,
+        ONYX_LEAF2,
         ONYX_LOMONOSOV,
         ONYX_MAGICBOOK,
         ONYX_MONTECRISTO3,
@@ -151,6 +153,7 @@ object DeviceInfo {
     private val ONYX_FAUST3: Boolean
     private val ONYX_KON_TIKI2: Boolean
     private val ONYX_LEAF: Boolean
+    private val ONYX_LEAF2: Boolean
     private val ONYX_LOMONOSOV: Boolean
     private val ONYX_MAGICBOOK: Boolean
     private val ONYX_MONTECRISTO3: Boolean
@@ -296,6 +299,11 @@ object DeviceInfo {
         ONYX_LEAF = MANUFACTURER.contentEquals("onyx")
             && PRODUCT.contentEquals("leaf")
             && DEVICE.contentEquals("leaf")
+
+        // Onyx Leaf 2
+        ONYX_LEAF2 = MANUFACTURER.contentEquals("onyx")
+            && PRODUCT.contentEquals("leaf2")
+            && DEVICE.contentEquals("leaf2")
 
         // Onyx Lomonosov
         ONYX_LOMONOSOV = MANUFACTURER.contentEquals("onyx")
@@ -458,6 +466,7 @@ object DeviceInfo {
         deviceMap[EinkDevice.ONYX_FAUST3] = ONYX_FAUST3
         deviceMap[EinkDevice.ONYX_KON_TIKI2] = ONYX_KON_TIKI2
         deviceMap[EinkDevice.ONYX_LEAF] = ONYX_LEAF
+        deviceMap[EinkDevice.ONYX_LEAF2] = ONYX_LEAF2
         deviceMap[EinkDevice.ONYX_LOMONOSOV] = ONYX_LOMONOSOV
         deviceMap[EinkDevice.ONYX_MAGICBOOK] = ONYX_MAGICBOOK
         deviceMap[EinkDevice.ONYX_MAX] = ONYX_MAX
@@ -497,6 +506,7 @@ object DeviceInfo {
         lightsMap[LightsDevice.ONYX_DARWIN7] = ONYX_DARWIN7
         lightsMap[LightsDevice.ONYX_FAUST3] = ONYX_FAUST3
         lightsMap[LightsDevice.ONYX_KON_TIKI2] = ONYX_KON_TIKI2
+        lightsMap[LightsDevice.ONYX_LEAF2] = ONYX_LEAF2
         lightsMap[LightsDevice.ONYX_LOMONOSOV] = ONYX_LOMONOSOV
         lightsMap[LightsDevice.ONYX_MAGICBOOK] = ONYX_MAGICBOOK
         lightsMap[LightsDevice.ONYX_MONTECRISTO3] = ONYX_MONTECRISTO3

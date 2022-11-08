@@ -33,6 +33,7 @@ object LightsFactory {
                     logController("Onyx/Qualcomm")
                     OnyxWarmthController()
                 }
+                DeviceInfo.LightsDevice.ONYX_LEAF2,
                 DeviceInfo.LightsDevice.ONYX_NOTE_AIR2,
                 DeviceInfo.LightsDevice.ONYX_NOVA2,
                 DeviceInfo.LightsDevice.ONYX_NOVA_AIR_C,
