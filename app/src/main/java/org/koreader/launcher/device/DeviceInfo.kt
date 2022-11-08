@@ -42,6 +42,7 @@ object DeviceInfo {
         BOYUE_T103D,
         CREMA,
         CREMA_0650L,
+        CREMA_CARTA_G,
         ENERGY,
         FIDIBOOK,
         HANVON_960,
@@ -54,8 +55,11 @@ object DeviceInfo {
         ONYX_FAUST3,
         ONYX_KON_TIKI2,
         ONYX_LEAF,
+        ONYX_LEAF2,
+        ONYX_LOMONOSOV,
         ONYX_MAGICBOOK,
         ONYX_MAX,
+        ONYX_MONTECRISTO3,
         ONYX_NOTE,
         ONYX_NOTE3,
         ONYX_NOTE5,
@@ -67,9 +71,11 @@ object DeviceInfo {
         ONYX_NOVA3_COLOR,
         ONYX_NOVA_AIR,
         ONYX_NOVA_AIR_C,
+        ONYX_NOVA_PRO,
         ONYX_POKE3,
         ONYX_POKE4,
         ONYX_POKE_PRO,
+        RIDI_PAPER_3,
         SONY_CP1,
         SONY_RP1,
         TOLINO
@@ -77,12 +83,16 @@ object DeviceInfo {
 
     enum class LightsDevice {
         NONE,
+        CREMA_CARTA_G,
         ONYX_C67,
         ONYX_DARWIN7,
         ONYX_FAUST3,
         ONYX_KON_TIKI2,
         ONYX_LEAF,
+        ONYX_LEAF2,
+        ONYX_LOMONOSOV,
         ONYX_MAGICBOOK,
+        ONYX_MONTECRISTO3,
         ONYX_NOTE3,
         ONYX_NOTE_AIR,
         ONYX_NOTE_AIR2,
@@ -92,9 +102,11 @@ object DeviceInfo {
         ONYX_NOVA3_COLOR,
         ONYX_NOVA_AIR,
         ONYX_NOVA_AIR_C,
+        ONYX_NOVA_PRO,
         ONYX_POKE3,
         ONYX_POKE4,
         ONYX_POKE_PRO,
+        RIDI_PAPER_3,
         TOLINO_EPOS,
         TOLINO_VISION5
     }
@@ -132,6 +144,7 @@ object DeviceInfo {
     private val BOYUE_T103D: Boolean
     private val CREMA: Boolean
     private val CREMA_0650L: Boolean
+    private val CREMA_CARTA_G: Boolean
     private val EMULATOR_X86: Boolean
     private val ENERGY: Boolean
     private val FIDIBOOK: Boolean
@@ -145,7 +158,10 @@ object DeviceInfo {
     private val ONYX_FAUST3: Boolean
     private val ONYX_KON_TIKI2: Boolean
     private val ONYX_LEAF: Boolean
+    private val ONYX_LEAF2: Boolean
+    private val ONYX_LOMONOSOV: Boolean
     private val ONYX_MAGICBOOK: Boolean
+    private val ONYX_MONTECRISTO3: Boolean
     private val ONYX_MAX: Boolean
     private val ONYX_NOTE: Boolean
     private val ONYX_NOTE3: Boolean
@@ -158,10 +174,12 @@ object DeviceInfo {
     private val ONYX_NOVA3_COLOR: Boolean
     private val ONYX_NOVA_AIR: Boolean
     private val ONYX_NOVA_AIR_C: Boolean
+    private val ONYX_NOVA_PRO: Boolean
     private val ONYX_POKE2: Boolean
     private val ONYX_POKE3: Boolean
     private val ONYX_POKE4: Boolean
     private val ONYX_POKE_PRO: Boolean
+    private val RIDI_PAPER_3: Boolean
     private val SONY_CP1: Boolean
     private val SONY_RP1: Boolean
     private val TOLINO_EPOS: Boolean
@@ -230,6 +248,10 @@ object DeviceInfo {
         CREMA_0650L = BRAND.contentEquals("crema")
             && PRODUCT.contentEquals("keplerb")
 
+        // Crema Carta G
+        CREMA_CARTA_G = BRAND.contentEquals("crema")
+            && MODEL.contentEquals("crema-0670c")
+
         // Android emulator for x86
         EMULATOR_X86 = MODEL.contentEquals("Android SDK built for x86")
 
@@ -288,10 +310,28 @@ object DeviceInfo {
             && PRODUCT.contentEquals("leaf")
             && DEVICE.contentEquals("leaf")
 
+        // Onyx Leaf 2
+        ONYX_LEAF2 = MANUFACTURER.contentEquals("onyx")
+            && PRODUCT.contentEquals("leaf2")
+            && DEVICE.contentEquals("leaf2")
+
+        // Onyx Lomonosov
+        ONYX_LOMONOSOV = MANUFACTURER.contentEquals("onyx")
+            && DEVICE.contentEquals("lomonosov")
+
+        // Onyx MagicBook
+        ONYX_MAGICBOOK = MANUFACTURER.contentEquals("onyx")
+            && BRAND.contentEquals("magicbook")
+
         // Onyx Max
         ONYX_MAX = MANUFACTURER.contentEquals("onyx")
             && PRODUCT.contentEquals("max")
             && DEVICE.contentEquals("max")
+
+        // Onyx Montecristo 3
+        ONYX_MONTECRISTO3 = MANUFACTURER.contentEquals("onyx")
+            && PRODUCT.contentEquals("mc_kepler_c")
+            && DEVICE.contentEquals("mc_kepler_c")
 
         // Onyx Note
         ONYX_NOTE = MANUFACTURER.contentEquals("onyx")
@@ -322,10 +362,6 @@ object DeviceInfo {
             && PRODUCT.contentEquals("notepro")
             && DEVICE.contentEquals("notepro")
 
-        // Onyx MagicBook
-        ONYX_MAGICBOOK = MANUFACTURER.contentEquals("onyx")
-            && BRAND.contentEquals("magicbook")
-
         // Onyx Nova 2
         ONYX_NOVA2 = MANUFACTURER.contentEquals("onyx")
             && PRODUCT.contentEquals("nova2")
@@ -348,6 +384,10 @@ object DeviceInfo {
         ONYX_NOVA_AIR_C = BRAND.contentEquals("onyx")
             && MODEL.contentEquals("novaairc")
 
+        // Onyx Nova Pro
+        ONYX_NOVA_PRO = BRAND.contentEquals("onyx")
+            && MODEL.contentEquals("novapro")
+
         // Onyx Poke 2
         ONYX_POKE2 = MANUFACTURER.contentEquals("onyx")
             && PRODUCT.contentEquals("poke2")
@@ -364,6 +404,11 @@ object DeviceInfo {
         // Onyx Poke Pro
         ONYX_POKE_PRO = MANUFACTURER.contentEquals("onyx")
             && PRODUCT.contentEquals("poke_pro")
+
+        // Ridi Paper 3
+        RIDI_PAPER_3 = BRAND.contentEquals("ridi")
+            && MODEL.contentEquals("ridipaper")
+            && PRODUCT.contentEquals("rp1")
 
         // Sony DPT-CP1
         SONY_CP1 = MANUFACTURER.contentEquals("sony")
@@ -425,6 +470,7 @@ object DeviceInfo {
         deviceMap[EinkDevice.BOYUE_T103D] = BOYUE_T103D
         deviceMap[EinkDevice.CREMA] = CREMA
         deviceMap[EinkDevice.CREMA_0650L] = CREMA_0650L
+        deviceMap[EinkDevice.CREMA_CARTA_G] = CREMA_CARTA_G
         deviceMap[EinkDevice.ENERGY] = ENERGY
         deviceMap[EinkDevice.FIDIBOOK] = FIDIBOOK
         deviceMap[EinkDevice.INKBOOK] = INKBOOK
@@ -436,8 +482,11 @@ object DeviceInfo {
         deviceMap[EinkDevice.ONYX_FAUST3] = ONYX_FAUST3
         deviceMap[EinkDevice.ONYX_KON_TIKI2] = ONYX_KON_TIKI2
         deviceMap[EinkDevice.ONYX_LEAF] = ONYX_LEAF
+        deviceMap[EinkDevice.ONYX_LEAF2] = ONYX_LEAF2
+        deviceMap[EinkDevice.ONYX_LOMONOSOV] = ONYX_LOMONOSOV
         deviceMap[EinkDevice.ONYX_MAGICBOOK] = ONYX_MAGICBOOK
         deviceMap[EinkDevice.ONYX_MAX] = ONYX_MAX
+        deviceMap[EinkDevice.ONYX_MONTECRISTO3] = ONYX_MONTECRISTO3
         deviceMap[EinkDevice.ONYX_NOTE] = ONYX_NOTE
         deviceMap[EinkDevice.ONYX_NOTE3] = ONYX_NOTE3
         deviceMap[EinkDevice.ONYX_NOTE5] = ONYX_NOTE5
@@ -449,9 +498,11 @@ object DeviceInfo {
         deviceMap[EinkDevice.ONYX_NOVA3_COLOR] = ONYX_NOVA3_COLOR
         deviceMap[EinkDevice.ONYX_NOVA_AIR] = ONYX_NOVA_AIR
         deviceMap[EinkDevice.ONYX_NOVA_AIR_C] = ONYX_NOVA_AIR_C
+        deviceMap[EinkDevice.ONYX_NOVA_PRO] = ONYX_NOVA_PRO
         deviceMap[EinkDevice.ONYX_POKE3] = ONYX_POKE3
         deviceMap[EinkDevice.ONYX_POKE4] = ONYX_POKE4
         deviceMap[EinkDevice.ONYX_POKE_PRO] = ONYX_POKE_PRO
+        deviceMap[EinkDevice.RIDI_PAPER_3] = RIDI_PAPER_3
         deviceMap[EinkDevice.SONY_CP1] = SONY_CP1
         deviceMap[EinkDevice.SONY_RP1] = SONY_RP1
         deviceMap[EinkDevice.TOLINO] = TOLINO
@@ -468,11 +519,15 @@ object DeviceInfo {
 
         // devices with custom lights
         val lightsMap = HashMap<LightsDevice, Boolean>()
+        lightsMap[LightsDevice.CREMA_CARTA_G] = CREMA_CARTA_G
         lightsMap[LightsDevice.ONYX_C67] = ONYX_C67
         lightsMap[LightsDevice.ONYX_DARWIN7] = ONYX_DARWIN7
         lightsMap[LightsDevice.ONYX_FAUST3] = ONYX_FAUST3
         lightsMap[LightsDevice.ONYX_KON_TIKI2] = ONYX_KON_TIKI2
+        lightsMap[LightsDevice.ONYX_LEAF2] = ONYX_LEAF2
+        lightsMap[LightsDevice.ONYX_LOMONOSOV] = ONYX_LOMONOSOV
         lightsMap[LightsDevice.ONYX_MAGICBOOK] = ONYX_MAGICBOOK
+        lightsMap[LightsDevice.ONYX_MONTECRISTO3] = ONYX_MONTECRISTO3
         lightsMap[LightsDevice.ONYX_NOTE3] = ONYX_NOTE3
         lightsMap[LightsDevice.ONYX_NOTE_AIR] = ONYX_NOTE_AIR
         lightsMap[LightsDevice.ONYX_NOTE_AIR2] = ONYX_NOTE_AIR2
@@ -481,8 +536,11 @@ object DeviceInfo {
         lightsMap[LightsDevice.ONYX_NOVA3_COLOR] = ONYX_NOVA3_COLOR
         lightsMap[LightsDevice.ONYX_NOVA_AIR] = ONYX_NOVA_AIR
         lightsMap[LightsDevice.ONYX_NOVA_AIR_C] = ONYX_NOVA_AIR_C
+        lightsMap[LightsDevice.ONYX_NOVA_PRO] = ONYX_NOVA_PRO
+        lightsMap[LightsDevice.ONYX_POKE3] = ONYX_POKE3
         lightsMap[LightsDevice.ONYX_POKE4] = ONYX_POKE4
         lightsMap[LightsDevice.ONYX_POKE_PRO] = ONYX_POKE_PRO
+        lightsMap[LightsDevice.RIDI_PAPER_3] = RIDI_PAPER_3
         lightsMap[LightsDevice.TOLINO_EPOS] = TOLINO_EPOS
         lightsMap[LightsDevice.TOLINO_VISION5] = TOLINO_VISION5
 

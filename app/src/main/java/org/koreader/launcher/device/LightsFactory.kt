@@ -13,6 +13,8 @@ object LightsFactory {
                     logController("TolinoRoot")
                     TolinoRootController()
                 }
+                DeviceInfo.LightsDevice.CREMA_CARTA_G,
+                DeviceInfo.LightsDevice.RIDI_PAPER_3,
                 DeviceInfo.LightsDevice.TOLINO_VISION5 -> {
                     logController("TolinoNTX")
                     TolinoNtxController()
@@ -21,16 +23,19 @@ object LightsFactory {
                 DeviceInfo.LightsDevice.ONYX_FAUST3,
                 DeviceInfo.LightsDevice.ONYX_KON_TIKI2,
                 DeviceInfo.LightsDevice.ONYX_LEAF,
+                DeviceInfo.LightsDevice.ONYX_LOMONOSOV,
                 DeviceInfo.LightsDevice.ONYX_NOTE3,
                 DeviceInfo.LightsDevice.ONYX_NOTE_AIR,
                 DeviceInfo.LightsDevice.ONYX_NOTE_PRO,
                 DeviceInfo.LightsDevice.ONYX_NOVA3,
                 DeviceInfo.LightsDevice.ONYX_NOVA_AIR,
+                DeviceInfo.LightsDevice.ONYX_NOVA_PRO,
                 DeviceInfo.LightsDevice.ONYX_POKE3,
                 DeviceInfo.LightsDevice.ONYX_POKE_PRO -> {
                     logController("Onyx/Qualcomm")
                     OnyxWarmthController()
                 }
+                DeviceInfo.LightsDevice.ONYX_LEAF2,
                 DeviceInfo.LightsDevice.ONYX_NOTE_AIR2,
                 DeviceInfo.LightsDevice.ONYX_NOVA2,
                 DeviceInfo.LightsDevice.ONYX_NOVA_AIR_C,
@@ -43,7 +48,8 @@ object LightsFactory {
                     OnyxColorController()
                 }
                 DeviceInfo.LightsDevice.ONYX_C67,
-                DeviceInfo.LightsDevice.ONYX_MAGICBOOK -> {
+                DeviceInfo.LightsDevice.ONYX_MAGICBOOK,
+                DeviceInfo.LightsDevice.ONYX_MONTECRISTO3 -> {
                     logController("Onyx C67")
                     OnyxC67Controller()
                 }

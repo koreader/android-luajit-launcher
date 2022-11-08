@@ -25,7 +25,8 @@ object EPDFactory {
                 DeviceInfo.EinkDevice.FIDIBOOK,
                 DeviceInfo.EinkDevice.INKBOOK,
                 DeviceInfo.EinkDevice.ONYX_C67,
-                DeviceInfo.EinkDevice.ONYX_MAGICBOOK -> {
+                DeviceInfo.EinkDevice.ONYX_MAGICBOOK,
+                DeviceInfo.EinkDevice.ONYX_MONTECRISTO3 -> {
                     logController("Rockchip RK3026")
                     RK3026EPDController()
                 }
@@ -52,7 +53,9 @@ object EPDFactory {
                 }
 
                 DeviceInfo.EinkDevice.CREMA,
+                DeviceInfo.EinkDevice.CREMA_CARTA_G,
                 DeviceInfo.EinkDevice.HANVON_960,
+                DeviceInfo.EinkDevice.RIDI_PAPER_3,
                 DeviceInfo.EinkDevice.TOLINO -> {
                     logController("Tolino/NTX")
                     TolinoEPDController()
@@ -60,6 +63,8 @@ object EPDFactory {
 
                 DeviceInfo.EinkDevice.ONYX_KON_TIKI2,
                 DeviceInfo.EinkDevice.ONYX_LEAF,
+                DeviceInfo.EinkDevice.ONYX_LEAF2,
+                DeviceInfo.EinkDevice.ONYX_LOMONOSOV,
                 DeviceInfo.EinkDevice.ONYX_MAX,
                 DeviceInfo.EinkDevice.ONYX_NOTE,
                 DeviceInfo.EinkDevice.ONYX_NOTE3,
@@ -72,6 +77,7 @@ object EPDFactory {
                 DeviceInfo.EinkDevice.ONYX_NOVA3_COLOR,
                 DeviceInfo.EinkDevice.ONYX_NOVA_AIR,
                 DeviceInfo.EinkDevice.ONYX_NOVA_AIR_C,
+                DeviceInfo.EinkDevice.ONYX_NOVA_PRO,
                 DeviceInfo.EinkDevice.ONYX_POKE3,
                 DeviceInfo.EinkDevice.ONYX_POKE4,
                 DeviceInfo.EinkDevice.ONYX_POKE_PRO -> {
