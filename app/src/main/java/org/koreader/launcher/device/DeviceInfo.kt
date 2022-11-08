@@ -42,6 +42,7 @@ object DeviceInfo {
         BOYUE_T103D,
         CREMA,
         CREMA_0650L,
+        CREMA_CARTA_G,
         ENERGY,
         FIDIBOOK,
         HANVON_960,
@@ -82,6 +83,7 @@ object DeviceInfo {
 
     enum class LightsDevice {
         NONE,
+        CREMA_CARTA_G,
         ONYX_C67,
         ONYX_DARWIN7,
         ONYX_FAUST3,
@@ -142,6 +144,7 @@ object DeviceInfo {
     private val BOYUE_T103D: Boolean
     private val CREMA: Boolean
     private val CREMA_0650L: Boolean
+    private val CREMA_CARTA_G: Boolean
     private val EMULATOR_X86: Boolean
     private val ENERGY: Boolean
     private val FIDIBOOK: Boolean
@@ -244,6 +247,10 @@ object DeviceInfo {
         // Crema Carta+
         CREMA_0650L = BRAND.contentEquals("crema")
             && PRODUCT.contentEquals("keplerb")
+
+        // Crema Carta G
+        CREMA_CARTA_G = BRAND.contentEquals("crema")
+            && MODEL.contentEquals("crema-0670c")
 
         // Android emulator for x86
         EMULATOR_X86 = MODEL.contentEquals("Android SDK built for x86")
@@ -463,6 +470,7 @@ object DeviceInfo {
         deviceMap[EinkDevice.BOYUE_T103D] = BOYUE_T103D
         deviceMap[EinkDevice.CREMA] = CREMA
         deviceMap[EinkDevice.CREMA_0650L] = CREMA_0650L
+        deviceMap[EinkDevice.CREMA_CARTA_G] = CREMA_CARTA_G
         deviceMap[EinkDevice.ENERGY] = ENERGY
         deviceMap[EinkDevice.FIDIBOOK] = FIDIBOOK
         deviceMap[EinkDevice.INKBOOK] = INKBOOK
@@ -511,6 +519,7 @@ object DeviceInfo {
 
         // devices with custom lights
         val lightsMap = HashMap<LightsDevice, Boolean>()
+        lightsMap[LightsDevice.CREMA_CARTA_G] = CREMA_CARTA_G
         lightsMap[LightsDevice.ONYX_C67] = ONYX_C67
         lightsMap[LightsDevice.ONYX_DARWIN7] = ONYX_DARWIN7
         lightsMap[LightsDevice.ONYX_FAUST3] = ONYX_FAUST3

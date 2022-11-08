@@ -53,6 +53,7 @@ object EPDFactory {
                 }
 
                 DeviceInfo.EinkDevice.CREMA,
+                DeviceInfo.EinkDevice.CREMA_CARTA_G,
                 DeviceInfo.EinkDevice.HANVON_960,
                 DeviceInfo.EinkDevice.RIDI_PAPER_3,
                 DeviceInfo.EinkDevice.TOLINO -> {
