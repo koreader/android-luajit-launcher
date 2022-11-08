@@ -69,6 +69,7 @@ object DeviceInfo {
         ONYX_NOVA3_COLOR,
         ONYX_NOVA_AIR,
         ONYX_NOVA_AIR_C,
+        ONYX_NOVA_PRO,
         ONYX_POKE3,
         ONYX_POKE4,
         ONYX_POKE_PRO,
@@ -96,6 +97,7 @@ object DeviceInfo {
         ONYX_NOVA3_COLOR,
         ONYX_NOVA_AIR,
         ONYX_NOVA_AIR_C,
+        ONYX_NOVA_PRO,
         ONYX_POKE3,
         ONYX_POKE4,
         ONYX_POKE_PRO,
@@ -164,6 +166,7 @@ object DeviceInfo {
     private val ONYX_NOVA3_COLOR: Boolean
     private val ONYX_NOVA_AIR: Boolean
     private val ONYX_NOVA_AIR_C: Boolean
+    private val ONYX_NOVA_PRO: Boolean
     private val ONYX_POKE2: Boolean
     private val ONYX_POKE3: Boolean
     private val ONYX_POKE4: Boolean
@@ -363,6 +366,10 @@ object DeviceInfo {
         ONYX_NOVA_AIR_C = BRAND.contentEquals("onyx")
             && MODEL.contentEquals("novaairc")
 
+        // Onyx Nova Pro
+        ONYX_NOVA_PRO = BRAND.contentEquals("onyx")
+            && MODEL.contentEquals("novapro")
+
         // Onyx Poke 2
         ONYX_POKE2 = MANUFACTURER.contentEquals("onyx")
             && PRODUCT.contentEquals("poke2")
@@ -466,6 +473,7 @@ object DeviceInfo {
         deviceMap[EinkDevice.ONYX_NOVA3_COLOR] = ONYX_NOVA3_COLOR
         deviceMap[EinkDevice.ONYX_NOVA_AIR] = ONYX_NOVA_AIR
         deviceMap[EinkDevice.ONYX_NOVA_AIR_C] = ONYX_NOVA_AIR_C
+        deviceMap[EinkDevice.ONYX_NOVA_PRO] = ONYX_NOVA_PRO
         deviceMap[EinkDevice.ONYX_POKE3] = ONYX_POKE3
         deviceMap[EinkDevice.ONYX_POKE4] = ONYX_POKE4
         deviceMap[EinkDevice.ONYX_POKE_PRO] = ONYX_POKE_PRO
@@ -500,6 +508,7 @@ object DeviceInfo {
         lightsMap[LightsDevice.ONYX_NOVA3_COLOR] = ONYX_NOVA3_COLOR
         lightsMap[LightsDevice.ONYX_NOVA_AIR] = ONYX_NOVA_AIR
         lightsMap[LightsDevice.ONYX_NOVA_AIR_C] = ONYX_NOVA_AIR_C
+        lightsMap[LightsDevice.ONYX_NOVA_PRO] = ONYX_NOVA_PRO
         lightsMap[LightsDevice.ONYX_POKE3] = ONYX_POKE3
         lightsMap[LightsDevice.ONYX_POKE4] = ONYX_POKE4
         lightsMap[LightsDevice.ONYX_POKE_PRO] = ONYX_POKE_PRO

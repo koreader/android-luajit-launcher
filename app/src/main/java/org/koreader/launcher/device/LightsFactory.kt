@@ -27,6 +27,7 @@ object LightsFactory {
                 DeviceInfo.LightsDevice.ONYX_NOTE_PRO,
                 DeviceInfo.LightsDevice.ONYX_NOVA3,
                 DeviceInfo.LightsDevice.ONYX_NOVA_AIR,
+                DeviceInfo.LightsDevice.ONYX_NOVA_PRO,
                 DeviceInfo.LightsDevice.ONYX_POKE3,
                 DeviceInfo.LightsDevice.ONYX_POKE_PRO -> {
                     logController("Onyx/Qualcomm")
