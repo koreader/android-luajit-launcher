@@ -13,6 +13,7 @@ object LightsFactory {
                     logController("TolinoRoot")
                     TolinoRootController()
                 }
+                DeviceInfo.LightsDevice.RIDI_PAPER_3,
                 DeviceInfo.LightsDevice.TOLINO_VISION5 -> {
                     logController("TolinoNTX")
                     TolinoNtxController()

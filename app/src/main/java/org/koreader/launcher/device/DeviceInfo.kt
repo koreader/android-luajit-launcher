@@ -74,6 +74,7 @@ object DeviceInfo {
         ONYX_POKE3,
         ONYX_POKE4,
         ONYX_POKE_PRO,
+        RIDI_PAPER_3,
         SONY_CP1,
         SONY_RP1,
         TOLINO
@@ -103,6 +104,7 @@ object DeviceInfo {
         ONYX_POKE3,
         ONYX_POKE4,
         ONYX_POKE_PRO,
+        RIDI_PAPER_3,
         TOLINO_EPOS,
         TOLINO_VISION5
     }
@@ -174,6 +176,7 @@ object DeviceInfo {
     private val ONYX_POKE3: Boolean
     private val ONYX_POKE4: Boolean
     private val ONYX_POKE_PRO: Boolean
+    private val RIDI_PAPER_3: Boolean
     private val SONY_CP1: Boolean
     private val SONY_RP1: Boolean
     private val TOLINO_EPOS: Boolean
@@ -395,6 +398,11 @@ object DeviceInfo {
         ONYX_POKE_PRO = MANUFACTURER.contentEquals("onyx")
             && PRODUCT.contentEquals("poke_pro")
 
+        // Ridi Paper 3
+        RIDI_PAPER_3 = BRAND.contentEquals("ridi")
+            && MODEL.contentEquals("ridipaper")
+            && PRODUCT.contentEquals("rp1")
+
         // Sony DPT-CP1
         SONY_CP1 = MANUFACTURER.contentEquals("sony")
             && MODEL.contentEquals("dpt-cp1")
@@ -486,6 +494,7 @@ object DeviceInfo {
         deviceMap[EinkDevice.ONYX_POKE3] = ONYX_POKE3
         deviceMap[EinkDevice.ONYX_POKE4] = ONYX_POKE4
         deviceMap[EinkDevice.ONYX_POKE_PRO] = ONYX_POKE_PRO
+        deviceMap[EinkDevice.RIDI_PAPER_3] = RIDI_PAPER_3
         deviceMap[EinkDevice.SONY_CP1] = SONY_CP1
         deviceMap[EinkDevice.SONY_RP1] = SONY_RP1
         deviceMap[EinkDevice.TOLINO] = TOLINO
@@ -522,6 +531,7 @@ object DeviceInfo {
         lightsMap[LightsDevice.ONYX_POKE3] = ONYX_POKE3
         lightsMap[LightsDevice.ONYX_POKE4] = ONYX_POKE4
         lightsMap[LightsDevice.ONYX_POKE_PRO] = ONYX_POKE_PRO
+        lightsMap[LightsDevice.RIDI_PAPER_3] = RIDI_PAPER_3
         lightsMap[LightsDevice.TOLINO_EPOS] = TOLINO_EPOS
         lightsMap[LightsDevice.TOLINO_VISION5] = TOLINO_VISION5
 
