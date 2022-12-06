@@ -77,6 +77,7 @@ object EPDFactory {
                 DeviceInfo.EinkDevice.ONYX_NOVA3,
                 DeviceInfo.EinkDevice.ONYX_NOVA3_COLOR,
                 DeviceInfo.EinkDevice.ONYX_NOVA_AIR,
+                DeviceInfo.EinkDevice.ONYX_NOVA_AIR_2,
                 DeviceInfo.EinkDevice.ONYX_NOVA_AIR_C,
                 DeviceInfo.EinkDevice.ONYX_NOVA_PRO,
                 DeviceInfo.EinkDevice.ONYX_POKE3,

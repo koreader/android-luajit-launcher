@@ -71,6 +71,7 @@ object DeviceInfo {
         ONYX_NOVA3,
         ONYX_NOVA3_COLOR,
         ONYX_NOVA_AIR,
+        ONYX_NOVA_AIR_2,
         ONYX_NOVA_AIR_C,
         ONYX_NOVA_PRO,
         ONYX_POKE3,
@@ -103,6 +104,7 @@ object DeviceInfo {
         ONYX_NOVA3,
         ONYX_NOVA3_COLOR,
         ONYX_NOVA_AIR,
+        ONYX_NOVA_AIR_2,
         ONYX_NOVA_AIR_C,
         ONYX_NOVA_PRO,
         ONYX_POKE3,
@@ -176,6 +178,7 @@ object DeviceInfo {
     private val ONYX_NOVA3: Boolean
     private val ONYX_NOVA3_COLOR: Boolean
     private val ONYX_NOVA_AIR: Boolean
+    private val ONYX_NOVA_AIR_2: Boolean
     private val ONYX_NOVA_AIR_C: Boolean
     private val ONYX_NOVA_PRO: Boolean
     private val ONYX_POKE2: Boolean
@@ -387,6 +390,10 @@ object DeviceInfo {
         ONYX_NOVA_AIR = MANUFACTURER.contentEquals("onyx")
             && MODEL.contentEquals("novaair")
 
+        // Onyx Nova Air 2
+        ONYX_NOVA_AIR_2 = MANUFACTURER.contentEquals("onyx")
+            && MODEL.contentEquals("novaair2")
+
         // Onyx Nova Air C
         ONYX_NOVA_AIR_C = BRAND.contentEquals("onyx")
             && MODEL.contentEquals("novaairc")
@@ -505,6 +512,7 @@ object DeviceInfo {
         deviceMap[EinkDevice.ONYX_NOVA3] = ONYX_NOVA3
         deviceMap[EinkDevice.ONYX_NOVA3_COLOR] = ONYX_NOVA3_COLOR
         deviceMap[EinkDevice.ONYX_NOVA_AIR] = ONYX_NOVA_AIR
+        deviceMap[EinkDevice.ONYX_NOVA_AIR_2] = ONYX_NOVA_AIR_2
         deviceMap[EinkDevice.ONYX_NOVA_AIR_C] = ONYX_NOVA_AIR_C
         deviceMap[EinkDevice.ONYX_NOVA_PRO] = ONYX_NOVA_PRO
         deviceMap[EinkDevice.ONYX_POKE3] = ONYX_POKE3
@@ -544,6 +552,7 @@ object DeviceInfo {
         lightsMap[LightsDevice.ONYX_NOVA3] = ONYX_NOVA3
         lightsMap[LightsDevice.ONYX_NOVA3_COLOR] = ONYX_NOVA3_COLOR
         lightsMap[LightsDevice.ONYX_NOVA_AIR] = ONYX_NOVA_AIR
+        lightsMap[LightsDevice.ONYX_NOVA_AIR_2] = ONYX_NOVA_AIR_2
         lightsMap[LightsDevice.ONYX_NOVA_AIR_C] = ONYX_NOVA_AIR_C
         lightsMap[LightsDevice.ONYX_NOVA_PRO] = ONYX_NOVA_PRO
         lightsMap[LightsDevice.ONYX_POKE3] = ONYX_POKE3
