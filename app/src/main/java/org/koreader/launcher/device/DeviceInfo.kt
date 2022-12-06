@@ -48,6 +48,7 @@ object DeviceInfo {
         HANVON_960,
         INKBOOK,
         JDREAD,
+        MEEBOOK_P6,
         NABUK,
         NOOK,
         ONYX_C67,
@@ -84,6 +85,7 @@ object DeviceInfo {
     enum class LightsDevice {
         NONE,
         CREMA_CARTA_G,
+        MEEBOOK_P6,
         ONYX_C67,
         ONYX_DARWIN7,
         ONYX_FAUST3,
@@ -151,6 +153,7 @@ object DeviceInfo {
     private val HANVON_960: Boolean
     private val INKBOOK: Boolean
     private val JDREAD: Boolean
+    private val MEEBOOK_P6: Boolean
     private val NABUK_REGAL_HD: Boolean
     private val NOOK: Boolean
     private val ONYX_C67: Boolean
@@ -275,6 +278,10 @@ object DeviceInfo {
         // JDRead1
         JDREAD = MANUFACTURER.contentEquals("onyx")
             && MODEL.contentEquals("jdread")
+
+        // Meebook P6
+        MEEBOOK_P6 = MANUFACTURER.contentEquals("haoqing")
+            && MODEL.contentEquals("p6")
 
         // Nabuk Regal HD
         NABUK_REGAL_HD = MANUFACTURER.contentEquals("onyx")
@@ -475,6 +482,7 @@ object DeviceInfo {
         deviceMap[EinkDevice.FIDIBOOK] = FIDIBOOK
         deviceMap[EinkDevice.INKBOOK] = INKBOOK
         deviceMap[EinkDevice.JDREAD] = JDREAD
+        deviceMap[EinkDevice.MEEBOOK_P6] = MEEBOOK_P6
         deviceMap[EinkDevice.NABUK] = NABUK_REGAL_HD
         deviceMap[EinkDevice.NOOK] = NOOK
         deviceMap[EinkDevice.ONYX_C67] = ONYX_C67
@@ -520,6 +528,7 @@ object DeviceInfo {
         // devices with custom lights
         val lightsMap = HashMap<LightsDevice, Boolean>()
         lightsMap[LightsDevice.CREMA_CARTA_G] = CREMA_CARTA_G
+        lightsMap[LightsDevice.MEEBOOK_P6] = MEEBOOK_P6
         lightsMap[LightsDevice.ONYX_C67] = ONYX_C67
         lightsMap[LightsDevice.ONYX_DARWIN7] = ONYX_DARWIN7
         lightsMap[LightsDevice.ONYX_FAUST3] = ONYX_FAUST3
