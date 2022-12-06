@@ -24,6 +24,7 @@ object EPDFactory {
                 DeviceInfo.EinkDevice.ENERGY,
                 DeviceInfo.EinkDevice.FIDIBOOK,
                 DeviceInfo.EinkDevice.INKBOOK,
+                DeviceInfo.EinkDevice.MEEBOOK_P6,
                 DeviceInfo.EinkDevice.ONYX_C67,
                 DeviceInfo.EinkDevice.ONYX_MAGICBOOK,
                 DeviceInfo.EinkDevice.ONYX_MONTECRISTO3 -> {
