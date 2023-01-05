@@ -114,6 +114,7 @@ object DeviceInfo {
         ONYX_TAB_ULTRA,
         RIDI_PAPER_3,
         TOLINO_EPOS,
+        TOLINO_SHINE3,
         TOLINO_VISION5
     }
 
@@ -192,6 +193,7 @@ object DeviceInfo {
     private val SONY_CP1: Boolean
     private val SONY_RP1: Boolean
     private val TOLINO_EPOS: Boolean
+    private val TOLINO_SHINE3: Boolean
     private val TOLINO_VISION5: Boolean
 
     init {
@@ -448,7 +450,14 @@ object DeviceInfo {
         TOLINO_EPOS = BRAND.contentEquals("rakutenkobo")
             && MODEL.contentEquals("tolino")
             && DEVICE.contentEquals("ntx_6sl")
+            && !HARDWARE.contentEquals("e60k00")
             && !HARDWARE.contentEquals("e70k00")
+
+        // Tolino Shine 3 also has warmth lights, but with ntx_io file
+        TOLINO_SHINE3 = BRAND.contentEquals("rakutenkobo")
+            && MODEL.contentEquals("tolino")
+            && DEVICE.contentEquals("ntx_6sl")
+            && HARDWARE.contentEquals("e60k00")
 
         // Tolino Vision 5 also has warmth lights, but with ntx_io file
         TOLINO_VISION5 = BRAND.contentEquals("rakutenkobo")
@@ -569,6 +578,7 @@ object DeviceInfo {
         lightsMap[LightsDevice.ONYX_TAB_ULTRA] = ONYX_TAB_ULTRA
         lightsMap[LightsDevice.RIDI_PAPER_3] = RIDI_PAPER_3
         lightsMap[LightsDevice.TOLINO_EPOS] = TOLINO_EPOS
+        lightsMap[LightsDevice.TOLINO_SHINE3] = TOLINO_SHINE3
         lightsMap[LightsDevice.TOLINO_VISION5] = TOLINO_VISION5
 
         lightsMap.keys.iterator().run {
