@@ -39,6 +39,7 @@ object LightsFactory {
                 }
                 DeviceInfo.LightsDevice.ONYX_LEAF2,
                 DeviceInfo.LightsDevice.ONYX_NOTE_AIR2,
+                DeviceInfo.LightsDevice.ONYX_NOTE_X2,
                 DeviceInfo.LightsDevice.ONYX_NOVA2,
                 DeviceInfo.LightsDevice.ONYX_NOVA_AIR_2,
                 DeviceInfo.LightsDevice.ONYX_NOVA_AIR_C,
