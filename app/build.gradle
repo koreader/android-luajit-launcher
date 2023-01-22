@@ -4,10 +4,10 @@ apply plugin: 'kotlin-android'
 android {
     ndkPath ndkCustomPath
     compileSdkVersion rootProject.ext.compileSdk
+    def baseVersionCode = versCode as Integer
 
     defaultConfig {
         applicationId "org.koreader.launcher"
-        versionCode versCode as Integer
         versionName versName
         minSdkVersion rootProject.ext.minSdk
         targetSdkVersion rootProject.ext.targetSdk
@@ -57,21 +57,25 @@ android {
 
     flavorDimensions 'ABI', 'CHANNEL'
     productFlavors {
-        x86 {
-            ndk { abiFilters "x86" }
-            dimension = 'ABI'
-        }
-        x86_64 {
-            ndk { abiFilters "x86_64" }
-            dimension = 'ABI'
-        }
         arm {
             ndk { abiFilters "armeabi-v7a" }
             dimension = 'ABI'
+            versionCode = baseVersionCode * 10 + 1
         }
         arm64 {
             ndk { abiFilters "arm64-v8a" }
             dimension = 'ABI'
+            versionCode = baseVersionCode * 10 + 2
+        }
+        x86 {
+            ndk { abiFilters "x86" }
+            dimension = 'ABI'
+            versionCode = baseVersionCode * 10 + 3
+        }
+        x86_64 {
+            ndk { abiFilters "x86_64" }
+            dimension = 'ABI'
+            versionCode = baseVersionCode * 10 + 4
         }
 
         fdroid {
