@@ -37,6 +37,7 @@ object EPDFactory {
                 DeviceInfo.EinkDevice.BOYUE_P6,
                 DeviceInfo.EinkDevice.BOYUE_P61,
                 DeviceInfo.EinkDevice.BOYUE_P78,
+                DeviceInfo.EinkDevice.BOYUE_S62,
                 DeviceInfo.EinkDevice.BOYUE_T78D,
                 DeviceInfo.EinkDevice.BOYUE_T80D,
                 DeviceInfo.EinkDevice.BOYUE_T103D -> {
