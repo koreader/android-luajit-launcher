@@ -434,11 +434,11 @@ object DeviceInfo {
         // Onyx Poke 4
         ONYX_POKE4 = BRAND.contentEquals("onyx")
             && MODEL.contentEquals("poke4")
-        
+
         // Onyx Poke 4 lite
         ONYX_POKE4LITE = BRAND.contentEquals("onyx")
             && MODEL.contentEquals("poke4lite")
-        
+
         // Onyx Poke Pro
         ONYX_POKE_PRO = MANUFACTURER.contentEquals("onyx")
             && PRODUCT.contentEquals("poke_pro")
