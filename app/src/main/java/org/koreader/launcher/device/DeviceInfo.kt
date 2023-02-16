@@ -78,7 +78,7 @@ object DeviceInfo {
         ONYX_NOVA_PRO,
         ONYX_POKE3,
         ONYX_POKE4,
-        ONYX_POKE4LITE
+        ONYX_POKE4LITE,
         ONYX_POKE_PRO,
         ONYX_TAB_ULTRA,
         RIDI_PAPER_3,
