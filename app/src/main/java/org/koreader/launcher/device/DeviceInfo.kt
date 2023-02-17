@@ -78,6 +78,7 @@ object DeviceInfo {
         ONYX_NOVA_PRO,
         ONYX_POKE3,
         ONYX_POKE4,
+        ONYX_POKE4LITE,
         ONYX_POKE_PRO,
         ONYX_TAB_ULTRA,
         RIDI_PAPER_3,
@@ -113,6 +114,7 @@ object DeviceInfo {
         ONYX_NOVA_PRO,
         ONYX_POKE3,
         ONYX_POKE4,
+        ONYX_POKE4LITE,
         ONYX_POKE_PRO,
         ONYX_TAB_ULTRA,
         RIDI_PAPER_3,
@@ -192,6 +194,7 @@ object DeviceInfo {
     private val ONYX_POKE2: Boolean
     private val ONYX_POKE3: Boolean
     private val ONYX_POKE4: Boolean
+    private val ONYX_POKE4LITE: Boolean
     private val ONYX_POKE_PRO: Boolean
     private val ONYX_TAB_ULTRA: Boolean
     private val RIDI_PAPER_3: Boolean
@@ -432,6 +435,10 @@ object DeviceInfo {
         ONYX_POKE4 = BRAND.contentEquals("onyx")
             && MODEL.contentEquals("poke4")
 
+        // Onyx Poke 4 lite
+        ONYX_POKE4LITE = BRAND.contentEquals("onyx")
+            && MODEL.contentEquals("poke4lite")
+
         // Onyx Poke Pro
         ONYX_POKE_PRO = MANUFACTURER.contentEquals("onyx")
             && PRODUCT.contentEquals("poke_pro")
@@ -547,6 +554,7 @@ object DeviceInfo {
         deviceMap[EinkDevice.ONYX_NOVA_PRO] = ONYX_NOVA_PRO
         deviceMap[EinkDevice.ONYX_POKE3] = ONYX_POKE3
         deviceMap[EinkDevice.ONYX_POKE4] = ONYX_POKE4
+        deviceMap[EinkDevice.ONYX_POKE4LITE] = ONYX_POKE4LITE
         deviceMap[EinkDevice.ONYX_POKE_PRO] = ONYX_POKE_PRO
         deviceMap[EinkDevice.ONYX_TAB_ULTRA] = ONYX_TAB_ULTRA
         deviceMap[EinkDevice.RIDI_PAPER_3] = RIDI_PAPER_3
@@ -589,6 +597,7 @@ object DeviceInfo {
         lightsMap[LightsDevice.ONYX_NOVA_PRO] = ONYX_NOVA_PRO
         lightsMap[LightsDevice.ONYX_POKE3] = ONYX_POKE3
         lightsMap[LightsDevice.ONYX_POKE4] = ONYX_POKE4
+        lightsMap[LightsDevice.ONYX_POKE4LITE] = ONYX_POKE4LITE
         lightsMap[LightsDevice.ONYX_POKE_PRO] = ONYX_POKE_PRO
         lightsMap[LightsDevice.ONYX_TAB_ULTRA] = ONYX_TAB_ULTRA
         lightsMap[LightsDevice.RIDI_PAPER_3] = RIDI_PAPER_3
