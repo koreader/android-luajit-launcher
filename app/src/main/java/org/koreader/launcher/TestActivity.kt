@@ -22,6 +22,7 @@ import org.koreader.launcher.device.lights.OnyxSdkLightsController
 import org.koreader.launcher.device.lights.OnyxWarmthController
 import org.koreader.launcher.device.lights.TolinoRootController
 import org.koreader.launcher.device.lights.TolinoNtxController
+import org.koreader.launcher.device.lights.BoyueS62RootController
 import org.koreader.launcher.dialog.LightDialog
 
 class TestActivity: AppCompatActivity() {
@@ -63,6 +64,7 @@ class TestActivity: AppCompatActivity() {
         epdMap["Freescale/NTX"] = TolinoEPDController()
 
         // Lights drivers
+        lightsMap["Boyue S62 Root"] = BoyueS62RootController()
         lightsMap["Onyx C67"] = OnyxC67Controller()
         lightsMap["Onyx Color"] = OnyxColorController()
         lightsMap["Onyx SDK (lights)"] = OnyxSdkLightsController()
