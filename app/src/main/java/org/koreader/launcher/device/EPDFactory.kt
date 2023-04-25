@@ -93,7 +93,8 @@ object EPDFactory {
 
                 DeviceInfo.EinkDevice.NABUK,
                 DeviceInfo.EinkDevice.ONYX_DARWIN7,
-                DeviceInfo.EinkDevice.ONYX_FAUST3 -> {
+                DeviceInfo.EinkDevice.ONYX_FAUST3,
+		        DeviceInfo.EinkDevice.TAGUS_GEA-> {
                     logController("Old Tolino/NTX")
                     OldTolinoEPDController()
                 }
