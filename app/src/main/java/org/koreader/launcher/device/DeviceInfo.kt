@@ -590,6 +590,7 @@ object DeviceInfo {
         lightsMap[LightsDevice.ONYX_DARWIN7] = ONYX_DARWIN7
         lightsMap[LightsDevice.ONYX_FAUST3] = ONYX_FAUST3
         lightsMap[LightsDevice.ONYX_KON_TIKI2] = ONYX_KON_TIKI2
+        lightsMap[LightsDevice.ONYX_LEAF] = ONYX_LEAF
         lightsMap[LightsDevice.ONYX_LEAF2] = ONYX_LEAF2
         lightsMap[LightsDevice.ONYX_LOMONOSOV] = ONYX_LOMONOSOV
         lightsMap[LightsDevice.ONYX_MAGICBOOK] = ONYX_MAGICBOOK
