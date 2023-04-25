@@ -60,6 +60,10 @@ object LightsFactory {
                     logController("Onyx C67")
                     OnyxC67Controller()
                 }
+                DeviceInfo.LightsDevice.BOYUE_S62 -> {
+                    logController("Boyue S62")
+                    BoyueS62RootController()
+                }
                 else -> {
                     logController("Generic")
                     GenericController()

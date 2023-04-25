@@ -90,6 +90,7 @@ object DeviceInfo {
 
     enum class LightsDevice {
         NONE,
+        BOYUE_S62,
         CREMA_CARTA_G,
         MEEBOOK_P6,
         ONYX_C67,
@@ -582,6 +583,7 @@ object DeviceInfo {
 
         // devices with custom lights
         val lightsMap = HashMap<LightsDevice, Boolean>()
+        lightsMap[LightsDevice.BOYUE_S62] = BOYUE_S62
         lightsMap[LightsDevice.CREMA_CARTA_G] = CREMA_CARTA_G
         lightsMap[LightsDevice.MEEBOOK_P6] = MEEBOOK_P6
         lightsMap[LightsDevice.ONYX_C67] = ONYX_C67
