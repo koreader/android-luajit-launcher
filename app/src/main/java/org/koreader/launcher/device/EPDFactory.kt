@@ -66,6 +66,7 @@ object EPDFactory {
                 DeviceInfo.EinkDevice.ONYX_KON_TIKI2,
                 DeviceInfo.EinkDevice.ONYX_LEAF,
                 DeviceInfo.EinkDevice.ONYX_LEAF2,
+                DeviceInfo.EinkDevice.ONYX_DARWIN9,
                 DeviceInfo.EinkDevice.ONYX_LOMONOSOV,
                 DeviceInfo.EinkDevice.ONYX_MAX,
                 DeviceInfo.EinkDevice.ONYX_NOTE,

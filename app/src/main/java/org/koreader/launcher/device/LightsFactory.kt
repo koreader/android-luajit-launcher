@@ -38,6 +38,7 @@ object LightsFactory {
                     OnyxWarmthController()
                 }
                 DeviceInfo.LightsDevice.ONYX_LEAF2,
+                DeviceInfo.LightsDevice.ONYX_DARWIN9,
                 DeviceInfo.LightsDevice.ONYX_NOTE_AIR2,
                 DeviceInfo.LightsDevice.ONYX_NOTE_X2,
                 DeviceInfo.LightsDevice.ONYX_NOVA2,
