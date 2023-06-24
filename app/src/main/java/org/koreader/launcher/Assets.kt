@@ -18,6 +18,7 @@ class Assets {
     private val tag = this::class.java.simpleName
 
     init {
+        Log.i(tag, "loading lib7z")
         System.loadLibrary("7z")
     }
 
