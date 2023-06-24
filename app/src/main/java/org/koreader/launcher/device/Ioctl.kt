@@ -5,12 +5,14 @@ import kotlin.math.abs
 
 open class Ioctl {
 
+    private val tag = this::class.java.simpleName
+
     init {
+        Log.i(tag, "loading libioctl")
         System.loadLibrary("ioctl")
     }
 
     private external fun ioctl(device: String, command: Int, args: Int): Int
-    private val tag = this::class.java.simpleName
 
     companion object {
         private const val ENOENT = 2
