@@ -25,26 +25,10 @@ BUILD_TASK?=assemble$(ARCH)$(FLAVOR)
 LINT_TASK?=lint$(ARCH)$(FLAVOR)
 
 # find the path where the SDK is installed
-ifdef SDK
-        ANDROID_SDK_FULLPATH?=$(SDK)
-else
-        ifdef ANDROID_HOME
-                ANDROID_SDK_FULLPATH?=$(ANDROID_HOME)
-        else
-                ANDROID_SDK_FULLPATH?=$(shell realpath ../../../base/toolchain/android-sdk-linux)
-        endif
-endif
+ANDROID_SDK_FULLPATH ?= $(or $(ANDROID_HOME),$(ANDROID_SDK_ROOT),$(shell realpath ../../../base/toolchain/android-sdk-linux))
 
 # find the path where the NDK is installed
-ifdef NDK
-	ANDROID_NDK_FULLPATH?=$(NDK)
-else
-	ifdef ANDROID_NDK_HOME
-		ANDROID_NDK_FULLPATH?=$(ANDROID_NDK_HOME)
-	else
-		ANDROID_NDK_FULLPATH?=$(shell realpath ../../../base/toolchain/android-ndk-r15c)
-	endif
-endif
+ANDROID_NDK_FULLPATH ?= $(or $(ANDROID_NDK_HOME),$(ANDROID_NDK_ROOT),$(shell realpath ../../../base/toolchain/android-ndk-r23c))
 
 # override android:versionName="string"
 ifdef ANDROID_NAME
@@ -126,7 +110,7 @@ clean:
 	@echo "Cleaning binaries, assets and LuaJIT build"
 	rm -rf assets/module/ bin/ jni/luajit/build
 	cd jni/luajit && \
-		./mk-luajit.sh clean
+		./mk-luajit.sh "$(ANDROID_FULL_ARCH)" clean
 
 mrproper: clean
 	-./gradlew clean --continue
