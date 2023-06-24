@@ -7,6 +7,7 @@ import org.apache.commons.compress.archivers.tar.TarArchiveInputStream
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
 import org.apache.commons.compress.compressors.lzma.LZMACompressorInputStream
+import org.apache.commons.compress.utils.IOUtils
 import java.io.*
 
 @SuppressLint("DiscouragedPrivateApi")
@@ -91,13 +92,7 @@ private fun uncompress(archive: String, extractTo: String): Boolean {
                     destPath.delete()
                 }
                 if (destPath.createNewFile()) {
-                    val buffer = ByteArray(4096)
-                    val bufferOutput = BufferedOutputStream(FileOutputStream(destPath))
-                    var len: Int
-                    while (it.read(buffer).also { size -> len = size } != -1) {
-                        bufferOutput.write(buffer, 0, len)
-                    }
-                    bufferOutput.close()
+                    FileOutputStream(destPath)?.use { out -> IOUtils.copy(it, out, 4096) }
                 }
             }
             tarEntry = it.nextTarEntry
