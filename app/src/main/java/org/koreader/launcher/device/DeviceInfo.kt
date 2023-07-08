@@ -77,6 +77,7 @@ object DeviceInfo {
         ONYX_NOVA_AIR_2,
         ONYX_NOVA_AIR_C,
         ONYX_NOVA_PRO,
+        ONYX_PAGE,
         ONYX_POKE3,
         ONYX_POKE4,
         ONYX_POKE4LITE,
@@ -116,6 +117,7 @@ object DeviceInfo {
         ONYX_NOVA_AIR_2,
         ONYX_NOVA_AIR_C,
         ONYX_NOVA_PRO,
+        ONYX_PAGE,
         ONYX_POKE3,
         ONYX_POKE4,
         ONYX_POKE4LITE,
@@ -197,6 +199,7 @@ object DeviceInfo {
     private val ONYX_NOVA_AIR_2: Boolean
     private val ONYX_NOVA_AIR_C: Boolean
     private val ONYX_NOVA_PRO: Boolean
+    private val ONYX_PAGE: Boolean
     private val ONYX_POKE2: Boolean
     private val ONYX_POKE3: Boolean
     private val ONYX_POKE4: Boolean
@@ -434,6 +437,10 @@ object DeviceInfo {
         ONYX_NOVA_PRO = BRAND.contentEquals("onyx")
             && MODEL.contentEquals("novapro")
 
+        // Onyx Page
+        ONYX_PAGE = BRAND.contentEquals("onyx")
+            && MODEL.contentEquals("page")
+
         // Onyx Poke 2
         ONYX_POKE2 = MANUFACTURER.contentEquals("onyx")
             && PRODUCT.contentEquals("poke2")
@@ -569,6 +576,7 @@ object DeviceInfo {
         deviceMap[EinkDevice.ONYX_NOVA_AIR_2] = ONYX_NOVA_AIR_2
         deviceMap[EinkDevice.ONYX_NOVA_AIR_C] = ONYX_NOVA_AIR_C
         deviceMap[EinkDevice.ONYX_NOVA_PRO] = ONYX_NOVA_PRO
+        deviceMap[EinkDevice.ONYX_PAGE] = ONYX_PAGE
         deviceMap[EinkDevice.ONYX_POKE3] = ONYX_POKE3
         deviceMap[EinkDevice.ONYX_POKE4] = ONYX_POKE4
         deviceMap[EinkDevice.ONYX_POKE4LITE] = ONYX_POKE4LITE
@@ -616,6 +624,7 @@ object DeviceInfo {
         lightsMap[LightsDevice.ONYX_NOVA_AIR_2] = ONYX_NOVA_AIR_2
         lightsMap[LightsDevice.ONYX_NOVA_AIR_C] = ONYX_NOVA_AIR_C
         lightsMap[LightsDevice.ONYX_NOVA_PRO] = ONYX_NOVA_PRO
+        lightsMap[LightsDevice.ONYX_PAGE] = ONYX_PAGE
         lightsMap[LightsDevice.ONYX_POKE3] = ONYX_POKE3
         lightsMap[LightsDevice.ONYX_POKE4] = ONYX_POKE4
         lightsMap[LightsDevice.ONYX_POKE4LITE] = ONYX_POKE4LITE

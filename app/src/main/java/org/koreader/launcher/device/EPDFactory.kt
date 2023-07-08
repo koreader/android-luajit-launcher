@@ -83,6 +83,7 @@ object EPDFactory {
                 DeviceInfo.EinkDevice.ONYX_NOVA_AIR_2,
                 DeviceInfo.EinkDevice.ONYX_NOVA_AIR_C,
                 DeviceInfo.EinkDevice.ONYX_NOVA_PRO,
+                DeviceInfo.EinkDevice.ONYX_PAGE,
                 DeviceInfo.EinkDevice.ONYX_POKE3,
                 DeviceInfo.EinkDevice.ONYX_POKE4,
                 DeviceInfo.EinkDevice.ONYX_POKE4LITE,
