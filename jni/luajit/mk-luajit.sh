@@ -118,7 +118,6 @@ case "$2" in
       koreader-luajit-makefile-tweaks.patch
       koreader-luajit-enable-table_pack.patch
       koreader-luajit-mcode-reserve-hack.patch
-      luajit-revert-b7a8c7c.patch
     )
     makecmd+=(amalg install)
     ;;
