@@ -17,6 +17,7 @@ import android.util.DisplayMetrics
 import android.view.Surface
 import android.view.View
 import android.view.WindowManager
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import java.util.*
@@ -110,12 +111,6 @@ fun Activity.getSdcardPath(): String? {
 
 fun Activity.getWidth(): Int {
     return getScreenSize(this).x
-}
-
-@Suppress("DEPRECATION")
-fun Activity.isFullscreenDeprecated(): Boolean {
-    return (window.attributes.flags and
-        WindowManager.LayoutParams.FLAG_FULLSCREEN != 0)
 }
 
 @Suppress("DEPRECATION")
@@ -264,40 +259,13 @@ fun Activity.sendAction(text: String, domain: String? = null) {
     startDictionaryActivity(this, sendIntent, domain)
 }
 
-@Suppress("DEPRECATION")
-fun Activity.setFullscreenDeprecated(fullscreen: Boolean) {
-    val cd = CountDownLatch(1)
-    runOnUiThread {
-        try {
-            if (fullscreen) {
-                window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-            } else {
-                window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        cd.countDown()
-    }
-    try {
-        cd.await()
-    } catch (ex: InterruptedException) {
-        ex.printStackTrace()
-    }
-}
-
-@Suppress("DEPRECATION")
+@RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
 private fun getScreenSize(activity: Activity): Point {
-    val size = Point()
     val display = activity.windowManager.defaultDisplay
-
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-        val metrics = DisplayMetrics()
-        display.getRealMetrics(metrics)
-        size.set(metrics.widthPixels, metrics.heightPixels)
-    } else {
-        display.getSize(size)
-    }
+    val metrics = DisplayMetrics()
+    val size = Point()
+    display.getRealMetrics(metrics)
+    size.set(metrics.widthPixels, metrics.heightPixels)
     return size
 }
 
