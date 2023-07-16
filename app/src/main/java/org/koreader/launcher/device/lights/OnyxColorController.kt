@@ -76,4 +76,7 @@ class OnyxColorController : LightsInterface {
     override fun getMaxBrightness(): Int {
         return BRIGHTNESS_MAX
     }
+    override fun hasStandaloneWarmth(): Boolean {
+        return false
+    }
 }

@@ -2158,6 +2158,16 @@ local function run(android_app_state)
         end)
     end
 
+    android.hasStandaloneWarmth = function()
+        return JNI:context(android.app.activity.vm, function(jni)
+            return jni:callBooleanMethod(
+                android.app.activity.clazz,
+                "hasStandaloneWarmth",
+                "()Z"
+            )
+        end)
+    end
+
     android.hasNativeRotation = function()
         return JNI:context(android.app.activity.vm, function(jni)
             return jni:callBooleanMethod(
