@@ -493,6 +493,10 @@ class MainActivity : NativeActivity(), LuaInterface,
         }
     }
 
+    override fun hasStandaloneWarmth(): Boolean {
+        return device.lights.hasStandaloneWarmth()
+    }
+
     override fun hasRuntimeChanges(): Boolean {
         return MainApp.supports_runtime_changes
     }
