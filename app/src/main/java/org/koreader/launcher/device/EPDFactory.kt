@@ -63,6 +63,7 @@ object EPDFactory {
                     TolinoEPDController()
                 }
 
+                DeviceInfo.EinkDevice.ONYX_EDISON,
                 DeviceInfo.EinkDevice.ONYX_KON_TIKI2,
                 DeviceInfo.EinkDevice.ONYX_LEAF,
                 DeviceInfo.EinkDevice.ONYX_LEAF2,
