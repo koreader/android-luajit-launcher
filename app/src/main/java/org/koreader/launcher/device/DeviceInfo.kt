@@ -359,10 +359,10 @@ object DeviceInfo {
             && PRODUCT.contentEquals("leaf")
             && DEVICE.contentEquals("leaf")
 
-        // Onyx Leaf 2
+        // Onyx Leaf 2 && Onyx Leaf 2 Plus
         ONYX_LEAF2 = MANUFACTURER.contentEquals("onyx")
-            && PRODUCT.contentEquals("leaf2")
-            && DEVICE.contentEquals("leaf2")
+            && (PRODUCT.contentEquals("leaf2") || PRODUCT.contentEquals("leaf2_p"))
+            && (DEVICE.contentEquals("leaf2") || DEVICE.contentEquals("leaf2_p"))
 
         // Onyx Lomonosov
         ONYX_LOMONOSOV = MANUFACTURER.contentEquals("onyx")
