@@ -402,9 +402,9 @@ object DeviceInfo {
             && PRODUCT.contentEquals("noteair")
             && DEVICE.contentEquals("noteair")
 
-        // Onyx Note Air 2
+        // Onyx Note Air 2 && Note Air 2 Plus
         ONYX_NOTE_AIR2 = BRAND.contentEquals("onyx")
-            && MODEL.contentEquals("noteair2")
+            && (MODEL.contentEquals("noteair2") || MODEL.contentEquals("noteair2p"))
 
         // Onyx Note Pro
         ONYX_NOTE_PRO = MANUFACTURER.contentEquals("onyx")
