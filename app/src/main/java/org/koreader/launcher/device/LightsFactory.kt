@@ -53,7 +53,7 @@ object LightsFactory {
                     OnyxSdkLightsController()
                 }
                 DeviceInfo.LightsDevice.ONYX_NOVA3_COLOR,
-		        DeviceInfo.LightsDevice.TAGUS_GEA -> {
+                DeviceInfo.LightsDevice.TAGUS_GEA -> {
                     logController("Onyx color")
                     OnyxColorController()
                 }
