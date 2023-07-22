@@ -331,13 +331,13 @@ object DeviceInfo {
 
         // ONYX DARWIN 7
         ONYX_DARWIN7 = MANUFACTURER.contentEquals("onyx")
-            && PRODUCT.contentEquals("mc_darwin7")
-            && DEVICE.contentEquals("mc_darwin7")
+            && (PRODUCT.contentEquals("mc_darwin7") || PRODUCT.contentEquals("darwin7"))
+            && (DEVICE.contentEquals("mc_darwin7") || DEVICE.contentEquals("darwin7"))
 
         // ONYX DARWIN 9
         ONYX_DARWIN9 = MANUFACTURER.contentEquals("onyx")
-            && PRODUCT.contentEquals("mc_darwin9")
-            && DEVICE.contentEquals("mc_darwin9")
+            && (PRODUCT.contentEquals("mc_darwin9") || PRODUCT.contentEquals("darwin9"))
+            && (DEVICE.contentEquals("mc_darwin9") || DEVICE.contentEquals("darwin9"))
 
         // Onyx Edison
         ONYX_EDISON = MANUFACTURER.contentEquals("onyx")
