@@ -55,6 +55,7 @@ object DeviceInfo {
         ONYX_C67,
         ONYX_DARWIN7,
         ONYX_DARWIN9,
+        ONYX_EDISON,
         ONYX_FAUST3,
         ONYX_KON_TIKI2,
         ONYX_LEAF,
@@ -98,6 +99,7 @@ object DeviceInfo {
         ONYX_C67,
         ONYX_DARWIN7,
         ONYX_DARWIN9,
+        ONYX_EDISON,
         ONYX_FAUST3,
         ONYX_KON_TIKI2,
         ONYX_LEAF,
@@ -177,6 +179,7 @@ object DeviceInfo {
     private val ONYX_C67: Boolean
     private val ONYX_DARWIN7: Boolean
     private val ONYX_DARWIN9: Boolean
+    private val ONYX_EDISON: Boolean
     private val ONYX_FAUST3: Boolean
     private val ONYX_KON_TIKI2: Boolean
     private val ONYX_LEAF: Boolean
@@ -335,6 +338,11 @@ object DeviceInfo {
         ONYX_DARWIN9 = MANUFACTURER.contentEquals("onyx")
             && PRODUCT.contentEquals("mc_darwin9")
             && DEVICE.contentEquals("mc_darwin9")
+
+        // Onyx Edison
+        ONYX_EDISON = MANUFACTURER.contentEquals("onyx")
+            && PRODUCT.contentEquals("edison")
+            && DEVICE.contentEquals("edison")
 
         // Onyx Faust 3
         ONYX_FAUST3 = MANUFACTURER.contentEquals("onyx")
@@ -554,6 +562,7 @@ object DeviceInfo {
         deviceMap[EinkDevice.ONYX_C67] = ONYX_C67
         deviceMap[EinkDevice.ONYX_DARWIN7] = ONYX_DARWIN7
         deviceMap[EinkDevice.ONYX_DARWIN9] = ONYX_DARWIN9
+        deviceMap[EinkDevice.ONYX_EDISON] = ONYX_EDISON
         deviceMap[EinkDevice.ONYX_FAUST3] = ONYX_FAUST3
         deviceMap[EinkDevice.ONYX_KON_TIKI2] = ONYX_KON_TIKI2
         deviceMap[EinkDevice.ONYX_LEAF] = ONYX_LEAF
@@ -606,6 +615,7 @@ object DeviceInfo {
         lightsMap[LightsDevice.ONYX_C67] = ONYX_C67
         lightsMap[LightsDevice.ONYX_DARWIN7] = ONYX_DARWIN7
         lightsMap[LightsDevice.ONYX_DARWIN9] = ONYX_DARWIN9
+        lightsMap[LightsDevice.ONYX_EDISON] = ONYX_EDISON
         lightsMap[LightsDevice.ONYX_FAUST3] = ONYX_FAUST3
         lightsMap[LightsDevice.ONYX_KON_TIKI2] = ONYX_KON_TIKI2
         lightsMap[LightsDevice.ONYX_LEAF] = ONYX_LEAF

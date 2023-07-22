@@ -22,6 +22,7 @@ object LightsFactory {
                     TolinoNtxController()
                 }
                 DeviceInfo.LightsDevice.ONYX_DARWIN7,
+                DeviceInfo.LightsDevice.ONYX_EDISON,
                 DeviceInfo.LightsDevice.ONYX_FAUST3,
                 DeviceInfo.LightsDevice.ONYX_KON_TIKI2,
                 DeviceInfo.LightsDevice.ONYX_LEAF,
