@@ -87,7 +87,7 @@ object DeviceInfo {
         RIDI_PAPER_3,
         SONY_CP1,
         SONY_RP1,
-	    TAGUS_GEA,
+        TAGUS_GEA,
         TOLINO
     }
 
@@ -126,7 +126,7 @@ object DeviceInfo {
         ONYX_POKE_PRO,
         ONYX_TAB_ULTRA,
         RIDI_PAPER_3,
-	    TAGUS_GEA,
+        TAGUS_GEA,
         TOLINO_EPOS,
         TOLINO_SHINE3,
         TOLINO_VISION5
@@ -487,9 +487,9 @@ object DeviceInfo {
         SONY_RP1 = MANUFACTURER.contentEquals("sony")
             && MODEL.contentEquals("dpt-rp1")
 
-	    // Tagus Gea
-	    TAGUS_GEA = MANUFACTURER.contentEquals("onyx")
-	        && MODEL.contentEquals("tagus_pokep")
+        // Tagus Gea
+        TAGUS_GEA = MANUFACTURER.contentEquals("onyx")
+            && MODEL.contentEquals("tagus_pokep")
 
         // Tolino (catch them all)
         TOLINO = BRAND.contentEquals("tolino") && MODEL.contentEquals("imx50_rdp")
@@ -594,7 +594,7 @@ object DeviceInfo {
         deviceMap[EinkDevice.RIDI_PAPER_3] = RIDI_PAPER_3
         deviceMap[EinkDevice.SONY_CP1] = SONY_CP1
         deviceMap[EinkDevice.SONY_RP1] = SONY_RP1
-	    deviceMap[EinkDevice.TAGUS_GEA] = TAGUS_GEA
+        deviceMap[EinkDevice.TAGUS_GEA] = TAGUS_GEA
         deviceMap[EinkDevice.TOLINO] = TOLINO
 
         deviceMap.keys.iterator().run {
@@ -641,7 +641,7 @@ object DeviceInfo {
         lightsMap[LightsDevice.ONYX_POKE_PRO] = ONYX_POKE_PRO
         lightsMap[LightsDevice.ONYX_TAB_ULTRA] = ONYX_TAB_ULTRA
         lightsMap[LightsDevice.RIDI_PAPER_3] = RIDI_PAPER_3
-	    lightsMap[LightsDevice.TAGUS_GEA] = TAGUS_GEA
+        lightsMap[LightsDevice.TAGUS_GEA] = TAGUS_GEA
         lightsMap[LightsDevice.TOLINO_EPOS] = TOLINO_EPOS
         lightsMap[LightsDevice.TOLINO_SHINE3] = TOLINO_SHINE3
         lightsMap[LightsDevice.TOLINO_VISION5] = TOLINO_VISION5
