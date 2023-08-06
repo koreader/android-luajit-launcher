@@ -44,10 +44,6 @@ class MainActivity : NativeActivity(), LuaInterface,
     // Path of last file imported
     private var lastImportedPath: String? = null
 
-    // Surface height & width determined at runtime to account for device cutout
-    private var surfaceHeight: Int? = null
-    private var surfaceWidth: Int? = null
-
     // Fullscreen - only used on API levels 16-18
     private var fullscreen: Boolean = true
 
@@ -165,8 +161,6 @@ class MainActivity : NativeActivity(), LuaInterface,
             "surface changed {\n  width:  %d\n  height: %d\n format: %s\n}",
             width, height, pixelFormatName(format))
         )
-        surfaceWidth = width
-        surfaceHeight = height
         super.surfaceChanged(holder, format, width, height)
         drawSplashScreen(holder)
     }
@@ -424,7 +418,7 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun getScreenHeight(): Int {
-        return surfaceHeight ?: getHeight()
+        return getHeight()
     }
 
     override fun getScreenMaxBrightness(): Int {
@@ -452,7 +446,7 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun getScreenWidth(): Int {
-        return surfaceWidth ?: getWidth()
+        return getWidth()
     }
 
     override fun getStatusBarHeight(): Int {
