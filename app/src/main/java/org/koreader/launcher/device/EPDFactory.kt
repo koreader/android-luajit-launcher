@@ -89,7 +89,8 @@ object EPDFactory {
                 DeviceInfo.EinkDevice.ONYX_POKE4,
                 DeviceInfo.EinkDevice.ONYX_POKE4LITE,
                 DeviceInfo.EinkDevice.ONYX_POKE_PRO,
-                DeviceInfo.EinkDevice.ONYX_TAB_ULTRA -> {
+                DeviceInfo.EinkDevice.ONYX_TAB_ULTRA,
+                DeviceInfo.EinkDevice.ONYX_TAB_ULTRA_C -> {
                     logController("Onyx/Qualcomm")
                     OnyxEPDController()
                 }
