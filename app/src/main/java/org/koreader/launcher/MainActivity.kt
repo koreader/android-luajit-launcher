@@ -44,6 +44,10 @@ class MainActivity : NativeActivity(), LuaInterface,
     // Path of last file imported
     private var lastImportedPath: String? = null
 
+    // Surface height & width determined at runtime to account for device cutout
+    private var surfaceHeight: Int? = null
+    private var surfaceWidth: Int? = null
+
     // Fullscreen - only used on API levels 16-18
     private var fullscreen: Boolean = true
 
@@ -109,6 +113,7 @@ class MainActivity : NativeActivity(), LuaInterface,
 
         // Window background must be black for vertical and horizontal lines to be visible
         window.setBackgroundDrawableResource(android.R.color.black)
+        window.attributes.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
 
         val surfaceKind: String = if (device.needsView) {
             view = NativeSurfaceView(this)
@@ -161,6 +166,8 @@ class MainActivity : NativeActivity(), LuaInterface,
             "surface changed {\n  width:  %d\n  height: %d\n format: %s\n}",
             width, height, pixelFormatName(format))
         )
+        //surfaceWidth = width
+        //surfaceHeight = height
         super.surfaceChanged(holder, format, width, height)
         drawSplashScreen(holder)
     }
@@ -418,7 +425,7 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun getScreenHeight(): Int {
-        return getHeight()
+        return surfaceHeight ?: getHeight()
     }
 
     override fun getScreenMaxBrightness(): Int {
@@ -446,7 +453,7 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun getScreenWidth(): Int {
-        return getWidth()
+        return surfaceWidth ?: getWidth()
     }
 
     override fun getStatusBarHeight(): Int {
