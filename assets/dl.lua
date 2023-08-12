@@ -114,7 +114,7 @@ function dl.dlopen(library, load_func, depth)
             -- libvulkan, and libz
             -- c.f., https://android.googlesource.com/platform/bionic/+/master/android-changes-for-ndk-developers.md#private-api-enforced-for-api-level-24
             -- Our current code should *never* hit any private system libs, so, this is basically overkill ;).
-            if depth > 0 and (pspec == "/system/lib" or library == "libdl.so") then
+            if depth > 0 and (pspec == "/system/lib" or pspec == "/system/lib64" or library == "libdl.so") then
                 -- depth > 0 to allow explicitly loading a system lib
                 -- (because this might have genuine use cases, as some early API levels do not put DT_NEEDED libraries into the global namespace)
                 -- pspec to reject system libs

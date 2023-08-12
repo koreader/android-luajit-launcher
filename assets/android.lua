@@ -2656,7 +2656,7 @@ local function run(android_app_state)
     android.dl = require("dl")
     android.dl.library_path = android.nativeLibraryDir..":"..
         android.dir..":"..android.dir.."/libs:"..
-        "/lib:/system/lib:/lib/lib?.so:/system/lib/lib?.so"
+        "/lib:/system/lib:/system/lib64:/lib/lib?.so:/system/lib/lib?.so:/system/lib64/lib?.so"
 
     -- register the dependency lib loader
     table.insert(package.loaders, 3, android.deplib_loader)
