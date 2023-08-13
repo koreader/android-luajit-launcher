@@ -44,9 +44,8 @@ class MainActivity : NativeActivity(), LuaInterface,
     // Path of last file imported
     private var lastImportedPath: String? = null
 
-    // Surface height & width determined at runtime to account for device cutout
-    private var surfaceHeight: Int? = null
-    private var surfaceWidth: Int? = null
+    // Device cutout - only used on API 28+
+    private var topInsetHeight: Int = 0
 
     // Fullscreen - only used on API levels 16-18
     private var fullscreen: Boolean = true
@@ -113,7 +112,6 @@ class MainActivity : NativeActivity(), LuaInterface,
 
         // Window background must be black for vertical and horizontal lines to be visible
         window.setBackgroundDrawableResource(android.R.color.black)
-        window.attributes.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
 
         val surfaceKind: String = if (device.needsView) {
             view = NativeSurfaceView(this)
@@ -166,10 +164,23 @@ class MainActivity : NativeActivity(), LuaInterface,
             "surface changed {\n  width:  %d\n  height: %d\n format: %s\n}",
             width, height, pixelFormatName(format))
         )
-        //surfaceWidth = width
-        //surfaceHeight = height
         super.surfaceChanged(holder, format, width, height)
         drawSplashScreen(holder)
+    }
+
+    override fun onAttachedToWindow() {
+        Log.d(TAG_SURFACE, "onAttachedToWindow()")
+        super.onAttachedToWindow()
+
+        // it seems to be working for Android 13 on emulator
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            val cut = windowManager.defaultDisplay.cutout
+
+            if (cut != null && cut.boundingRects.isNotEmpty()) {
+                // TODO: we can handle various kinds of cutouts: getSafeInsetLeft, getSafeInsetRight, getSafeInsetTop, getSafeInsetBottom
+                topInsetHeight = cut.safeInsetTop
+            }
+        }
     }
 
     /* Called just before the activity is resumed by an intent */
@@ -425,7 +436,21 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun getScreenHeight(): Int {
-        return surfaceHeight ?: getHeight()
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            // We need to handle the notch in Portrait
+            // NOTE: getScreenAvailableHeight does it automatically, but it also excludes the nav bar, when there's one :/
+            if (getOrientationCompat(screenIsLandscape).and(1) == 0) {
+                // getScreenOrientation returns LinuxFB rotation constants, Portrait rotations are always even
+                Log.d(TAG_SURFACE, "Height notch setted")
+                getHeight() - topInsetHeight
+            } else {
+                getHeight()
+            }
+        } else {
+            getHeight()
+        }
+
+        return getHeight()
     }
 
     override fun getScreenMaxBrightness(): Int {
@@ -453,7 +478,21 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun getScreenWidth(): Int {
-        return surfaceWidth ?: getWidth()
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            // We need to handle the notch in Landscape
+            // NOTE: getScreenAvailableWidth does it automatically, but it also excludes the nav bar, when there's one :/
+            if (getOrientationCompat(screenIsLandscape).and(1) == 1) {
+                // getScreenOrientation returns LinuxFB rotation constants, Landscape rotations are always odd
+                Log.d(TAG_SURFACE, "Width notch setted")
+                getWidth() - topInsetHeight
+            } else {
+                getWidth()
+            }
+        } else {
+            getWidth()
+        }
+
+        return getWidth()
     }
 
     override fun getStatusBarHeight(): Int {
