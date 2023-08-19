@@ -1,5 +1,5 @@
 diff --git a/src/lj_def.h b/src/lj_def.h
-index 3a28026c..e441c0e6 100644
+index b61297aa..907729e0 100644
 --- a/src/lj_def.h
 +++ b/src/lj_def.h
 @@ -39,6 +39,7 @@ typedef int intptr_t;
@@ -11,10 +11,10 @@ index 3a28026c..e441c0e6 100644
  
  /* Needed everywhere. */
 diff --git a/src/lj_jit.h b/src/lj_jit.h
-index 34ddf907..9e1902b4 100644
+index 0fae60ad..353d33fb 100644
 --- a/src/lj_jit.h
 +++ b/src/lj_jit.h
-@@ -492,6 +492,7 @@ typedef struct jit_State {
+@@ -508,6 +508,7 @@ typedef struct jit_State {
    BCIns patchins;	/* Instruction for pending re-patch. */
  
    int mcprot;		/* Protection of current mcode area. */
@@ -23,7 +23,7 @@ index 34ddf907..9e1902b4 100644
    MCode *mctop;		/* Top of current mcode area. */
    MCode *mcbot;		/* Bottom of current mcode area. */
 diff --git a/src/lj_mcode.c b/src/lj_mcode.c
-index b3efbc55..536b9ab7 100644
+index 163aada4..6e83086a 100644
 --- a/src/lj_mcode.c
 +++ b/src/lj_mcode.c
 @@ -103,9 +103,13 @@ static int mcode_setprot(void *p, size_t sz, DWORD prot)
@@ -42,7 +42,7 @@ index b3efbc55..536b9ab7 100644
    if (p == MAP_FAILED) {
      if (!hint) lj_trace_err(J, LJ_TRERR_MCODEAL);
      p = NULL;
-@@ -215,18 +219,37 @@ static void *mcode_alloc(jit_State *J, size_t sz)
+@@ -216,18 +220,37 @@ static void *mcode_alloc(jit_State *J, size_t sz)
    uintptr_t target = (uintptr_t)(void *)lj_vm_exit_handler & ~(uintptr_t)0xffff;
  #endif
    const uintptr_t range = (1u << (LJ_TARGET_JUMPRANGE-1)) - (1u << 21);
@@ -86,7 +86,7 @@ index b3efbc55..536b9ab7 100644
      }
      /* Next try probing 64K-aligned pseudo-random addresses. */
      do {
-@@ -245,14 +268,14 @@ static void *mcode_alloc(jit_State *J, size_t sz)
+@@ -246,14 +269,14 @@ static void *mcode_alloc(jit_State *J, size_t sz)
  {
  #if defined(__OpenBSD__) || defined(__NetBSD__) || LJ_TARGET_UWP
    /* Allow better executable memory allocation for OpenBSD W^X mode. */
@@ -103,7 +103,7 @@ index b3efbc55..536b9ab7 100644
  #endif
  }
  
-@@ -288,10 +311,79 @@ void lj_mcode_free(jit_State *J)
+@@ -289,10 +312,79 @@ void lj_mcode_free(jit_State *J)
      size_t sz = ((MCLink *)mc)->size;
      lj_err_deregister_mcode(mc, sz, (uint8_t *)mc + sizeof(MCLink));
      mcode_free(J, mc, sz);
@@ -184,7 +184,7 @@ index b3efbc55..536b9ab7 100644
  
  /* Reserve the remainder of the current MCode area. */
 diff --git a/src/lj_mcode.h b/src/lj_mcode.h
-index caaaec61..f4ebe621 100644
+index be35925f..d8407242 100644
 --- a/src/lj_mcode.h
 +++ b/src/lj_mcode.h
 @@ -17,6 +17,7 @@ LJ_FUNC void lj_mcode_sync(void *start, void *end);
@@ -196,10 +196,10 @@ index caaaec61..f4ebe621 100644
  LJ_FUNC void lj_mcode_commit(jit_State *J, MCode *m);
  LJ_FUNC void lj_mcode_abort(jit_State *J);
 diff --git a/src/lj_trace.c b/src/lj_trace.c
-index a0ff8864..9fda7017 100644
+index e019a79f..80d57744 100644
 --- a/src/lj_trace.c
 +++ b/src/lj_trace.c
-@@ -297,8 +297,8 @@ int lj_trace_flushall(lua_State *L)
+@@ -300,8 +300,8 @@ int lj_trace_flushall(lua_State *L)
    J->freetrace = 0;
    /* Clear penalty cache. */
    memset(J->penalty, 0, sizeof(J->penalty));
@@ -210,7 +210,7 @@ index a0ff8864..9fda7017 100644
    memset(J->exitstubgroup, 0, sizeof(J->exitstubgroup));
    lj_vmevent_send(L, TRACE,
      setstrV(L, L->top++, lj_str_newlit(L, "flush"));
-@@ -621,8 +621,9 @@ static int trace_abort(jit_State *J)
+@@ -640,8 +640,9 @@ static int trace_abort(jit_State *J)
    L->top--;  /* Remove error object */
    if (e == LJ_TRERR_DOWNREC)
      return trace_downrec(J);
@@ -222,7 +222,7 @@ index a0ff8864..9fda7017 100644
  }
  
 diff --git a/src/ljamalg.c b/src/ljamalg.c
-index 384b3cc1..c80f6268 100644
+index cae8356c..cbd8e279 100644
 --- a/src/ljamalg.c
 +++ b/src/ljamalg.c
 @@ -18,6 +18,9 @@
