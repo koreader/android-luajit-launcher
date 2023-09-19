@@ -82,6 +82,7 @@ object DeviceInfo {
         ONYX_PALMA,
         ONYX_POKE3,
         ONYX_POKE4,
+        ONYX_POKE5,
         ONYX_POKE4LITE,
         ONYX_POKE_PRO,
         ONYX_TAB_ULTRA,
@@ -124,6 +125,7 @@ object DeviceInfo {
         ONYX_PALMA,
         ONYX_POKE3,
         ONYX_POKE4,
+        ONYX_POKE5,
         ONYX_POKE4LITE,
         ONYX_POKE_PRO,
         ONYX_TAB_ULTRA,
@@ -209,6 +211,7 @@ object DeviceInfo {
     private val ONYX_POKE2: Boolean
     private val ONYX_POKE3: Boolean
     private val ONYX_POKE4: Boolean
+    private val ONYX_POKE5: Boolean
     private val ONYX_POKE4LITE: Boolean
     private val ONYX_POKE_PRO: Boolean
     private val ONYX_TAB_ULTRA: Boolean
@@ -469,6 +472,10 @@ object DeviceInfo {
         ONYX_POKE4 = BRAND.contentEquals("onyx")
             && MODEL.contentEquals("poke4")
 
+        // Onyx Poke 5
+        ONYX_POKE5 = BRAND.contentEquals("onyx")
+            && MODEL.contentEquals("poke5p")
+
         // Onyx Poke 4 lite
         ONYX_POKE4LITE = BRAND.contentEquals("onyx")
             && MODEL.contentEquals("poke4lite")
@@ -596,6 +603,7 @@ object DeviceInfo {
         deviceMap[EinkDevice.ONYX_PALMA] = ONYX_PALMA
         deviceMap[EinkDevice.ONYX_POKE3] = ONYX_POKE3
         deviceMap[EinkDevice.ONYX_POKE4] = ONYX_POKE4
+        deviceMap[EinkDevice.ONYX_POKE5] = ONYX_POKE5
         deviceMap[EinkDevice.ONYX_POKE4LITE] = ONYX_POKE4LITE
         deviceMap[EinkDevice.ONYX_POKE_PRO] = ONYX_POKE_PRO
         deviceMap[EinkDevice.ONYX_TAB_ULTRA] = ONYX_TAB_ULTRA
@@ -646,6 +654,7 @@ object DeviceInfo {
         lightsMap[LightsDevice.ONYX_PALMA] = ONYX_PALMA
         lightsMap[LightsDevice.ONYX_POKE3] = ONYX_POKE3
         lightsMap[LightsDevice.ONYX_POKE4] = ONYX_POKE4
+        lightsMap[LightsDevice.ONYX_POKE5] = ONYX_POKE5
         lightsMap[LightsDevice.ONYX_POKE4LITE] = ONYX_POKE4LITE
         lightsMap[LightsDevice.ONYX_POKE_PRO] = ONYX_POKE_PRO
         lightsMap[LightsDevice.ONYX_TAB_ULTRA] = ONYX_TAB_ULTRA
