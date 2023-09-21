@@ -26,6 +26,7 @@ import org.koreader.launcher.extensions.*
 import java.io.File
 import java.util.Locale
 import java.util.concurrent.CountDownLatch
+import android.content.res.Configuration
 
 class MainActivity : NativeActivity(), LuaInterface,
     ActivityCompat.OnRequestPermissionsResultCallback {
@@ -44,8 +45,9 @@ class MainActivity : NativeActivity(), LuaInterface,
     // Path of last file imported
     private var lastImportedPath: String? = null
 
-    // Device cutout - only used on API 28+
-    private var topInsetHeight: Int = 0
+    // Surface height & width determined at runtime to account for device cutout
+    private var surfaceHeight: Int? = null
+    private var surfaceWidth: Int? = null
 
     // Fullscreen - only used on API levels 16-18
     private var fullscreen: Boolean = true
@@ -164,23 +166,20 @@ class MainActivity : NativeActivity(), LuaInterface,
             "surface changed {\n  width:  %d\n  height: %d\n format: %s\n}",
             width, height, pixelFormatName(format))
         )
-        super.surfaceChanged(holder, format, width, height)
-        drawSplashScreen(holder)
-    }
 
-    override fun onAttachedToWindow() {
-        Log.d(TAG_SURFACE, "onAttachedToWindow()")
-        super.onAttachedToWindow()
-
-        // it seems to be working for Android 13 on emulator
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             val cut = windowManager.defaultDisplay.cutout
-
             if (cut != null && cut.boundingRects.isNotEmpty()) {
-                // TODO: we can handle various kinds of cutouts: getSafeInsetLeft, getSafeInsetRight, getSafeInsetTop, getSafeInsetBottom
-                topInsetHeight = cut.safeInsetTop
+                Log.v(TAG_SURFACE, "Device with cutout")
+                surfaceWidth = width
+                surfaceHeight = height
+                // We need to trigger a new configuration event for KoReader to fix rotation as Surface might be invoked later
+                onConfigurationChanged(Configuration(resources.configuration))
             }
         }
+
+        super.surfaceChanged(holder, format, width, height)
+        drawSplashScreen(holder)
     }
 
     /* Called just before the activity is resumed by an intent */
@@ -436,21 +435,7 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun getScreenHeight(): Int {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            // We need to handle the notch in Portrait
-            // NOTE: getScreenAvailableHeight does it automatically, but it also excludes the nav bar, when there's one :/
-            if (getOrientationCompat(screenIsLandscape).and(1) == 0) {
-                // getScreenOrientation returns LinuxFB rotation constants, Portrait rotations are always even
-                Log.d(TAG_SURFACE, "Height notch setted")
-                getHeight() - topInsetHeight
-            } else {
-                getHeight()
-            }
-        } else {
-            getHeight()
-        }
-
-        return getHeight()
+        return surfaceHeight ?: getHeight()
     }
 
     override fun getScreenMaxBrightness(): Int {
@@ -478,21 +463,7 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun getScreenWidth(): Int {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            // We need to handle the notch in Landscape
-            // NOTE: getScreenAvailableWidth does it automatically, but it also excludes the nav bar, when there's one :/
-            if (getOrientationCompat(screenIsLandscape).and(1) == 1) {
-                // getScreenOrientation returns LinuxFB rotation constants, Landscape rotations are always odd
-                Log.d(TAG_SURFACE, "Width notch setted")
-                getWidth() - topInsetHeight
-            } else {
-                getWidth()
-            }
-        } else {
-            getWidth()
-        }
-
-        return getWidth()
+        return surfaceWidth ?: getWidth()
     }
 
     override fun getStatusBarHeight(): Int {
