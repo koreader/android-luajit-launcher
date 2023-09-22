@@ -49,6 +49,8 @@ class MainActivity : NativeActivity(), LuaInterface,
     private var surfaceHeight: Int? = null
     private var surfaceWidth: Int? = null
 
+    private var onConfigurationChangedCalled = false
+
     // Fullscreen - only used on API levels 16-18
     private var fullscreen: Boolean = true
 
@@ -173,13 +175,22 @@ class MainActivity : NativeActivity(), LuaInterface,
                 Log.v(TAG_SURFACE, "Device with cutout")
                 surfaceWidth = width
                 surfaceHeight = height
-                // We need to trigger a new configuration event for KoReader to fix rotation as Surface might be invoked later
-                onConfigurationChanged(Configuration(resources.configuration))
+
+                // We need to trigger a new configuration event for KoReader to fix rotation when surfaceChanged might be invoked later
+                if (onConfigurationChangedCalled)
+                    onConfigurationChanged(Configuration(resources.configuration))
+
+                onConfigurationChangedCalled = false
             }
         }
 
         super.surfaceChanged(holder, format, width, height)
         drawSplashScreen(holder)
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        onConfigurationChangedCalled = true
     }
 
     /* Called just before the activity is resumed by an intent */
