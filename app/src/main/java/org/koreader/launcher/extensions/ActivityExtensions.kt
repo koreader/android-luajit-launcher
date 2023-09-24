@@ -236,7 +236,7 @@ fun Activity.requestSpecialPermission(intent: Intent, rationale: String,
             .setCancelable(false)
             .setPositiveButton(ok) { _, _ ->
                 startActivity(intent)
-                finishAffinity()
+                finish()
             }
 
         if (cancelButton != null) {
