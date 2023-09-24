@@ -44,13 +44,9 @@ class MainActivity : NativeActivity(), LuaInterface,
     // Path of last file imported
     private var lastImportedPath: String? = null
 
-    // Surface height & width determined at runtime to account for device cutout
-    // ONLY FOR ANDROID 13
-    private var surfaceHeight: Int? = null
-    private var surfaceWidth: Int? = null
-
     // Device cutout - only used on API 28+
-    private var topInsetHeight: Int = 0
+    private var insetsHeight: Int = 0
+    private var insetsWidth: Int = 0
 
     // Fullscreen - only used on API levels 16-18
     private var fullscreen: Boolean = true
@@ -170,12 +166,6 @@ class MainActivity : NativeActivity(), LuaInterface,
             width, height, pixelFormatName(format))
         )
 
-        // ONLY FOR ANDROID 13
-        if (android.os.Build.VERSION.SDK_INT == 33) {
-            surfaceWidth = width
-            surfaceHeight = height
-        }
-
         super.surfaceChanged(holder, format, width, height)
         drawSplashScreen(holder)
     }
@@ -184,26 +174,20 @@ class MainActivity : NativeActivity(), LuaInterface,
         Log.d(TAG_SURFACE, "onAttachedToWindow()")
         super.onAttachedToWindow()
 
-        // ONLY FOR ANDROID 13
-        if (android.os.Build.VERSION.SDK_INT == 33) {
-            // nothing to do
-        }
-        // ONLY FOR ANDROID 14
-        else if (android.os.Build.VERSION.SDK_INT == 34) {
+        if (Build.VERSION.SDK_INT >= 33) {
             val cut = windowManager.defaultDisplay.cutout
             if (cut != null && cut.boundingRects.isNotEmpty()) {
-                // TODO: we can handle various kinds of cutouts: getSafeInsetLeft, getSafeInsetRight, getSafeInsetTop, getSafeInsetBottom
-                topInsetHeight = cut.safeInsetTop
+                insetsHeight = cut.safeInsetTop + cut.safeInsetBottom
             }
         }
         else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             val cut: DisplayCutout? = window.decorView.rootWindowInsets.displayCutout
             if (cut != null) {
                 val cutPixels = cut.safeInsetTop
-                if (topInsetHeight != cutPixels) {
+                if (insetsHeight != cutPixels) {
                     Log.v(TAG_SURFACE,
                         "top $cutPixels pixels are not available, reason: window inset")
-                    topInsetHeight = cutPixels
+                    insetsHeight = cutPixels
                 }
             }
         }
@@ -462,17 +446,12 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun getScreenHeight(): Int {
-        // ONLY FOR ANDROID 13
-        if (android.os.Build.VERSION.SDK_INT == 33) {
-            return surfaceHeight ?: getHeight()
-        }
-
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             // We need to handle the notch in Portrait
             // NOTE: getScreenAvailableHeight does it automatically, but it also excludes the nav bar, when there's one :/
             if (getOrientationCompat(screenIsLandscape).and(1) == 0) {
                 // getScreenOrientation returns LinuxFB rotation constants, Portrait rotations are always even
-                getHeight() - topInsetHeight
+                getHeight() - insetsHeight
             } else {
                 getHeight()
             }
@@ -506,17 +485,12 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun getScreenWidth(): Int {
-        // ONLY FOR ANDROID 13
-        if (android.os.Build.VERSION.SDK_INT == 33) {
-            return surfaceWidth ?: getWidth()
-        }
-
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             // We need to handle the notch in Landscape
             // NOTE: getScreenAvailableWidth does it automatically, but it also excludes the nav bar, when there's one :/
             if (getOrientationCompat(screenIsLandscape).and(1) == 1) {
                 // getScreenOrientation returns LinuxFB rotation constants, Landscape rotations are always odd
-                getWidth() - topInsetHeight
+                getWidth() - insetsHeight
             } else {
                 getWidth()
             }
