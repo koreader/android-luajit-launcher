@@ -44,6 +44,11 @@ class MainActivity : NativeActivity(), LuaInterface,
     // Path of last file imported
     private var lastImportedPath: String? = null
 
+    // Surface height & width determined at runtime to account for device cutout
+    // ONLY FOR ANDROID 13
+    private var surfaceHeight: Int? = null
+    private var surfaceWidth: Int? = null
+
     // Device cutout - only used on API 28+
     private var topInsetHeight: Int = 0
 
@@ -164,6 +169,13 @@ class MainActivity : NativeActivity(), LuaInterface,
             "surface changed {\n  width:  %d\n  height: %d\n format: %s\n}",
             width, height, pixelFormatName(format))
         )
+
+        // ONLY FOR ANDROID 13
+        if (android.os.Build.VERSION.SDK_INT == 33) {
+            surfaceWidth = width
+            surfaceHeight = height
+        }
+
         super.surfaceChanged(holder, format, width, height)
         drawSplashScreen(holder)
     }
@@ -171,7 +183,20 @@ class MainActivity : NativeActivity(), LuaInterface,
     override fun onAttachedToWindow() {
         Log.d(TAG_SURFACE, "onAttachedToWindow()")
         super.onAttachedToWindow()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+
+        // ONLY FOR ANDROID 13
+        if (android.os.Build.VERSION.SDK_INT == 33) {
+            // nothing to do
+        }
+        // ONLY FOR ANDROID 14
+        else if (android.os.Build.VERSION.SDK_INT == 34) {
+            val cut = windowManager.defaultDisplay.cutout
+            if (cut != null && cut.boundingRects.isNotEmpty()) {
+                // TODO: we can handle various kinds of cutouts: getSafeInsetLeft, getSafeInsetRight, getSafeInsetTop, getSafeInsetBottom
+                topInsetHeight = cut.safeInsetTop
+            }
+        }
+        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             val cut: DisplayCutout? = window.decorView.rootWindowInsets.displayCutout
             if (cut != null) {
                 val cutPixels = cut.safeInsetTop
@@ -437,6 +462,11 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun getScreenHeight(): Int {
+        // ONLY FOR ANDROID 13
+        if (android.os.Build.VERSION.SDK_INT == 33) {
+            return surfaceHeight ?: getHeight()
+        }
+
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             // We need to handle the notch in Portrait
             // NOTE: getScreenAvailableHeight does it automatically, but it also excludes the nav bar, when there's one :/
@@ -476,6 +506,11 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun getScreenWidth(): Int {
+        // ONLY FOR ANDROID 13
+        if (android.os.Build.VERSION.SDK_INT == 33) {
+            return surfaceWidth ?: getWidth()
+        }
+
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             // We need to handle the notch in Landscape
             // NOTE: getScreenAvailableWidth does it automatically, but it also excludes the nav bar, when there's one :/
