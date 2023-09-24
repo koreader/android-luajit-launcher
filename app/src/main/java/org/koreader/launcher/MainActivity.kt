@@ -46,7 +46,6 @@ class MainActivity : NativeActivity(), LuaInterface,
 
     // Device cutout - only used on API 28+
     private var insetsHeight: Int = 0
-    private var insetsWidth: Int = 0
 
     // Fullscreen - only used on API levels 16-18
     private var fullscreen: Boolean = true
