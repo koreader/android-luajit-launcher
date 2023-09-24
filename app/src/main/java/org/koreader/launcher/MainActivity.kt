@@ -26,7 +26,6 @@ import org.koreader.launcher.extensions.*
 import java.io.File
 import java.util.Locale
 import java.util.concurrent.CountDownLatch
-import android.content.res.Configuration
 
 class MainActivity : NativeActivity(), LuaInterface,
     ActivityCompat.OnRequestPermissionsResultCallback {
@@ -48,8 +47,6 @@ class MainActivity : NativeActivity(), LuaInterface,
     // Surface height & width determined at runtime to account for device cutout
     private var surfaceHeight: Int? = null
     private var surfaceWidth: Int? = null
-
-    private var onConfigurationChangedCalled = false
 
     // Fullscreen - only used on API levels 16-18
     private var fullscreen: Boolean = true
@@ -175,22 +172,11 @@ class MainActivity : NativeActivity(), LuaInterface,
                 Log.v(TAG_SURFACE, "Device with cutout")
                 surfaceWidth = width
                 surfaceHeight = height
-
-                // We need to trigger a new configuration event for KoReader to fix rotation when surfaceChanged might be invoked later
-                if (onConfigurationChangedCalled)
-                    onConfigurationChanged(Configuration(resources.configuration))
-
-                onConfigurationChangedCalled = false
             }
         }
 
         super.surfaceChanged(holder, format, width, height)
         drawSplashScreen(holder)
-    }
-
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        onConfigurationChangedCalled = true
     }
 
     /* Called just before the activity is resumed by an intent */
