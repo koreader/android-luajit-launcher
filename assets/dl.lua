@@ -54,6 +54,9 @@ end
 local dl = {
     -- set this to search in certain directories
     library_path = '/lib/?;/usr/lib/?;/usr/local/lib/?',
+    -- set this to the directory of system libraries
+    -- (to be ignored when loading dependencies).
+    system_libdir = nil,
 }
 
 local function sys_dlopen(library, global, padding)
@@ -114,7 +117,7 @@ function dl.dlopen(library, load_func, depth)
             -- libvulkan, and libz
             -- c.f., https://android.googlesource.com/platform/bionic/+/master/android-changes-for-ndk-developers.md#private-api-enforced-for-api-level-24
             -- Our current code should *never* hit any private system libs, so, this is basically overkill ;).
-            if depth > 0 and (pspec == "/system/lib" or library == "libdl.so") then
+            if depth > 0 and (pspec == dl.system_libdir or library == "libdl.so") then
                 -- depth > 0 to allow explicitly loading a system lib
                 -- (because this might have genuine use cases, as some early API levels do not put DT_NEEDED libraries into the global namespace)
                 -- pspec to reject system libs
