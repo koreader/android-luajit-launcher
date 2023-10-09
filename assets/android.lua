@@ -2654,9 +2654,10 @@ local function run(android_app_state)
 
     -- load the dlopen() implementation
     android.dl = require("dl")
+    android.dl.system_libdir = ffi.abi("64bit") and "/system/lib64" or "/system/lib"
     android.dl.library_path = android.nativeLibraryDir..":"..
         android.dir..":"..android.dir.."/libs:"..
-        "/lib:/system/lib:/lib/lib?.so:/system/lib/lib?.so"
+        string.gsub("@:@/lib?.so", "@", android.dl.system_libdir)
 
     -- register the dependency lib loader
     table.insert(package.loaders, 3, android.deplib_loader)
