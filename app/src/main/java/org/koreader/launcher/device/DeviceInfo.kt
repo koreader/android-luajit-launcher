@@ -71,6 +71,7 @@ object DeviceInfo {
         ONYX_NOTE_AIR2,
         ONYX_NOTE_PRO,
         ONYX_NOTE_X2,
+        ONYX_NOVA,
         ONYX_NOVA2,
         ONYX_NOVA3,
         ONYX_NOVA3_COLOR,
@@ -114,6 +115,7 @@ object DeviceInfo {
         ONYX_NOTE_AIR2,
         ONYX_NOTE_PRO,
         ONYX_NOTE_X2,
+        ONYX_NOVA,
         ONYX_NOVA2,
         ONYX_NOVA3,
         ONYX_NOVA3_COLOR,
@@ -199,6 +201,7 @@ object DeviceInfo {
     private val ONYX_NOTE_AIR2: Boolean
     private val ONYX_NOTE_PRO: Boolean
     private val ONYX_NOTE_X2: Boolean
+    private val ONYX_NOVA: Boolean
     private val ONYX_NOVA2: Boolean
     private val ONYX_NOVA3: Boolean
     private val ONYX_NOVA3_COLOR: Boolean
@@ -421,6 +424,11 @@ object DeviceInfo {
         ONYX_NOTE_X2 = MANUFACTURER.contentEquals("onyx")
             && MODEL.contentEquals("notex2")
 
+        // Onyx Nova
+        ONYX_NOVA = MANUFACTURER.contentEquals("onyx")
+            && PRODUCT.contentEquals("nova")
+            && DEVICE.contentEquals("nova")
+
         // Onyx Nova 2
         ONYX_NOVA2 = MANUFACTURER.contentEquals("onyx")
             && PRODUCT.contentEquals("nova2")
@@ -592,6 +600,7 @@ object DeviceInfo {
         deviceMap[EinkDevice.ONYX_NOTE_AIR2] = ONYX_NOTE_AIR2
         deviceMap[EinkDevice.ONYX_NOTE_PRO] = ONYX_NOTE_PRO
         deviceMap[EinkDevice.ONYX_NOTE_X2] = ONYX_NOTE_X2
+        deviceMap[EinkDevice.ONYX_NOVA] = ONYX_NOVA
         deviceMap[EinkDevice.ONYX_NOVA2] = ONYX_NOVA2
         deviceMap[EinkDevice.ONYX_NOVA3] = ONYX_NOVA3
         deviceMap[EinkDevice.ONYX_NOVA3_COLOR] = ONYX_NOVA3_COLOR
@@ -643,6 +652,7 @@ object DeviceInfo {
         lightsMap[LightsDevice.ONYX_NOTE_AIR] = ONYX_NOTE_AIR
         lightsMap[LightsDevice.ONYX_NOTE_AIR2] = ONYX_NOTE_AIR2
         lightsMap[LightsDevice.ONYX_NOTE_X2] = ONYX_NOTE_X2
+        lightsMap[LightsDevice.ONYX_NOVA] = ONYX_NOVA
         lightsMap[LightsDevice.ONYX_NOVA2] = ONYX_NOVA2
         lightsMap[LightsDevice.ONYX_NOVA3] = ONYX_NOVA3
         lightsMap[LightsDevice.ONYX_NOVA3_COLOR] = ONYX_NOVA3_COLOR
