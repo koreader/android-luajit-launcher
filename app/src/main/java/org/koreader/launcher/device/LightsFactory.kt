@@ -17,6 +17,7 @@ object LightsFactory {
                 DeviceInfo.LightsDevice.MEEBOOK_P6,
                 DeviceInfo.LightsDevice.RIDI_PAPER_3,
                 DeviceInfo.LightsDevice.TOLINO_SHINE3,
+                DeviceInfo.LightsDevice.TOLINO_VISION4,
                 DeviceInfo.LightsDevice.TOLINO_VISION5 -> {
                     logController("TolinoNTX")
                     TolinoNtxController()
