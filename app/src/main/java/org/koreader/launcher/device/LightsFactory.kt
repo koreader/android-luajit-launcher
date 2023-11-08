@@ -17,6 +17,7 @@ object LightsFactory {
                 DeviceInfo.LightsDevice.MEEBOOK_P6,
                 DeviceInfo.LightsDevice.RIDI_PAPER_3,
                 DeviceInfo.LightsDevice.TOLINO_SHINE3,
+                DeviceInfo.LightsDevice.TOLINO_VISION4,
                 DeviceInfo.LightsDevice.TOLINO_VISION5 -> {
                     logController("TolinoNTX")
                     TolinoNtxController()
@@ -42,11 +43,13 @@ object LightsFactory {
                 DeviceInfo.LightsDevice.ONYX_DARWIN9,
                 DeviceInfo.LightsDevice.ONYX_NOTE_AIR2,
                 DeviceInfo.LightsDevice.ONYX_NOTE_X2,
+                DeviceInfo.LightsDevice.ONYX_NOVA,
                 DeviceInfo.LightsDevice.ONYX_NOVA2,
                 DeviceInfo.LightsDevice.ONYX_NOVA_AIR_2,
                 DeviceInfo.LightsDevice.ONYX_NOVA_AIR_C,
                 DeviceInfo.LightsDevice.ONYX_PAGE,
                 DeviceInfo.LightsDevice.ONYX_POKE4,
+                DeviceInfo.LightsDevice.ONYX_POKE5,
                 DeviceInfo.LightsDevice.ONYX_POKE4LITE,
                 DeviceInfo.LightsDevice.ONYX_TAB_ULTRA,
                 DeviceInfo.LightsDevice.ONYX_TAB_ULTRA_C -> {
