@@ -133,6 +133,7 @@ object DeviceInfo {
         TAGUS_GEA,
         TOLINO_EPOS,
         TOLINO_SHINE3,
+        TOLINO_VISION4,
         TOLINO_VISION5
     }
 
@@ -221,6 +222,7 @@ object DeviceInfo {
     private val TAGUS_GEA: Boolean
     private val TOLINO_EPOS: Boolean
     private val TOLINO_SHINE3: Boolean
+    private val TOLINO_VISION4: Boolean
     private val TOLINO_VISION5: Boolean
 
     init {
@@ -510,11 +512,12 @@ object DeviceInfo {
             || MODEL.contentEquals("tolino") && (DEVICE.contentEquals("tolino_vision2")
             || DEVICE.contentEquals("ntx_6sl"))
 
-        // Tolino Epos 2 and Tolino Vision 4 also have warmth lights
+        // Tolino Epos 2 also have warmth lights
         TOLINO_EPOS = BRAND.contentEquals("rakutenkobo")
             && MODEL.contentEquals("tolino")
             && DEVICE.contentEquals("ntx_6sl")
             && !HARDWARE.contentEquals("e60k00")
+            && !HARDWARE.contentEquals("e60q50")
             && !HARDWARE.contentEquals("e70k00")
 
         // Tolino Shine 3 also has warmth lights, but with ntx_io file
@@ -522,6 +525,12 @@ object DeviceInfo {
             && MODEL.contentEquals("tolino")
             && DEVICE.contentEquals("ntx_6sl")
             && HARDWARE.contentEquals("e60k00")
+
+        // Tolino Vision 4 also has warmth lights, but with ntx_io file
+        TOLINO_VISION4 = BRAND.contentEquals("rakutenkobo")
+            && MODEL.contentEquals("tolino")
+            && DEVICE.contentEquals("ntx_6sl")
+            && HARDWARE.contentEquals("e60q50")
 
         // Tolino Vision 5 also has warmth lights, but with ntx_io file
         TOLINO_VISION5 = BRAND.contentEquals("rakutenkobo")
@@ -662,6 +671,7 @@ object DeviceInfo {
         lightsMap[LightsDevice.TAGUS_GEA] = TAGUS_GEA
         lightsMap[LightsDevice.TOLINO_EPOS] = TOLINO_EPOS
         lightsMap[LightsDevice.TOLINO_SHINE3] = TOLINO_SHINE3
+        lightsMap[LightsDevice.TOLINO_VISION4] = TOLINO_VISION4
         lightsMap[LightsDevice.TOLINO_VISION5] = TOLINO_VISION5
 
         lightsMap.keys.iterator().run {
