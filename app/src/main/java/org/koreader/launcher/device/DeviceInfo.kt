@@ -71,6 +71,7 @@ object DeviceInfo {
         ONYX_NOTE_AIR2,
         ONYX_NOTE_PRO,
         ONYX_NOTE_X2,
+        ONYX_NOVA,
         ONYX_NOVA2,
         ONYX_NOVA3,
         ONYX_NOVA3_COLOR,
@@ -79,8 +80,10 @@ object DeviceInfo {
         ONYX_NOVA_AIR_C,
         ONYX_NOVA_PRO,
         ONYX_PAGE,
+        ONYX_PALMA,
         ONYX_POKE3,
         ONYX_POKE4,
+        ONYX_POKE5,
         ONYX_POKE4LITE,
         ONYX_POKE_PRO,
         ONYX_TAB_ULTRA,
@@ -113,6 +116,7 @@ object DeviceInfo {
         ONYX_NOTE_AIR2,
         ONYX_NOTE_PRO,
         ONYX_NOTE_X2,
+        ONYX_NOVA,
         ONYX_NOVA2,
         ONYX_NOVA3,
         ONYX_NOVA3_COLOR,
@@ -121,16 +125,18 @@ object DeviceInfo {
         ONYX_NOVA_AIR_C,
         ONYX_NOVA_PRO,
         ONYX_PAGE,
+        ONYX_PALMA,
         ONYX_POKE3,
         ONYX_POKE4,
+        ONYX_POKE5,
         ONYX_POKE4LITE,
         ONYX_POKE_PRO,
         ONYX_TAB_ULTRA,
-        ONYX_TAB_ULTRA_C,
         RIDI_PAPER_3,
         TAGUS_GEA,
         TOLINO_EPOS,
         TOLINO_SHINE3,
+        TOLINO_VISION4,
         TOLINO_VISION5
     }
 
@@ -197,6 +203,7 @@ object DeviceInfo {
     private val ONYX_NOTE_AIR2: Boolean
     private val ONYX_NOTE_PRO: Boolean
     private val ONYX_NOTE_X2: Boolean
+    private val ONYX_NOVA: Boolean
     private val ONYX_NOVA2: Boolean
     private val ONYX_NOVA3: Boolean
     private val ONYX_NOVA3_COLOR: Boolean
@@ -205,9 +212,11 @@ object DeviceInfo {
     private val ONYX_NOVA_AIR_C: Boolean
     private val ONYX_NOVA_PRO: Boolean
     private val ONYX_PAGE: Boolean
+    private val ONYX_PALMA: Boolean
     private val ONYX_POKE2: Boolean
     private val ONYX_POKE3: Boolean
     private val ONYX_POKE4: Boolean
+    private val ONYX_POKE5: Boolean
     private val ONYX_POKE4LITE: Boolean
     private val ONYX_POKE_PRO: Boolean
     private val ONYX_TAB_ULTRA: Boolean
@@ -218,6 +227,7 @@ object DeviceInfo {
     private val TAGUS_GEA: Boolean
     private val TOLINO_EPOS: Boolean
     private val TOLINO_SHINE3: Boolean
+    private val TOLINO_VISION4: Boolean
     private val TOLINO_VISION5: Boolean
 
     init {
@@ -418,6 +428,11 @@ object DeviceInfo {
         ONYX_NOTE_X2 = MANUFACTURER.contentEquals("onyx")
             && MODEL.contentEquals("notex2")
 
+        // Onyx Nova
+        ONYX_NOVA = MANUFACTURER.contentEquals("onyx")
+            && PRODUCT.contentEquals("nova")
+            && DEVICE.contentEquals("nova")
+
         // Onyx Nova 2
         ONYX_NOVA2 = MANUFACTURER.contentEquals("onyx")
             && PRODUCT.contentEquals("nova2")
@@ -452,6 +467,10 @@ object DeviceInfo {
         ONYX_PAGE = BRAND.contentEquals("onyx")
             && MODEL.contentEquals("page")
 
+        // Onyx Palma
+        ONYX_PALMA = BRAND.contentEquals("onyx")
+            && MODEL.contentEquals("palma")
+
         // Onyx Poke 2
         ONYX_POKE2 = MANUFACTURER.contentEquals("onyx")
             && PRODUCT.contentEquals("poke2")
@@ -464,6 +483,10 @@ object DeviceInfo {
         // Onyx Poke 4
         ONYX_POKE4 = BRAND.contentEquals("onyx")
             && MODEL.contentEquals("poke4")
+
+        // Onyx Poke 5
+        ONYX_POKE5 = BRAND.contentEquals("onyx")
+            && MODEL.contentEquals("poke5p")
 
         // Onyx Poke 4 lite
         ONYX_POKE4LITE = BRAND.contentEquals("onyx")
@@ -503,11 +526,12 @@ object DeviceInfo {
             || MODEL.contentEquals("tolino") && (DEVICE.contentEquals("tolino_vision2")
             || DEVICE.contentEquals("ntx_6sl"))
 
-        // Tolino Epos 2 and Tolino Vision 4 also have warmth lights
+        // Tolino Epos 2 also have warmth lights
         TOLINO_EPOS = BRAND.contentEquals("rakutenkobo")
             && MODEL.contentEquals("tolino")
             && DEVICE.contentEquals("ntx_6sl")
             && !HARDWARE.contentEquals("e60k00")
+            && !HARDWARE.contentEquals("e60q50")
             && !HARDWARE.contentEquals("e70k00")
 
         // Tolino Shine 3 also has warmth lights, but with ntx_io file
@@ -515,6 +539,12 @@ object DeviceInfo {
             && MODEL.contentEquals("tolino")
             && DEVICE.contentEquals("ntx_6sl")
             && HARDWARE.contentEquals("e60k00")
+
+        // Tolino Vision 4 also has warmth lights, but with ntx_io file
+        TOLINO_VISION4 = BRAND.contentEquals("rakutenkobo")
+            && MODEL.contentEquals("tolino")
+            && DEVICE.contentEquals("ntx_6sl")
+            && HARDWARE.contentEquals("e60q50")
 
         // Tolino Vision 5 also has warmth lights, but with ntx_io file
         TOLINO_VISION5 = BRAND.contentEquals("rakutenkobo")
@@ -585,6 +615,7 @@ object DeviceInfo {
         deviceMap[EinkDevice.ONYX_NOTE_AIR2] = ONYX_NOTE_AIR2
         deviceMap[EinkDevice.ONYX_NOTE_PRO] = ONYX_NOTE_PRO
         deviceMap[EinkDevice.ONYX_NOTE_X2] = ONYX_NOTE_X2
+        deviceMap[EinkDevice.ONYX_NOVA] = ONYX_NOVA
         deviceMap[EinkDevice.ONYX_NOVA2] = ONYX_NOVA2
         deviceMap[EinkDevice.ONYX_NOVA3] = ONYX_NOVA3
         deviceMap[EinkDevice.ONYX_NOVA3_COLOR] = ONYX_NOVA3_COLOR
@@ -593,8 +624,10 @@ object DeviceInfo {
         deviceMap[EinkDevice.ONYX_NOVA_AIR_C] = ONYX_NOVA_AIR_C
         deviceMap[EinkDevice.ONYX_NOVA_PRO] = ONYX_NOVA_PRO
         deviceMap[EinkDevice.ONYX_PAGE] = ONYX_PAGE
+        deviceMap[EinkDevice.ONYX_PALMA] = ONYX_PALMA
         deviceMap[EinkDevice.ONYX_POKE3] = ONYX_POKE3
         deviceMap[EinkDevice.ONYX_POKE4] = ONYX_POKE4
+        deviceMap[EinkDevice.ONYX_POKE5] = ONYX_POKE5
         deviceMap[EinkDevice.ONYX_POKE4LITE] = ONYX_POKE4LITE
         deviceMap[EinkDevice.ONYX_POKE_PRO] = ONYX_POKE_PRO
         deviceMap[EinkDevice.ONYX_TAB_ULTRA] = ONYX_TAB_ULTRA
@@ -635,6 +668,7 @@ object DeviceInfo {
         lightsMap[LightsDevice.ONYX_NOTE_AIR] = ONYX_NOTE_AIR
         lightsMap[LightsDevice.ONYX_NOTE_AIR2] = ONYX_NOTE_AIR2
         lightsMap[LightsDevice.ONYX_NOTE_X2] = ONYX_NOTE_X2
+        lightsMap[LightsDevice.ONYX_NOVA] = ONYX_NOVA
         lightsMap[LightsDevice.ONYX_NOVA2] = ONYX_NOVA2
         lightsMap[LightsDevice.ONYX_NOVA3] = ONYX_NOVA3
         lightsMap[LightsDevice.ONYX_NOVA3_COLOR] = ONYX_NOVA3_COLOR
@@ -643,16 +677,18 @@ object DeviceInfo {
         lightsMap[LightsDevice.ONYX_NOVA_AIR_C] = ONYX_NOVA_AIR_C
         lightsMap[LightsDevice.ONYX_NOVA_PRO] = ONYX_NOVA_PRO
         lightsMap[LightsDevice.ONYX_PAGE] = ONYX_PAGE
+        lightsMap[LightsDevice.ONYX_PALMA] = ONYX_PALMA
         lightsMap[LightsDevice.ONYX_POKE3] = ONYX_POKE3
         lightsMap[LightsDevice.ONYX_POKE4] = ONYX_POKE4
+        lightsMap[LightsDevice.ONYX_POKE5] = ONYX_POKE5
         lightsMap[LightsDevice.ONYX_POKE4LITE] = ONYX_POKE4LITE
         lightsMap[LightsDevice.ONYX_POKE_PRO] = ONYX_POKE_PRO
         lightsMap[LightsDevice.ONYX_TAB_ULTRA] = ONYX_TAB_ULTRA
-        lightsMap[LightsDevice.ONYX_TAB_ULTRA_C] = ONYX_TAB_ULTRA_C
         lightsMap[LightsDevice.RIDI_PAPER_3] = RIDI_PAPER_3
         lightsMap[LightsDevice.TAGUS_GEA] = TAGUS_GEA
         lightsMap[LightsDevice.TOLINO_EPOS] = TOLINO_EPOS
         lightsMap[LightsDevice.TOLINO_SHINE3] = TOLINO_SHINE3
+        lightsMap[LightsDevice.TOLINO_VISION4] = TOLINO_VISION4
         lightsMap[LightsDevice.TOLINO_VISION5] = TOLINO_VISION5
 
         lightsMap.keys.iterator().run {
@@ -695,8 +731,8 @@ object DeviceInfo {
         HAS_COLOR_SCREEN = when (EINK) {
             EinkDevice.NONE,
             EinkDevice.ONYX_NOVA3_COLOR,
-            EinkDevice.ONYX_NOVA_AIR_C,
-            EinkDevice.ONYX_TAB_ULTRA_C -> true
+            EinkDevice.ONYX_TAB_ULTRA_C,
+            EinkDevice.ONYX_NOVA_AIR_C -> true
             else -> false
         }
     }
