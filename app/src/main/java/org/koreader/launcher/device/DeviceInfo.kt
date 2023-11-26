@@ -93,7 +93,8 @@ object DeviceInfo {
         SONY_CP1,
         SONY_RP1,
         TAGUS_GEA,
-        TOLINO
+        TOLINO,
+        NGL4
     }
 
     enum class LightsDevice {
@@ -186,6 +187,7 @@ object DeviceInfo {
     private val MEEBOOK_P6: Boolean
     private val NABUK_REGAL_HD: Boolean
     private val NOOK: Boolean
+    private val NGL4: Boolean
     private val ONYX_C67: Boolean
     private val ONYX_DARWIN7: Boolean
     private val ONYX_DARWIN9: Boolean
@@ -339,6 +341,10 @@ object DeviceInfo {
         NOOK = (MANUFACTURER.contentEquals("barnesandnoble") || MANUFACTURER.contentEquals("freescale"))
             && (MODEL.contentEquals("bnrv510") || MODEL.contentEquals("bnrv520") || MODEL.contentEquals("bnrv700")
             || MODEL.contentEquals("evk_mx6sl") || MODEL.startsWith("ereader"))
+
+        // Nook Glowlight 4  (4/4e/4plus)
+        NGL4 = (MANUFACTURER.contentEquals("barnesandnoble"))
+            && (MODEL.contentEquals("bnrv1000") || MODEL.contentEquals("bnrv1100") || MODEL.contentEquals("bnrv1300"))
 
         // Onyx C67
         ONYX_C67 = MANUFACTURER.contentEquals("onyx")
@@ -603,6 +609,7 @@ object DeviceInfo {
         deviceMap[EinkDevice.MEEBOOK_P6] = MEEBOOK_P6
         deviceMap[EinkDevice.NABUK] = NABUK_REGAL_HD
         deviceMap[EinkDevice.NOOK] = NOOK
+        deviceMap[EinkDevice.NGL4] = NGL4
         deviceMap[EinkDevice.ONYX_C67] = ONYX_C67
         deviceMap[EinkDevice.ONYX_DARWIN7] = ONYX_DARWIN7
         deviceMap[EinkDevice.ONYX_DARWIN9] = ONYX_DARWIN9
