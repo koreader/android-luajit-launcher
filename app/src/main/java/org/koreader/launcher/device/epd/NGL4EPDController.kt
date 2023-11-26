@@ -14,11 +14,8 @@ class NGL4EPDController : NTXEPDController(), EPDInterface {
     companion object {
         private const val NGL4TAG = "NGL4"
 
-        //const val NGL4_UI_FULL_REFRESH = -2147483644
-
         // constants taken as is from sunxi-kobo.h (NGL4 prefix insered for names)
-        // Reverse-engineering and tests showed that the constants are identical 
-
+      
         const val NGL4_EINK_INIT_MODE = 0x01
         const val NGL4_EINK_DU_MODE = 0x02
         const val NGL4_EINK_GC16_MODE = 0x04
@@ -43,7 +40,7 @@ class NGL4EPDController : NTXEPDController(), EPDInterface {
         const val NGL4_EINK_DITHERING_Y4 = 0x02800000
         const val NGL4_EINK_DITHERING_SIMPLE = 0x04800000
         const val NGL4_EINK_DITHERING_NTX_Y1 = 0x08800000
-        const val NGL4_EINK_NO_MERGE = Integer.MIN_VALUE //0x80000000
+        const val NGL4_EINK_NO_MERGE = Integer.MIN_VALUE // 0x80000000
 
         const val NGL4_PAGE_DELAY = 0
         const val NGL4_UI_DELAY = 0
@@ -56,7 +53,6 @@ class NGL4EPDController : NTXEPDController(), EPDInterface {
 
     override fun getMode(): String {
        return "full-only"
-       // return "all"
     }
 
     override fun getWaveformFull(): Int {
@@ -67,7 +63,6 @@ class NGL4EPDController : NTXEPDController(), EPDInterface {
 
     override fun getWaveformPartial(): Int {
         return NGL4_EINK_GU16_MODE
-        //return NGL4_UPDATE_PARTIAL + NGL4_EINK_GC16_MODE
     }
 
     override fun getWaveformFullUi(): Int {
@@ -76,13 +71,10 @@ class NGL4EPDController : NTXEPDController(), EPDInterface {
 
     override fun getWaveformPartialUi(): Int {
        return NGL4_EINK_GLR16_MODE
-       // return NGL4_UPDATE_PARTIAL + NGL4_EINK_GLR16_MODE
     }
 
     override fun getWaveformFast(): Int {
         return NGL4_EINK_A2_MODE;
-        //return NGL4_UPDATE_PARTIAL + NGL4_EINK_DU_MODE
-        //return NGL4_UPDATE_PARTIAL + NGL4_EINK_A2_MODE + NGL4_EINK_DITHERING_Y4
     }
 
     // the delays below are effectively not used because of the method involved
@@ -112,7 +104,6 @@ class NGL4EPDController : NTXEPDController(), EPDInterface {
         try {
           Log.i(NGL4TAG, String.format(Locale.US, "setEpdMode to addEpdc: type:%d x:%d y:%d w:%d h:%d",
             mode, x, y, width, height))
-
 
           val iArr = intArrayOf(x, y, width, height, mode)
 
