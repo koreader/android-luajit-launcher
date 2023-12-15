@@ -135,8 +135,6 @@ class MainActivity : NativeActivity(), LuaInterface,
         if (!hasMandatoryPermissions()) {
             requestMandatoryPermissions()
         }
-
-        device.epd.create()
     }
 
     /* Called when the activity has become visible. */
