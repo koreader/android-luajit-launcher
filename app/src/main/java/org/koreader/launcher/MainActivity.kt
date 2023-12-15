@@ -135,6 +135,8 @@ class MainActivity : NativeActivity(), LuaInterface,
         if (!hasMandatoryPermissions()) {
             requestMandatoryPermissions()
         }
+
+        device.epd.create()
     }
 
     /* Called when the activity has become visible. */
@@ -177,9 +179,10 @@ class MainActivity : NativeActivity(), LuaInterface,
             val cut = windowManager.defaultDisplay.cutout
             if (cut != null && cut.boundingRects.isNotEmpty()) {
                 insetsHeight = cut.safeInsetTop + cut.safeInsetBottom
+                Log.v(TAG_SURFACE,
+                    "edges $insetsHeight pixels are not available, reason: window inset")
             }
-        }
-        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             val cut: DisplayCutout? = window.decorView.rootWindowInsets.displayCutout
             if (cut != null) {
                 val cutPixels = cut.safeInsetTop
