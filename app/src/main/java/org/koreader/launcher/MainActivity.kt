@@ -173,25 +173,20 @@ class MainActivity : NativeActivity(), LuaInterface,
         Log.d(TAG_SURFACE, "onAttachedToWindow()")
         super.onAttachedToWindow()
 
-        if (Build.VERSION.SDK_INT >= 33) {
-            val cut = windowManager.defaultDisplay.cutout
-            if (cut != null && cut.boundingRects.isNotEmpty()) {
-                val cutPixels = cut.safeInsetTop
-                if (topInsetHeight != cutPixels) {
-                    Log.v(TAG_SURFACE,
-                        "top $cutPixels pixels are not available, reason: window inset")
-                    topInsetHeight = cutPixels
-                }
-            }
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            val cut: DisplayCutout? = window.decorView.rootWindowInsets.displayCutout
-            if (cut != null) {
-                val cutPixels = cut.safeInsetTop
-                if (topInsetHeight != cutPixels) {
-                    Log.v(TAG_SURFACE,
-                        "top $cutPixels pixels are not available, reason: window inset")
-                    topInsetHeight = cutPixels
-                }
+        val cut = when {
+            Build.VERSION.SDK_INT >= 33 -> {
+                windowManager.defaultDisplay.cutout as? DisplayCutout
+            } Build.VERSION.SDK_INT >= Build.VERSION_CODES.P -> {
+                window.decorView.rootWindowInsets?.displayCutout as? DisplayCutout
+            } else -> null
+        }
+
+        if (cut != null) {
+            val cutPixels = cut.safeInsetTop
+            if (topInsetHeight != cutPixels) {
+                Log.v(TAG_SURFACE,
+                    "top $cutPixels pixels are not available, reason: window inset")
+                topInsetHeight = cutPixels
             }
         }
     }
