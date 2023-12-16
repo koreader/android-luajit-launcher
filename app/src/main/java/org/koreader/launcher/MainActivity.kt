@@ -45,7 +45,7 @@ class MainActivity : NativeActivity(), LuaInterface,
     private var lastImportedPath: String? = null
 
     // Device cutout - only used on API 28+
-    private var insetsHeight: Int = 0
+    private var topInsetHeight: Int = 0
 
     // Fullscreen - only used on API levels 16-18
     private var fullscreen: Boolean = true
@@ -176,18 +176,21 @@ class MainActivity : NativeActivity(), LuaInterface,
         if (Build.VERSION.SDK_INT >= 33) {
             val cut = windowManager.defaultDisplay.cutout
             if (cut != null && cut.boundingRects.isNotEmpty()) {
-                insetsHeight = cut.safeInsetTop + cut.safeInsetBottom
-                Log.v(TAG_SURFACE,
-                    "edges $insetsHeight pixels are not available, reason: window inset")
+                val cutPixels = cut.safeInsetTop
+                if (topInsetHeight != cutPixels) {
+                    Log.v(TAG_SURFACE,
+                        "top $cutPixels pixels are not available, reason: window inset")
+                    topInsetHeight = cutPixels
+                }
             }
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             val cut: DisplayCutout? = window.decorView.rootWindowInsets.displayCutout
             if (cut != null) {
                 val cutPixels = cut.safeInsetTop
-                if (insetsHeight != cutPixels) {
+                if (topInsetHeight != cutPixels) {
                     Log.v(TAG_SURFACE,
                         "top $cutPixels pixels are not available, reason: window inset")
-                    insetsHeight = cutPixels
+                    topInsetHeight = cutPixels
                 }
             }
         }
@@ -451,7 +454,7 @@ class MainActivity : NativeActivity(), LuaInterface,
             // NOTE: getScreenAvailableHeight does it automatically, but it also excludes the nav bar, when there's one :/
             if (getOrientationCompat(screenIsLandscape).and(1) == 0) {
                 // getScreenOrientation returns LinuxFB rotation constants, Portrait rotations are always even
-                getHeight() - insetsHeight
+                getHeight() - topInsetHeight
             } else {
                 getHeight()
             }
@@ -490,7 +493,7 @@ class MainActivity : NativeActivity(), LuaInterface,
             // NOTE: getScreenAvailableWidth does it automatically, but it also excludes the nav bar, when there's one :/
             if (getOrientationCompat(screenIsLandscape).and(1) == 1) {
                 // getScreenOrientation returns LinuxFB rotation constants, Landscape rotations are always odd
-                getWidth() - insetsHeight
+                getWidth() - topInsetHeight
             } else {
                 getWidth()
             }
