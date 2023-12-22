@@ -87,6 +87,7 @@ object DeviceInfo {
         ONYX_POKE4LITE,
         ONYX_POKE_PRO,
         ONYX_TAB_ULTRA,
+        ONYX_TAB_ULTRA_C,
         RIDI_PAPER_3,
         SONY_CP1,
         SONY_RP1,
@@ -219,6 +220,7 @@ object DeviceInfo {
     private val ONYX_POKE4LITE: Boolean
     private val ONYX_POKE_PRO: Boolean
     private val ONYX_TAB_ULTRA: Boolean
+    private val ONYX_TAB_ULTRA_C: Boolean
     private val RIDI_PAPER_3: Boolean
     private val SONY_CP1: Boolean
     private val SONY_RP1: Boolean
@@ -498,6 +500,10 @@ object DeviceInfo {
         ONYX_TAB_ULTRA = MANUFACTURER.contentEquals("onyx")
             && MODEL.contentEquals("tabultra")
 
+        // Onyx Tab Ultra C
+        ONYX_TAB_ULTRA_C = MANUFACTURER.contentEquals("onyx")
+            && MODEL.contentEquals("tabultrac")
+
         // Ridi Paper 3
         RIDI_PAPER_3 = BRAND.contentEquals("ridi")
             && MODEL.contentEquals("ridipaper")
@@ -625,6 +631,7 @@ object DeviceInfo {
         deviceMap[EinkDevice.ONYX_POKE4LITE] = ONYX_POKE4LITE
         deviceMap[EinkDevice.ONYX_POKE_PRO] = ONYX_POKE_PRO
         deviceMap[EinkDevice.ONYX_TAB_ULTRA] = ONYX_TAB_ULTRA
+        deviceMap[EinkDevice.ONYX_TAB_ULTRA_C] = ONYX_TAB_ULTRA_C
         deviceMap[EinkDevice.RIDI_PAPER_3] = RIDI_PAPER_3
         deviceMap[EinkDevice.SONY_CP1] = SONY_CP1
         deviceMap[EinkDevice.SONY_RP1] = SONY_RP1
@@ -724,6 +731,7 @@ object DeviceInfo {
         HAS_COLOR_SCREEN = when (EINK) {
             EinkDevice.NONE,
             EinkDevice.ONYX_NOVA3_COLOR,
+            EinkDevice.ONYX_TAB_ULTRA_C,
             EinkDevice.ONYX_NOVA_AIR_C -> true
             else -> false
         }
