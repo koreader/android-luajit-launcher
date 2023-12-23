@@ -6,7 +6,6 @@ import org.koreader.launcher.device.LightsInterface
 import android.content.Context
 import java.lang.Class.forName
 import java.lang.reflect.Method
-import android.content.Intent
 
 class OnyxUltraCLightsController : LightsInterface {
     companion object {
@@ -17,7 +16,7 @@ class OnyxUltraCLightsController : LightsInterface {
     }
 
     override fun getPlatform(): String {
-        return "onyx-ultrac"
+        return "onyx-ultrac-lights"
     }
 
     override fun hasFallback(): Boolean {
@@ -42,27 +41,11 @@ class OnyxUltraCLightsController : LightsInterface {
 
     override fun setBrightness(activity: Activity, brightness: Int) {
         if (brightness < MIN || brightness > BRIGHTNESS_MAX) {
-            Log.w(TAG, "Brightness value out of range: $brightness")
+            Log.w(TAG, "brightness value of of range: $brightness")
             return
         }
-
-        val actualBrightness = getBrightness(activity).takeIf { it != -1 } ?: return
-
-        val intent = when {
-            brightness > actualBrightness -> Intent("onyx.action.BRIGHTNESS_UP")
-            brightness < actualBrightness -> Intent("onyx.action.RIGHTNESS_DOWN")
-            else -> {
-                return
-            }
-        }
-
-        val diff = kotlin.math.abs(brightness - actualBrightness)
-
-        repeat(diff) {
-            activity.sendBroadcast(intent)
-        }
-
         Log.v(TAG, "Setting brightness to $brightness")
+        FrontLightUltraC.setCold(brightness, activity)
     }
 
     override fun setWarmth(activity: Activity, warmth: Int) {
@@ -70,24 +53,8 @@ class OnyxUltraCLightsController : LightsInterface {
             Log.w(TAG, "warmth value of of range: $warmth")
             return
         }
-
-        val actualBrightness = getWarmth(activity).takeIf { it != -1 } ?: return
-
-        val intent = when {
-            warmth > actualBrightness -> Intent("onyx.action.TEMPERATURE_UP")
-            warmth < actualBrightness -> Intent("onyx.action.TEMPERATURE_DOWN")
-            else -> {
-                return
-            }
-        }
-
-        val diff = kotlin.math.abs(warmth - actualBrightness)
-
-        repeat(diff) {
-            activity.sendBroadcast(intent)
-        }
-
         Log.v(TAG, "Setting warmth to $warmth")
+        FrontLightUltraC.setWarm(warmth, activity)
     }
 
     override fun getMinWarmth(): Int {
@@ -121,31 +88,53 @@ object FrontLightUltraC {
         null
     }
 
-    private val getCoolWarmBrightness: Method? = try {
-        flController!!.getMethod("getBrightnessConfig", Context::class.java, Integer.TYPE)
+    private val setCoolWarmBrightness: Method? = try {
+        flController!!.getMethod("setLightValue", Integer.TYPE, Integer.TYPE)
     } catch (e: Exception) {
         Log.w(TAG, "$e")
         null
     }
 
-    private const val LIGHT_CONFIG_WARM: Int = 6
-    private const val LIGHT_CONFIG_BRIGHTNESS: Int = 7
+    private val getCoolWarmBrightness: Method? = try {
+        flController!!.getMethod("getLightValue", Integer.TYPE)
+    } catch (e: Exception) {
+        Log.w(TAG, "$e")
+        null
+    }
+    private const val BRIGHTNESS_CONFIG_WARM_IDX: Int = 6
+    private const val BRIGHTNESS_CONFIG_COLD_IDX: Int = 7
 
     fun getWarm(context: Context?): Int {
         return try {
-            getCoolWarmBrightness!!.invoke(flController!!, context, LIGHT_CONFIG_WARM) as Int
+            getCoolWarmBrightness!!.invoke(flController!!, BRIGHTNESS_CONFIG_WARM_IDX) as Int
         } catch (e: Exception) {
             e.printStackTrace()
-            -1
+            0
         }
     }
 
     fun getCold(context: Context?): Int {
         return try {
-            getCoolWarmBrightness!!.invoke(flController!!, context, LIGHT_CONFIG_BRIGHTNESS) as Int
+            getCoolWarmBrightness!!.invoke(flController!!, BRIGHTNESS_CONFIG_COLD_IDX) as Int
         } catch (e: Exception) {
             e.printStackTrace()
-            -1
+            0
+        }
+    }
+
+    fun setWarm(value: Int, context: Context?) {
+        try {
+            setCoolWarmBrightness!!.invoke(flController!!, BRIGHTNESS_CONFIG_WARM_IDX, value)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    fun setCold(value: Int, context: Context?) {
+        try {
+            setCoolWarmBrightness!!.invoke(flController!!, BRIGHTNESS_CONFIG_COLD_IDX, value)
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 }
