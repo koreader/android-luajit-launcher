@@ -23,40 +23,18 @@ object LightsFactory {
                     TolinoNtxController()
                 }
                 DeviceInfo.LightsDevice.ONYX_DARWIN7,
-                DeviceInfo.LightsDevice.ONYX_EDISON,
                 DeviceInfo.LightsDevice.ONYX_FAUST3,
-                DeviceInfo.LightsDevice.ONYX_KON_TIKI2,
-                DeviceInfo.LightsDevice.ONYX_LEAF,
-                DeviceInfo.LightsDevice.ONYX_LOMONOSOV,
-                DeviceInfo.LightsDevice.ONYX_NOTE3,
-                DeviceInfo.LightsDevice.ONYX_NOTE_AIR,
-                DeviceInfo.LightsDevice.ONYX_NOTE_PRO,
-                DeviceInfo.LightsDevice.ONYX_NOVA3,
-                DeviceInfo.LightsDevice.ONYX_NOVA_AIR,
-                DeviceInfo.LightsDevice.ONYX_NOVA_PRO,
-                DeviceInfo.LightsDevice.ONYX_POKE3,
-                DeviceInfo.LightsDevice.ONYX_POKE_PRO -> {
+                DeviceInfo.LightsDevice.ONYX_WARMTH -> {
                     logController("Onyx/Qualcomm")
                     OnyxWarmthController()
                 }
-                DeviceInfo.LightsDevice.ONYX_LEAF2,
-                DeviceInfo.LightsDevice.ONYX_DARWIN9,
-                DeviceInfo.LightsDevice.ONYX_NOTE_AIR2,
-                DeviceInfo.LightsDevice.ONYX_NOTE_X2,
-                DeviceInfo.LightsDevice.ONYX_NOVA,
-                DeviceInfo.LightsDevice.ONYX_NOVA2,
-                DeviceInfo.LightsDevice.ONYX_NOVA_AIR_2,
                 DeviceInfo.LightsDevice.ONYX_NOVA_AIR_C,
-                DeviceInfo.LightsDevice.ONYX_PAGE,
-                DeviceInfo.LightsDevice.ONYX_POKE4,
-                DeviceInfo.LightsDevice.ONYX_POKE5,
-                DeviceInfo.LightsDevice.ONYX_POKE4LITE,
-                DeviceInfo.LightsDevice.ONYX_TAB_ULTRA -> {
+                DeviceInfo.LightsDevice.ONYX_SDK -> {
                     logController("Onyx/Sdk")
                     OnyxSdkLightsController()
                 }
                 DeviceInfo.LightsDevice.ONYX_NOVA3_COLOR,
-                DeviceInfo.LightsDevice.TAGUS_GEA -> {
+                DeviceInfo.LightsDevice.ONYX_TAGUS_GEA -> {
                     logController("Onyx color")
                     OnyxColorController()
                 }

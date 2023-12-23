@@ -63,37 +63,14 @@ object EPDFactory {
                     TolinoEPDController()
                 }
 
-                DeviceInfo.EinkDevice.ONYX_EDISON,
-                DeviceInfo.EinkDevice.ONYX_KON_TIKI2,
-                DeviceInfo.EinkDevice.ONYX_LEAF,
-                DeviceInfo.EinkDevice.ONYX_LEAF2,
-                DeviceInfo.EinkDevice.ONYX_DARWIN9,
-                DeviceInfo.EinkDevice.ONYX_LOMONOSOV,
                 DeviceInfo.EinkDevice.ONYX_MAX,
                 DeviceInfo.EinkDevice.ONYX_NOTE,
-                DeviceInfo.EinkDevice.ONYX_NOTE3,
-                DeviceInfo.EinkDevice.ONYX_NOTE5,
-                DeviceInfo.EinkDevice.ONYX_NOTE_AIR,
-                DeviceInfo.EinkDevice.ONYX_NOTE_AIR2,
-                DeviceInfo.EinkDevice.ONYX_NOTE_PRO,
-                DeviceInfo.EinkDevice.ONYX_NOTE_X2,
-                DeviceInfo.EinkDevice.ONYX_NOVA,
-                DeviceInfo.EinkDevice.ONYX_NOVA2,
-                DeviceInfo.EinkDevice.ONYX_NOVA3,
                 DeviceInfo.EinkDevice.ONYX_NOVA3_COLOR,
-                DeviceInfo.EinkDevice.ONYX_NOVA_AIR,
-                DeviceInfo.EinkDevice.ONYX_NOVA_AIR_2,
                 DeviceInfo.EinkDevice.ONYX_NOVA_AIR_C,
-                DeviceInfo.EinkDevice.ONYX_NOVA_PRO,
-                DeviceInfo.EinkDevice.ONYX_PAGE,
-                DeviceInfo.EinkDevice.ONYX_PALMA,
-                DeviceInfo.EinkDevice.ONYX_POKE3,
-                DeviceInfo.EinkDevice.ONYX_POKE4,
-                DeviceInfo.EinkDevice.ONYX_POKE5,
-                DeviceInfo.EinkDevice.ONYX_POKE4LITE,
-                DeviceInfo.EinkDevice.ONYX_POKE_PRO,
                 DeviceInfo.EinkDevice.ONYX_TAB_ULTRA_C,
-                DeviceInfo.EinkDevice.ONYX_TAB_ULTRA -> {
+                DeviceInfo.EinkDevice.ONYX_GENERIC,
+                DeviceInfo.EinkDevice.ONYX_SDK,
+                DeviceInfo.EinkDevice.ONYX_WARMTH -> {
                     logController("Onyx/Qualcomm")
                     OnyxEPDController()
                 }
@@ -101,7 +78,7 @@ object EPDFactory {
                 DeviceInfo.EinkDevice.NABUK,
                 DeviceInfo.EinkDevice.ONYX_DARWIN7,
                 DeviceInfo.EinkDevice.ONYX_FAUST3,
-                DeviceInfo.EinkDevice.TAGUS_GEA-> {
+                DeviceInfo.EinkDevice.ONYX_TAGUS_GEA-> {
                     logController("Old Tolino/NTX")
                     OldTolinoEPDController()
                 }

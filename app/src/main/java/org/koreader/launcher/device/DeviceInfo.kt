@@ -52,46 +52,25 @@ object DeviceInfo {
         MEEBOOK_P6,
         NABUK,
         NOOK,
+        ONYX_GENERIC,
+        ONYX_SDK,
+        ONYX_WARMTH,
         ONYX_C67,
         ONYX_DARWIN7,
-        ONYX_DARWIN9,
-        ONYX_EDISON,
         ONYX_FAUST3,
-        ONYX_KON_TIKI2,
-        ONYX_LEAF,
-        ONYX_LEAF2,
-        ONYX_LOMONOSOV,
         ONYX_MAGICBOOK,
         ONYX_MAX,
         ONYX_MONTECRISTO3,
         ONYX_NOTE,
-        ONYX_NOTE3,
-        ONYX_NOTE5,
-        ONYX_NOTE_AIR,
-        ONYX_NOTE_AIR2,
-        ONYX_NOTE_PRO,
-        ONYX_NOTE_X2,
         ONYX_NOVA,
-        ONYX_NOVA2,
-        ONYX_NOVA3,
         ONYX_NOVA3_COLOR,
         ONYX_NOVA_AIR,
-        ONYX_NOVA_AIR_2,
         ONYX_NOVA_AIR_C,
-        ONYX_NOVA_PRO,
-        ONYX_PAGE,
-        ONYX_PALMA,
-        ONYX_POKE3,
-        ONYX_POKE4,
-        ONYX_POKE5,
-        ONYX_POKE4LITE,
-        ONYX_POKE_PRO,
-        ONYX_TAB_ULTRA,
         ONYX_TAB_ULTRA_C,
         RIDI_PAPER_3,
         SONY_CP1,
         SONY_RP1,
-        TAGUS_GEA,
+        ONYX_TAGUS_GEA,
         TOLINO
     }
 
@@ -100,40 +79,17 @@ object DeviceInfo {
         BOYUE_S62,
         CREMA_CARTA_G,
         MEEBOOK_P6,
+        ONYX_SDK,
+        ONYX_WARMTH,
         ONYX_C67,
         ONYX_DARWIN7,
-        ONYX_DARWIN9,
-        ONYX_EDISON,
         ONYX_FAUST3,
-        ONYX_KON_TIKI2,
-        ONYX_LEAF,
-        ONYX_LEAF2,
-        ONYX_LOMONOSOV,
         ONYX_MAGICBOOK,
         ONYX_MONTECRISTO3,
-        ONYX_NOTE3,
-        ONYX_NOTE_AIR,
-        ONYX_NOTE_AIR2,
-        ONYX_NOTE_PRO,
-        ONYX_NOTE_X2,
-        ONYX_NOVA,
-        ONYX_NOVA2,
-        ONYX_NOVA3,
         ONYX_NOVA3_COLOR,
-        ONYX_NOVA_AIR,
-        ONYX_NOVA_AIR_2,
         ONYX_NOVA_AIR_C,
-        ONYX_NOVA_PRO,
-        ONYX_PAGE,
-        ONYX_PALMA,
-        ONYX_POKE3,
-        ONYX_POKE4,
-        ONYX_POKE5,
-        ONYX_POKE4LITE,
-        ONYX_POKE_PRO,
-        ONYX_TAB_ULTRA,
         RIDI_PAPER_3,
-        TAGUS_GEA,
+        ONYX_TAGUS_GEA,
         TOLINO_EPOS,
         TOLINO_SHINE3,
         TOLINO_VISION4,
@@ -184,47 +140,24 @@ object DeviceInfo {
     private val MEEBOOK_P6: Boolean
     private val NABUK_REGAL_HD: Boolean
     private val NOOK: Boolean
+    private val ONYX_GENERIC: Boolean
+    private val ONYX_SDK: Boolean
+    private val ONYX_WARMTH: Boolean
     private val ONYX_C67: Boolean
     private val ONYX_DARWIN7: Boolean
-    private val ONYX_DARWIN9: Boolean
-    private val ONYX_EDISON: Boolean
     private val ONYX_FAUST3: Boolean
-    private val ONYX_KON_TIKI2: Boolean
-    private val ONYX_LEAF: Boolean
-    private val ONYX_LEAF2: Boolean
-    private val ONYX_LOMONOSOV: Boolean
     private val ONYX_MAGICBOOK: Boolean
     private val ONYX_MONTECRISTO3: Boolean
     private val ONYX_MAX: Boolean
     private val ONYX_NOTE: Boolean
-    private val ONYX_NOTE3: Boolean
-    private val ONYX_NOTE5: Boolean
-    private val ONYX_NOTE_AIR: Boolean
-    private val ONYX_NOTE_AIR2: Boolean
-    private val ONYX_NOTE_PRO: Boolean
-    private val ONYX_NOTE_X2: Boolean
-    private val ONYX_NOVA: Boolean
-    private val ONYX_NOVA2: Boolean
-    private val ONYX_NOVA3: Boolean
     private val ONYX_NOVA3_COLOR: Boolean
-    private val ONYX_NOVA_AIR: Boolean
-    private val ONYX_NOVA_AIR_2: Boolean
     private val ONYX_NOVA_AIR_C: Boolean
-    private val ONYX_NOVA_PRO: Boolean
-    private val ONYX_PAGE: Boolean
-    private val ONYX_PALMA: Boolean
     private val ONYX_POKE2: Boolean
-    private val ONYX_POKE3: Boolean
-    private val ONYX_POKE4: Boolean
-    private val ONYX_POKE5: Boolean
-    private val ONYX_POKE4LITE: Boolean
-    private val ONYX_POKE_PRO: Boolean
-    private val ONYX_TAB_ULTRA: Boolean
     private val ONYX_TAB_ULTRA_C: Boolean
+    private val ONYX_TAGUS_GEA: Boolean
     private val RIDI_PAPER_3: Boolean
     private val SONY_CP1: Boolean
     private val SONY_RP1: Boolean
-    private val TAGUS_GEA: Boolean
     private val TOLINO_EPOS: Boolean
     private val TOLINO_SHINE3: Boolean
     private val TOLINO_VISION4: Boolean
@@ -337,6 +270,32 @@ object DeviceInfo {
             && (MODEL.contentEquals("bnrv510") || MODEL.contentEquals("bnrv520") || MODEL.contentEquals("bnrv700")
             || MODEL.contentEquals("evk_mx6sl") || MODEL.startsWith("ereader"))
 
+        // Group of Onyx Generic
+        ONYX_GENERIC = MANUFACTURER.contentEquals("onyx") && (MODEL.contentEquals("palma")
+            || PRODUCT.contentEquals("note") || PRODUCT.contentEquals("note5")
+        )
+
+        // Group of Onyx Sdk
+        ONYX_SDK = MANUFACTURER.contentEquals("onyx") && (PRODUCT.contentEquals("leaf2")
+            || PRODUCT.contentEquals("leaf2_p") || PRODUCT.contentEquals("mc_darwin9")
+            || PRODUCT.contentEquals("darwin9") || MODEL.contentEquals("noteair2")
+            || MODEL.contentEquals("noteair2p") || MODEL.contentEquals("notex2")
+            || PRODUCT.contentEquals("nova") || PRODUCT.contentEquals("nova2")
+            || MODEL.contentEquals("novaair2") || MODEL.contentEquals("page")
+            || MODEL.contentEquals("poke4") || MODEL.contentEquals("poke5p")
+            || MODEL.contentEquals("poke4lite") || MODEL.contentEquals("tabultra")
+        )
+
+        // Group of Onyx Warmth
+        ONYX_WARMTH = MANUFACTURER.contentEquals("onyx") && (PRODUCT.contentEquals("edison")
+            || PRODUCT.contentEquals("kon_tiki2") || PRODUCT.contentEquals("leaf")
+            || DEVICE.contentEquals("lomonosov") || PRODUCT.contentEquals("note3")
+            || PRODUCT.contentEquals("noteair") || PRODUCT.contentEquals("notepro")
+            || PRODUCT.contentEquals("nova3") || MODEL.contentEquals("novaair")
+            || MODEL.contentEquals("novapro") || PRODUCT.contentEquals("poke3")
+            || PRODUCT.contentEquals("poke_pro")
+        )
+
         // Onyx C67
         ONYX_C67 = MANUFACTURER.contentEquals("onyx")
             && (PRODUCT.startsWith("c67") || MODEL.contentEquals("rk30sdk"))
@@ -347,39 +306,10 @@ object DeviceInfo {
             && (PRODUCT.contentEquals("mc_darwin7") || PRODUCT.contentEquals("darwin7"))
             && (DEVICE.contentEquals("mc_darwin7") || DEVICE.contentEquals("darwin7"))
 
-        // ONYX DARWIN 9
-        ONYX_DARWIN9 = MANUFACTURER.contentEquals("onyx")
-            && (PRODUCT.contentEquals("mc_darwin9") || PRODUCT.contentEquals("darwin9"))
-            && (DEVICE.contentEquals("mc_darwin9") || DEVICE.contentEquals("darwin9"))
-
-        // Onyx Edison
-        ONYX_EDISON = MANUFACTURER.contentEquals("onyx")
-            && PRODUCT.contentEquals("edison")
-            && DEVICE.contentEquals("edison")
-
         // Onyx Faust 3
         ONYX_FAUST3 = MANUFACTURER.contentEquals("onyx")
             && PRODUCT.contentEquals("mc_faust3")
             && DEVICE.contentEquals("mc_faust3")
-
-        // Onyx Kon-Tiki 2
-        ONYX_KON_TIKI2 = MANUFACTURER.contentEquals("onyx")
-            && PRODUCT.contentEquals("kon_tiki2")
-            && DEVICE.contentEquals("kon_tiki2")
-
-        // Onyx Leaf
-        ONYX_LEAF = MANUFACTURER.contentEquals("onyx")
-            && PRODUCT.contentEquals("leaf")
-            && DEVICE.contentEquals("leaf")
-
-        // Onyx Leaf 2 && Onyx Leaf 2 Plus
-        ONYX_LEAF2 = MANUFACTURER.contentEquals("onyx")
-            && (PRODUCT.contentEquals("leaf2") || PRODUCT.contentEquals("leaf2_p"))
-            && (DEVICE.contentEquals("leaf2") || DEVICE.contentEquals("leaf2_p"))
-
-        // Onyx Lomonosov
-        ONYX_LOMONOSOV = MANUFACTURER.contentEquals("onyx")
-            && DEVICE.contentEquals("lomonosov")
 
         // Onyx MagicBook
         ONYX_MAGICBOOK = MANUFACTURER.contentEquals("onyx")
@@ -400,109 +330,25 @@ object DeviceInfo {
             && PRODUCT.contentEquals("note")
             && DEVICE.contentEquals("note")
 
-        // Onyx Note 3
-        ONYX_NOTE3 = MANUFACTURER.contentEquals("onyx")
-            && PRODUCT.contentEquals("note3")
-            && DEVICE.contentEquals("note3")
-
-        // Onyx Note 5
-        ONYX_NOTE5 = BRAND.contentEquals("onyx")
-            && PRODUCT.contentEquals("note5")
-            && DEVICE.contentEquals("note5")
-
-        // Onyx Note Air
-        ONYX_NOTE_AIR = MANUFACTURER.contentEquals("onyx")
-            && PRODUCT.contentEquals("noteair")
-            && DEVICE.contentEquals("noteair")
-
-        // Onyx Note Air 2 && Note Air 2 Plus
-        ONYX_NOTE_AIR2 = BRAND.contentEquals("onyx")
-            && (MODEL.contentEquals("noteair2") || MODEL.contentEquals("noteair2p"))
-
-        // Onyx Note Pro
-        ONYX_NOTE_PRO = MANUFACTURER.contentEquals("onyx")
-            && PRODUCT.contentEquals("notepro")
-            && DEVICE.contentEquals("notepro")
-
-        // Onyx Note X2
-        ONYX_NOTE_X2 = MANUFACTURER.contentEquals("onyx")
-            && MODEL.contentEquals("notex2")
-
-        // Onyx Nova
-        ONYX_NOVA = MANUFACTURER.contentEquals("onyx")
-            && PRODUCT.contentEquals("nova")
-            && DEVICE.contentEquals("nova")
-
-        // Onyx Nova 2
-        ONYX_NOVA2 = MANUFACTURER.contentEquals("onyx")
-            && PRODUCT.contentEquals("nova2")
-            && DEVICE.contentEquals("nova2")
-
-        // Onyx Nova 3
-        ONYX_NOVA3 = MANUFACTURER.contentEquals("onyx")
-            && PRODUCT.contentEquals("nova3")
-            && DEVICE.contentEquals("nova3")
-
         // Onyx Nova 3 Color
         ONYX_NOVA3_COLOR = MANUFACTURER.contentEquals("onyx")
             && MODEL.contentEquals("nova3color")
-
-        // Onyx Nova Air
-        ONYX_NOVA_AIR = MANUFACTURER.contentEquals("onyx")
-            && MODEL.contentEquals("novaair")
-
-        // Onyx Nova Air 2
-        ONYX_NOVA_AIR_2 = MANUFACTURER.contentEquals("onyx")
-            && MODEL.contentEquals("novaair2")
 
         // Onyx Nova Air C
         ONYX_NOVA_AIR_C = BRAND.contentEquals("onyx")
             && MODEL.contentEquals("novaairc")
 
-        // Onyx Nova Pro
-        ONYX_NOVA_PRO = BRAND.contentEquals("onyx")
-            && MODEL.contentEquals("novapro")
-
-        // Onyx Page
-        ONYX_PAGE = BRAND.contentEquals("onyx")
-            && MODEL.contentEquals("page")
-
-        // Onyx Palma
-        ONYX_PALMA = BRAND.contentEquals("onyx")
-            && MODEL.contentEquals("palma")
-
         // Onyx Poke 2
         ONYX_POKE2 = MANUFACTURER.contentEquals("onyx")
             && PRODUCT.contentEquals("poke2")
 
-        // Onyx Poke 3
-        ONYX_POKE3 = MANUFACTURER.contentEquals("onyx")
-            && PRODUCT.contentEquals("poke3")
-            && DEVICE.contentEquals("poke3")
-
-        // Onyx Poke 4
-        ONYX_POKE4 = BRAND.contentEquals("onyx")
-            && MODEL.contentEquals("poke4")
-
-        // Onyx Poke 5
-        ONYX_POKE5 = BRAND.contentEquals("onyx")
-            && MODEL.contentEquals("poke5p")
-
-        // Onyx Poke 4 lite
-        ONYX_POKE4LITE = BRAND.contentEquals("onyx")
-            && MODEL.contentEquals("poke4lite")
-
-        // Onyx Poke Pro
-        ONYX_POKE_PRO = MANUFACTURER.contentEquals("onyx")
-            && PRODUCT.contentEquals("poke_pro")
-
-        // Onyx Tab Ultra
-        ONYX_TAB_ULTRA = MANUFACTURER.contentEquals("onyx")
-            && MODEL.contentEquals("tabultra")
-
         // Onyx Tab Ultra C
         ONYX_TAB_ULTRA_C = MANUFACTURER.contentEquals("onyx")
             && MODEL.contentEquals("tabultrac")
+
+        // Onyx Tagus Gea
+        ONYX_TAGUS_GEA = MANUFACTURER.contentEquals("onyx")
+            && MODEL.contentEquals("tagus_pokep")
 
         // Ridi Paper 3
         RIDI_PAPER_3 = BRAND.contentEquals("ridi")
@@ -516,10 +362,6 @@ object DeviceInfo {
         // Sony DPT-RP1
         SONY_RP1 = MANUFACTURER.contentEquals("sony")
             && MODEL.contentEquals("dpt-rp1")
-
-        // Tagus Gea
-        TAGUS_GEA = MANUFACTURER.contentEquals("onyx")
-            && MODEL.contentEquals("tagus_pokep")
 
         // Tolino (catch them all)
         TOLINO = BRAND.contentEquals("tolino") && MODEL.contentEquals("imx50_rdp")
@@ -598,44 +440,18 @@ object DeviceInfo {
         deviceMap[EinkDevice.NOOK] = NOOK
         deviceMap[EinkDevice.ONYX_C67] = ONYX_C67
         deviceMap[EinkDevice.ONYX_DARWIN7] = ONYX_DARWIN7
-        deviceMap[EinkDevice.ONYX_DARWIN9] = ONYX_DARWIN9
-        deviceMap[EinkDevice.ONYX_EDISON] = ONYX_EDISON
         deviceMap[EinkDevice.ONYX_FAUST3] = ONYX_FAUST3
-        deviceMap[EinkDevice.ONYX_KON_TIKI2] = ONYX_KON_TIKI2
-        deviceMap[EinkDevice.ONYX_LEAF] = ONYX_LEAF
-        deviceMap[EinkDevice.ONYX_LEAF2] = ONYX_LEAF2
-        deviceMap[EinkDevice.ONYX_LOMONOSOV] = ONYX_LOMONOSOV
         deviceMap[EinkDevice.ONYX_MAGICBOOK] = ONYX_MAGICBOOK
         deviceMap[EinkDevice.ONYX_MAX] = ONYX_MAX
         deviceMap[EinkDevice.ONYX_MONTECRISTO3] = ONYX_MONTECRISTO3
         deviceMap[EinkDevice.ONYX_NOTE] = ONYX_NOTE
-        deviceMap[EinkDevice.ONYX_NOTE3] = ONYX_NOTE3
-        deviceMap[EinkDevice.ONYX_NOTE5] = ONYX_NOTE5
-        deviceMap[EinkDevice.ONYX_NOTE_AIR] = ONYX_NOTE_AIR
-        deviceMap[EinkDevice.ONYX_NOTE_AIR2] = ONYX_NOTE_AIR2
-        deviceMap[EinkDevice.ONYX_NOTE_PRO] = ONYX_NOTE_PRO
-        deviceMap[EinkDevice.ONYX_NOTE_X2] = ONYX_NOTE_X2
-        deviceMap[EinkDevice.ONYX_NOVA] = ONYX_NOVA
-        deviceMap[EinkDevice.ONYX_NOVA2] = ONYX_NOVA2
-        deviceMap[EinkDevice.ONYX_NOVA3] = ONYX_NOVA3
         deviceMap[EinkDevice.ONYX_NOVA3_COLOR] = ONYX_NOVA3_COLOR
-        deviceMap[EinkDevice.ONYX_NOVA_AIR] = ONYX_NOVA_AIR
-        deviceMap[EinkDevice.ONYX_NOVA_AIR_2] = ONYX_NOVA_AIR_2
         deviceMap[EinkDevice.ONYX_NOVA_AIR_C] = ONYX_NOVA_AIR_C
-        deviceMap[EinkDevice.ONYX_NOVA_PRO] = ONYX_NOVA_PRO
-        deviceMap[EinkDevice.ONYX_PAGE] = ONYX_PAGE
-        deviceMap[EinkDevice.ONYX_PALMA] = ONYX_PALMA
-        deviceMap[EinkDevice.ONYX_POKE3] = ONYX_POKE3
-        deviceMap[EinkDevice.ONYX_POKE4] = ONYX_POKE4
-        deviceMap[EinkDevice.ONYX_POKE5] = ONYX_POKE5
-        deviceMap[EinkDevice.ONYX_POKE4LITE] = ONYX_POKE4LITE
-        deviceMap[EinkDevice.ONYX_POKE_PRO] = ONYX_POKE_PRO
-        deviceMap[EinkDevice.ONYX_TAB_ULTRA] = ONYX_TAB_ULTRA
         deviceMap[EinkDevice.ONYX_TAB_ULTRA_C] = ONYX_TAB_ULTRA_C
         deviceMap[EinkDevice.RIDI_PAPER_3] = RIDI_PAPER_3
         deviceMap[EinkDevice.SONY_CP1] = SONY_CP1
         deviceMap[EinkDevice.SONY_RP1] = SONY_RP1
-        deviceMap[EinkDevice.TAGUS_GEA] = TAGUS_GEA
+        deviceMap[EinkDevice.ONYX_TAGUS_GEA] = ONYX_TAGUS_GEA
         deviceMap[EinkDevice.TOLINO] = TOLINO
 
         deviceMap.keys.iterator().run {
@@ -655,37 +471,13 @@ object DeviceInfo {
         lightsMap[LightsDevice.MEEBOOK_P6] = MEEBOOK_P6
         lightsMap[LightsDevice.ONYX_C67] = ONYX_C67
         lightsMap[LightsDevice.ONYX_DARWIN7] = ONYX_DARWIN7
-        lightsMap[LightsDevice.ONYX_DARWIN9] = ONYX_DARWIN9
-        lightsMap[LightsDevice.ONYX_EDISON] = ONYX_EDISON
         lightsMap[LightsDevice.ONYX_FAUST3] = ONYX_FAUST3
-        lightsMap[LightsDevice.ONYX_KON_TIKI2] = ONYX_KON_TIKI2
-        lightsMap[LightsDevice.ONYX_LEAF] = ONYX_LEAF
-        lightsMap[LightsDevice.ONYX_LEAF2] = ONYX_LEAF2
-        lightsMap[LightsDevice.ONYX_LOMONOSOV] = ONYX_LOMONOSOV
         lightsMap[LightsDevice.ONYX_MAGICBOOK] = ONYX_MAGICBOOK
         lightsMap[LightsDevice.ONYX_MONTECRISTO3] = ONYX_MONTECRISTO3
-        lightsMap[LightsDevice.ONYX_NOTE3] = ONYX_NOTE3
-        lightsMap[LightsDevice.ONYX_NOTE_AIR] = ONYX_NOTE_AIR
-        lightsMap[LightsDevice.ONYX_NOTE_AIR2] = ONYX_NOTE_AIR2
-        lightsMap[LightsDevice.ONYX_NOTE_X2] = ONYX_NOTE_X2
-        lightsMap[LightsDevice.ONYX_NOVA] = ONYX_NOVA
-        lightsMap[LightsDevice.ONYX_NOVA2] = ONYX_NOVA2
-        lightsMap[LightsDevice.ONYX_NOVA3] = ONYX_NOVA3
         lightsMap[LightsDevice.ONYX_NOVA3_COLOR] = ONYX_NOVA3_COLOR
-        lightsMap[LightsDevice.ONYX_NOVA_AIR] = ONYX_NOVA_AIR
-        lightsMap[LightsDevice.ONYX_NOVA_AIR_2] = ONYX_NOVA_AIR_2
         lightsMap[LightsDevice.ONYX_NOVA_AIR_C] = ONYX_NOVA_AIR_C
-        lightsMap[LightsDevice.ONYX_NOVA_PRO] = ONYX_NOVA_PRO
-        lightsMap[LightsDevice.ONYX_PAGE] = ONYX_PAGE
-        lightsMap[LightsDevice.ONYX_PALMA] = ONYX_PALMA
-        lightsMap[LightsDevice.ONYX_POKE3] = ONYX_POKE3
-        lightsMap[LightsDevice.ONYX_POKE4] = ONYX_POKE4
-        lightsMap[LightsDevice.ONYX_POKE5] = ONYX_POKE5
-        lightsMap[LightsDevice.ONYX_POKE4LITE] = ONYX_POKE4LITE
-        lightsMap[LightsDevice.ONYX_POKE_PRO] = ONYX_POKE_PRO
-        lightsMap[LightsDevice.ONYX_TAB_ULTRA] = ONYX_TAB_ULTRA
         lightsMap[LightsDevice.RIDI_PAPER_3] = RIDI_PAPER_3
-        lightsMap[LightsDevice.TAGUS_GEA] = TAGUS_GEA
+        lightsMap[LightsDevice.ONYX_TAGUS_GEA] = ONYX_TAGUS_GEA
         lightsMap[LightsDevice.TOLINO_EPOS] = TOLINO_EPOS
         lightsMap[LightsDevice.TOLINO_SHINE3] = TOLINO_SHINE3
         lightsMap[LightsDevice.TOLINO_VISION4] = TOLINO_VISION4
