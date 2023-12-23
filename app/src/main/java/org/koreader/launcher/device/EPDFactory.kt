@@ -72,6 +72,7 @@ object EPDFactory {
                 DeviceInfo.EinkDevice.ONYX_MAX,
                 DeviceInfo.EinkDevice.ONYX_NOTE,
                 DeviceInfo.EinkDevice.ONYX_NOTE3,
+                DeviceInfo.EinkDevice.ONYX_NOTE4,
                 DeviceInfo.EinkDevice.ONYX_NOTE5,
                 DeviceInfo.EinkDevice.ONYX_NOTE_AIR,
                 DeviceInfo.EinkDevice.ONYX_NOTE_AIR2,
