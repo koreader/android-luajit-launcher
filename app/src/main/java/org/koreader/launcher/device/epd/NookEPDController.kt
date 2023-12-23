@@ -36,7 +36,8 @@ class NookEPDController : NTXEPDController(), EPDInterface {
     }
 
     override fun getWaveformDelay(): Int {
-        return EINK_WAVEFORM_DELAY
+        // we're racing against system driver. Let the system win
+        return 500
     }
 
     override fun getWaveformDelayUi(): Int {
