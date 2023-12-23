@@ -271,12 +271,14 @@ object DeviceInfo {
             || MODEL.contentEquals("evk_mx6sl") || MODEL.startsWith("ereader"))
 
         // Group of Onyx Generic
-        ONYX_GENERIC = MANUFACTURER.contentEquals("onyx") && (MODEL.contentEquals("palma")
+        ONYX_GENERIC = (MANUFACTURER.contentEquals("onyx") || BRAND.contentEquals("onyx"))
+            && (MODEL.contentEquals("palma")
             || PRODUCT.contentEquals("note") || PRODUCT.contentEquals("note5")
         )
 
         // Group of Onyx Sdk
-        ONYX_SDK = MANUFACTURER.contentEquals("onyx") && (PRODUCT.contentEquals("leaf2")
+        ONYX_SDK = (MANUFACTURER.contentEquals("onyx") || BRAND.contentEquals("onyx"))
+            && (PRODUCT.contentEquals("leaf2")
             || PRODUCT.contentEquals("leaf2_p") || PRODUCT.contentEquals("mc_darwin9")
             || PRODUCT.contentEquals("darwin9") || MODEL.contentEquals("noteair2")
             || MODEL.contentEquals("noteair2p") || MODEL.contentEquals("notex2")
@@ -287,7 +289,8 @@ object DeviceInfo {
         )
 
         // Group of Onyx Warmth
-        ONYX_WARMTH = MANUFACTURER.contentEquals("onyx") && (PRODUCT.contentEquals("edison")
+        ONYX_WARMTH = (MANUFACTURER.contentEquals("onyx") || BRAND.contentEquals("onyx"))
+            && (PRODUCT.contentEquals("edison")
             || PRODUCT.contentEquals("kon_tiki2") || PRODUCT.contentEquals("leaf")
             || DEVICE.contentEquals("lomonosov") || PRODUCT.contentEquals("note3")
             || PRODUCT.contentEquals("noteair") || PRODUCT.contentEquals("notepro")
