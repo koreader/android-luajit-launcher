@@ -272,8 +272,7 @@ object DeviceInfo {
 
         // Group of Onyx Generic
         ONYX_GENERIC = (MANUFACTURER.contentEquals("onyx") || BRAND.contentEquals("onyx"))
-            && (MODEL.contentEquals("palma")
-            || PRODUCT.contentEquals("note") || PRODUCT.contentEquals("note5")
+            && (MODEL.contentEquals("palma") || PRODUCT.contentEquals("note5")
         )
 
         // Group of Onyx Sdk
