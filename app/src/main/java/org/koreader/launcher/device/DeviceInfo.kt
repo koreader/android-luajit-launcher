@@ -441,6 +441,9 @@ object DeviceInfo {
         deviceMap[EinkDevice.MEEBOOK_P6] = MEEBOOK_P6
         deviceMap[EinkDevice.NABUK] = NABUK_REGAL_HD
         deviceMap[EinkDevice.NOOK] = NOOK
+        deviceMap[EinkDevice.ONYX_GENERIC] = ONYX_GENERIC
+        deviceMap[EinkDevice.ONYX_SDK] = ONYX_SDK
+        deviceMap[EinkDevice.ONYX_WARMTH] = ONYX_WARMTH
         deviceMap[EinkDevice.ONYX_C67] = ONYX_C67
         deviceMap[EinkDevice.ONYX_DARWIN7] = ONYX_DARWIN7
         deviceMap[EinkDevice.ONYX_FAUST3] = ONYX_FAUST3
@@ -472,6 +475,8 @@ object DeviceInfo {
         lightsMap[LightsDevice.BOYUE_S62] = BOYUE_S62
         lightsMap[LightsDevice.CREMA_CARTA_G] = CREMA_CARTA_G
         lightsMap[LightsDevice.MEEBOOK_P6] = MEEBOOK_P6
+        lightsMap[LightsDevice.ONYX_SDK] = ONYX_SDK
+        lightsMap[LightsDevice.ONYX_WARMTH] = ONYX_WARMTH
         lightsMap[LightsDevice.ONYX_C67] = ONYX_C67
         lightsMap[LightsDevice.ONYX_DARWIN7] = ONYX_DARWIN7
         lightsMap[LightsDevice.ONYX_FAUST3] = ONYX_FAUST3
