@@ -66,6 +66,7 @@ object DeviceInfo {
         ONYX_MONTECRISTO3,
         ONYX_NOTE,
         ONYX_NOTE3,
+        ONYX_NOTE4,
         ONYX_NOTE5,
         ONYX_NOTE_AIR,
         ONYX_NOTE_AIR2,
