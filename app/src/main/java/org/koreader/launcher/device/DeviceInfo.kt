@@ -66,6 +66,7 @@ object DeviceInfo {
         ONYX_MONTECRISTO3,
         ONYX_NOTE,
         ONYX_NOTE3,
+        ONYX_NOTE4,
         ONYX_NOTE5,
         ONYX_NOTE_AIR,
         ONYX_NOTE_AIR2,
@@ -112,6 +113,7 @@ object DeviceInfo {
         ONYX_MAGICBOOK,
         ONYX_MONTECRISTO3,
         ONYX_NOTE3,
+        ONYX_NOTE4,
         ONYX_NOTE_AIR,
         ONYX_NOTE_AIR2,
         ONYX_NOTE_PRO,
@@ -198,6 +200,7 @@ object DeviceInfo {
     private val ONYX_MAX: Boolean
     private val ONYX_NOTE: Boolean
     private val ONYX_NOTE3: Boolean
+    private val ONYX_NOTE4: Boolean
     private val ONYX_NOTE5: Boolean
     private val ONYX_NOTE_AIR: Boolean
     private val ONYX_NOTE_AIR2: Boolean
@@ -405,6 +408,10 @@ object DeviceInfo {
             && PRODUCT.contentEquals("note3")
             && DEVICE.contentEquals("note3")
 
+        // Onyx Note 4
+        ONYX_NOTE4 = MANUFACTURER.contentEquals("onyx")
+            && MODEL.contentEquals("mc_note4")
+
         // Onyx Note 5
         ONYX_NOTE5 = BRAND.contentEquals("onyx")
             && PRODUCT.contentEquals("note5")
@@ -610,6 +617,7 @@ object DeviceInfo {
         deviceMap[EinkDevice.ONYX_MONTECRISTO3] = ONYX_MONTECRISTO3
         deviceMap[EinkDevice.ONYX_NOTE] = ONYX_NOTE
         deviceMap[EinkDevice.ONYX_NOTE3] = ONYX_NOTE3
+        deviceMap[EinkDevice.ONYX_NOTE4] = ONYX_NOTE4
         deviceMap[EinkDevice.ONYX_NOTE5] = ONYX_NOTE5
         deviceMap[EinkDevice.ONYX_NOTE_AIR] = ONYX_NOTE_AIR
         deviceMap[EinkDevice.ONYX_NOTE_AIR2] = ONYX_NOTE_AIR2
@@ -665,6 +673,7 @@ object DeviceInfo {
         lightsMap[LightsDevice.ONYX_MAGICBOOK] = ONYX_MAGICBOOK
         lightsMap[LightsDevice.ONYX_MONTECRISTO3] = ONYX_MONTECRISTO3
         lightsMap[LightsDevice.ONYX_NOTE3] = ONYX_NOTE3
+        lightsMap[LightsDevice.ONYX_NOTE4] = ONYX_NOTE4
         lightsMap[LightsDevice.ONYX_NOTE_AIR] = ONYX_NOTE_AIR
         lightsMap[LightsDevice.ONYX_NOTE_AIR2] = ONYX_NOTE_AIR2
         lightsMap[LightsDevice.ONYX_NOTE_X2] = ONYX_NOTE_X2
