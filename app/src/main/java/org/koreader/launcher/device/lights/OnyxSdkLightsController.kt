@@ -76,6 +76,7 @@ class OnyxSdkLightsController : LightsInterface {
     override fun enableFrontlightSwitch(activity: Activity): Int {
         return 1
     }
+
     override fun hasStandaloneWarmth(): Boolean {
         return false
     }
