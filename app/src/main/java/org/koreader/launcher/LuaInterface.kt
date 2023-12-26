@@ -48,8 +48,8 @@ interface LuaInterface {
     fun hasLights(): Boolean
     fun hasNativeRotation(): Boolean
     fun hasOTAUpdates(): Boolean
-    fun hasStandaloneWarmth(): Boolean
     fun hasRuntimeChanges(): Boolean
+    fun hasStandaloneWarmth(): Boolean
     fun installApk()
     fun isCharging(): Boolean
     fun isChromeOS(): Boolean
