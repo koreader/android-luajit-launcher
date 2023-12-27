@@ -93,7 +93,8 @@ object DeviceInfo {
         SONY_CP1,
         SONY_RP1,
         TAGUS_GEA,
-        TOLINO
+        TOLINO,
+        TOLINO_SHINE4
     }
 
     enum class LightsDevice {
@@ -138,6 +139,7 @@ object DeviceInfo {
         TAGUS_GEA,
         TOLINO_EPOS,
         TOLINO_SHINE3,
+        TOLINO_SHINE4,
         TOLINO_VISION4,
         TOLINO_VISION5
     }
@@ -230,6 +232,7 @@ object DeviceInfo {
     private val TAGUS_GEA: Boolean
     private val TOLINO_EPOS: Boolean
     private val TOLINO_SHINE3: Boolean
+    private val TOLINO_SHINE4: Boolean
     private val TOLINO_VISION4: Boolean
     private val TOLINO_VISION5: Boolean
 
@@ -547,6 +550,12 @@ object DeviceInfo {
             && DEVICE.contentEquals("ntx_6sl")
             && HARDWARE.contentEquals("e60k00")
 
+        // Tolino Shine 4 also has warmth lights, but with ntx_io file
+        TOLINO_SHINE4 = BRAND.contentEquals("rakutenkobo")
+            && MODEL.contentEquals("tolino")
+            && DEVICE.contentEquals("ntx_6sl")
+            && HARDWARE.contentEquals("sun8iw15p1")
+
         // Tolino Vision 4 also has warmth lights, but with ntx_io file
         TOLINO_VISION4 = BRAND.contentEquals("rakutenkobo")
             && MODEL.contentEquals("tolino")
@@ -645,6 +654,7 @@ object DeviceInfo {
         deviceMap[EinkDevice.SONY_RP1] = SONY_RP1
         deviceMap[EinkDevice.TAGUS_GEA] = TAGUS_GEA
         deviceMap[EinkDevice.TOLINO] = TOLINO
+        deviceMap[EinkDevice.TOLINO_SHINE4] = TOLINO_SHINE4
 
         deviceMap.keys.iterator().run {
             while (this.hasNext()) {
@@ -697,6 +707,7 @@ object DeviceInfo {
         lightsMap[LightsDevice.TAGUS_GEA] = TAGUS_GEA
         lightsMap[LightsDevice.TOLINO_EPOS] = TOLINO_EPOS
         lightsMap[LightsDevice.TOLINO_SHINE3] = TOLINO_SHINE3
+        lightsMap[LightsDevice.TOLINO_SHINE4] = TOLINO_SHINE4
         lightsMap[LightsDevice.TOLINO_VISION4] = TOLINO_VISION4
         lightsMap[LightsDevice.TOLINO_VISION5] = TOLINO_VISION5
 
