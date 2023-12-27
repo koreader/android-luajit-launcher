@@ -551,9 +551,9 @@ object DeviceInfo {
             && HARDWARE.contentEquals("e60k00")
 
         // Tolino Shine 4 also has warmth lights, but with ntx_io file
-        TOLINO_SHINE4 = BRAND.contentEquals("rakutenkobo")
-            && MODEL.contentEquals("tolino")
-            && DEVICE.contentEquals("ntx_6sl")
+        TOLINO_SHINE4 = BRAND.contentEquals("rakuten kobo inc.")
+            && MODEL.contentEquals("tolino shine 4")
+            && DEVICE.contentEquals("tolino")
             && HARDWARE.contentEquals("sun8iw15p1")
 
         // Tolino Vision 4 also has warmth lights, but with ntx_io file
