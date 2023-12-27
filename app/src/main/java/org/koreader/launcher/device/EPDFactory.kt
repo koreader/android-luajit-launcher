@@ -62,6 +62,10 @@ object EPDFactory {
                     logController("Tolino/NTX")
                     TolinoEPDController()
                 }
+                DeviceInfo.EinkDevice.TOLINO_SHINE4 -> {
+                    logController("Tolino/NTX")
+                    TolinoEPDController()
+                }
 
                 DeviceInfo.EinkDevice.ONYX_EDISON,
                 DeviceInfo.EinkDevice.ONYX_KON_TIKI2,
