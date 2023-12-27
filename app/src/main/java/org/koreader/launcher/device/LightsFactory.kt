@@ -10,7 +10,7 @@ object LightsFactory {
         get() {
             return when (DeviceInfo.LIGHTS) {
                 DeviceInfo.LightsDevice.TOLINO_EPOS,
-                DeviceInfo.LightsDevice.TOLINO_SHINE4,-> {
+                DeviceInfo.LightsDevice.TOLINO_SHINE4 -> {
                     logController("TolinoRoot")
                     TolinoRootController()
                 }
