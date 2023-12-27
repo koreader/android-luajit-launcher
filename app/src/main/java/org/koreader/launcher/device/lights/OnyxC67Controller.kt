@@ -60,13 +60,20 @@ class OnyxC67Controller : LightsInterface {
     override fun getMinWarmth(): Int {
         return 0
     }
+
     override fun getMaxWarmth(): Int {
         return 0
     }
+
     override fun getMinBrightness(): Int {
         return BRIGHTNESS_MIN
     }
+
     override fun getMaxBrightness(): Int {
         return BRIGHTNESS_MAX
+    }
+
+    override fun hasStandaloneWarmth(): Boolean {
+        return false
     }
 }
