@@ -137,10 +137,10 @@ object DeviceInfo {
         RIDI_PAPER_3,
         TAGUS_GEA,
         TOLINO_EPOS,
+        TOLINO_PAGE2,
         TOLINO_SHINE3,
         TOLINO_VISION4,
-        TOLINO_VISION5,
-        TOLINO_PAGE2
+        TOLINO_VISION5
     }
 
     enum class QuirkDevice {
@@ -230,10 +230,10 @@ object DeviceInfo {
     private val SONY_RP1: Boolean
     private val TAGUS_GEA: Boolean
     private val TOLINO_EPOS: Boolean
+    private val TOLINO_PAGE2: Boolean
     private val TOLINO_SHINE3: Boolean
     private val TOLINO_VISION4: Boolean
     private val TOLINO_VISION5: Boolean
-    private val TOLINO_PAGE2: Boolean
 
     init {
         MANUFACTURER = lowerCase(getBuildField("MANUFACTURER"))
@@ -541,8 +541,14 @@ object DeviceInfo {
             && DEVICE.contentEquals("ntx_6sl")
             && !HARDWARE.contentEquals("e60k00")
             && !HARDWARE.contentEquals("e60q50")
-            && !HARDWARE.contentEquals("e70k00")
             && !HARDWARE.contentEquals("e60qv0")
+            && !HARDWARE.contentEquals("e70k00")
+
+        // Tolino Page 2 has no warmth lights
+        TOLINO_PAGE2 = BRAND.contentEquals("rakutenkobo")
+            && MODEL.contentEquals("tolino")
+            && DEVICE.contentEquals("ntx_6sl")
+            && HARDWARE.contentEquals("e60qv0")
 
         // Tolino Shine 3 also has warmth lights, but with ntx_io file
         TOLINO_SHINE3 = BRAND.contentEquals("rakutenkobo")
@@ -561,12 +567,6 @@ object DeviceInfo {
             && MODEL.contentEquals("tolino")
             && DEVICE.contentEquals("ntx_6sl")
             && HARDWARE.contentEquals("e70k00")
-
-        // Tolino Page 2 has no warmth lights
-        TOLINO_PAGE2 = BRAND.contentEquals("rakutenkobo")
-            && MODEL.contentEquals("tolino")
-            && DEVICE.contentEquals("ntx_6sl")
-            && HARDWARE.contentEquals("e60qv0")
 
         // devices with known bugs
         val bugMap = HashMap<QuirkDevice, Boolean>()
@@ -705,10 +705,10 @@ object DeviceInfo {
         lightsMap[LightsDevice.RIDI_PAPER_3] = RIDI_PAPER_3
         lightsMap[LightsDevice.TAGUS_GEA] = TAGUS_GEA
         lightsMap[LightsDevice.TOLINO_EPOS] = TOLINO_EPOS
+        lightsMap[LightsDevice.TOLINO_PAGE2] = TOLINO_PAGE2
         lightsMap[LightsDevice.TOLINO_SHINE3] = TOLINO_SHINE3
         lightsMap[LightsDevice.TOLINO_VISION4] = TOLINO_VISION4
         lightsMap[LightsDevice.TOLINO_VISION5] = TOLINO_VISION5
-        lightsMap[LightsDevice.TOLINO_PAGE2] = TOLINO_PAGE2
 
         lightsMap.keys.iterator().run {
             while (this.hasNext()) {
