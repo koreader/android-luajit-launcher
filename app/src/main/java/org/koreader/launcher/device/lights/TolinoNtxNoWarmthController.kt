@@ -5,8 +5,6 @@ import android.provider.Settings
 import android.util.Log
 import org.koreader.launcher.device.Ioctl
 import org.koreader.launcher.device.LightsInterface
-import org.koreader.launcher.extensions.read
-import java.io.File
 
 /* Special controller for Tolino Page 2
  *
