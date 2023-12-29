@@ -93,8 +93,7 @@ object DeviceInfo {
         SONY_CP1,
         SONY_RP1,
         TAGUS_GEA,
-        TOLINO,
-        TOLINO_SHINE4
+        TOLINO
     }
 
     enum class LightsDevice {
