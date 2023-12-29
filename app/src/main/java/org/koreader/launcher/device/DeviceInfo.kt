@@ -653,7 +653,6 @@ object DeviceInfo {
         deviceMap[EinkDevice.SONY_RP1] = SONY_RP1
         deviceMap[EinkDevice.TAGUS_GEA] = TAGUS_GEA
         deviceMap[EinkDevice.TOLINO] = TOLINO
-        deviceMap[EinkDevice.TOLINO_SHINE4] = TOLINO_SHINE4
 
         deviceMap.keys.iterator().run {
             while (this.hasNext()) {
