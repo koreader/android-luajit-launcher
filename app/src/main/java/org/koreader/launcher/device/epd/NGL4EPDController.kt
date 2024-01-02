@@ -12,7 +12,7 @@ class NGL4EPDController : NTXEPDController(), EPDInterface {
     companion object {
         private const val NGL4TAG = "NGL4"
 
-        // constants taken as is from sunxi-kobo.h (NGL4 prefix insered for names)
+        // constants taken as is from sunxi-kobo.h (NGL4 prefix inserted for names)
 
         const val NGL4_EINK_INIT_MODE = 0x01
         const val NGL4_EINK_DU_MODE = 0x02
@@ -40,13 +40,14 @@ class NGL4EPDController : NTXEPDController(), EPDInterface {
         const val NGL4_EINK_DITHERING_NTX_Y1 = 0x08800000
         const val NGL4_EINK_NO_MERGE = Integer.MIN_VALUE //0x80000000
 
-        const val NGL4_PAGE_DELAY = 0 //500
-        const val NGL4_UI_DELAY = 0   //500
-        const val NGL4_FAST_DELAY = 0 //500
+        const val NGL4_PAGE_DELAY = 0
+        const val NGL4_UI_DELAY = 0
+        const val NGL4_FAST_DELAY = 0
     }
 
     override fun getPlatform(): String {
-        return "ngl4"
+        // the platform reported is "freescale" in order to not introduce new unexplained names 
+        return "freescale"
     }
 
     override fun getMode(): String {
@@ -57,7 +58,7 @@ class NGL4EPDController : NTXEPDController(), EPDInterface {
         return NGL4_EINK_NO_MERGE + NGL4_EINK_GC16_MODE
     }
 
-    // the mode constants below are effectively not used because getMode returns anything other than "all"
+    // the mode constants below are effectively not used because getMode returns something other than "all"
 
     override fun getWaveformPartial(): Int {
         return NGL4_EINK_GU16_MODE
@@ -73,10 +74,9 @@ class NGL4EPDController : NTXEPDController(), EPDInterface {
 
     override fun getWaveformFast(): Int {
        return NGL4_EINK_GU16_MODE
-       // return NGL4_EINK_A2_MODE;
     }
 
-    // the delays below are effectively not used because of the method involved
+    // getWaveformDelay is the only effectively used delay because of getMode being not "all" 
 
     override fun getWaveformDelay(): Int {
         return NGL4_PAGE_DELAY
@@ -92,7 +92,6 @@ class NGL4EPDController : NTXEPDController(), EPDInterface {
 
     override fun needsView(): Boolean {
         return true
-        //return false
     }
 
     override fun setEpdMode(targetView: android.view.View,
@@ -100,7 +99,7 @@ class NGL4EPDController : NTXEPDController(), EPDInterface {
                             x: Int, y: Int, width: Int, height: Int, epdMode: String?)
     {
 
-       Log.i(NGL4TAG, String.format(Locale.US, "defaulting to requestEpdMode: type:%d delay: %d x:%d y:%d w:%d h:%d",
+       Log.i(NGL4TAG, String.format(Locale.US, "calling requestEpdMode: type:%d delay: %d x:%d y:%d w:%d h:%d",
           mode, delay, x, y, width, height))
        requestEpdMode(targetView, mode, delay, x, y, width, height)
 
