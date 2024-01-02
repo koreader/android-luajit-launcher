@@ -6,8 +6,6 @@ import org.koreader.launcher.device.EPDInterface
 import org.koreader.launcher.device.epd.freescale.NTXEPDController
 import android.util.Log
 import java.util.*
-import android.view.Surface;
-import android.view.SurfaceView;
 
 class NGL4EPDController : NTXEPDController(), EPDInterface {
 
@@ -15,7 +13,7 @@ class NGL4EPDController : NTXEPDController(), EPDInterface {
         private const val NGL4TAG = "NGL4"
 
         // constants taken as is from sunxi-kobo.h (NGL4 prefix insered for names)
-      
+
         const val NGL4_EINK_INIT_MODE = 0x01
         const val NGL4_EINK_DU_MODE = 0x02
         const val NGL4_EINK_GC16_MODE = 0x04
@@ -40,15 +38,15 @@ class NGL4EPDController : NTXEPDController(), EPDInterface {
         const val NGL4_EINK_DITHERING_Y4 = 0x02800000
         const val NGL4_EINK_DITHERING_SIMPLE = 0x04800000
         const val NGL4_EINK_DITHERING_NTX_Y1 = 0x08800000
-        const val NGL4_EINK_NO_MERGE = Integer.MIN_VALUE // 0x80000000
+        const val NGL4_EINK_NO_MERGE = Integer.MIN_VALUE //0x80000000
 
-        const val NGL4_PAGE_DELAY = 0
-        const val NGL4_UI_DELAY = 0
-        const val NGL4_FAST_DELAY = 0
+        const val NGL4_PAGE_DELAY = 0 //500
+        const val NGL4_UI_DELAY = 0   //500
+        const val NGL4_FAST_DELAY = 0 //500
     }
 
     override fun getPlatform(): String {
-        return "freescale"
+        return "ngl4"
     }
 
     override fun getMode(): String {
@@ -74,7 +72,8 @@ class NGL4EPDController : NTXEPDController(), EPDInterface {
     }
 
     override fun getWaveformFast(): Int {
-        return NGL4_EINK_A2_MODE;
+       return NGL4_EINK_GU16_MODE
+       // return NGL4_EINK_A2_MODE;
     }
 
     // the delays below are effectively not used because of the method involved
@@ -101,20 +100,15 @@ class NGL4EPDController : NTXEPDController(), EPDInterface {
                             x: Int, y: Int, width: Int, height: Int, epdMode: String?)
     {
 
-        try {
-          Log.i(NGL4TAG, String.format(Locale.US, "setEpdMode to addEpdc: type:%d x:%d y:%d w:%d h:%d",
-            mode, x, y, width, height))
+       Log.i(NGL4TAG, String.format(Locale.US, "defaulting to requestEpdMode: type:%d delay: %d x:%d y:%d w:%d h:%d",
+          mode, delay, x, y, width, height))
+       requestEpdMode(targetView, mode, delay, x, y, width, height)
 
-          val iArr = intArrayOf(x, y, width, height, mode)
-
-          Class.forName("android.view.Surface").getDeclaredMethod("addEpdc", IntArray::class.java).invoke(
-            (targetView as SurfaceView).holder.surface, iArr);
-        } catch (e: Exception) {
-            Log.e(NGL4TAG, e.toString())
-            false
-        }
     }
 
     override fun resume() {}
     override fun pause() {}
 }
+
+
+
