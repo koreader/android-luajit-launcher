@@ -22,6 +22,10 @@ object LightsFactory {
                     logController("TolinoNTX")
                     TolinoNtxController()
                 }
+                DeviceInfo.LightsDevice.TOLINO_PAGE2 -> {
+                    logController("TolinoNTXNoWarmth")
+                    TolinoNtxNoWarmthController()
+                }
                 DeviceInfo.LightsDevice.ONYX_DARWIN7,
                 DeviceInfo.LightsDevice.ONYX_EDISON,
                 DeviceInfo.LightsDevice.ONYX_FAUST3,
