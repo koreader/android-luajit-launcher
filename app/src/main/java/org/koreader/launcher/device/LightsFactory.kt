@@ -61,6 +61,10 @@ object LightsFactory {
                     logController("Onyx color")
                     OnyxColorController()
                 }
+                DeviceInfo.LightsDevice.ONYX_TAB_ULTRA_C -> {
+                    logController("Onyx Adb")
+                    OnyxAdbLightsController()
+                }
                 DeviceInfo.LightsDevice.ONYX_C67,
                 DeviceInfo.LightsDevice.ONYX_MAGICBOOK,
                 DeviceInfo.LightsDevice.ONYX_MONTECRISTO3 -> {

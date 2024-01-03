@@ -134,6 +134,7 @@ object DeviceInfo {
         ONYX_POKE4LITE,
         ONYX_POKE_PRO,
         ONYX_TAB_ULTRA,
+        ONYX_TAB_ULTRA_C,
         RIDI_PAPER_3,
         TAGUS_GEA,
         TOLINO_EPOS,
@@ -693,6 +694,7 @@ object DeviceInfo {
         lightsMap[LightsDevice.ONYX_POKE4LITE] = ONYX_POKE4LITE
         lightsMap[LightsDevice.ONYX_POKE_PRO] = ONYX_POKE_PRO
         lightsMap[LightsDevice.ONYX_TAB_ULTRA] = ONYX_TAB_ULTRA
+        lightsMap[LightsDevice.ONYX_TAB_ULTRA_C] = ONYX_TAB_ULTRA_C
         lightsMap[LightsDevice.RIDI_PAPER_3] = RIDI_PAPER_3
         lightsMap[LightsDevice.TAGUS_GEA] = TAGUS_GEA
         lightsMap[LightsDevice.TOLINO_EPOS] = TOLINO_EPOS
