@@ -735,7 +735,7 @@ class MainActivity : NativeActivity(), LuaInterface,
 
     override fun showFrontlightDialog(title: String, dim: String, warmth: String,
                                       okButton: String, cancelButton: String) {
-        lightDialog.show(this, device.lights, title, dim, warmth, okButton, cancelButton)
+        lightDialog.show(this, device.lights, title, dim, warmth, okButton, cancelButton, "")
     }
 
     override fun showToast(message: String, longTimeout: Boolean) {
