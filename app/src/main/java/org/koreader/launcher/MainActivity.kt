@@ -117,8 +117,8 @@ class MainActivity : NativeActivity(), LuaInterface,
             view = NativeSurfaceView(this)
 
               // The following two lines brings SurfaceView to "top" in order for NGL4 refresh to work, should be compatible with other controllers
-            view?.setZOrderOnTop(true); 
-            view?.holder?.setFormat(PixelFormat.TRANSPARENT);
+            view?.setZOrderOnTop(true)
+            view?.holder?.setFormat(PixelFormat.TRANSPARENT)
 
             window.takeSurface(null)
             view?.holder?.addCallback(this)

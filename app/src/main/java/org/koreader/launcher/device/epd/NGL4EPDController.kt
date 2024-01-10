@@ -46,7 +46,7 @@ class NGL4EPDController : NTXEPDController(), EPDInterface {
     }
 
     override fun getPlatform(): String {
-        // the platform reported is "freescale" in order to not introduce new unexplained names 
+        // the platform reported is "freescale" in order to not introduce new unexplained names
         return "freescale"
     }
 
@@ -76,7 +76,7 @@ class NGL4EPDController : NTXEPDController(), EPDInterface {
        return NGL4_EINK_GU16_MODE
     }
 
-    // getWaveformDelay is the only effectively used delay because of getMode being not "all" 
+    // getWaveformDelay is the only effectively used delay because of getMode being not "all"
 
     override fun getWaveformDelay(): Int {
         return NGL4_PAGE_DELAY
@@ -102,12 +102,8 @@ class NGL4EPDController : NTXEPDController(), EPDInterface {
        Log.i(NGL4TAG, String.format(Locale.US, "calling requestEpdMode: type:%d delay: %d x:%d y:%d w:%d h:%d",
           mode, delay, x, y, width, height))
        requestEpdMode(targetView, mode, delay, x, y, width, height)
-
     }
 
     override fun resume() {}
     override fun pause() {}
 }
-
-
-
