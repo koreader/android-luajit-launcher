@@ -10,6 +10,7 @@ import org.koreader.launcher.device.epd.RK3026EPDController
 import org.koreader.launcher.device.epd.RK3368EPDController
 import org.koreader.launcher.device.epd.OnyxEPDController
 import org.koreader.launcher.device.epd.OldTolinoEPDController
+import org.koreader.launcher.device.epd.NGL4EPDController
 
 import java.util.*
 
@@ -53,7 +54,10 @@ object EPDFactory {
                     logController("Nook/NTX")
                     NookEPDController()
                 }
-
+               DeviceInfo.EinkDevice.NOOK_GL4 -> {
+                    logController("NOOK_GL4")
+                    NGL4EPDController()
+                }
                 DeviceInfo.EinkDevice.CREMA,
                 DeviceInfo.EinkDevice.CREMA_CARTA_G,
                 DeviceInfo.EinkDevice.HANVON_960,
