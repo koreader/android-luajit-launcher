@@ -11,8 +11,6 @@ import android.widget.RelativeLayout
 import android.widget.SeekBar
 import android.widget.TextView
 import org.koreader.launcher.device.LightsInterface
-import org.koreader.launcher.dialog.LightDialog
-import org.koreader.launcher.dialog.ToolTip
 
 class LightDialog {
 
@@ -32,8 +30,7 @@ class LightDialog {
         dim: String,
         warmth: String,
         okButton: String,
-        cancelButton: String,
-        tooltipText: String
+        cancelButton: String
     ) {
         val hasWarmth = controller.hasWarmth()
         state = LIGHT_DIALOG_OPENED
@@ -89,10 +86,6 @@ class LightDialog {
                 })
                 linearLayout.addView(warmthText)
                 linearLayout.addView(warmthSeekBar)
-            }
-
-            if (tooltipText.isNotEmpty()) {
-                ToolTip.showTooltip(titleText, tooltipText, activity)
             }
 
             val builder = AlertDialog.Builder(activity)
