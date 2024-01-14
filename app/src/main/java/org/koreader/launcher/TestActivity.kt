@@ -149,7 +149,7 @@ class TestActivity: AppCompatActivity() {
 
             if (id == "Onyx ADB (lights)") {
                 val tooltipText = "For $id, please see the wiki to enable additional permissions:\n" +
-                    "https://github.com/koreader/koreader/wiki/Android-tips-and-tricks#adb-stuff-todo"
+                    "https://github.com/koreader/koreader/wiki/Android-tips-and-tricks#adb-stuff"
                 ToolTip.showTooltip(binding.root, tooltipText, this)
                 Log.i(tag, tooltipText)
             }
