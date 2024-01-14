@@ -9,7 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupWindow
 import android.widget.TextView
-import org.koreader.launcher.dialog.ToolTip
 import org.koreader.launcher.R
 
 class ToolTip(private val context: Context) {
