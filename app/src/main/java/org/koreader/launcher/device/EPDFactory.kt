@@ -23,6 +23,7 @@ object EPDFactory {
                 DeviceInfo.EinkDevice.BOYUE_T80S,
                 DeviceInfo.EinkDevice.CREMA_0650L,
                 DeviceInfo.EinkDevice.ENERGY,
+                DeviceInfo.EinkDevice.ENERGY_PRO_HD,
                 DeviceInfo.EinkDevice.FIDIBOOK,
                 DeviceInfo.EinkDevice.INKBOOK,
                 DeviceInfo.EinkDevice.MEEBOOK_P6,

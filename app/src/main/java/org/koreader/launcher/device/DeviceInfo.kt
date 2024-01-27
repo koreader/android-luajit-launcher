@@ -45,6 +45,7 @@ object DeviceInfo {
         CREMA_0650L,
         CREMA_CARTA_G,
         ENERGY,
+        ENERGY_PRO_HD,
         FIDIBOOK,
         HANVON_960,
         INKBOOK,
@@ -101,6 +102,7 @@ object DeviceInfo {
         NONE,
         BOYUE_S62,
         CREMA_CARTA_G,
+        ENERGY_PRO_HD,
         MEEBOOK_P6,
         ONYX_C67,
         ONYX_DARWIN7,
@@ -182,6 +184,7 @@ object DeviceInfo {
     private val CREMA_CARTA_G: Boolean
     private val EMULATOR_X86: Boolean
     private val ENERGY: Boolean
+    private val ENERGY_PRO_HD: Boolean
     private val FIDIBOOK: Boolean
     private val HANVON_960: Boolean
     private val INKBOOK: Boolean
@@ -314,6 +317,10 @@ object DeviceInfo {
         // Energy Sistem eReaders. Tested on Energy Ereader Pro 4
         ENERGY = (BRAND.contentEquals("energysistem") || BRAND.contentEquals("energy_sistem"))
             && MODEL.startsWith("ereader")
+
+        // Energy Ereader Pro HD
+        ENERGY_PRO_HD = MANUFACTURER.contentEquals("energy_sistem")
+            && MODEL.contentEquals("energy ereader pro hd")
 
         // Fidibook
         FIDIBOOK = MANUFACTURER.contentEquals("fidibo")
@@ -613,6 +620,7 @@ object DeviceInfo {
         deviceMap[EinkDevice.CREMA_0650L] = CREMA_0650L
         deviceMap[EinkDevice.CREMA_CARTA_G] = CREMA_CARTA_G
         deviceMap[EinkDevice.ENERGY] = ENERGY
+        deviceMap[EinkDevice.ENERGY_PRO_HD] = ENERGY_PRO_HD
         deviceMap[EinkDevice.FIDIBOOK] = FIDIBOOK
         deviceMap[EinkDevice.INKBOOK] = INKBOOK
         deviceMap[EinkDevice.JDREAD] = JDREAD
@@ -677,6 +685,7 @@ object DeviceInfo {
         val lightsMap = HashMap<LightsDevice, Boolean>()
         lightsMap[LightsDevice.BOYUE_S62] = BOYUE_S62
         lightsMap[LightsDevice.CREMA_CARTA_G] = CREMA_CARTA_G
+        lightsMap[LightsDevice.ENERGY_PRO_HD] = ENERGY_PRO_HD
         lightsMap[LightsDevice.MEEBOOK_P6] = MEEBOOK_P6
         lightsMap[LightsDevice.ONYX_C67] = ONYX_C67
         lightsMap[LightsDevice.ONYX_DARWIN7] = ONYX_DARWIN7

@@ -22,6 +22,7 @@ object LightsFactory {
                     logController("TolinoNTX")
                     TolinoNtxController()
                 }
+                DeviceInfo.LightsDevice.ENERGY_PRO_HD,
                 DeviceInfo.LightsDevice.TOLINO_PAGE2 -> {
                     logController("TolinoNTXNoWarmth")
                     TolinoNtxNoWarmthController()
