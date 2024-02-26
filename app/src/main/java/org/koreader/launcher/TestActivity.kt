@@ -16,6 +16,7 @@ import org.koreader.launcher.device.epd.OnyxEPDController
 import org.koreader.launcher.device.epd.RK3026EPDController
 import org.koreader.launcher.device.epd.RK3368EPDController
 import org.koreader.launcher.device.epd.TolinoEPDController
+import org.koreader.launcher.device.epd.NGL4EPDController
 import org.koreader.launcher.device.lights.OnyxC67Controller
 import org.koreader.launcher.device.lights.OnyxColorController
 import org.koreader.launcher.device.lights.OnyxSdkLightsController
@@ -63,6 +64,7 @@ class TestActivity: AppCompatActivity() {
         epdMap["Rockchip RK3026"] = RK3026EPDController()
         epdMap["Rockchip RK3368"] = RK3368EPDController()
         epdMap["Freescale/NTX"] = TolinoEPDController()
+        epdMap["Nook GL4"] = NGL4EPDController()
 
         // Lights drivers
         lightsMap["Boyue S62 Root"] = BoyueS62RootController()
@@ -158,14 +160,18 @@ class TestActivity: AppCompatActivity() {
             epdMap[id]?.let { driver ->
                 when (id) {
                     "Freescale/NTX",
-                    "Onyx/Qualcomm" -> {
+                    "Onyx/Qualcomm",
+                    "Nook GL4" -> {
                         val display = windowManager.defaultDisplay
                         val size = Point()
                         display.getSize(size)
-                        if (id == "Freescale/NTX") {
+                        when (id) {
+                          "Freescale/NTX" ->
                             driver.setEpdMode(v, 34, 50, 0, 0, size.x, size.y, null)
-                        } else {
+                          "Onyx/Qualcomm" ->
                             driver.setEpdMode(v, 98, 50, 0, 0, size.x, size.y, null)
+                          "Nook GL4" ->
+                            driver.setEpdMode(v, -2147483644, 50, 0, 0, size.x, size.y, null)
                         }
                     }
 
