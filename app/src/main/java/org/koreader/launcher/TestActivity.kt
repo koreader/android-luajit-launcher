@@ -12,11 +12,12 @@ import org.koreader.launcher.device.Device
 import org.koreader.launcher.device.DeviceInfo
 import org.koreader.launcher.device.EPDInterface
 import org.koreader.launcher.device.LightsInterface
+import org.koreader.launcher.device.epd.NGL4EPDController
 import org.koreader.launcher.device.epd.OnyxEPDController
 import org.koreader.launcher.device.epd.RK3026EPDController
 import org.koreader.launcher.device.epd.RK3368EPDController
 import org.koreader.launcher.device.epd.TolinoEPDController
-import org.koreader.launcher.device.epd.NGL4EPDController
+import org.koreader.launcher.device.lights.OnyxAdbLightsController
 import org.koreader.launcher.device.lights.OnyxC67Controller
 import org.koreader.launcher.device.lights.OnyxColorController
 import org.koreader.launcher.device.lights.OnyxSdkLightsController
@@ -26,6 +27,7 @@ import org.koreader.launcher.device.lights.TolinoNtxController
 import org.koreader.launcher.device.lights.TolinoNtxNoWarmthController
 import org.koreader.launcher.device.lights.BoyueS62RootController
 import org.koreader.launcher.dialog.LightDialog
+import org.koreader.launcher.dialog.ToolTip
 
 class TestActivity: AppCompatActivity() {
     private val tag = this::class.java.simpleName
@@ -60,14 +62,15 @@ class TestActivity: AppCompatActivity() {
         }
 
         // EPD drivers
+        epdMap["Freescale/NTX"] = TolinoEPDController()
+        epdMap["Nook GL4"] = NGL4EPDController()
         epdMap["Onyx/Qualcomm"] = OnyxEPDController()
         epdMap["Rockchip RK3026"] = RK3026EPDController()
         epdMap["Rockchip RK3368"] = RK3368EPDController()
-        epdMap["Freescale/NTX"] = TolinoEPDController()
-        epdMap["Nook GL4"] = NGL4EPDController()
 
         // Lights drivers
         lightsMap["Boyue S62 Root"] = BoyueS62RootController()
+        lightsMap["Onyx ADB (lights)"] = OnyxAdbLightsController()
         lightsMap["Onyx C67"] = OnyxC67Controller()
         lightsMap["Onyx Color"] = OnyxColorController()
         lightsMap["Onyx SDK (lights)"] = OnyxSdkLightsController()
@@ -143,6 +146,14 @@ class TestActivity: AppCompatActivity() {
     private fun runLights(id: String) {
         lightsMap[id]?.let { driver ->
             Log.i(tag, String.format("running lights test: %s", id))
+
+            if (id == "Onyx ADB (lights)") {
+                val tooltipText = "For $id, please see the wiki to enable additional permissions:\n" +
+                    "https://github.com/koreader/koreader/wiki/Android-tips-and-tricks#adb-stuff"
+                ToolTip.showTooltip(binding.root, tooltipText, this)
+                Log.i(tag, tooltipText)
+            }
+
             val dialog = LightDialog()
             val title = String.format("Test %s", id)
             dialog.show(
@@ -168,10 +179,10 @@ class TestActivity: AppCompatActivity() {
                         when (id) {
                           "Freescale/NTX" ->
                             driver.setEpdMode(v, 34, 50, 0, 0, size.x, size.y, null)
-                          "Onyx/Qualcomm" ->
-                            driver.setEpdMode(v, 98, 50, 0, 0, size.x, size.y, null)
                           "Nook GL4" ->
                             driver.setEpdMode(v, -2147483644, 50, 0, 0, size.x, size.y, null)
+                          "Onyx/Qualcomm" ->
+                            driver.setEpdMode(v, 98, 50, 0, 0, size.x, size.y, null)
                         }
                     }
 

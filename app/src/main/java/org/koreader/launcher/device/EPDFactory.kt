@@ -54,10 +54,12 @@ object EPDFactory {
                     logController("Nook/NTX")
                     NookEPDController()
                 }
-               DeviceInfo.EinkDevice.NOOK_GL4 -> {
+
+                DeviceInfo.EinkDevice.NOOK_GL4 -> {
                     logController("NOOK_GL4")
                     NGL4EPDController()
                 }
+
                 DeviceInfo.EinkDevice.CREMA,
                 DeviceInfo.EinkDevice.CREMA_CARTA_G,
                 DeviceInfo.EinkDevice.HANVON_960,
