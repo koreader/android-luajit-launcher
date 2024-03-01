@@ -768,6 +768,7 @@ object DeviceInfo {
 
         HAS_COLOR_SCREEN = when (EINK) {
             EinkDevice.NONE,
+            EinkDevice.ONYX_NOTE_AIR3C,
             EinkDevice.ONYX_NOVA3_COLOR,
             EinkDevice.ONYX_TAB_ULTRA_C,
             EinkDevice.ONYX_NOVA_AIR_C -> true

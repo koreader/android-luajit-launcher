@@ -3,22 +3,15 @@ package org.koreader.launcher.device.lights
 import android.app.Activity
 import android.util.Log
 import org.koreader.launcher.device.LightsInterface
-import org.koreader.launcher.extensions.read
-import org.koreader.launcher.extensions.write
-import java.io.File
 
-class OnyxBlController : LightsInterface {
+class OnyxSdk2LightsController : LightsInterface {
     companion object {
         private const val TAG = "Lights"
-        private const val MIN = 0
-        private const val WHITE_FILE = "/sys/class/backlight/onyx_bl_br/brightness"
-        private const val WARMTH_FILE = "/sys/class/backlight/onyx_bl_ct/brightness"
-        private const val MAX_WHITE_FILE = "/sys/class/backlight/onyx_bl_br/max_brightness"
-        private const val MAX_WARMTH_FILE = "/sys/class/backlight/onyx_bl_ct/max_brightness"
+        private const val MIN_LIGHT_VALUE = 0
     }
 
     override fun getPlatform(): String {
-        return "onyx-bl"
+        return "onyx-sdk-2-lights"
     }
 
     override fun hasFallback(): Boolean {
@@ -34,46 +27,45 @@ class OnyxBlController : LightsInterface {
     }
 
     override fun getBrightness(activity: Activity): Int {
-        return File(WHITE_FILE).read()
+        return OnyxSdkDeviceController.getLightValue(OnyxSdkDeviceController.Light.COLD)
     }
 
     override fun getWarmth(activity: Activity): Int {
-        return File(WARMTH_FILE).read()
+        return OnyxSdkDeviceController.getLightValue(OnyxSdkDeviceController.Light.WARM)
     }
 
     override fun setBrightness(activity: Activity, brightness: Int) {
-        if (brightness < MIN || brightness > getMaxBrightness()) {
+        if (brightness < getMinBrightness() || brightness > getMaxBrightness()) {
             Log.w(TAG, "brightness value of of range: $brightness")
             return
         }
         Log.v(TAG, "Setting brightness to $brightness")
-        File(WHITE_FILE).write(brightness)
+        OnyxSdkDeviceController.setLightValue(OnyxSdkDeviceController.Light.COLD, brightness)
     }
 
     override fun setWarmth(activity: Activity, warmth: Int) {
-        if (warmth < MIN || warmth > getMaxWarmth()) {
+        if (warmth < getMinWarmth() || warmth > getMaxWarmth()) {
             Log.w(TAG, "warmth value of of range: $warmth")
             return
         }
-
         Log.v(TAG, "Setting warmth to $warmth")
-        File(WARMTH_FILE).write(warmth)
+        OnyxSdkDeviceController.setLightValue(OnyxSdkDeviceController.Light.WARM, warmth)
     }
 
     override fun getMinWarmth(): Int {
-        return MIN
+        return MIN_LIGHT_VALUE
     }
 
     override fun getMaxWarmth(): Int {
-        return File(MAX_WARMTH_FILE).read()
+        return OnyxSdkDeviceController.getMaxLightValue(OnyxSdkDeviceController.Light.WARM)
     }
 
     override fun getMinBrightness(): Int {
-        return MIN
+        return MIN_LIGHT_VALUE
     }
 
     override fun getMaxBrightness(): Int {
-        return File(MAX_WHITE_FILE).read()
+        return OnyxSdkDeviceController.getMaxLightValue(OnyxSdkDeviceController.Light.COLD)
     }
 
     override fun enableFrontlightSwitch(activity: Activity): Int {
@@ -81,6 +73,6 @@ class OnyxBlController : LightsInterface {
     }
 
     override fun hasStandaloneWarmth(): Boolean {
-        return true
+        return false
     }
 }
