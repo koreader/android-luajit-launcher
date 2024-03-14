@@ -49,6 +49,7 @@ object DeviceInfo {
         HANVON_960,
         INKBOOK,
         JDREAD,
+        LINFINY_ENOTE,
         MEEBOOK_P6,
         NABUK,
         NOOK,
@@ -148,6 +149,7 @@ object DeviceInfo {
     enum class QuirkDevice {
         NONE,
         EMULATOR,
+        LINFINY_ENOTE,
         ONYX_MAX,
         ONYX_NOTE,
         ONYX_POKE2,
@@ -186,6 +188,7 @@ object DeviceInfo {
     private val HANVON_960: Boolean
     private val INKBOOK: Boolean
     private val JDREAD: Boolean
+    private val LINFINY_ENOTE: Boolean
     private val MEEBOOK_P6: Boolean
     private val NABUK_REGAL_HD: Boolean
     private val NOOK: Boolean
@@ -331,6 +334,10 @@ object DeviceInfo {
         // JDRead1
         JDREAD = MANUFACTURER.contentEquals("onyx")
             && MODEL.contentEquals("jdread")
+
+        // Linfiny A4 (13.3") eNote / Avalue ENT-13T1 / QuirkLogic Papyr
+        LINFINY_ENOTE = MANUFACTURER.contentEquals("linfiny")
+	    && MODEL.contentEquals("ent-13t1")
 
         // Meebook P6
         MEEBOOK_P6 = MANUFACTURER.contentEquals("haoqing")
@@ -578,6 +585,7 @@ object DeviceInfo {
         // devices with known bugs
         val bugMap = HashMap<QuirkDevice, Boolean>()
         bugMap[QuirkDevice.EMULATOR] = EMULATOR_X86
+        bugMap[QuirkDevice.LINFINY_ENOTE] = LINFINY_ENOTE
         bugMap[QuirkDevice.ONYX_MAX] = ONYX_MAX
         bugMap[QuirkDevice.ONYX_NOTE] = ONYX_NOTE
         bugMap[QuirkDevice.ONYX_POKE2] = ONYX_POKE2
@@ -616,6 +624,7 @@ object DeviceInfo {
         deviceMap[EinkDevice.FIDIBOOK] = FIDIBOOK
         deviceMap[EinkDevice.INKBOOK] = INKBOOK
         deviceMap[EinkDevice.JDREAD] = JDREAD
+        deviceMap[EinkDevice.LINFINY_ENOTE] = LINFINY_ENOTE
         deviceMap[EinkDevice.MEEBOOK_P6] = MEEBOOK_P6
         deviceMap[EinkDevice.NABUK] = NABUK_REGAL_HD
         deviceMap[EinkDevice.NOOK] = NOOK
@@ -749,6 +758,7 @@ object DeviceInfo {
 
         // Android devices without lights
         QUIRK_NO_LIGHTS = when (QUIRK) {
+            QuirkDevice.LINFINY_ENOTE,
             QuirkDevice.ONYX_MAX,
             QuirkDevice.ONYX_NOTE,
             QuirkDevice.SONY_CP1,
