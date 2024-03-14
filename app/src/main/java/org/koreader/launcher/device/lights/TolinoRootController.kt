@@ -22,8 +22,11 @@ class TolinoRootController : LightsInterface {
         private const val MIN = 0
         private const val ACTUAL_BRIGHTNESS_FILE = "/sys/class/backlight/mxc_msp430_fl.0/actual_brightness" // always readable, same for Epos2 and Vision4
         private const val COLOR_FILE_EPOS2 = "/sys/class/backlight/tlc5947_bl/color"
+        private const val COLOR_FILE_SHINE4 = "/sys/class/leds/aw99703-bl_FL1/color"
         private const val COLOR_FILE_VISION4HD = "/sys/class/backlight/lm3630a_led/color"
-        private val COLOR_FILE = if (File(COLOR_FILE_VISION4HD).exists())
+        private val COLOR_FILE = if (File(COLOR_FILE_SHINE4).exists())
+            COLOR_FILE_SHINE4
+        else if (File(COLOR_FILE_VISION4HD).exists())
             COLOR_FILE_VISION4HD
         else
             COLOR_FILE_EPOS2

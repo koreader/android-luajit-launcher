@@ -142,6 +142,7 @@ object DeviceInfo {
         TOLINO_EPOS,
         TOLINO_PAGE2,
         TOLINO_SHINE3,
+        TOLINO_SHINE4,
         TOLINO_VISION4,
         TOLINO_VISION5
     }
@@ -238,6 +239,7 @@ object DeviceInfo {
     private val TOLINO_EPOS: Boolean
     private val TOLINO_PAGE2: Boolean
     private val TOLINO_SHINE3: Boolean
+    private val TOLINO_SHINE4: Boolean
     private val TOLINO_VISION4: Boolean
     private val TOLINO_VISION5: Boolean
 
@@ -570,6 +572,12 @@ object DeviceInfo {
             && DEVICE.contentEquals("ntx_6sl")
             && HARDWARE.contentEquals("e60k00")
 
+        // Tolino Shine 4 also has warmth lights, but with ntx_io file
+        TOLINO_SHINE4 = BRAND.contentEquals("rakutenkobo")
+            && MODEL.contentEquals("tolino shine 4")
+            && DEVICE.contentEquals("tolino")
+            && HARDWARE.contentEquals("sun8iw15p1")
+
         // Tolino Vision 4 also has warmth lights, but with ntx_io file
         TOLINO_VISION4 = BRAND.contentEquals("rakutenkobo")
             && MODEL.contentEquals("tolino")
@@ -725,6 +733,7 @@ object DeviceInfo {
         lightsMap[LightsDevice.TOLINO_EPOS] = TOLINO_EPOS
         lightsMap[LightsDevice.TOLINO_PAGE2] = TOLINO_PAGE2
         lightsMap[LightsDevice.TOLINO_SHINE3] = TOLINO_SHINE3
+        lightsMap[LightsDevice.TOLINO_SHINE4] = TOLINO_SHINE4
         lightsMap[LightsDevice.TOLINO_VISION4] = TOLINO_VISION4
         lightsMap[LightsDevice.TOLINO_VISION5] = TOLINO_VISION5
 
