@@ -95,6 +95,8 @@ void android_main(struct android_app* state) {
         // Check if we are exiting.
         if (state->destroyRequested != 0) {
             LOGV("onDestroy()");
+            window_ready = 0;
+            gained_focus = 0;
             return;
         }
     }
