@@ -18,7 +18,6 @@ object EPDFactory {
     val epdController: EPDInterface
         get() {
             return when (DeviceInfo.EINK) {
-                DeviceInfo.EinkDevice.BOYUE_C64P,
                 DeviceInfo.EinkDevice.BOYUE_T61,
                 DeviceInfo.EinkDevice.BOYUE_T62,
                 DeviceInfo.EinkDevice.BOYUE_T80S,
@@ -34,6 +33,7 @@ object EPDFactory {
                     RK3026EPDController()
                 }
 
+                DeviceInfo.EinkDevice.BOYUE_C64P,
                 DeviceInfo.EinkDevice.BOYUE_K78W,
                 DeviceInfo.EinkDevice.BOYUE_K103,
                 DeviceInfo.EinkDevice.BOYUE_P6,

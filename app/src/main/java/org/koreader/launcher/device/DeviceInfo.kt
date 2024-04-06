@@ -101,7 +101,6 @@ object DeviceInfo {
 
     enum class LightsDevice {
         NONE,
-        BOYUE_C64P,
         BOYUE_S62,
         CREMA_CARTA_G,
         MEEBOOK_P6,
