@@ -28,6 +28,7 @@ object DeviceInfo {
 
     enum class EinkDevice {
         NONE,
+        BOYUE_C64P,
         BOYUE_K78W,
         BOYUE_K103,
         BOYUE_P6,
@@ -41,7 +42,6 @@ object DeviceInfo {
         BOYUE_T80D,
         BOYUE_T80S,
         BOYUE_T103D,
-        C64P,
         CREMA,
         CREMA_0650L,
         CREMA_CARTA_G,
@@ -101,8 +101,8 @@ object DeviceInfo {
 
     enum class LightsDevice {
         NONE,
+        BOYUE_C64P,
         BOYUE_S62,
-        C64P,
         CREMA_CARTA_G,
         MEEBOOK_P6,
         ONYX_C67,
@@ -168,6 +168,7 @@ object DeviceInfo {
     internal val TOLINO: Boolean
 
     // device probe
+    private val BOYUE_C64P: Boolean
     private val BOYUE_K78W: Boolean
     private val BOYUE_K103: Boolean
     private val BOYUE_P6: Boolean
@@ -181,7 +182,6 @@ object DeviceInfo {
     private val BOYUE_T80D: Boolean
     private val BOYUE_T80S: Boolean
     private val BOYUE_T103D: Boolean
-    private val C64P: Boolean
     private val CREMA: Boolean
     private val CREMA_0650L: Boolean
     private val CREMA_CARTA_G: Boolean
@@ -254,6 +254,10 @@ object DeviceInfo {
         BOYUE = MANUFACTURER.contentEquals("boeye")
             || MANUFACTURER.contentEquals("boyue")
 
+        // Boyue C64P (Boyue P6 Clone)
+        BOYUE_C64P = BRAND.contentEquals("c64p")
+            && PRODUCT.contentEquals("c64p")
+
         // Boyue Likebook Ares
         BOYUE_K78W = BOYUE
             && (PRODUCT.contentEquals("k78w") || PRODUCT.contentEquals("ares"))
@@ -301,10 +305,6 @@ object DeviceInfo {
         // Boyue Likebook Mimas
         BOYUE_T103D = BOYUE
             && (PRODUCT.contentEquals("t103d") || PRODUCT.contentEquals("mimas"))
-
-        // C64P (Boyue P6 Clone)
-        C64P = BRAND.contentEquals("c64p")
-            && PRODUCT.contentEquals("c64p")
 
         // Crema Note (1010P)
         CREMA = BRAND.contentEquals("crema")
@@ -611,6 +611,7 @@ object DeviceInfo {
 
         // e-ink devices
         val deviceMap = HashMap<EinkDevice, Boolean>()
+        deviceMap[EinkDevice.BOYUE_C64P] = BOYUE_C64P
         deviceMap[EinkDevice.BOYUE_K103] = BOYUE_K103
         deviceMap[EinkDevice.BOYUE_K78W] = BOYUE_K78W
         deviceMap[EinkDevice.BOYUE_P6] = BOYUE_P6
@@ -624,7 +625,6 @@ object DeviceInfo {
         deviceMap[EinkDevice.BOYUE_T80D] = BOYUE_T80D
         deviceMap[EinkDevice.BOYUE_T80S] = BOYUE_T80S
         deviceMap[EinkDevice.BOYUE_T103D] = BOYUE_T103D
-        deviceMap[EinkDevice.C64P] = C64P
         deviceMap[EinkDevice.CREMA] = CREMA
         deviceMap[EinkDevice.CREMA_0650L] = CREMA_0650L
         deviceMap[EinkDevice.CREMA_CARTA_G] = CREMA_CARTA_G
@@ -693,7 +693,6 @@ object DeviceInfo {
         // devices with custom lights
         val lightsMap = HashMap<LightsDevice, Boolean>()
         lightsMap[LightsDevice.BOYUE_S62] = BOYUE_S62
-        lightsMap[LightsDevice.C64P] = C64P
         lightsMap[LightsDevice.CREMA_CARTA_G] = CREMA_CARTA_G
         lightsMap[LightsDevice.MEEBOOK_P6] = MEEBOOK_P6
         lightsMap[LightsDevice.ONYX_C67] = ONYX_C67
