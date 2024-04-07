@@ -28,6 +28,7 @@ object DeviceInfo {
 
     enum class EinkDevice {
         NONE,
+        BOYUE_C64P,
         BOYUE_K78W,
         BOYUE_K103,
         BOYUE_P6,
@@ -166,6 +167,7 @@ object DeviceInfo {
     internal val TOLINO: Boolean
 
     // device probe
+    private val BOYUE_C64P: Boolean
     private val BOYUE_K78W: Boolean
     private val BOYUE_K103: Boolean
     private val BOYUE_P6: Boolean
@@ -250,6 +252,10 @@ object DeviceInfo {
         HARDWARE = lowerCase(getBuildField("HARDWARE"))
         BOYUE = MANUFACTURER.contentEquals("boeye")
             || MANUFACTURER.contentEquals("boyue")
+
+        // Boyue C64P (Boyue P6 Clone)
+        BOYUE_C64P = BRAND.contentEquals("c64p")
+            && PRODUCT.contentEquals("c64p")
 
         // Boyue Likebook Ares
         BOYUE_K78W = BOYUE
@@ -604,6 +610,7 @@ object DeviceInfo {
 
         // e-ink devices
         val deviceMap = HashMap<EinkDevice, Boolean>()
+        deviceMap[EinkDevice.BOYUE_C64P] = BOYUE_C64P
         deviceMap[EinkDevice.BOYUE_K103] = BOYUE_K103
         deviceMap[EinkDevice.BOYUE_K78W] = BOYUE_K78W
         deviceMap[EinkDevice.BOYUE_P6] = BOYUE_P6

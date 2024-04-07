@@ -33,6 +33,7 @@ object EPDFactory {
                     RK3026EPDController()
                 }
 
+                DeviceInfo.EinkDevice.BOYUE_C64P,
                 DeviceInfo.EinkDevice.BOYUE_K78W,
                 DeviceInfo.EinkDevice.BOYUE_K103,
                 DeviceInfo.EinkDevice.BOYUE_P6,
