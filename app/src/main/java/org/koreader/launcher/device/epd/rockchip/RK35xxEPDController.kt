@@ -34,10 +34,9 @@
  */
 package org.koreader.launcher.device.epd.rockchip
 
+import android.annotation.SuppressLint
 import android.util.Log
 import android.view.View
-import java.lang.reflect.Modifier
-import java.util.Locale
 
 abstract class RK35xxEPDController {
     companion object {
@@ -45,6 +44,7 @@ abstract class RK35xxEPDController {
 
         const val EPD_AUTO = 0
 
+        @SuppressLint("WrongConstant")
         fun requestEpdMode(view: View): Boolean {
             return try {
                 val einkManagerClass = Class.forName("android.os.EinkManager")
