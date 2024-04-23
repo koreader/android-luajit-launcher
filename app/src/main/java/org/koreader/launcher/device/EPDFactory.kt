@@ -11,6 +11,7 @@ import org.koreader.launcher.device.epd.RK3368EPDController
 import org.koreader.launcher.device.epd.OnyxEPDController
 import org.koreader.launcher.device.epd.OldTolinoEPDController
 import org.koreader.launcher.device.epd.NGL4EPDController
+import org.koreader.launcher.device.epd.RK3566EPDController
 
 import java.util.*
 
@@ -113,6 +114,11 @@ object EPDFactory {
                 DeviceInfo.EinkDevice.TAGUS_GEA-> {
                     logController("Old Tolino/NTX")
                     OldTolinoEPDController()
+                }
+
+                DeviceInfo.EinkDevice.XIAOMI_READER -> {
+                    logController("Rockchip RK3566")
+                    RK3566EPDController()
                 }
 
                 else -> {
