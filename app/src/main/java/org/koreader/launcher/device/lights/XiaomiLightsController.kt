@@ -167,25 +167,25 @@ object XiaomiLedControl {
         }
     }
 
-    fun setWarm(value: Int, context: Context?) {
-        try {
-            setLedValue(getLight(context), value, context)
-            setWarmLevel!!.invoke(ledController!!, context, value)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-
-    fun setLight(value: Int, context: Context?) {
-        try {
-            setLedValue(value, getWarm(context), context)
-            setLightLevel!!.invoke(ledController!!, context, value)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-
-    private fun setLedValue(lightValue: Int, warmValue: Int, context: Context?) {
-        setLedValue!!.invoke(ledController!!, context, lightValue, warmValue)
-    }
+//    fun setWarm(value: Int, context: Context?) {
+//        try {
+//            setLedValue(getLight(context), value, context)
+//            setWarmLevel!!.invoke(ledController!!, context, value)
+//        } catch (e: Exception) {
+//            e.printStackTrace()
+//        }
+//    }
+//
+//    fun setLight(value: Int, context: Context?) {
+//        try {
+//            setLedValue(value, getWarm(context), context)
+//            setLightLevel!!.invoke(ledController!!, context, value)
+//        } catch (e: Exception) {
+//            e.printStackTrace()
+//        }
+//    }
+//
+//    private fun setLedValue(lightValue: Int, warmValue: Int, context: Context?) {
+//        setLedValue!!.invoke(ledController!!, context, lightValue, warmValue)
+//    }
 }
