@@ -148,7 +148,6 @@ object XiaomiLedControl {
                 return 0
             }
             getWarmLevel!!.invoke(ledController, context) as Int
-
         } catch (e: Exception) {
             e.printStackTrace()
             0

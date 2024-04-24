@@ -63,6 +63,5 @@ abstract class RK35xxEPDController {
                 false
             }
         }
-
     }
 }
