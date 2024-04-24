@@ -32,11 +32,29 @@ class XiaomiLightsController : LightsInterface {
     }
 
     override fun getBrightness(activity: Activity): Int {
-        return XiaomiLedControl.getLight(activity)
+        return try {
+            val enabled = getLightStatus!!.invoke(ledController!!, activity) as Boolean
+            if (!enabled) {
+                return 0
+            }
+            getLightLevel!!.invoke(ledController, activity) as Int
+        } catch (e: Exception) {
+            e.printStackTrace()
+            0
+        }
     }
 
     override fun getWarmth(activity: Activity): Int {
-        return XiaomiLedControl.getWarm(activity)
+        return try {
+            val enabled = getWarmStatus!!.invoke(ledController!!, activity) as Boolean
+            if (!enabled) {
+                return 0
+            }
+            getWarmLevel!!.invoke(ledController, activity) as Int
+        } catch (e: Exception) {
+            e.printStackTrace()
+            0
+        }
     }
 
     override fun setBrightness(activity: Activity, brightness: Int) {
@@ -45,7 +63,14 @@ class XiaomiLightsController : LightsInterface {
             return
         }
         Log.v(TAG, "Setting brightness to $brightness")
-//        XiaomiLedControl.setLight(brightness, activity)
+//    fun setLight(value: Int, context: Context?) {
+//        try {
+//            setLedValue(value, getWarm(context), context)
+//            setLightLevel!!.invoke(ledController!!, context, value)
+//        } catch (e: Exception) {
+//            e.printStackTrace()
+//        }
+//    }
     }
 
     override fun setWarmth(activity: Activity, warmth: Int) {
@@ -54,7 +79,12 @@ class XiaomiLightsController : LightsInterface {
             return
         }
         Log.v(TAG, "Setting warmth to $warmth")
-//        XiaomiLedControl.setWarm(warmth, activity)
+//        try {
+//            setLedValue(getLight(context), value, context)
+//            setWarmLevel!!.invoke(ledController!!, context, value)
+//        } catch (e: Exception) {
+//            e.printStackTrace()
+//        }
     }
 
     override fun getMinWarmth(): Int {
@@ -80,10 +110,6 @@ class XiaomiLightsController : LightsInterface {
     override fun hasStandaloneWarmth(): Boolean {
         return true
     }
-}
-
-object XiaomiLedControl {
-    private const val TAG = "lights"
 
     private val ledController: Class<*>? = try {
         forName("android.os.MoanLedControl")
@@ -98,6 +124,10 @@ object XiaomiLedControl {
         Log.w(TAG, "$e")
         null
     }
+
+//    private fun setLedValue(lightValue: Int, warmValue: Int, context: Context?) {
+//        setLedValue!!.invoke(ledController!!, context, lightValue, warmValue)
+//    }
 
     private val setWarmLevel: Method? = try {
         ledController!!.getMethod("setWarmLevel", Context::class.java, Integer.TYPE)
@@ -140,52 +170,4 @@ object XiaomiLedControl {
         Log.w(TAG, "$e")
         null
     }
-
-    fun getWarm(context: Context?): Int {
-        return try {
-            val enabled = getWarmStatus!!.invoke(ledController!!, context) as Boolean
-            if (!enabled) {
-                return 0
-            }
-            getWarmLevel!!.invoke(ledController, context) as Int
-        } catch (e: Exception) {
-            e.printStackTrace()
-            0
-        }
-    }
-
-    fun getLight(context: Context?): Int {
-        return try {
-            val enabled = getLightStatus!!.invoke(ledController!!, context) as Boolean
-            if (!enabled) {
-                return 0
-            }
-            getLightLevel!!.invoke(ledController, context) as Int
-        } catch (e: Exception) {
-            e.printStackTrace()
-            0
-        }
-    }
-
-//    fun setWarm(value: Int, context: Context?) {
-//        try {
-//            setLedValue(getLight(context), value, context)
-//            setWarmLevel!!.invoke(ledController!!, context, value)
-//        } catch (e: Exception) {
-//            e.printStackTrace()
-//        }
-//    }
-//
-//    fun setLight(value: Int, context: Context?) {
-//        try {
-//            setLedValue(value, getWarm(context), context)
-//            setLightLevel!!.invoke(ledController!!, context, value)
-//        } catch (e: Exception) {
-//            e.printStackTrace()
-//        }
-//    }
-//
-//    private fun setLedValue(lightValue: Int, warmValue: Int, context: Context?) {
-//        setLedValue!!.invoke(ledController!!, context, lightValue, warmValue)
-//    }
 }
