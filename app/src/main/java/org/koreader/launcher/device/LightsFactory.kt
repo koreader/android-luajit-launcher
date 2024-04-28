@@ -79,10 +79,6 @@ object LightsFactory {
                     logController("Boyue S62")
                     BoyueS62RootController()
                 }
-                DeviceInfo.LightsDevice.XIAOMI_READER -> {
-                    logController("Xiaomi Reader")
-                    XiaomiLightsController()
-                }
                 else -> {
                     logController("Generic")
                     GenericController()
