@@ -105,11 +105,8 @@ object FrontLightAdb {
     private val checkCTMMethod: Method? = getMethod("checkCTM")
 
     private fun getMaxLightValue(lightType: Int): Int {
-        return try {
-            getMaxLightValueMethod?.invoke(flController, lightType) as? Int ?: 0
-        } catch (e: Exception) {
-            Log.e(TAG, "Error getting the max light", e)
-            0
+        return (getMaxLightValueMethod?.invoke(flController, lightType) as? Int ?: 0).let {
+            if (it == 0) 100 else it
         }
     }
 
@@ -153,12 +150,7 @@ object FrontLightAdb {
     }
 
     private fun getValue(method: Method?, lightType: Int): Int {
-        return try {
-            method?.invoke(flController, lightType) as? Int ?: 0
-        } catch (e: Exception) {
-            Log.e(TAG, "Error getting light value", e)
-            0
-        }
+        return method?.invoke(flController, lightType) as? Int ?: 0
     }
 
     private fun setValue(method: Method?, lightType: Int, value: Int) {
