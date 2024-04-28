@@ -10,8 +10,6 @@ import java.lang.reflect.Method
 class OnyxAdbLightsController : LightsInterface {
     companion object {
         private const val TAG = "Lights"
-        private const val BRIGHTNESS_MAX = 25
-        private const val WARMTH_MAX = 24
         private const val MIN = 0
     }
 
@@ -32,29 +30,29 @@ class OnyxAdbLightsController : LightsInterface {
     }
 
     override fun getBrightness(activity: Activity): Int {
-        return FrontLightAdb.getCold(activity)
+        return FrontLightAdb.getBrightness(activity)
     }
 
     override fun getWarmth(activity: Activity): Int {
-        return FrontLightAdb.getWarm(activity)
+        return FrontLightAdb.getWarmth(activity)
     }
 
     override fun setBrightness(activity: Activity, brightness: Int) {
-        if (brightness < MIN || brightness > BRIGHTNESS_MAX) {
+        if (brightness < MIN || brightness > getMaxBrightness()) {
             Log.w(TAG, "brightness value of of range: $brightness")
             return
         }
         Log.v(TAG, "Setting brightness to $brightness")
-        FrontLightAdb.setCold(brightness, activity)
+        FrontLightAdb.setBrightness(brightness, activity)
     }
 
     override fun setWarmth(activity: Activity, warmth: Int) {
-        if (warmth < MIN || warmth > WARMTH_MAX) {
+        if (warmth < MIN || warmth > getMaxWarmth()) {
             Log.w(TAG, "warmth value of of range: $warmth")
             return
         }
         Log.v(TAG, "Setting warmth to $warmth")
-        FrontLightAdb.setWarm(warmth, activity)
+        FrontLightAdb.setWarmth(warmth, activity)
     }
 
     override fun getMinWarmth(): Int {
@@ -62,7 +60,7 @@ class OnyxAdbLightsController : LightsInterface {
     }
 
     override fun getMaxWarmth(): Int {
-        return WARMTH_MAX
+        return FrontLightAdb.getMaxWarmth()
     }
 
     override fun getMinBrightness(): Int {
@@ -70,7 +68,7 @@ class OnyxAdbLightsController : LightsInterface {
     }
 
     override fun getMaxBrightness(): Int {
-        return BRIGHTNESS_MAX
+        return FrontLightAdb.getMaxBrightness()
     }
 
     override fun enableFrontlightSwitch(activity: Activity): Int {
@@ -92,53 +90,90 @@ object FrontLightAdb {
         null
     }
 
-    private val setCoolWarmBrightness: Method? = try {
-        flController!!.getMethod("setLightValue", Integer.TYPE, Integer.TYPE)
-    } catch (e: Exception) {
-        Log.w(TAG, "$e")
-        null
-    }
-
-    private val getCoolWarmBrightness: Method? = try {
-        flController!!.getMethod("getLightValue", Integer.TYPE)
-    } catch (e: Exception) {
-        Log.w(TAG, "$e")
-        null
-    }
-    private const val BRIGHTNESS_CONFIG_WARM_IDX: Int = 6
-    private const val BRIGHTNESS_CONFIG_COLD_IDX: Int = 7
-
-    fun getWarm(context: Context?): Int {
+    private fun getMethod(name: String, vararg parameterTypes: Class<*>): Method? {
         return try {
-            getCoolWarmBrightness!!.invoke(flController!!, BRIGHTNESS_CONFIG_WARM_IDX) as Int
+            flController?.getMethod(name, *parameterTypes)
         } catch (e: Exception) {
-            e.printStackTrace()
-            0
+            Log.w(TAG, "$e")
+            null
         }
     }
 
-    fun getCold(context: Context?): Int {
-        return try {
-            getCoolWarmBrightness!!.invoke(flController!!, BRIGHTNESS_CONFIG_COLD_IDX) as Int
-        } catch (e: Exception) {
-            e.printStackTrace()
-            0
+    private val setLightValueMethod: Method? = getMethod("setLightValue", Integer.TYPE, Integer.TYPE)
+    private val getLightValueMethod: Method? = getMethod("getLightValue", Integer.TYPE)
+    private val getMaxLightValueMethod: Method? = getMethod("getMaxLightValue", Integer.TYPE)
+    private val checkCTMMethod: Method? = getMethod("checkCTM")
+
+    private fun getMaxLightValue(lightType: Int): Int {
+        return (getMaxLightValueMethod?.invoke(flController, lightType) as? Int ?: 0).let {
+            if (it == 0) 100 else it
         }
     }
 
-    fun setWarm(value: Int, context: Context?) {
+    fun checkType(): Int {
+        if (checkCTMMethod?.invoke(flController) as? Boolean == true) {
+            return 1
+        } else {
+            return 0
+        }
+    }
+
+    private val type = checkType()
+
+    fun getBrightnessType(): Int {
+        if (type == 1) {
+            return 7
+        } else {
+            return 3
+        }
+    }
+
+    fun getWarmthType(): Int {
+        if (type == 1) {
+            return 6
+        } else {
+            return 2
+        }
+    }
+
+    private var brightnessType = getBrightnessType()
+    private var warmthType = getWarmthType()
+    private val brightnessMax = getMaxLightValue(brightnessType)
+    private val warmthMax = getMaxLightValue(warmthType)
+
+    fun getMaxBrightness(): Int {
+        return brightnessMax
+    }
+
+    fun getMaxWarmth(): Int {
+        return warmthMax
+    }
+
+    private fun getValue(method: Method?, lightType: Int): Int {
+        return method?.invoke(flController, lightType) as? Int ?: 0
+    }
+
+    private fun setValue(method: Method?, lightType: Int, value: Int) {
         try {
-            setCoolWarmBrightness!!.invoke(flController!!, BRIGHTNESS_CONFIG_WARM_IDX, value)
+            method?.invoke(flController, lightType, value)
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(TAG, "Error setting light value", e)
         }
     }
 
-    fun setCold(value: Int, context: Context?) {
-        try {
-            setCoolWarmBrightness!!.invoke(flController!!, BRIGHTNESS_CONFIG_COLD_IDX, value)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+    fun getWarmth(context: Context?): Int {
+        return getValue(getLightValueMethod, warmthType)
+    }
+
+    fun getBrightness(context: Context?): Int {
+        return getValue(getLightValueMethod, brightnessType)
+    }
+
+    fun setWarmth(value: Int, context: Context?) {
+        setValue(setLightValueMethod, warmthType, value)
+    }
+
+    fun setBrightness(value: Int, context: Context?) {
+        setValue(setLightValueMethod, brightnessType, value)
     }
 }

@@ -36,7 +36,6 @@ object LightsFactory {
                 DeviceInfo.LightsDevice.ONYX_NOTE_AIR,
                 DeviceInfo.LightsDevice.ONYX_NOTE_PRO,
                 DeviceInfo.LightsDevice.ONYX_NOVA3,
-                DeviceInfo.LightsDevice.ONYX_NOVA_AIR,
                 DeviceInfo.LightsDevice.ONYX_NOVA_PRO,
                 DeviceInfo.LightsDevice.ONYX_POKE3,
                 DeviceInfo.LightsDevice.ONYX_POKE_PRO -> {
@@ -65,6 +64,7 @@ object LightsFactory {
                     logController("Onyx color")
                     OnyxColorController()
                 }
+                DeviceInfo.LightsDevice.ONYX_NOVA_AIR,
                 DeviceInfo.LightsDevice.ONYX_TAB_ULTRA_C -> {
                     logController("Onyx Adb")
                     OnyxAdbLightsController()
