@@ -16,6 +16,7 @@ import org.koreader.launcher.device.epd.NGL4EPDController
 import org.koreader.launcher.device.epd.OnyxEPDController
 import org.koreader.launcher.device.epd.RK3026EPDController
 import org.koreader.launcher.device.epd.RK3368EPDController
+import org.koreader.launcher.device.epd.RK3566EPDController
 import org.koreader.launcher.device.epd.TolinoEPDController
 import org.koreader.launcher.device.lights.OnyxAdbLightsController
 import org.koreader.launcher.device.lights.OnyxC67Controller
@@ -67,6 +68,7 @@ class TestActivity: AppCompatActivity() {
         epdMap["Onyx/Qualcomm"] = OnyxEPDController()
         epdMap["Rockchip RK3026"] = RK3026EPDController()
         epdMap["Rockchip RK3368"] = RK3368EPDController()
+        epdMap["Rockchip RK3566"] = RK3566EPDController()
 
         // Lights drivers
         lightsMap["Boyue S62 Root"] = BoyueS62RootController()
@@ -110,7 +112,7 @@ class TestActivity: AppCompatActivity() {
         }
 
         val epdAdapter: ArrayAdapter<String> = ArrayAdapter(this,
-            android.R.layout.simple_spinner_item, epdOptions)
+            android.R.layout.simple_spinner_item, epdOptions.sortedWith(compareBy { it }))
 
         epdAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.spinnerEpd.adapter = epdAdapter
@@ -187,7 +189,8 @@ class TestActivity: AppCompatActivity() {
                     }
 
                     "Rockchip RK3026",
-                    "Rockchip RK3368" -> {
+                    "Rockchip RK3368",
+                    "Rockchip RK3566" -> {
                         driver.setEpdMode(v, 0, 0, 0, 0, 0, 0, "EPD_FULL")
                     }
                     else -> {
