@@ -97,7 +97,8 @@ object DeviceInfo {
         SONY_RP1,
         TAGUS_GEA,
         TOLINO,
-        XIAOMI_READER
+        XIAOMI_READER,
+        PUBU_PUBOOK,
     }
 
     enum class LightsDevice {
@@ -146,7 +147,8 @@ object DeviceInfo {
         TOLINO_SHINE3,
         TOLINO_VISION4,
         TOLINO_VISION5,
-        XIAOMI_READER
+        XIAOMI_READER,
+        PUBU_PUBOOK
     }
 
     enum class QuirkDevice {
@@ -245,6 +247,7 @@ object DeviceInfo {
     private val TOLINO_VISION4: Boolean
     private val TOLINO_VISION5: Boolean
     private val XIAOMI_READER: Boolean
+    private val PUBU_PUBOOK: Boolean
 
     init {
         MANUFACTURER = lowerCase(getBuildField("MANUFACTURER"))
@@ -597,6 +600,12 @@ object DeviceInfo {
             && DEVICE.contentEquals("rk3566_eink")
             && HARDWARE.contentEquals("rk30board")
 
+        PUBU_PUBOOK = MANUFACTURER.contentEquals("rockchip")
+            && BRAND.contentEquals("rockchip")
+            && MODEL.contentEquals("pubook")
+            && DEVICE.contentEquals("pubook")
+            && HARDWARE.contentEquals("rk30board")
+
         // devices with known bugs
         val bugMap = HashMap<QuirkDevice, Boolean>()
         bugMap[QuirkDevice.EMULATOR] = EMULATOR_X86
@@ -688,6 +697,7 @@ object DeviceInfo {
         deviceMap[EinkDevice.TAGUS_GEA] = TAGUS_GEA
         deviceMap[EinkDevice.TOLINO] = TOLINO
         deviceMap[EinkDevice.XIAOMI_READER] = XIAOMI_READER
+        deviceMap[EinkDevice.PUBU_PUBOOK] = PUBU_PUBOOK
 
         deviceMap.keys.iterator().run {
             while (this.hasNext()) {
@@ -745,6 +755,7 @@ object DeviceInfo {
         lightsMap[LightsDevice.TOLINO_VISION4] = TOLINO_VISION4
         lightsMap[LightsDevice.TOLINO_VISION5] = TOLINO_VISION5
         lightsMap[LightsDevice.XIAOMI_READER] = XIAOMI_READER
+        lightsMap[LightsDevice.PUBU_PUBOOK] = PUBU_PUBOOK
 
         lightsMap.keys.iterator().run {
             while (this.hasNext()) {

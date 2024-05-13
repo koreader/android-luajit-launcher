@@ -116,7 +116,8 @@ object EPDFactory {
                     OldTolinoEPDController()
                 }
 
-                DeviceInfo.EinkDevice.XIAOMI_READER -> {
+                DeviceInfo.EinkDevice.XIAOMI_READER,
+                DeviceInfo.EinkDevice.PUBU_PUBOOK -> {
                     logController("Rockchip RK3566")
                     RK3566EPDController()
                 }
