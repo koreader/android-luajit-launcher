@@ -49,9 +49,13 @@ object DeviceInfo {
         FIDIBOOK,
         HANVON_960,
         INKBOOK,
+        INKPALM_PLUS,
         JDREAD,
         LINFINY_ENOTE,
+        MEEBOOK_M6,
+        MEEBOOK_M7,
         MEEBOOK_P6,
+        MOAAN_MIX7,
         NABUK,
         NOOK,
         NOOK_GL4,
@@ -191,9 +195,13 @@ object DeviceInfo {
     private val FIDIBOOK: Boolean
     private val HANVON_960: Boolean
     private val INKBOOK: Boolean
+    private val INKPALM_PLUS: Boolean
     private val JDREAD: Boolean
     private val LINFINY_ENOTE: Boolean
+    private val MEEBOOK_M6: Boolean
+    private val MEEBOOK_M7: Boolean
     private val MEEBOOK_P6: Boolean
+    private val MOAAN_MIX7: Boolean
     private val NABUK_REGAL_HD: Boolean
     private val NOOK: Boolean
     private val NOOK_GL4: Boolean
@@ -340,17 +348,33 @@ object DeviceInfo {
             && BRAND.contentEquals("inkbook")
             && MODEL.startsWith("prime"))
 
+        // InkPalm Plus
+        INKPALM_PLUS = MANUFACTURER.contentEquals("rockchip")
+            && MODEL.contentEquals("inkpalmplus")
+
         // JDRead1
         JDREAD = MANUFACTURER.contentEquals("onyx")
             && MODEL.contentEquals("jdread")
 
         // Linfiny A4 (13.3") eNote / Avalue ENT-13T1 / QuirkLogic Papyr
         LINFINY_ENOTE = MANUFACTURER.contentEquals("linfiny")
-	    && MODEL.contentEquals("ent-13t1")
+        && MODEL.contentEquals("ent-13t1")
+
+        // Meebook M6
+        MEEBOOK_M6 = MANUFACTURER.contentEquals("haoqing")
+            && MODEL.contentEquals("m6")
+
+        // Meebook M7
+        MEEBOOK_M7 = MANUFACTURER.contentEquals("haoqing")
+            && MODEL.contentEquals("m7")
 
         // Meebook P6
         MEEBOOK_P6 = MANUFACTURER.contentEquals("haoqing")
             && MODEL.contentEquals("p6")
+
+        // Moaan Mix7
+        MOAAN_MIX7 = MANUFACTURER.contentEquals("rockchip")
+            && MODEL.contentEquals("moaanmix7")
 
         // Nabuk Regal HD
         NABUK_REGAL_HD = MANUFACTURER.contentEquals("onyx")
