@@ -120,6 +120,7 @@ object EPDFactory {
                 DeviceInfo.EinkDevice.MEEBOOK_M6,
                 DeviceInfo.EinkDevice.MEEBOOK_M7,
                 DeviceInfo.EinkDevice.MOAAN_MIX7,
+                DeviceInfo.EinkDevice.PUBU_PUBOOK,
                 DeviceInfo.EinkDevice.XIAOMI_READER -> {
                     logController("Rockchip RK3566")
                     RK3566EPDController()
