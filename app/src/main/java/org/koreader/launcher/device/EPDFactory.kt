@@ -58,7 +58,8 @@ object EPDFactory {
                     NookEPDController()
                 }
 
-                DeviceInfo.EinkDevice.NOOK_GL4 -> {
+                DeviceInfo.EinkDevice.NOOK_GL4,
+                DeviceInfo.EinkDevice.TOLINO_VISION6 -> {
                     logController("NOOK_GL4")
                     NGL4EPDController()
                 }
@@ -116,6 +117,7 @@ object EPDFactory {
                     OldTolinoEPDController()
                 }
 
+                DeviceInfo.EinkDevice.HYREAD_MINI6,
                 DeviceInfo.EinkDevice.INKPALM_PLUS,
                 DeviceInfo.EinkDevice.MEEBOOK_M6,
                 DeviceInfo.EinkDevice.MEEBOOK_M7,
