@@ -48,6 +48,7 @@ object DeviceInfo {
         ENERGY,
         FIDIBOOK,
         HANVON_960,
+        HYREAD_MINI6,
         INKBOOK,
         INKPALM_PLUS,
         JDREAD,
@@ -102,6 +103,7 @@ object DeviceInfo {
         SONY_RP1,
         TAGUS_GEA,
         TOLINO,
+        TOLINO_VISION6,
         XIAOMI_READER
     }
 
@@ -151,6 +153,7 @@ object DeviceInfo {
         TOLINO_SHINE3,
         TOLINO_VISION4,
         TOLINO_VISION5,
+        TOLINO_VISION6,
         XIAOMI_READER
     }
 
@@ -195,6 +198,7 @@ object DeviceInfo {
     private val ENERGY: Boolean
     private val FIDIBOOK: Boolean
     private val HANVON_960: Boolean
+    private val HYREAD_MINI6: Boolean
     private val INKBOOK: Boolean
     private val INKPALM_PLUS: Boolean
     private val JDREAD: Boolean
@@ -254,6 +258,7 @@ object DeviceInfo {
     private val TOLINO_SHINE3: Boolean
     private val TOLINO_VISION4: Boolean
     private val TOLINO_VISION5: Boolean
+    private val TOLINO_VISION6: Boolean
     private val XIAOMI_READER: Boolean
 
     init {
@@ -344,6 +349,10 @@ object DeviceInfo {
         // Hanvon 960
         HANVON_960 = BRAND.contentEquals("freescale")
             && PRODUCT.contentEquals("evk_6sl_eink")
+
+        // Hyread Mini 6
+        HYREAD_MINI6 = MANUFACTURER.contentEquals("hyread")
+            && MODEL.contentEquals("k06nu")
 
         // Artatech Inkbook Prime/Prime HD.
         INKBOOK = (MANUFACTURER.contentEquals("artatech")
@@ -623,6 +632,12 @@ object DeviceInfo {
             && MODEL.contentEquals("tolino")
             && DEVICE.contentEquals("ntx_6sl")
             && HARDWARE.contentEquals("e70k00")
+
+        // Tolino Vision 6
+        TOLINO_VISION6 = BRAND.contentEquals("rakutenkobo")
+            && MODEL.contentEquals("tolino vision 6")
+            && DEVICE.contentEquals("tolino")
+            && HARDWARE.contentEquals("sun8iw15p1")
 
         XIAOMI_READER = MANUFACTURER.contentEquals("xiaomi")
             && BRAND.contentEquals("xiaomi")
