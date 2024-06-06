@@ -22,11 +22,6 @@ WRes InAssetFile_Open(struct AAssetManager *mgr, CSzAssetFile *p, const char *na
 
 WRes AssetFile_Close(CSzAssetFile *p);
 
-/* reads max(*size, remain file's size) bytes */
-static SRes AssetFileInStream_Read(const ISeekInStream *pp, void *buf, size_t *size);
-
-static SRes AssetFileInStream_Seek(const ISeekInStream *pp, Int64 *pos, ESzSeek origin);
-
 typedef struct {
     ISeekInStream vt;
     CSzAssetFile assetFile;
