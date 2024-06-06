@@ -50,6 +50,10 @@ NAME?=1.0
 VERSION?=1
 APPNAME?="luajit-launcher"
 
+ifneq (,$(CI))
+  GRADLE_FLAGS ?= --console=plain --no-daemon -x lintVitalArmRocksRelease
+endif
+
 update:
 	@echo "Updating sources"
 	git submodule init
@@ -80,7 +84,7 @@ prepare: update
 debug: update build-luajit-debug
 	@echo "Building $(APPNAME) debug APK: Version $(NAME), release $(VERSION), flavor $(FLAVOR)"
 	./gradlew -q -PversName=$(NAME) -PversCode=$(VERSION) -PprojectName=$(APPNAME) \
-		-PndkCustomPath=$(ANDROID_NDK_FULLPATH) app:$(BUILD_TASK)Debug
+		-PndkCustomPath=$(ANDROID_NDK_FULLPATH) $(GRADLE_FLAGS) app:$(BUILD_TASK)Debug
 	mkdir -p bin/
 	find app/build/outputs/apk/ -type f -name '*.apk' -exec mv -v {} bin/ \;
 	@echo "Application $(APPNAME) was built, type: debug (signed), flavor: $(FLAVOR), version: $(NAME), release $(VERSION)"
@@ -88,7 +92,7 @@ debug: update build-luajit-debug
 release: update build-luajit
 	@echo "Building $(APPNAME) release APK: Version $(NAME), release $(VERSION), flavor $(FLAVOR)"
 	./gradlew -q -PversName=$(NAME) -PversCode=$(VERSION) -PprojectName=$(APPNAME) \
-		-PndkCustomPath=$(ANDROID_NDK_FULLPATH) app:$(BUILD_TASK)Release
+		-PndkCustomPath=$(ANDROID_NDK_FULLPATH) $(GRADLE_FLAGS) app:$(BUILD_TASK)Release
 	mkdir -p bin/
 	find app/build/outputs/apk/ -type f -name '*.apk' -exec mv -v {} bin/ \;
 	@echo "Application $(APPNAME) was built, type: release (unsigned), flavor: $(FLAVOR), version: $(NAME), release $(VERSION)"
