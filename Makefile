@@ -53,6 +53,7 @@ APPNAME?="luajit-launcher"
 ifneq (,$(CI))
   GRADLE_FLAGS ?= --console=plain --no-daemon -x lintVitalArmRocksRelease
 endif
+GRADLE_FLAGS += $(PARALLEL_JOBS:%=--max-workers=%)
 
 update:
 	@echo "Updating sources"
