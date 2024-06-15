@@ -2,8 +2,10 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
 android {
+    namespace 'org.koreader.launcher'
+    ndkVersion '23.2.8568313'
     ndkPath ndkCustomPath
-    compileSdkVersion rootProject.ext.compileSdk
+    compileSdk rootProject.ext.compileSdk
     def baseVersionCode = versCode as Integer
 
     defaultConfig {
@@ -55,7 +57,16 @@ android {
         }
     }
 
-    flavorDimensions 'ABI', 'CHANNEL'
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+
+    flavorDimensions = [ 'ABI', 'CHANNEL'  ]
     productFlavors {
         arm {
             ndk { abiFilters "armeabi-v7a" }
@@ -89,25 +100,28 @@ android {
         }
     }
 
-    compileOptions {
-        coreLibraryDesugaringEnabled true
-    }
-
     packagingOptions {
-        exclude '/kotlin/**.kotlin_builtins'
-        exclude '/kotlin/**.kotlin_metadata'
-        exclude '/META-INF/**.kotlin_module'
-        exclude '/META-INF/**.version'
+        jniLibs {
+            useLegacyPackaging true
+        }
+        resources {
+            excludes += '/kotlin/**.kotlin_builtins'
+            excludes += '/kotlin/**.kotlin_metadata'
+            excludes += '/META-INF/**.kotlin_module'
+            excludes += '/META-INF/**.version'
+        }
     }
 
-    lintOptions {
-        xmlReport false
-        htmlReport false
+    lint {
+        disable 'ChromeOsAbiSupport'
+        disable 'GradleDependency'
         disable 'QueryAllPackagesPermission'
+        htmlReport false
+        xmlReport false
     }
 
-    applicationVariants.all { variant ->
-        variant.outputs.all {
+    applicationVariants.configureEach { variant ->
+        variant.outputs.configureEach {
             outputFileName = "NativeActivity.apk"
         }
     }
@@ -119,16 +133,9 @@ repositories {
 }
 
 dependencies {
-    coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:$android_desugar_jdk"
-
-    //noinspection GradleDependency
     implementation "androidx.core:core-ktx:$androidx_core_version"
-    //noinspection GradleDependency
     implementation "androidx.appcompat:appcompat:$androidx_appcompat_version"
-    //noinspection GradleDependency
     implementation "androidx.legacy:legacy-support-v4:$androidx_supportv4_version"
-    //noinspection GradleDependency
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_plugin_version"
     implementation "org.apache.commons:commons-compress:$commons_compress_version"
-
 }
