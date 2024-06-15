@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="org.koreader.launcher" >
+    xmlns:tools="http://schemas.android.com/tools">
 
     <!-- only used by application stores, to filter the app on unsupported devices -->
     <uses-feature android:name="android.software.leanback" android:required="false" />
@@ -33,8 +32,7 @@
         android:fullBackupContent="false"
         android:usesCleartextTraffic="true"
         android:requestLegacyExternalStorage="true"
-        android:supportsRtl="true"
-        android:extractNativeLibs="true" >
+        android:supportsRtl="true">
         <meta-data android:name="android.max_aspect" android:value="3.1" />
         <activity
             android:name=".MainActivity"
