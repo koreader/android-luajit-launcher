@@ -12,12 +12,11 @@ import java.io.InputStreamReader
 
 class MainApp : MultiDexApplication() {
     companion object {
-        const val name = BuildConfig.APP_NAME
-        const val flavor = BuildConfig.FLAVOR_CHANNEL
-        const val has_ota_updates = BuildConfig.IN_APP_UPDATES
-        const val provider = "${BuildConfig.APPLICATION_ID}.provider"
-        const val supports_runtime_changes = BuildConfig.SUPPORTS_RUNTIME_CHANGES
-
+        const val NAME = BuildConfig.APP_NAME
+        const val FLAVOR = BuildConfig.FLAVOR_CHANNEL
+        const val OTA_UPDATES = BuildConfig.IN_APP_UPDATES
+        const val RUNTIME_CHANGES = BuildConfig.SUPPORTS_RUNTIME_CHANGES
+        const val PROVIDER = "${BuildConfig.APPLICATION_ID}.provider"
         val is_debug = BuildConfig.DEBUG
 
         // internal path for app files
@@ -48,7 +47,7 @@ class MainApp : MultiDexApplication() {
         fun crashReport(context: Context, reason: String? = null) {
             writeLogToFile(crash_report_path, true)
             val reportIntent = Intent(context, CrashReportActivity::class.java)
-            reportIntent.putExtra("title", "$name crashed")
+            reportIntent.putExtra("title", "$NAME crashed")
             reportIntent.putExtra("reason", reason ?: "")
             reportIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or
                 Intent.FLAG_ACTIVITY_TASK_ON_HOME or
@@ -95,7 +94,7 @@ class MainApp : MultiDexApplication() {
         super.onCreate()
         assets_path = filesDir.absolutePath
         storage_path = Environment.getExternalStorageDirectory().absolutePath
-        app_storage_path = String.format("%s%s%s", storage_path, File.separator, name.lowercase())
+        app_storage_path = String.format("%s%s%s", storage_path, File.separator, NAME.lowercase())
         crash_report_path = String.format("%s%s%s", cacheDir, File.separator, "crash.log")
         targetSdk = applicationContext.applicationInfo.targetSdkVersion
 

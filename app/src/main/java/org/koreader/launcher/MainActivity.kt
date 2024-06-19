@@ -18,6 +18,7 @@ import android.provider.Settings
 import android.util.Log
 import android.view.*
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import org.koreader.launcher.device.Device
@@ -99,6 +100,7 @@ class MainActivity : NativeActivity(), LuaInterface,
      *--------------------------------------------------------------*/
 
     /* Called when the activity is first created. */
+    @SuppressLint("UnspecifiedRegisterReceiverFlag")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         assets = Assets()
@@ -174,24 +176,25 @@ class MainActivity : NativeActivity(), LuaInterface,
         drawSplashScreen(holder)
     }
 
+    @RequiresApi(Build.VERSION_CODES.P)
     override fun onAttachedToWindow() {
         Log.d(TAG_SURFACE, "onAttachedToWindow()")
         super.onAttachedToWindow()
 
         val cut = when {
-            Build.VERSION.SDK_INT >= 33 -> {
-                windowManager.defaultDisplay.cutout as? DisplayCutout
+            Build.VERSION.SDK_INT >= 30 -> {
+                display?.cutout
             } Build.VERSION.SDK_INT >= Build.VERSION_CODES.P -> {
-                window.decorView.rootWindowInsets?.displayCutout as? DisplayCutout
+                window.decorView.rootWindowInsets?.displayCutout
             } else -> null
         }
 
-        if (cut != null) {
-            val cutPixels = cut.safeInsetTop
-            if (topInsetHeight != cutPixels) {
+        cut?.let { cutout ->
+            val pixels = cutout.safeInsetTop
+            if (topInsetHeight != pixels) {
                 Log.v(TAG_SURFACE,
-                    "top $cutPixels pixels are not available, reason: window inset")
-                topInsetHeight = cutPixels
+                    "top $pixels pixels are not available, reason: window inset")
+                topInsetHeight = pixels
             }
         }
     }
@@ -411,7 +414,7 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun getFlavor(): String {
-        return MainApp.flavor
+        return MainApp.FLAVOR
     }
 
     override fun getLastImportedPath(): String? {
@@ -425,7 +428,7 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun getName(): String {
-        return MainApp.name
+        return MainApp.NAME
     }
 
     override fun getNetworkInfo(): String {
@@ -536,7 +539,7 @@ class MainActivity : NativeActivity(), LuaInterface,
     override fun hasOTAUpdates(): Boolean {
         return when (platform) {
             "chrome" -> false
-            else -> MainApp.has_ota_updates
+            else -> MainApp.OTA_UPDATES
         }
     }
 
@@ -545,7 +548,7 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun hasRuntimeChanges(): Boolean {
-        return MainApp.supports_runtime_changes
+        return MainApp.RUNTIME_CHANGES
     }
 
     override fun installApk() {
@@ -580,11 +583,8 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun isFullscreen(): Boolean {
-        return if (Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR2 ||
-            Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR1) {
+        return if (Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR2) {
             fullscreen
-        } else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.JELLY_BEAN) {
-            isFullscreenDeprecated()
         } else {
             false
         }
@@ -699,11 +699,8 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun setFullscreen(enabled: Boolean) {
-        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR2 ||
-            Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR1) {
+        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN_MR2) {
             fullscreen = enabled
-        } else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.JELLY_BEAN) {
-            setFullscreenDeprecated(enabled)
         }
     }
 
@@ -835,9 +832,6 @@ class MainActivity : NativeActivity(), LuaInterface,
                     View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
                     View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
                     View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN ->
-                decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN or
-                    View.SYSTEM_UI_FLAG_LOW_PROFILE
             else -> decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LOW_PROFILE
         }
     }

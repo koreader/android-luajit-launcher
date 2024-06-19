@@ -92,7 +92,7 @@ private fun uncompress(archive: String, extractTo: String): Boolean {
                     destPath.delete()
                 }
                 if (destPath.createNewFile()) {
-                    FileOutputStream(destPath)?.use { out -> IOUtils.copy(it, out, 4096) }
+                    FileOutputStream(destPath).use { out -> IOUtils.copy(it, out, 4096) }
                 }
             }
             tarEntry = it.nextTarEntry
