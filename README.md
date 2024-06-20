@@ -1,7 +1,7 @@
 # android-luajit-launcher
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/193dcd3a4fe14bb48960a6473156c814)](https://www.codacy.com/gh/koreader/android-luajit-launcher/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=koreader/android-luajit-launcher&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/193dcd3a4fe14bb48960a6473156c814)](https://app.codacy.com/gh/koreader/android-luajit-launcher/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 
 Android NativeActivity based launcher for LuaJIT, implementing the main loop within Lua land via FFI.
 
