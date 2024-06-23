@@ -11,10 +11,10 @@ import kotlin.collections.HashMap
 import java.util.Locale
 
 object DeviceInfo {
-    const val STR_KOBO = "rakutenkobo"
-    const val STR_NTX = "ntx_6sl"
-    const val STR_ROCKCHIP = "rockchip"
-    const val STR_TOLINO = "tolino"
+    private const val STR_KOBO = "rakutenkobo"
+    private const val STR_NTX = "ntx_6sl"
+    private const val STR_ROCKCHIP = "rockchip"
+    private const val STR_TOLINO = "tolino"
 
     val MANUFACTURER: String
     val BRAND: String
