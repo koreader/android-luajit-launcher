@@ -11,6 +11,11 @@ import kotlin.collections.HashMap
 import java.util.Locale
 
 object DeviceInfo {
+    private const val STR_KOBO = "rakutenkobo"
+    private const val STR_NTX = "ntx_6sl"
+    private const val STR_ROCKCHIP = "rockchip"
+    private const val STR_TOLINO = "tolino"
+
     val MANUFACTURER: String
     val BRAND: String
     val MODEL: String
@@ -360,7 +365,7 @@ object DeviceInfo {
             && MODEL.startsWith("prime"))
 
         // InkPalm Plus
-        INKPALM_PLUS = MANUFACTURER.contentEquals("rockchip")
+        INKPALM_PLUS = MANUFACTURER.contentEquals(STR_ROCKCHIP)
             && MODEL.contentEquals("inkpalmplus")
 
         // JDRead1
@@ -384,7 +389,7 @@ object DeviceInfo {
             && MODEL.contentEquals("p6")
 
         // Moaan Mix7
-        MOAAN_MIX7 = MANUFACTURER.contentEquals("rockchip")
+        MOAAN_MIX7 = MANUFACTURER.contentEquals(STR_ROCKCHIP)
             && MODEL.contentEquals("moaanmix7")
 
         // Nabuk Regal HD
@@ -572,8 +577,8 @@ object DeviceInfo {
             && MODEL.contentEquals("tabultrac")
 
         // Pubu Pubook
-        PUBU_PUBOOK = MANUFACTURER.contentEquals("rockchip")
-            && BRAND.contentEquals("rockchip")
+        PUBU_PUBOOK = MANUFACTURER.contentEquals(STR_ROCKCHIP)
+            && BRAND.contentEquals(STR_ROCKCHIP)
             && MODEL.contentEquals("pubook")
             && DEVICE.contentEquals("pubook")
             && HARDWARE.contentEquals("rk30board")
@@ -596,47 +601,47 @@ object DeviceInfo {
             && MODEL.contentEquals("tagus_pokep")
 
         // Tolino (catch them all)
-        TOLINO = BRAND.contentEquals("tolino") && MODEL.contentEquals("imx50_rdp")
-            || MODEL.contentEquals("tolino") && (DEVICE.contentEquals("tolino_vision2")
-            || DEVICE.contentEquals("ntx_6sl"))
+        TOLINO = BRAND.contentEquals(STR_TOLINO) && MODEL.contentEquals("imx50_rdp")
+            || MODEL.contentEquals(STR_TOLINO) && (DEVICE.contentEquals("tolino_vision2")
+            || DEVICE.contentEquals(STR_NTX))
 
         // Tolino Epos 2 also have warmth lights
-        TOLINO_EPOS = BRAND.contentEquals("rakutenkobo")
-            && MODEL.contentEquals("tolino")
-            && DEVICE.contentEquals("ntx_6sl")
+        TOLINO_EPOS = BRAND.contentEquals(STR_KOBO)
+            && MODEL.contentEquals(STR_TOLINO)
+            && DEVICE.contentEquals(STR_NTX)
             && !HARDWARE.contentEquals("e60k00")
             && !HARDWARE.contentEquals("e60q50")
             && !HARDWARE.contentEquals("e60qv0")
             && !HARDWARE.contentEquals("e70k00")
 
         // Tolino Page 2 has no warmth lights
-        TOLINO_PAGE2 = BRAND.contentEquals("rakutenkobo")
-            && MODEL.contentEquals("tolino")
-            && DEVICE.contentEquals("ntx_6sl")
+        TOLINO_PAGE2 = BRAND.contentEquals(STR_KOBO)
+            && MODEL.contentEquals(STR_TOLINO)
+            && DEVICE.contentEquals(STR_NTX)
             && HARDWARE.contentEquals("e60qv0")
 
         // Tolino Shine 3 also has warmth lights, but with ntx_io file
-        TOLINO_SHINE3 = BRAND.contentEquals("rakutenkobo")
-            && MODEL.contentEquals("tolino")
-            && DEVICE.contentEquals("ntx_6sl")
+        TOLINO_SHINE3 = BRAND.contentEquals(STR_KOBO)
+            && MODEL.contentEquals(STR_TOLINO)
+            && DEVICE.contentEquals(STR_NTX)
             && HARDWARE.contentEquals("e60k00")
 
         // Tolino Vision 4 also has warmth lights, but with ntx_io file
-        TOLINO_VISION4 = BRAND.contentEquals("rakutenkobo")
-            && MODEL.contentEquals("tolino")
-            && DEVICE.contentEquals("ntx_6sl")
+        TOLINO_VISION4 = BRAND.contentEquals(STR_KOBO)
+            && MODEL.contentEquals(STR_TOLINO)
+            && DEVICE.contentEquals(STR_NTX)
             && HARDWARE.contentEquals("e60q50")
 
         // Tolino Vision 5 also has warmth lights, but with ntx_io file
-        TOLINO_VISION5 = BRAND.contentEquals("rakutenkobo")
-            && MODEL.contentEquals("tolino")
-            && DEVICE.contentEquals("ntx_6sl")
+        TOLINO_VISION5 = BRAND.contentEquals(STR_KOBO)
+            && MODEL.contentEquals(STR_TOLINO)
+            && DEVICE.contentEquals(STR_NTX)
             && HARDWARE.contentEquals("e70k00")
 
         // Tolino Vision 6
-        TOLINO_VISION6 = BRAND.contentEquals("rakutenkobo")
+        TOLINO_VISION6 = BRAND.contentEquals(STR_KOBO)
             && MODEL.contentEquals("tolino vision 6")
-            && DEVICE.contentEquals("tolino")
+            && DEVICE.contentEquals(STR_TOLINO)
             && HARDWARE.contentEquals("sun8iw15p1")
 
         XIAOMI_READER = MANUFACTURER.contentEquals("xiaomi")
