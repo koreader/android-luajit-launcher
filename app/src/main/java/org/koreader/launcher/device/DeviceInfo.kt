@@ -158,7 +158,6 @@ object DeviceInfo {
         TOLINO_SHINE3,
         TOLINO_VISION4,
         TOLINO_VISION5,
-        TOLINO_VISION6,
         XIAOMI_READER
     }
 

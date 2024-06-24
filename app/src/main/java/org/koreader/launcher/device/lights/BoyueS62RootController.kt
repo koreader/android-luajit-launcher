@@ -61,7 +61,7 @@ class BoyueS62RootController : LightsInterface {
         activity.runOnUiThread {
             try {
                 //Runtime.getRuntime().exec("su -c settings put system boyue_warm_light " + brightness) // slow
-                Runtime.getRuntime().exec("su -c echo " + brightness + " > /sys/class/backlight/rk28_bl_warm/brightness")
+                Runtime.getRuntime().exec("su -c echo $brightness > /sys/class/backlight/rk28_bl_warm/brightness")
             } catch (e: Exception) {
                 Log.w(TAG, "$e")
             }

@@ -17,7 +17,6 @@ class TolinoNtxNoWarmthController : Ioctl(), LightsInterface {
         private const val TAG = "Lights"
         private const val BRIGHTNESS_MAX = 255
         private const val MIN = 0
-        private const val NTX_IO_FILE = "/dev/ntx_io"
     }
 
     override fun getPlatform(): String {
