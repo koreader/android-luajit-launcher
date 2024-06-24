@@ -57,8 +57,8 @@ class GenericController : LightsInterface {
     // Values between 0 and BRIGHTNESS_MIN are gracefully ignored.
     override fun setBrightness(activity: Activity, brightness: Int) {
         Log.v(TAG, "Setting brightness to $brightness")
-        val level: Float? = when(brightness) {
-            0 ->  0.0f
+        val level: Float? = when (brightness) {
+            0 -> 0.0f
             else -> {
                 if ((brightness < BRIGHTNESS_MIN || brightness > BRIGHTNESS_MAX))
                     null
