@@ -1,3 +1,5 @@
+@file:Suppress("SameParameterValue", "UNUSED_PARAMETER")
+
 package org.koreader.launcher.device.lights
 
 import android.app.Activity
@@ -110,29 +112,29 @@ object FrontLightAdb {
         }
     }
 
-    fun checkType(): Int {
-        if (checkCTMMethod?.invoke(flController) as? Boolean == true) {
-            return 1
+    private fun checkType(): Int {
+        return if (checkCTMMethod?.invoke(flController) as? Boolean == true) {
+            1
         } else {
-            return 0
+            0
         }
     }
 
     private val type = checkType()
 
-    fun getBrightnessType(): Int {
-        if (type == 1) {
-            return 7
+    private fun getBrightnessType(): Int {
+        return if (type == 1) {
+            7
         } else {
-            return 3
+            3
         }
     }
 
-    fun getWarmthType(): Int {
-        if (type == 1) {
-            return 6
+    private fun getWarmthType(): Int {
+        return if (type == 1) {
+            6
         } else {
-            return 2
+            2
         }
     }
 

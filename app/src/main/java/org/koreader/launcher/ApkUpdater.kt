@@ -21,7 +21,7 @@ class ApkUpdater {
     private var downloadPath: String? = null
 
     fun download(context: Context, url: String, name: String): Int {
-        return if (MainApp.has_ota_updates) {
+        return if (MainApp.OTA_UPDATES) {
             val file = File(context.getExternalFilesDir(null), name)
             val result = try {
                 if (file.exists()) {
@@ -51,16 +51,16 @@ class ApkUpdater {
             }
             result
         } else {
-            Log.w(tag, "Download APK is not supported in ${MainApp.flavor}")
+            Log.w(tag, "Download APK is not supported in ${MainApp.FLAVOR}")
             DOWNLOAD_NOT_SUPPORTED
         }
     }
 
     fun install(context: Context) {
-        if (MainApp.has_ota_updates) {
+        if (MainApp.OTA_UPDATES) {
             downloadPath?.let { apk ->
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    val uri = FileProvider.getUriForFile(context, MainApp.provider, File(apk))
+                    val uri = FileProvider.getUriForFile(context, MainApp.PROVIDER, File(apk))
                     @Suppress("DEPRECATION") val intent = Intent(Intent.ACTION_INSTALL_PACKAGE)
                     intent.data = uri
                     intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
@@ -75,7 +75,7 @@ class ApkUpdater {
                 downloadPath = null
             }
         } else {
-            Log.w(tag, "Install APK is not supported in ${MainApp.flavor}")
+            Log.w(tag, "Install APK is not supported in ${MainApp.FLAVOR}")
         }
     }
 }

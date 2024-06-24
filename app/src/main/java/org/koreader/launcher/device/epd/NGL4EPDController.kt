@@ -9,6 +9,7 @@ import java.util.*
 
 class NGL4EPDController : NTXEPDController(), EPDInterface {
 
+    @Suppress("unused")
     companion object {
         private const val NGL4TAG = "NGL4"
 

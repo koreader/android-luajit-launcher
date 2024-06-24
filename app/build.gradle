@@ -116,6 +116,7 @@ android {
         disable 'ChromeOsAbiSupport'
         disable 'GradleDependency'
         disable 'QueryAllPackagesPermission'
+        disable 'SameParameterValue'
         htmlReport false
         xmlReport false
     }

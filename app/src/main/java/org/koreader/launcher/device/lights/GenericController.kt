@@ -57,17 +57,24 @@ class GenericController : LightsInterface {
     // Values between 0 and BRIGHTNESS_MIN are gracefully ignored.
     override fun setBrightness(activity: Activity, brightness: Int) {
         Log.v(TAG, "Setting brightness to $brightness")
-        if ((brightness < BRIGHTNESS_MIN || brightness > BRIGHTNESS_MAX) || (brightness < 0)) return
-        val level = if (brightness > 0) {
-                (brightness - BRIGHTNESS_MIN) * 1.0f / (BRIGHTNESS_MAX - BRIGHTNESS_MIN)
-            } else 0.0f
-        activity.runOnUiThread {
-            try {
-                val params = activity.window.attributes
-                params.screenBrightness = level
-                activity.window.attributes = params
-            } catch (e: Exception) {
-                Log.w(TAG, e.toString())
+        val level: Float? = when (brightness) {
+            0 -> 0.0f
+            else -> {
+                if ((brightness < BRIGHTNESS_MIN || brightness > BRIGHTNESS_MAX))
+                    null
+                else
+                    (brightness - BRIGHTNESS_MIN) * 1.0f / (BRIGHTNESS_MAX - BRIGHTNESS_MIN)
+            }
+        }
+        level?.let { value ->
+            activity.runOnUiThread {
+                try {
+                    val params = activity.window.attributes
+                    params.screenBrightness = value
+                    activity.window.attributes = params
+                } catch (e: Exception) {
+                    Log.w(TAG, e.toString())
+                }
             }
         }
     }

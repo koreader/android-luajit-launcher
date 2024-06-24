@@ -1,5 +1,6 @@
 package org.koreader.launcher.dialog
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -11,13 +12,12 @@ import android.widget.PopupWindow
 import android.widget.TextView
 import org.koreader.launcher.R
 
-class ToolTip(private val context: Context) {
-
+@SuppressLint("InflateParams")
+class ToolTip(context: Context) {
     private val popupWindow: PopupWindow
-    private val tooltipView: View
+    private val tooltipView = LayoutInflater.from(context).inflate(R.layout.tooltip_layout, null)
 
     init {
-        tooltipView = LayoutInflater.from(context).inflate(R.layout.tooltip_layout, null)
         popupWindow = PopupWindow(
             tooltipView,
             ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -37,6 +37,7 @@ class ToolTip(private val context: Context) {
         popupWindow.showAtLocation(anchorView, Gravity.NO_GRAVITY, location[0], location[1] - anchorView.height)
     }
 
+    @Suppress("unused")
     fun dismissTooltip() {
         popupWindow.dismiss()
     }

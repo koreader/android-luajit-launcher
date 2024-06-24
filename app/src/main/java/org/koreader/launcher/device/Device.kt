@@ -1,13 +1,13 @@
 package org.koreader.launcher.device
 
 import android.app.Activity
-import android.os.Build
 import org.koreader.launcher.extensions.platform
 
 class Device(activity: Activity) {
     val epd = EPDFactory.epdController
     val lights = LightsFactory.lightsController
 
+    @Suppress("unused")
     val product = DeviceInfo.PRODUCT
     val needsWakelocks = DeviceInfo.QUIRK_NEEDS_WAKELOCKS
     val bugRotation = DeviceInfo.QUIRK_NO_HW_ROTATION
@@ -28,19 +28,7 @@ class Device(activity: Activity) {
         else -> epd.needsView()
     }
 
-    val einkPlatform = when (val platform = epd.getPlatform()) {
-        "freescale" -> {
-            if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN)
-                || (DeviceInfo.EINK == DeviceInfo.EinkDevice.CREMA)) {
-                platform
-            } else {
-                "$platform-legacy"
-            }
-        }
-        else -> {
-            platform
-        }
-    }
+    val einkPlatform = epd.getPlatform()
 
     val properties: String
       get() = String.format("%s;%s;%s;%s;%s;%s;%b;%b",
