@@ -6,12 +6,14 @@ import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import android.system.Os
+import android.util.Log
 import org.koreader.launcher.MainApp
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
 
+private const val TAG = "UriGuesser"
 fun Uri.absolutePath(context: Context): String? {
     return when (this.scheme) {
         ContentResolver.SCHEME_FILE -> pathFromFile(this)
@@ -21,6 +23,7 @@ fun Uri.absolutePath(context: Context): String? {
 }
 
 fun Uri.toFile(context: Context, path: String): String? {
+    Log.i(TAG, "Uri.toFile-> $path")
     if (this.scheme != ContentResolver.SCHEME_CONTENT) {
         return null
     }
@@ -56,11 +59,15 @@ fun Uri.toFile(context: Context, path: String): String? {
 }
 
 private fun pathFromFile(uri: Uri): String? {
-    return uri.path?.let { filePath -> File(filePath) }?.absolutePath
+    val path = uri.path?.let { filePath -> File(filePath) }?.absolutePath
+    Log.i(TAG, "pathFromFile-> $path")
+    return path
 }
 
 private fun pathFromImportedFile(uri: Uri, context: Context): String? {
-    return uri.toFile(context, MainApp.app_storage_path)
+    val path = uri.toFile(context, MainApp.app_storage_path)
+    Log.i(TAG, "pathFromImportedFile-> $path")
+    return path
 }
 private fun pathFromContent(uri: Uri, context: Context): String? {
     val path = uri.authority?.let { _ ->
@@ -89,6 +96,7 @@ private fun pathFromContent(uri: Uri, context: Context): String? {
         if (filePath.contains("/Android/data"))
             pathFromImportedFile(uri, context)
         else
+            Log.i(TAG, "pathFromContent-> $filePath")
             filePath
     }?: pathFromImportedFile(uri, context)
 }
