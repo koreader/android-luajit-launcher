@@ -7,14 +7,14 @@ import android.os.Build
 import android.provider.MediaStore
 import android.system.Os
 import android.util.Log
-import org.koreader.launcher.MainApp
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
 
-private const val TAG = "UriGuesser"
+private const val TAG = "UriHandler"
 fun Uri.absolutePath(context: Context): String? {
+    Log.i(TAG, "Absolute path guessing")
     return when (this.scheme) {
         ContentResolver.SCHEME_FILE -> pathFromFile(this)
         ContentResolver.SCHEME_CONTENT -> pathFromContent(this, context)
@@ -25,6 +25,7 @@ fun Uri.absolutePath(context: Context): String? {
 fun Uri.toFile(context: Context, path: String): String? {
     Log.i(TAG, "Uri.toFile-> $path")
     if (this.scheme != ContentResolver.SCHEME_CONTENT) {
+        Log.e(TAG, "unsupported scheme")
         return null
     }
 
@@ -59,18 +60,23 @@ fun Uri.toFile(context: Context, path: String): String? {
 }
 
 private fun pathFromFile(uri: Uri): String? {
-    val path = uri.path?.let { filePath -> File(filePath) }?.absolutePath
-    Log.i(TAG, "pathFromFile-> $path")
-    return path
+    return uri.path?.let {
+        Log.i(TAG, "found local file-> $it")
+        File(it).absolutePath
+    }
 }
 
 private fun pathFromImportedFile(uri: Uri, context: Context): String? {
-    val path = uri.toFile(context, MainApp.app_storage_path)
-    Log.i(TAG, "pathFromImportedFile-> $path")
-    return path
+    return context.getExternalFilesDir(null)?.let { path ->
+        val result = uri.toFile(context, path.absolutePath)
+        Log.i(TAG, "Imported to $result")
+        result
+    }
 }
+
 private fun pathFromContent(uri: Uri, context: Context): String? {
     val path = uri.authority?.let { _ ->
+        Log.i(TAG,"found content, trying to guess if it's a local file on a readable directory")
         try {
             context.contentResolver.openFileDescriptor(uri, "r")?.use { parcel ->
                 try {
@@ -92,11 +98,16 @@ private fun pathFromContent(uri: Uri, context: Context): String? {
         }
     }
 
-    return path?.let { filePath ->
-        if (filePath.contains("/Android/data"))
+    return path?.let { p ->
+        if (p.startsWith("/data") or p.contains("/Android/data")) {
+            Log.i(TAG, "Non readable file, importing it")
             pathFromImportedFile(uri, context)
-        else
-            Log.i(TAG, "pathFromContent-> $filePath")
-            filePath
-    }?: pathFromImportedFile(uri, context)
+        } else {
+            Log.i(TAG, "Guessed path -> $p")
+            p
+        }
+    }?: run {
+        Log.i(TAG, "Not a local file, importing it")
+        pathFromImportedFile(uri, context)
+    }
 }
