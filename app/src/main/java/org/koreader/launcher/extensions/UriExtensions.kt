@@ -14,7 +14,6 @@ import java.io.IOException
 
 private const val TAG = "UriHandler"
 fun Uri.absolutePath(context: Context): String? {
-    Log.i(TAG, "Absolute path guessing")
     return when (this.scheme) {
         ContentResolver.SCHEME_FILE -> pathFromFile(this)
         ContentResolver.SCHEME_CONTENT -> pathFromContent(this, context)
@@ -23,7 +22,6 @@ fun Uri.absolutePath(context: Context): String? {
 }
 
 fun Uri.toFile(context: Context, path: String): String? {
-    Log.i(TAG, "Uri.toFile-> $path")
     if (this.scheme != ContentResolver.SCHEME_CONTENT) {
         Log.e(TAG, "unsupported scheme")
         return null
@@ -61,7 +59,7 @@ fun Uri.toFile(context: Context, path: String): String? {
 
 private fun pathFromFile(uri: Uri): String? {
     return uri.path?.let {
-        Log.i(TAG, "found local file-> $it")
+        Log.i(TAG, "Found local file-> $it")
         File(it).absolutePath
     }
 }
@@ -76,7 +74,7 @@ private fun pathFromImportedFile(uri: Uri, context: Context): String? {
 
 private fun pathFromContent(uri: Uri, context: Context): String? {
     val path = uri.authority?.let { _ ->
-        Log.i(TAG,"found content, trying to guess if it's a local file on a readable directory")
+        Log.i(TAG,"Found content, trying to guess if it's a local file on a readable directory")
         try {
             context.contentResolver.openFileDescriptor(uri, "r")?.use { parcel ->
                 try {

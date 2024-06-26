@@ -407,6 +407,7 @@ class MainActivity : NativeActivity(), LuaInterface,
 
     override fun getFilePathFromIntent(): String? {
         return intent?.let {
+            Log.i(tag, "New intent: $it.action")
             if (it.action == Intent.ACTION_VIEW) {
                 it.data?.absolutePath(this)
             } else null
