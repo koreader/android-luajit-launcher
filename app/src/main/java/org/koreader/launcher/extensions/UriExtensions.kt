@@ -64,17 +64,17 @@ private fun pathFromFile(uri: Uri): String? {
     }
 }
 
-private fun pathFromImportedFile(uri: Uri, context: Context): String? {
+private fun pathFromImportedFile(uri: Uri, context: Context, reason: String): String? {
     return context.getExternalFilesDir(null)?.let { path ->
         val result = uri.toFile(context, path.absolutePath)
-        Log.i(TAG, "Imported to $result")
+        Log.i(TAG, "[$reason]: imported to $result")
         result
     }
 }
 
 private fun pathFromContent(uri: Uri, context: Context): String? {
     val path = uri.authority?.let { _ ->
-        Log.i(TAG,"Found content, trying to guess if it's a local file on a readable directory")
+        Log.i(TAG,"Found content, trying to guess its path")
         try {
             context.contentResolver.openFileDescriptor(uri, "r")?.use { parcel ->
                 try {
@@ -98,14 +98,12 @@ private fun pathFromContent(uri: Uri, context: Context): String? {
 
     return path?.let { p ->
         if (p.startsWith("/data") or p.contains("/Android/data")) {
-            Log.i(TAG, "Non readable file, importing it")
-            pathFromImportedFile(uri, context)
+            pathFromImportedFile(uri, context, "Non readable file")
         } else {
             Log.i(TAG, "Guessed path -> $p")
             p
         }
     }?: run {
-        Log.i(TAG, "Not a local file, importing it")
-        pathFromImportedFile(uri, context)
+        pathFromImportedFile(uri, context, "Not a local file")
     }
 }
