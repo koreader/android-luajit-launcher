@@ -83,6 +83,7 @@ object DeviceInfo {
         ONYX_NOTE5,
         ONYX_NOTE_AIR,
         ONYX_NOTE_AIR2,
+        ONYX_NOTE_AIR3C,
         ONYX_NOTE_PRO,
         ONYX_NOTE_X2,
         ONYX_NOVA,
@@ -132,6 +133,7 @@ object DeviceInfo {
         ONYX_NOTE4,
         ONYX_NOTE_AIR,
         ONYX_NOTE_AIR2,
+        ONYX_NOTE_AIR3C,
         ONYX_NOTE_PRO,
         ONYX_NOTE_X2,
         ONYX_NOVA,
@@ -232,6 +234,7 @@ object DeviceInfo {
     private val ONYX_NOTE5: Boolean
     private val ONYX_NOTE_AIR: Boolean
     private val ONYX_NOTE_AIR2: Boolean
+    private val ONYX_NOTE_AIR3C: Boolean
     private val ONYX_NOTE_PRO: Boolean
     private val ONYX_NOTE_X2: Boolean
     private val ONYX_NOVA: Boolean
@@ -490,6 +493,11 @@ object DeviceInfo {
         ONYX_NOTE_AIR2 = BRAND.contentEquals("onyx")
             && (MODEL.contentEquals("noteair2") || MODEL.contentEquals("noteair2p"))
 
+        // Onyx Note Air 3C
+        ONYX_NOTE_AIR3C = BRAND.contentEquals("onyx")
+            && PRODUCT.contentEquals("noteair3c")
+            && DEVICE.contentEquals("noteair3c")
+
         // Onyx Note Pro
         ONYX_NOTE_PRO = MANUFACTURER.contentEquals("onyx")
             && PRODUCT.contentEquals("notepro")
@@ -715,6 +723,7 @@ object DeviceInfo {
         deviceMap[EinkDevice.ONYX_NOTE5] = ONYX_NOTE5
         deviceMap[EinkDevice.ONYX_NOTE_AIR] = ONYX_NOTE_AIR
         deviceMap[EinkDevice.ONYX_NOTE_AIR2] = ONYX_NOTE_AIR2
+        deviceMap[EinkDevice.ONYX_NOTE_AIR3C] = ONYX_NOTE_AIR3C
         deviceMap[EinkDevice.ONYX_NOTE_PRO] = ONYX_NOTE_PRO
         deviceMap[EinkDevice.ONYX_NOTE_X2] = ONYX_NOTE_X2
         deviceMap[EinkDevice.ONYX_NOVA] = ONYX_NOVA
@@ -772,6 +781,7 @@ object DeviceInfo {
         lightsMap[LightsDevice.ONYX_NOTE4] = ONYX_NOTE4
         lightsMap[LightsDevice.ONYX_NOTE_AIR] = ONYX_NOTE_AIR
         lightsMap[LightsDevice.ONYX_NOTE_AIR2] = ONYX_NOTE_AIR2
+        lightsMap[LightsDevice.ONYX_NOTE_AIR3C] = ONYX_NOTE_AIR3C
         lightsMap[LightsDevice.ONYX_NOTE_X2] = ONYX_NOTE_X2
         lightsMap[LightsDevice.ONYX_NOVA] = ONYX_NOVA
         lightsMap[LightsDevice.ONYX_NOVA2] = ONYX_NOVA2
@@ -839,6 +849,7 @@ object DeviceInfo {
 
         HAS_COLOR_SCREEN = when (EINK) {
             EinkDevice.NONE,
+            EinkDevice.ONYX_NOTE_AIR3C,
             EinkDevice.ONYX_NOVA3_COLOR,
             EinkDevice.ONYX_TAB_ULTRA_C,
             EinkDevice.ONYX_NOVA_AIR_C -> true
