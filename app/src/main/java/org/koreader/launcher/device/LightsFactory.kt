@@ -63,7 +63,7 @@ object LightsFactory {
                     OnyxColorController()
                 }
                 DeviceInfo.LightsDevice.ONYX_NOVA_AIR,
-                DeviceInfo.LightsDevice.ONYX_PAGE,                
+                DeviceInfo.LightsDevice.ONYX_PAGE,
                 DeviceInfo.LightsDevice.ONYX_POKE5,
                 DeviceInfo.LightsDevice.ONYX_TAB_ULTRA_C -> {
                     logController("Onyx Adb")
