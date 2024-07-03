@@ -66,6 +66,14 @@ class Assets {
         val filesDir = activity.filesDir.absolutePath
         activity.runOnUiThread { dialog = FramelessProgressDialog.show(activity, "") }
 
+        // remove old files
+        try {
+            File(filesDir).deleteRecursively()
+            File(filesDir).mkdir()
+        } catch (e: IOException) {
+            Log.e(tag, "Error prunning old files: $e")
+        }
+
         /* copy regular files and extract 7z files from assets store */
         activity.assets.list("module")?.let { bundle ->
             for (asset in bundle) {
