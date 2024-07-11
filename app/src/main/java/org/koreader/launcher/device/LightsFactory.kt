@@ -13,6 +13,7 @@ object LightsFactory {
                     logController("TolinoRoot")
                     TolinoRootController()
                 }
+                DeviceInfo.LightsDevice.CREMA_0710C,
                 DeviceInfo.LightsDevice.CREMA_CARTA_G,
                 DeviceInfo.LightsDevice.MEEBOOK_P6,
                 DeviceInfo.LightsDevice.RIDI_PAPER_3,
