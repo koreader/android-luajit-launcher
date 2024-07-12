@@ -6,6 +6,7 @@ package org.koreader.launcher.device
 import android.util.Log
 import org.koreader.launcher.device.epd.NookEPDController
 import org.koreader.launcher.device.epd.TolinoEPDController
+import org.koreader.launcher.device.epd.TolinoAltEPDController
 import org.koreader.launcher.device.epd.RK3026EPDController
 import org.koreader.launcher.device.epd.RK3368EPDController
 import org.koreader.launcher.device.epd.OnyxEPDController
@@ -71,6 +72,11 @@ object EPDFactory {
                 DeviceInfo.EinkDevice.TOLINO -> {
                     logController("Tolino/NTX")
                     TolinoEPDController()
+                }
+
+                DeviceInfo.EinkDevice.CREMA_0710C -> {
+                    logController("Tolino/NTX Alternative")
+                    TolinoAltEPDController()
                 }
 
                 DeviceInfo.EinkDevice.ONYX_EDISON,

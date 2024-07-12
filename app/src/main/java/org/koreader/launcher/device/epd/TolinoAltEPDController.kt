@@ -1,0 +1,63 @@
+/* Tested on Crema Grande */
+
+package org.koreader.launcher.device.epd
+
+import org.koreader.launcher.device.EPDInterface
+import org.koreader.launcher.device.epd.freescale.NTXAltEPDController
+
+class TolinoAltEPDController : NTXAltEPDController(), EPDInterface {
+
+    override fun getPlatform(): String {
+        return "freescale"
+    }
+
+    override fun getMode(): String {
+        return "full-only"
+    }
+
+    override fun getWaveformFull(): Int {
+        return EINK_WAVEFORM_UPDATE_FULL + EINK_WAVEFORM_MODE_GC16
+    }
+
+    override fun getWaveformPartial(): Int {
+        return EINK_WAVEFORM_UPDATE_PARTIAL + EINK_WAVEFORM_MODE_GC16
+    }
+
+    override fun getWaveformFullUi(): Int {
+        return EINK_WAVEFORM_UPDATE_FULL + EINK_WAVEFORM_MODE_GLR16
+    }
+
+    override fun getWaveformPartialUi(): Int {
+        return EINK_WAVEFORM_UPDATE_PARTIAL + EINK_WAVEFORM_MODE_GLR16
+    }
+
+    override fun getWaveformFast(): Int {
+        return EINK_WAVEFORM_UPDATE_PARTIAL + EINK_WAVEFORM_MODE_DU
+    }
+
+    override fun getWaveformDelay(): Int {
+        return EINK_WAVEFORM_DELAY
+    }
+
+    override fun getWaveformDelayUi(): Int {
+        return EINK_WAVEFORM_DELAY
+    }
+
+    override fun getWaveformDelayFast(): Int {
+        return EINK_WAVEFORM_DELAY
+    }
+
+    override fun needsView(): Boolean {
+        return false
+    }
+
+    override fun setEpdMode(targetView: android.view.View,
+                            mode: Int, delay: Long,
+                            x: Int, y: Int, width: Int, height: Int, epdMode: String?)
+    {
+        requestEpdMode()
+    }
+
+    override fun resume() {}
+    override fun pause() {}
+}
