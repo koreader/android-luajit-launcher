@@ -62,6 +62,7 @@ object DeviceInfo {
         MEEBOOK_M7,
         MEEBOOK_P6,
         MOAAN_MIX7,
+        MOOINKPLUS2C,
         NABUK,
         NOOK,
         NOOK_GL4,
@@ -70,6 +71,8 @@ object DeviceInfo {
         ONYX_DARWIN9,
         ONYX_EDISON,
         ONYX_FAUST3,
+        ONYX_GO_COLOR7,
+        ONYX_JDREAD,
         ONYX_KON_TIKI2,
         ONYX_LEAF,
         ONYX_LEAF2,
@@ -108,6 +111,7 @@ object DeviceInfo {
         SONY_RP1,
         TAGUS_GEA,
         TOLINO,
+        TOLINO_EPOS3,
         TOLINO_VISION6,
         XIAOMI_READER
     }
@@ -117,11 +121,14 @@ object DeviceInfo {
         BOYUE_S62,
         CREMA_CARTA_G,
         MEEBOOK_P6,
+        NOOK_GL4,
         ONYX_C67,
         ONYX_DARWIN7,
         ONYX_DARWIN9,
         ONYX_EDISON,
         ONYX_FAUST3,
+        ONYX_GO_COLOR7,
+        ONYX_JDREAD,
         ONYX_KON_TIKI2,
         ONYX_LEAF,
         ONYX_LEAF2,
@@ -211,6 +218,7 @@ object DeviceInfo {
     private val MEEBOOK_M7: Boolean
     private val MEEBOOK_P6: Boolean
     private val MOAAN_MIX7: Boolean
+    private val MOOINKPLUS2C: Boolean
     private val NABUK_REGAL_HD: Boolean
     private val NOOK: Boolean
     private val NOOK_GL4: Boolean
@@ -219,6 +227,8 @@ object DeviceInfo {
     private val ONYX_DARWIN9: Boolean
     private val ONYX_EDISON: Boolean
     private val ONYX_FAUST3: Boolean
+    private val ONYX_GO_COLOR7: Boolean
+    private val ONYX_JDREAD: Boolean
     private val ONYX_KON_TIKI2: Boolean
     private val ONYX_LEAF: Boolean
     private val ONYX_LEAF2: Boolean
@@ -258,6 +268,7 @@ object DeviceInfo {
     private val SONY_RP1: Boolean
     private val TAGUS_GEA: Boolean
     private val TOLINO_EPOS: Boolean
+    private val TOLINO_EPOS3: Boolean
     private val TOLINO_PAGE2: Boolean
     private val TOLINO_SHINE3: Boolean
     private val TOLINO_VISION4: Boolean
@@ -391,6 +402,10 @@ object DeviceInfo {
         MOAAN_MIX7 = MANUFACTURER.contentEquals(STR_ROCKCHIP)
             && MODEL.contentEquals("moaanmix7")
 
+        // Mooink Plus 2c
+        MOOINKPLUS2C = BRAND.contentEquals("allwinner")
+            && MODEL.contentEquals("mooink plus 2c")
+
         // Nabuk Regal HD
         NABUK_REGAL_HD = MANUFACTURER.contentEquals("onyx")
             && MODEL.contentEquals("nabukreg_hd")
@@ -428,6 +443,14 @@ object DeviceInfo {
         ONYX_FAUST3 = MANUFACTURER.contentEquals("onyx")
             && PRODUCT.contentEquals("mc_faust3")
             && DEVICE.contentEquals("mc_faust3")
+
+        // Onyx Boox Go Color 7
+        ONYX_GO_COLOR7 = BRAND.contentEquals("onyx")
+            && MODEL.contentEquals("gocolor7")
+
+        // Onyx JDRead
+        ONYX_JDREAD = BRAND.contentEquals("onyx")
+            && MODEL.contentEquals("jdread")
 
         // Onyx Kon-Tiki 2
         ONYX_KON_TIKI2 = MANUFACTURER.contentEquals("onyx")
@@ -613,6 +636,10 @@ object DeviceInfo {
             && !HARDWARE.contentEquals("e60qv0")
             && !HARDWARE.contentEquals("e70k00")
 
+        // Tolino Epos 3
+        TOLINO_EPOS3 = BRAND.contentEquals(STR_KOBO)
+            && MODEL.contentEquals("tolino epos 3")
+
         // Tolino Page 2 has no warmth lights
         TOLINO_PAGE2 = BRAND.contentEquals(STR_KOBO)
             && MODEL.contentEquals(STR_TOLINO)
@@ -694,6 +721,7 @@ object DeviceInfo {
         deviceMap[EinkDevice.JDREAD] = JDREAD
         deviceMap[EinkDevice.LINFINY_ENOTE] = LINFINY_ENOTE
         deviceMap[EinkDevice.MEEBOOK_P6] = MEEBOOK_P6
+        deviceMap[EinkDevice.MOOINKPLUS2C] = MOOINKPLUS2C
         deviceMap[EinkDevice.NABUK] = NABUK_REGAL_HD
         deviceMap[EinkDevice.NOOK] = NOOK
         deviceMap[EinkDevice.NOOK_GL4] = NOOK_GL4
@@ -702,6 +730,8 @@ object DeviceInfo {
         deviceMap[EinkDevice.ONYX_DARWIN9] = ONYX_DARWIN9
         deviceMap[EinkDevice.ONYX_EDISON] = ONYX_EDISON
         deviceMap[EinkDevice.ONYX_FAUST3] = ONYX_FAUST3
+        deviceMap[EinkDevice.ONYX_GO_COLOR7] = ONYX_GO_COLOR7
+        deviceMap[EinkDevice.ONYX_JDREAD] = ONYX_JDREAD
         deviceMap[EinkDevice.ONYX_KON_TIKI2] = ONYX_KON_TIKI2
         deviceMap[EinkDevice.ONYX_LEAF] = ONYX_LEAF
         deviceMap[EinkDevice.ONYX_LEAF2] = ONYX_LEAF2
@@ -740,6 +770,7 @@ object DeviceInfo {
         deviceMap[EinkDevice.SONY_RP1] = SONY_RP1
         deviceMap[EinkDevice.TAGUS_GEA] = TAGUS_GEA
         deviceMap[EinkDevice.TOLINO] = TOLINO
+        deviceMap[EinkDevice.TOLINO_EPOS3] = TOLINO_EPOS3
         deviceMap[EinkDevice.XIAOMI_READER] = XIAOMI_READER
 
         deviceMap.keys.iterator().run {
@@ -757,11 +788,14 @@ object DeviceInfo {
         lightsMap[LightsDevice.BOYUE_S62] = BOYUE_S62
         lightsMap[LightsDevice.CREMA_CARTA_G] = CREMA_CARTA_G
         lightsMap[LightsDevice.MEEBOOK_P6] = MEEBOOK_P6
+        lightsMap[LightsDevice.NOOK_GL4] = NOOK_GL4
         lightsMap[LightsDevice.ONYX_C67] = ONYX_C67
         lightsMap[LightsDevice.ONYX_DARWIN7] = ONYX_DARWIN7
         lightsMap[LightsDevice.ONYX_DARWIN9] = ONYX_DARWIN9
         lightsMap[LightsDevice.ONYX_EDISON] = ONYX_EDISON
         lightsMap[LightsDevice.ONYX_FAUST3] = ONYX_FAUST3
+        lightsMap[LightsDevice.ONYX_GO_COLOR7] = ONYX_GO_COLOR7
+        lightsMap[LightsDevice.ONYX_JDREAD] = ONYX_JDREAD
         lightsMap[LightsDevice.ONYX_KON_TIKI2] = ONYX_KON_TIKI2
         lightsMap[LightsDevice.ONYX_LEAF] = ONYX_LEAF
         lightsMap[LightsDevice.ONYX_LEAF2] = ONYX_LEAF2
@@ -839,6 +873,7 @@ object DeviceInfo {
 
         HAS_COLOR_SCREEN = when (EINK) {
             EinkDevice.NONE,
+            EinkDevice.ONYX_GO_COLOR7,
             EinkDevice.ONYX_NOVA3_COLOR,
             EinkDevice.ONYX_TAB_ULTRA_C,
             EinkDevice.ONYX_NOVA_AIR_C -> true
