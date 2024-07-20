@@ -58,7 +58,9 @@ object EPDFactory {
                     NookEPDController()
                 }
 
+                DeviceInfo.EinkDevice.MOOINKPLUS2C,
                 DeviceInfo.EinkDevice.NOOK_GL4,
+                DeviceInfo.EinkDevice.TOLINO_EPOS3,
                 DeviceInfo.EinkDevice.TOLINO_VISION6 -> {
                     logController("NOOK_GL4")
                     NGL4EPDController()
@@ -67,6 +69,7 @@ object EPDFactory {
                 DeviceInfo.EinkDevice.CREMA,
                 DeviceInfo.EinkDevice.CREMA_CARTA_G,
                 DeviceInfo.EinkDevice.HANVON_960,
+                DeviceInfo.EinkDevice.ONYX_JDREAD,
                 DeviceInfo.EinkDevice.RIDI_PAPER_3,
                 DeviceInfo.EinkDevice.TOLINO -> {
                     logController("Tolino/NTX")
@@ -74,6 +77,7 @@ object EPDFactory {
                 }
 
                 DeviceInfo.EinkDevice.ONYX_EDISON,
+                DeviceInfo.EinkDevice.ONYX_GO_COLOR7,
                 DeviceInfo.EinkDevice.ONYX_KON_TIKI2,
                 DeviceInfo.EinkDevice.ONYX_LEAF,
                 DeviceInfo.EinkDevice.ONYX_LEAF2,

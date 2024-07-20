@@ -9,6 +9,7 @@ object LightsFactory {
     val lightsController: LightsInterface
         get() {
             return when (DeviceInfo.LIGHTS) {
+                DeviceInfo.LightsDevice.NOOK_GL4,
                 DeviceInfo.LightsDevice.TOLINO_EPOS -> {
                     logController("TolinoRoot")
                     TolinoRootController()
@@ -57,11 +58,13 @@ object LightsFactory {
                     logController("Onyx/Sdk")
                     OnyxSdkLightsController()
                 }
+                DeviceInfo.LightsDevice.ONYX_JDREAD,
                 DeviceInfo.LightsDevice.ONYX_NOVA3_COLOR,
                 DeviceInfo.LightsDevice.TAGUS_GEA -> {
                     logController("Onyx color")
                     OnyxColorController()
                 }
+                DeviceInfo.LightsDevice.ONYX_GO_COLOR7,
                 DeviceInfo.LightsDevice.ONYX_NOVA_AIR,
                 DeviceInfo.LightsDevice.ONYX_PAGE,
                 DeviceInfo.LightsDevice.ONYX_POKE5,
