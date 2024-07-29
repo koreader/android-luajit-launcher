@@ -872,6 +872,7 @@ object DeviceInfo {
         }
 
         HAS_COLOR_SCREEN = when (EINK) {
+			EinkDevice.MOOINKPLUS2C,
             EinkDevice.NONE,
             EinkDevice.ONYX_GO_COLOR7,
             EinkDevice.ONYX_NOVA3_COLOR,
