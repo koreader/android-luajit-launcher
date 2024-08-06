@@ -1,0 +1,63 @@
+name: build
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on: [push, pull_request]
+
+defaults:
+  run:
+    shell: bash --noprofile --norc -eo pipefail {0}
+
+env:
+  BASH_ENV: '/root/.bashrc'
+
+jobs:
+
+  build:
+
+    strategy:
+      fail-fast: true
+      matrix:
+        variant: [debug, release]
+
+    name: ${{ matrix.variant }}
+    runs-on: ubuntu-latest
+    container:
+      image: koreader/koandroid:0.8.3-20.04
+      options: --user root
+
+    steps:
+
+      # Checkout / fetch. {{{
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          clean: false
+          fetch-depth: 0
+          fetch-tags: true
+          show-progress: false
+
+      - name: Fix checkout ownership
+        run: chown 'root:root' .
+
+      - name: Update submodules
+        run: make update
+
+      # }}}
+
+      # Build. {{{
+
+      - name: Build
+        run: |
+          # Ensure the build fail if gradle tries to install/update an SDK package.
+          echo 'android.builder.sdkDownload=false' >>gradle.properties
+          make ${{ matrix.variant }}
+
+      # }}}
+
+  # }}}
+
+# vim: foldmethod=marker foldlevel=0
