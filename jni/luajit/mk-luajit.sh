@@ -29,7 +29,7 @@ function check_NDK() {
 
     echo "Using NDKABI ${NDKABI}."
 
-    NDKVER=$(grep -oP 'r\K([0-9]+)(?=[a-z])' ${ANDROID_NDK_ROOT}/CHANGELOG.md | head -1)
+    NDKVER=$(grep -oP 'r\K([0-9]+)(?=[a-z])' ${ANDROID_NDK_HOME}/CHANGELOG.md | head -1)
     echo "Detected NDK version ${NDKVER}..."
     if [ "$NDKVER" -lt 15 ]; then
         echo 'NDK not of the right version, please update to NDK version 15 or higher.'
@@ -38,7 +38,7 @@ function check_NDK() {
 }
 
 check_NDK
-export PATH="${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/linux-x86_64/bin:${PATH}"
+export PATH="${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin:${PATH}"
 
 makecmd=(
   make -C "${DEST}"
