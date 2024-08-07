@@ -102,8 +102,8 @@ function dl.dlopen(library, load_func, depth)
         end
 
         local ok, lib = pcall(Elf.open, lname)
-        if not ok and lname:find("%.so%.%d+$") then
-            lname = lname:gsub("%.so%.%d+$", "%.so")
+        if not ok and lname:find("%.so%.%d[.%d]*$") then
+            lname = lname:gsub("%.so%.%d[.%d]*$", "%.so")
             ok, lib = pcall(Elf.open, lname)
         end
         if ok then
