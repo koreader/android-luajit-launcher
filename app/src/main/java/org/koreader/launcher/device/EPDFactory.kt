@@ -49,6 +49,7 @@ object EPDFactory {
                 }
 
                 DeviceInfo.EinkDevice.BOYUE_T65S,
+                DeviceInfo.EinkDevice.CREMA_0710C,
                 DeviceInfo.EinkDevice.JDREAD,
                 DeviceInfo.EinkDevice.LINFINY_ENOTE,
                 DeviceInfo.EinkDevice.NOOK,
