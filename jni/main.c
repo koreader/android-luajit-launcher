@@ -32,9 +32,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "android_native_app_glue.h"
 #include "jni_helper.h"
 
-#include "luajit-2.1/lua.h"
-#include "luajit-2.1/lualib.h"
-#include "luajit-2.1/lauxlib.h"
+#include "lua.h"
+#include "lualib.h"
+#include "lauxlib.h"
 
 #define  TAG "NativeThread"
 
