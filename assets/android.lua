@@ -522,48 +522,48 @@ int32_t AMotionEvent_getMetaState(const AInputEvent* motion_event);
 int32_t AMotionEvent_getEdgeFlags(const AInputEvent* motion_event);
 int64_t AMotionEvent_getDownTime(const AInputEvent* motion_event);
 int64_t AMotionEvent_getEventTime(const AInputEvent* motion_event);
-float AMotionEvent_getXOffset(const AInputEvent* motion_event); //__NDK_FPABI__
-float AMotionEvent_getYOffset(const AInputEvent* motion_event); //__NDK_FPABI__
-float AMotionEvent_getXPrecision(const AInputEvent* motion_event); //__NDK_FPABI__
-float AMotionEvent_getYPrecision(const AInputEvent* motion_event); //__NDK_FPABI__
+float AMotionEvent_getXOffset(const AInputEvent* motion_event);
+float AMotionEvent_getYOffset(const AInputEvent* motion_event);
+float AMotionEvent_getXPrecision(const AInputEvent* motion_event);
+float AMotionEvent_getYPrecision(const AInputEvent* motion_event);
 size_t AMotionEvent_getPointerCount(const AInputEvent* motion_event);
 int32_t AMotionEvent_getPointerId(const AInputEvent* motion_event, size_t pointer_index);
-float AMotionEvent_getRawX(const AInputEvent* motion_event, size_t pointer_index); //__NDK_FPABI__
-float AMotionEvent_getRawY(const AInputEvent* motion_event, size_t pointer_index); //__NDK_FPABI__
-float AMotionEvent_getX(const AInputEvent* motion_event, size_t pointer_index); //__NDK_FPABI__
-float AMotionEvent_getY(const AInputEvent* motion_event, size_t pointer_index); //__NDK_FPABI__
-float AMotionEvent_getPressure(const AInputEvent* motion_event, size_t pointer_index); //__NDK_FPABI__
-float AMotionEvent_getSize(const AInputEvent* motion_event, size_t pointer_index); //__NDK_FPABI__
-float AMotionEvent_getTouchMajor(const AInputEvent* motion_event, size_t pointer_index); //__NDK_FPABI__
-float AMotionEvent_getTouchMinor(const AInputEvent* motion_event, size_t pointer_index); //__NDK_FPABI__
-float AMotionEvent_getToolMajor(const AInputEvent* motion_event, size_t pointer_index); //__NDK_FPABI__
-float AMotionEvent_getToolMinor(const AInputEvent* motion_event, size_t pointer_index); //__NDK_FPABI__
-float AMotionEvent_getOrientation(const AInputEvent* motion_event, size_t pointer_index); //__NDK_FPABI__
+float AMotionEvent_getRawX(const AInputEvent* motion_event, size_t pointer_index);
+float AMotionEvent_getRawY(const AInputEvent* motion_event, size_t pointer_index);
+float AMotionEvent_getX(const AInputEvent* motion_event, size_t pointer_index);
+float AMotionEvent_getY(const AInputEvent* motion_event, size_t pointer_index);
+float AMotionEvent_getPressure(const AInputEvent* motion_event, size_t pointer_index);
+float AMotionEvent_getSize(const AInputEvent* motion_event, size_t pointer_index);
+float AMotionEvent_getTouchMajor(const AInputEvent* motion_event, size_t pointer_index);
+float AMotionEvent_getTouchMinor(const AInputEvent* motion_event, size_t pointer_index);
+float AMotionEvent_getToolMajor(const AInputEvent* motion_event, size_t pointer_index);
+float AMotionEvent_getToolMinor(const AInputEvent* motion_event, size_t pointer_index);
+float AMotionEvent_getOrientation(const AInputEvent* motion_event, size_t pointer_index);
 size_t AMotionEvent_getHistorySize(const AInputEvent* motion_event);
 int64_t AMotionEvent_getHistoricalEventTime(const AInputEvent* motion_event,
         size_t history_index);
 float AMotionEvent_getHistoricalRawX(const AInputEvent* motion_event, size_t pointer_index,
-        size_t history_index); //__NDK_FPABI__
+        size_t history_index);
 float AMotionEvent_getHistoricalRawY(const AInputEvent* motion_event, size_t pointer_index,
-        size_t history_index); //__NDK_FPABI__
+        size_t history_index);
 float AMotionEvent_getHistoricalX(const AInputEvent* motion_event, size_t pointer_index,
-        size_t history_index); //__NDK_FPABI__
+        size_t history_index);
 float AMotionEvent_getHistoricalY(const AInputEvent* motion_event, size_t pointer_index,
-        size_t history_index); //__NDK_FPABI__
+        size_t history_index);
 float AMotionEvent_getHistoricalPressure(const AInputEvent* motion_event, size_t pointer_index,
-        size_t history_index); //__NDK_FPABI__
+        size_t history_index);
 float AMotionEvent_getHistoricalSize(const AInputEvent* motion_event, size_t pointer_index,
-        size_t history_index); //__NDK_FPABI__
+        size_t history_index);
 float AMotionEvent_getHistoricalTouchMajor(const AInputEvent* motion_event, size_t pointer_index,
-        size_t history_index); //__NDK_FPABI__
+        size_t history_index);
 float AMotionEvent_getHistoricalTouchMinor(const AInputEvent* motion_event, size_t pointer_index,
-        size_t history_index); //__NDK_FPABI__
+        size_t history_index);
 float AMotionEvent_getHistoricalToolMajor(const AInputEvent* motion_event, size_t pointer_index,
-        size_t history_index); //__NDK_FPABI__
+        size_t history_index);
 float AMotionEvent_getHistoricalToolMinor(const AInputEvent* motion_event, size_t pointer_index,
-        size_t history_index); //__NDK_FPABI__
+        size_t history_index);
 float AMotionEvent_getHistoricalOrientation(const AInputEvent* motion_event, size_t pointer_index,
-        size_t history_index); //__NDK_FPABI__
+        size_t history_index);
 
 struct AInputQueue;
 typedef struct AInputQueue AInputQueue;
@@ -610,23 +610,24 @@ void ANativeWindow_release(ANativeWindow* window);
 int32_t ANativeWindow_getWidth(ANativeWindow* window);
 int32_t ANativeWindow_getHeight(ANativeWindow* window);
 int32_t ANativeWindow_getFormat(ANativeWindow* window);
-int32_t ANativeWindow_setBuffersGeometry(ANativeWindow* window, int32_t width, int32_t height, int32_t format);
+int32_t ANativeWindow_setBuffersGeometry(ANativeWindow* window,
+        int32_t width, int32_t height, int32_t format);
 int32_t ANativeWindow_lock(ANativeWindow* window, ANativeWindow_Buffer* outBuffer,
         ARect* inOutDirtyBounds);
 int32_t ANativeWindow_unlockAndPost(ANativeWindow* window);
 
 // from android-ndk/platforms/android-9/arch-x86/usr/include/jni.h:
 
-typedef uint8_t         jboolean;       /* unsigned 8 bits */
-typedef int8_t          jbyte;          /* signed 8 bits */
-typedef uint16_t        jchar;          /* unsigned 16 bits */
-typedef int16_t         jshort;         /* signed 16 bits */
-typedef int32_t         jint;           /* signed 32 bits */
-typedef int64_t         jlong;          /* signed 64 bits */
-typedef float           jfloat;         /* 32-bit IEEE 754 */
-typedef double          jdouble;        /* 64-bit IEEE 754 */
+typedef uint8_t  jboolean; /* unsigned 8 bits */
+typedef int8_t   jbyte;    /* signed 8 bits */
+typedef uint16_t jchar;    /* unsigned 16 bits */
+typedef int16_t  jshort;   /* signed 16 bits */
+typedef int32_t  jint;     /* signed 32 bits */
+typedef int64_t  jlong;    /* signed 64 bits */
+typedef float    jfloat;   /* 32-bit IEEE 754 */
+typedef double   jdouble;  /* 64-bit IEEE 754 */
 
-typedef jint            jsize;
+typedef jint     jsize;
 
 typedef void*           jobject;
 typedef jobject         jclass;
@@ -728,7 +729,7 @@ struct JNINativeInterface {
     jobject     (*AllocObject)(JNIEnv*, jclass);
     jobject     (*NewObject)(JNIEnv*, jclass, jmethodID, ...);
     jobject     (*NewObjectV)(JNIEnv*, jclass, jmethodID, va_list);
-    jobject     (*NewObjectA)(JNIEnv*, jclass, jmethodID, jvalue*);
+    jobject     (*NewObjectA)(JNIEnv*, jclass, jmethodID, const jvalue*);
 
     jclass      (*GetObjectClass)(JNIEnv*, jobject);
     jboolean    (*IsInstanceOf)(JNIEnv*, jobject, jclass);
@@ -736,95 +737,95 @@ struct JNINativeInterface {
 
     jobject     (*CallObjectMethod)(JNIEnv*, jobject, jmethodID, ...);
     jobject     (*CallObjectMethodV)(JNIEnv*, jobject, jmethodID, va_list);
-    jobject     (*CallObjectMethodA)(JNIEnv*, jobject, jmethodID, jvalue*);
+    jobject     (*CallObjectMethodA)(JNIEnv*, jobject, jmethodID, const jvalue*);
     jboolean    (*CallBooleanMethod)(JNIEnv*, jobject, jmethodID, ...);
     jboolean    (*CallBooleanMethodV)(JNIEnv*, jobject, jmethodID, va_list);
-    jboolean    (*CallBooleanMethodA)(JNIEnv*, jobject, jmethodID, jvalue*);
+    jboolean    (*CallBooleanMethodA)(JNIEnv*, jobject, jmethodID, const jvalue*);
     jbyte       (*CallByteMethod)(JNIEnv*, jobject, jmethodID, ...);
     jbyte       (*CallByteMethodV)(JNIEnv*, jobject, jmethodID, va_list);
-    jbyte       (*CallByteMethodA)(JNIEnv*, jobject, jmethodID, jvalue*);
+    jbyte       (*CallByteMethodA)(JNIEnv*, jobject, jmethodID, const jvalue*);
     jchar       (*CallCharMethod)(JNIEnv*, jobject, jmethodID, ...);
     jchar       (*CallCharMethodV)(JNIEnv*, jobject, jmethodID, va_list);
-    jchar       (*CallCharMethodA)(JNIEnv*, jobject, jmethodID, jvalue*);
+    jchar       (*CallCharMethodA)(JNIEnv*, jobject, jmethodID, const jvalue*);
     jshort      (*CallShortMethod)(JNIEnv*, jobject, jmethodID, ...);
     jshort      (*CallShortMethodV)(JNIEnv*, jobject, jmethodID, va_list);
-    jshort      (*CallShortMethodA)(JNIEnv*, jobject, jmethodID, jvalue*);
+    jshort      (*CallShortMethodA)(JNIEnv*, jobject, jmethodID, const jvalue*);
     jint        (*CallIntMethod)(JNIEnv*, jobject, jmethodID, ...);
     jint        (*CallIntMethodV)(JNIEnv*, jobject, jmethodID, va_list);
-    jint        (*CallIntMethodA)(JNIEnv*, jobject, jmethodID, jvalue*);
+    jint        (*CallIntMethodA)(JNIEnv*, jobject, jmethodID, const jvalue*);
     jlong       (*CallLongMethod)(JNIEnv*, jobject, jmethodID, ...);
     jlong       (*CallLongMethodV)(JNIEnv*, jobject, jmethodID, va_list);
-    jlong       (*CallLongMethodA)(JNIEnv*, jobject, jmethodID, jvalue*);
+    jlong       (*CallLongMethodA)(JNIEnv*, jobject, jmethodID, const jvalue*);
     jfloat      (*CallFloatMethod)(JNIEnv*, jobject, jmethodID, ...);
     jfloat      (*CallFloatMethodV)(JNIEnv*, jobject, jmethodID, va_list);
-    jfloat      (*CallFloatMethodA)(JNIEnv*, jobject, jmethodID, jvalue*);
+    jfloat      (*CallFloatMethodA)(JNIEnv*, jobject, jmethodID, const jvalue*);
     jdouble     (*CallDoubleMethod)(JNIEnv*, jobject, jmethodID, ...);
     jdouble     (*CallDoubleMethodV)(JNIEnv*, jobject, jmethodID, va_list);
-    jdouble     (*CallDoubleMethodA)(JNIEnv*, jobject, jmethodID, jvalue*);
+    jdouble     (*CallDoubleMethodA)(JNIEnv*, jobject, jmethodID, const jvalue*);
     void        (*CallVoidMethod)(JNIEnv*, jobject, jmethodID, ...);
     void        (*CallVoidMethodV)(JNIEnv*, jobject, jmethodID, va_list);
-    void        (*CallVoidMethodA)(JNIEnv*, jobject, jmethodID, jvalue*);
+    void        (*CallVoidMethodA)(JNIEnv*, jobject, jmethodID, const jvalue*);
 
     jobject     (*CallNonvirtualObjectMethod)(JNIEnv*, jobject, jclass,
                         jmethodID, ...);
     jobject     (*CallNonvirtualObjectMethodV)(JNIEnv*, jobject, jclass,
                         jmethodID, va_list);
     jobject     (*CallNonvirtualObjectMethodA)(JNIEnv*, jobject, jclass,
-                        jmethodID, jvalue*);
+                        jmethodID, const jvalue*);
     jboolean    (*CallNonvirtualBooleanMethod)(JNIEnv*, jobject, jclass,
                         jmethodID, ...);
     jboolean    (*CallNonvirtualBooleanMethodV)(JNIEnv*, jobject, jclass,
                          jmethodID, va_list);
     jboolean    (*CallNonvirtualBooleanMethodA)(JNIEnv*, jobject, jclass,
-                         jmethodID, jvalue*);
+                         jmethodID, const jvalue*);
     jbyte       (*CallNonvirtualByteMethod)(JNIEnv*, jobject, jclass,
                         jmethodID, ...);
     jbyte       (*CallNonvirtualByteMethodV)(JNIEnv*, jobject, jclass,
                         jmethodID, va_list);
     jbyte       (*CallNonvirtualByteMethodA)(JNIEnv*, jobject, jclass,
-                        jmethodID, jvalue*);
+                        jmethodID, const jvalue*);
     jchar       (*CallNonvirtualCharMethod)(JNIEnv*, jobject, jclass,
                         jmethodID, ...);
     jchar       (*CallNonvirtualCharMethodV)(JNIEnv*, jobject, jclass,
                         jmethodID, va_list);
     jchar       (*CallNonvirtualCharMethodA)(JNIEnv*, jobject, jclass,
-                        jmethodID, jvalue*);
+                        jmethodID, const jvalue*);
     jshort      (*CallNonvirtualShortMethod)(JNIEnv*, jobject, jclass,
                         jmethodID, ...);
     jshort      (*CallNonvirtualShortMethodV)(JNIEnv*, jobject, jclass,
                         jmethodID, va_list);
     jshort      (*CallNonvirtualShortMethodA)(JNIEnv*, jobject, jclass,
-                        jmethodID, jvalue*);
+                        jmethodID, const jvalue*);
     jint        (*CallNonvirtualIntMethod)(JNIEnv*, jobject, jclass,
                         jmethodID, ...);
     jint        (*CallNonvirtualIntMethodV)(JNIEnv*, jobject, jclass,
                         jmethodID, va_list);
     jint        (*CallNonvirtualIntMethodA)(JNIEnv*, jobject, jclass,
-                        jmethodID, jvalue*);
+                        jmethodID, const jvalue*);
     jlong       (*CallNonvirtualLongMethod)(JNIEnv*, jobject, jclass,
                         jmethodID, ...);
     jlong       (*CallNonvirtualLongMethodV)(JNIEnv*, jobject, jclass,
                         jmethodID, va_list);
     jlong       (*CallNonvirtualLongMethodA)(JNIEnv*, jobject, jclass,
-                        jmethodID, jvalue*);
+                        jmethodID, const jvalue*);
     jfloat      (*CallNonvirtualFloatMethod)(JNIEnv*, jobject, jclass,
                         jmethodID, ...);
     jfloat      (*CallNonvirtualFloatMethodV)(JNIEnv*, jobject, jclass,
                         jmethodID, va_list);
     jfloat      (*CallNonvirtualFloatMethodA)(JNIEnv*, jobject, jclass,
-                        jmethodID, jvalue*);
+                        jmethodID, const jvalue*);
     jdouble     (*CallNonvirtualDoubleMethod)(JNIEnv*, jobject, jclass,
                         jmethodID, ...);
     jdouble     (*CallNonvirtualDoubleMethodV)(JNIEnv*, jobject, jclass,
                         jmethodID, va_list);
     jdouble     (*CallNonvirtualDoubleMethodA)(JNIEnv*, jobject, jclass,
-                        jmethodID, jvalue*);
+                        jmethodID, const jvalue*);
     void        (*CallNonvirtualVoidMethod)(JNIEnv*, jobject, jclass,
                         jmethodID, ...);
     void        (*CallNonvirtualVoidMethodV)(JNIEnv*, jobject, jclass,
                         jmethodID, va_list);
     void        (*CallNonvirtualVoidMethodA)(JNIEnv*, jobject, jclass,
-                        jmethodID, jvalue*);
+                        jmethodID, const jvalue*);
 
     jfieldID    (*GetFieldID)(JNIEnv*, jclass, const char*, const char*);
 
@@ -852,36 +853,35 @@ struct JNINativeInterface {
 
     jobject     (*CallStaticObjectMethod)(JNIEnv*, jclass, jmethodID, ...);
     jobject     (*CallStaticObjectMethodV)(JNIEnv*, jclass, jmethodID, va_list);
-    jobject     (*CallStaticObjectMethodA)(JNIEnv*, jclass, jmethodID, jvalue*);
+    jobject     (*CallStaticObjectMethodA)(JNIEnv*, jclass, jmethodID, const jvalue*);
     jboolean    (*CallStaticBooleanMethod)(JNIEnv*, jclass, jmethodID, ...);
     jboolean    (*CallStaticBooleanMethodV)(JNIEnv*, jclass, jmethodID,
                         va_list);
-    jboolean    (*CallStaticBooleanMethodA)(JNIEnv*, jclass, jmethodID,
-                        jvalue*);
+    jboolean    (*CallStaticBooleanMethodA)(JNIEnv*, jclass, jmethodID, const jvalue*);
     jbyte       (*CallStaticByteMethod)(JNIEnv*, jclass, jmethodID, ...);
     jbyte       (*CallStaticByteMethodV)(JNIEnv*, jclass, jmethodID, va_list);
-    jbyte       (*CallStaticByteMethodA)(JNIEnv*, jclass, jmethodID, jvalue*);
+    jbyte       (*CallStaticByteMethodA)(JNIEnv*, jclass, jmethodID, const jvalue*);
     jchar       (*CallStaticCharMethod)(JNIEnv*, jclass, jmethodID, ...);
     jchar       (*CallStaticCharMethodV)(JNIEnv*, jclass, jmethodID, va_list);
-    jchar       (*CallStaticCharMethodA)(JNIEnv*, jclass, jmethodID, jvalue*);
+    jchar       (*CallStaticCharMethodA)(JNIEnv*, jclass, jmethodID, const jvalue*);
     jshort      (*CallStaticShortMethod)(JNIEnv*, jclass, jmethodID, ...);
     jshort      (*CallStaticShortMethodV)(JNIEnv*, jclass, jmethodID, va_list);
-    jshort      (*CallStaticShortMethodA)(JNIEnv*, jclass, jmethodID, jvalue*);
+    jshort      (*CallStaticShortMethodA)(JNIEnv*, jclass, jmethodID, const jvalue*);
     jint        (*CallStaticIntMethod)(JNIEnv*, jclass, jmethodID, ...);
     jint        (*CallStaticIntMethodV)(JNIEnv*, jclass, jmethodID, va_list);
-    jint        (*CallStaticIntMethodA)(JNIEnv*, jclass, jmethodID, jvalue*);
+    jint        (*CallStaticIntMethodA)(JNIEnv*, jclass, jmethodID, const jvalue*);
     jlong       (*CallStaticLongMethod)(JNIEnv*, jclass, jmethodID, ...);
     jlong       (*CallStaticLongMethodV)(JNIEnv*, jclass, jmethodID, va_list);
-    jlong       (*CallStaticLongMethodA)(JNIEnv*, jclass, jmethodID, jvalue*);
+    jlong       (*CallStaticLongMethodA)(JNIEnv*, jclass, jmethodID, const jvalue*);
     jfloat      (*CallStaticFloatMethod)(JNIEnv*, jclass, jmethodID, ...);
     jfloat      (*CallStaticFloatMethodV)(JNIEnv*, jclass, jmethodID, va_list);
-    jfloat      (*CallStaticFloatMethodA)(JNIEnv*, jclass, jmethodID, jvalue*);
+    jfloat      (*CallStaticFloatMethodA)(JNIEnv*, jclass, jmethodID, const jvalue*);
     jdouble     (*CallStaticDoubleMethod)(JNIEnv*, jclass, jmethodID, ...);
     jdouble     (*CallStaticDoubleMethodV)(JNIEnv*, jclass, jmethodID, va_list);
-    jdouble     (*CallStaticDoubleMethodA)(JNIEnv*, jclass, jmethodID, jvalue*);
+    jdouble     (*CallStaticDoubleMethodA)(JNIEnv*, jclass, jmethodID, const jvalue*);
     void        (*CallStaticVoidMethod)(JNIEnv*, jclass, jmethodID, ...);
     void        (*CallStaticVoidMethodV)(JNIEnv*, jclass, jmethodID, va_list);
-    void        (*CallStaticVoidMethodA)(JNIEnv*, jclass, jmethodID, jvalue*);
+    void        (*CallStaticVoidMethodA)(JNIEnv*, jclass, jmethodID, const jvalue*);
 
     jfieldID    (*GetStaticFieldID)(JNIEnv*, jclass, const char*,
                         const char*);
@@ -1090,6 +1090,7 @@ typedef struct ANativeActivity {
     int32_t sdkVersion;
     void* instance;
     AAssetManager* assetManager;
+    const char* obbPath;
 } ANativeActivity;
 
 void ANativeActivity_finish(ANativeActivity* activity);
@@ -1107,19 +1108,43 @@ enum {
 };
 void ANativeActivity_hideSoftInput(ANativeActivity* activity, uint32_t flags);
 
+]]
 
+if ffi.abi("64bit") then
+
+ffi.cdef[[
 // from android-ndk/platforms/android-9/arch-arm/usr/include/pthread.h:
 
 typedef struct {
-    int volatile value;
+  int32_t __private[10];
 } pthread_mutex_t;
 
 typedef struct {
-    int volatile value;
+  int32_t __private[10];
 } pthread_cond_t;
 
 typedef long pthread_t;
+]]
 
+else
+
+ffi.cdef[[
+// from android-ndk/platforms/android-9/arch-arm/usr/include/pthread.h:
+
+typedef struct {
+  int32_t __private[1];
+} pthread_mutex_t;
+
+typedef struct {
+  int32_t __private[1];
+} pthread_cond_t;
+
+typedef long pthread_t;
+]]
+
+end
+
+ffi.cdef[[
 // from android-ndk/sources/android/native_app_glue/android_native_app_glue.h:
 
 struct android_poll_source {
