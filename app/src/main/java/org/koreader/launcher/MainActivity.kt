@@ -168,7 +168,7 @@ class MainActivity : NativeActivity(), LuaInterface,
 
     override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
         Log.v(TAG_SURFACE, String.format(Locale.US,
-            "surface changed {\n  width:  %d\n  height: %d\n format: %s\n}",
+            "surface changed {\n  width:  %d\n  height: %d\n  format: %s\n}",
             width, height, pixelFormatName(format))
         )
 
