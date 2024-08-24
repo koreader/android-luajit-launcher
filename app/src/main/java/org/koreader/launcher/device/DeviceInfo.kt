@@ -72,6 +72,7 @@ object DeviceInfo {
         ONYX_DARWIN9,
         ONYX_EDISON,
         ONYX_FAUST3,
+        ONYX_GO_103,
         ONYX_GO_COLOR7,
         ONYX_JDREAD,
         ONYX_KON_TIKI2,
@@ -230,6 +231,7 @@ object DeviceInfo {
     private val ONYX_DARWIN9: Boolean
     private val ONYX_EDISON: Boolean
     private val ONYX_FAUST3: Boolean
+    private val ONYX_GO_103: Boolean
     private val ONYX_GO_COLOR7: Boolean
     private val ONYX_JDREAD: Boolean
     private val ONYX_KON_TIKI2: Boolean
@@ -450,6 +452,10 @@ object DeviceInfo {
         ONYX_FAUST3 = MANUFACTURER.contentEquals("onyx")
             && PRODUCT.contentEquals("mc_faust3")
             && DEVICE.contentEquals("mc_faust3")
+
+        // Onyx Boox Go 10.3
+        ONYX_GO_103 = BRAND.contentEquals("onyx")
+            && MODEL.contentEquals("go103")
 
         // Onyx Boox Go Color 7
         ONYX_GO_COLOR7 = BRAND.contentEquals("onyx")
@@ -738,6 +744,7 @@ object DeviceInfo {
         deviceMap[EinkDevice.ONYX_DARWIN9] = ONYX_DARWIN9
         deviceMap[EinkDevice.ONYX_EDISON] = ONYX_EDISON
         deviceMap[EinkDevice.ONYX_FAUST3] = ONYX_FAUST3
+        deviceMap[EinkDevice.ONYX_GO_103] = ONYX_GO_103
         deviceMap[EinkDevice.ONYX_GO_COLOR7] = ONYX_GO_COLOR7
         deviceMap[EinkDevice.ONYX_JDREAD] = ONYX_JDREAD
         deviceMap[EinkDevice.ONYX_KON_TIKI2] = ONYX_KON_TIKI2

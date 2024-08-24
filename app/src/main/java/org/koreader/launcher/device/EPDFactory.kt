@@ -78,6 +78,7 @@ object EPDFactory {
                 }
 
                 DeviceInfo.EinkDevice.ONYX_EDISON,
+                DeviceInfo.EinkDevice.ONYX_GO_103,
                 DeviceInfo.EinkDevice.ONYX_GO_COLOR7,
                 DeviceInfo.EinkDevice.ONYX_KON_TIKI2,
                 DeviceInfo.EinkDevice.ONYX_LEAF,
