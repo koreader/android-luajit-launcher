@@ -9,8 +9,7 @@ object LightsFactory {
     val lightsController: LightsInterface
         get() {
             return when (DeviceInfo.LIGHTS) {
-                DeviceInfo.LightsDevice.NOOK_GL4,
-                DeviceInfo.LightsDevice.TOLINO_EPOS -> {
+                DeviceInfo.LightsDevice.NOOK_GL4 -> {
                     logController("TolinoRoot")
                     TolinoRootController()
                 }

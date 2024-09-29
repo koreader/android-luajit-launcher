@@ -163,7 +163,6 @@ object DeviceInfo {
         ONYX_TAB_ULTRA_C,
         RIDI_PAPER_3,
         TAGUS_GEA,
-        TOLINO_EPOS,
         TOLINO_EPOS1,
         TOLINO_PAGE2,
         TOLINO_SHINE3,
@@ -273,7 +272,6 @@ object DeviceInfo {
     private val SONY_CP1: Boolean
     private val SONY_RP1: Boolean
     private val TAGUS_GEA: Boolean
-    private val TOLINO_EPOS: Boolean
     private val TOLINO_EPOS1: Boolean
     private val TOLINO_EPOS3: Boolean
     private val TOLINO_PAGE2: Boolean
@@ -642,17 +640,7 @@ object DeviceInfo {
             || MODEL.contentEquals(STR_TOLINO) && (DEVICE.contentEquals("tolino_vision2")
             || DEVICE.contentEquals(STR_NTX))
 
-        // Tolino Epos 2 also have warmth lights
-        TOLINO_EPOS = BRAND.contentEquals(STR_KOBO)
-            && MODEL.contentEquals(STR_TOLINO)
-            && DEVICE.contentEquals(STR_NTX)
-            && !HARDWARE.contentEquals("e60k00")
-            && !HARDWARE.contentEquals("e60q50")
-            && !HARDWARE.contentEquals("e60qv0")
-            && !HARDWARE.contentEquals("e70k00")
-            && !HARDWARE.contentEquals("e70q20")
-
-        // Tolino Epos 1 also has warmth lights, but with ntx_io file
+        // Tolino Epos 1
         TOLINO_EPOS1 = BRAND.contentEquals(STR_KOBO)
             && MODEL.contentEquals(STR_TOLINO)
             && DEVICE.contentEquals(STR_NTX)
@@ -851,7 +839,6 @@ object DeviceInfo {
         lightsMap[LightsDevice.ONYX_TAB_ULTRA_C] = ONYX_TAB_ULTRA_C
         lightsMap[LightsDevice.RIDI_PAPER_3] = RIDI_PAPER_3
         lightsMap[LightsDevice.TAGUS_GEA] = TAGUS_GEA
-        lightsMap[LightsDevice.TOLINO_EPOS] = TOLINO_EPOS
         lightsMap[LightsDevice.TOLINO_EPOS1] = TOLINO_EPOS1
         lightsMap[LightsDevice.TOLINO_PAGE2] = TOLINO_PAGE2
         lightsMap[LightsDevice.TOLINO_SHINE3] = TOLINO_SHINE3
