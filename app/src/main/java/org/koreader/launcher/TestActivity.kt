@@ -3,6 +3,7 @@ package org.koreader.launcher
 import android.graphics.Point
 import android.text.method.LinkMovementMethod
 import android.util.Log
+import android.view.KeyEvent
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -145,6 +146,13 @@ class TestActivity: AppCompatActivity() {
         super.onDestroy()
         Log.i(tag, MARKER_END)
     }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        val msg = String.format("Pressed: %d", keyCode)
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+        return super.onKeyDown(keyCode, event)
+    }
+
     private fun runLights(id: String) {
         lightsMap[id]?.let { driver ->
             Log.i(tag, String.format("running lights test: %s", id))
