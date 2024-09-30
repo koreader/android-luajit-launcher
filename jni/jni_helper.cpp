@@ -1,8 +1,3 @@
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#include <jni.h>
 #include "jni_helper.h"
 
 bool has_permission(struct android_app* app) {
@@ -35,7 +30,3 @@ void crash_report(struct android_app* app) {
         vm->DetachCurrentThread();
     }
 }
-
-#ifdef __cplusplus
-}
-#endif
