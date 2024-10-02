@@ -92,26 +92,6 @@ class Assets {
                                 return false
                             }
                         }
-                        (assetName == "module/map.txt") -> {
-                            /* Symlink binaries stored as shared libraries */
-                            val nativeLibsDir = activity.applicationInfo.nativeLibraryDir
-                            activity.assets.open(assetName).bufferedReader().use { text ->
-                                Log.v(tag, "Reading symlinks map from $assetName")
-                                text.forEachLine { line ->
-                                    try {
-                                        val array = line.split(" ").toTypedArray()
-                                        if (array.size == 2) {
-                                            val link = "$filesDir/${array[0]}"
-                                            val file = "$nativeLibsDir/${array[1]}"
-                                            Log.v(tag, "Symlink $file to $link")
-                                            File(file).symlink(link)
-                                        }
-                                    } catch (e: Exception) {
-                                        e.printStackTrace()
-                                    }
-                                }
-                            }
-                        }
                         else -> {
                             /* Copy all regular files in assets store */
                             Log.v(tag, "Extracting $assetName")
@@ -136,37 +116,11 @@ class Assets {
             }
         }
 
-        /* copy libraries stored as raw assets */
-        activity.assets.list("libs")?.let {
-            val libsDir = File("$filesDir/libs")
-            val libsPath = libsDir.absolutePath
-            if (!libsDir.exists()) {
-                libsDir.mkdir()
-            }
-            for (lib in it) {
-                try {
-                    val file = File(libsPath, lib)
-                    val inputStream = activity.assets.open("libs/$lib")
-                    val outputStream = FileOutputStream(file)
-                    inputStream.use { source ->
-                        outputStream.use { target ->
-                            source.copyTo(target)
-                        }
-                    }
-                    inputStream.close()
-                    outputStream.flush()
-                    outputStream.close()
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }
-        } ?: Log.v(tag, "No libraries to copy")
-
         activity.runOnUiThread { dialog?.dismiss() }
         return true
     }
 
-    /* dialog used while extracting assets from zip */
+    /* dialog used while extracting assets from APK */
     private var dialog: FramelessProgressDialog? = null
     private class FramelessProgressDialog private constructor(context: Context):
         Dialog(context, R.style.FramelessDialog) {
