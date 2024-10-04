@@ -51,7 +51,7 @@ extractStream(JNIEnv *env, ISeekInStream *seekStream, const char *destDir,
     else {
         lookStream.bufSize = inBufSize;
         lookStream.realStream = seekStream;
-        LookToRead2_Init(&lookStream);
+        LookToRead2_INIT(&lookStream);
     }
 
     CrcGenerateTable();
