@@ -1574,35 +1574,6 @@ function android.asset_loader(modulename)
     return errmsg
 end
 
---[[--
-This loader function just loads dependency libraries for the C module.
-
-@string modulename
-@treturn bool success or failure
---]]
-function android.deplib_loader(modulename)
-    local function readable(filename)
-        local f = io.open(filename, "r")
-        if f == nil then return false end
-        f:close()
-        return true
-    end
-
-    local modulepath = string.gsub(modulename, "%.", "/")
-    for path in string.gmatch(package.cpath, "([^;]+)") do
-        local module = string.gsub(path, "%?", modulepath)
-        -- try to load dependencies of this module with our dlopen implementation
-        if readable(module) then
-            android.DEBUG("try to load module "..module)
-            local ok, err = pcall(android.dl.dlopen, module)
-            if ok then return end
-            if err then
-                android.LOGE("error: " .. err)
-            end
-        end
-    end
-end
-
 function android.get_application_directory()
 end
 
@@ -2764,27 +2735,8 @@ local function run(android_app_state)
 
     -- set up a sensible package.path
     package.path = "?.lua;"..android.dir.."/?.lua;"
-    -- set absolute cpath
-    package.cpath = "?.so;"..android.dir.."/?.so;"
     -- register the asset loader
     table.insert(package.loaders, 2, android.asset_loader)
-
-    -- load the dlopen() implementation
-    android.dl = require("dl")
-    android.dl.system_libdir = ffi.abi("64bit") and "/system/lib64" or "/system/lib"
-    android.dl.library_path = android.nativeLibraryDir..":"..
-        android.dir..":"..android.dir.."/libs:"..
-        string.gsub("@:@/lib?.so", "@", android.dl.system_libdir)
-
-    -- register the dependency lib loader
-    table.insert(package.loaders, 3, android.deplib_loader)
-
-    -- ffi.load wrapper
-    local ffi_load = ffi.load
-    ffi.load = function(library, ...) -- luacheck: ignore 212
-        android.DEBUG("ffi.load "..library)
-        return android.dl.dlopen(library, ffi_load)
-    end
 
     local installed = android.extractAssets()
     if not installed then
