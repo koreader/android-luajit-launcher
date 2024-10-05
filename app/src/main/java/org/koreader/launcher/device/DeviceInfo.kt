@@ -164,6 +164,7 @@ object DeviceInfo {
         RIDI_PAPER_3,
         TAGUS_GEA,
         TOLINO_EPOS1,
+        TOLINO_EPOS3,
         TOLINO_PAGE2,
         TOLINO_SHINE3,
         TOLINO_VISION4,
@@ -840,6 +841,7 @@ object DeviceInfo {
         lightsMap[LightsDevice.RIDI_PAPER_3] = RIDI_PAPER_3
         lightsMap[LightsDevice.TAGUS_GEA] = TAGUS_GEA
         lightsMap[LightsDevice.TOLINO_EPOS1] = TOLINO_EPOS1
+        lightsMap[LightsDevice.TOLINO_EPOS3] = TOLINO_EPOS3
         lightsMap[LightsDevice.TOLINO_PAGE2] = TOLINO_PAGE2
         lightsMap[LightsDevice.TOLINO_SHINE3] = TOLINO_SHINE3
         lightsMap[LightsDevice.TOLINO_VISION4] = TOLINO_VISION4
