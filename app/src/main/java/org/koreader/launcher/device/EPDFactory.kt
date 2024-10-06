@@ -72,7 +72,8 @@ object EPDFactory {
                 DeviceInfo.EinkDevice.HANVON_960,
                 DeviceInfo.EinkDevice.ONYX_JDREAD,
                 DeviceInfo.EinkDevice.RIDI_PAPER_3,
-                DeviceInfo.EinkDevice.TOLINO -> {
+                DeviceInfo.EinkDevice.TOLINO,
+                DeviceInfo.EinkDevice.TOLINO_EPOS1 -> {
                     logController("Tolino/NTX")
                     TolinoEPDController()
                 }
