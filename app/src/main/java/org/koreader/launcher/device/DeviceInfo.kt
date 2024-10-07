@@ -39,6 +39,7 @@ object DeviceInfo {
         BOYUE_P6,
         BOYUE_P61,
         BOYUE_P78,
+        BOYUE_P101,
         BOYUE_S62,
         BOYUE_T61,
         BOYUE_T62,
@@ -197,6 +198,7 @@ object DeviceInfo {
     private val BOYUE_P6: Boolean
     private val BOYUE_P61: Boolean
     private val BOYUE_P78: Boolean
+    private val BOYUE_P101: Boolean
     private val BOYUE_S62: Boolean
     private val BOYUE_T61: Boolean
     private val BOYUE_T62: Boolean
@@ -311,6 +313,9 @@ object DeviceInfo {
 
         // Boyue Likebook P78
         BOYUE_P78 = BOYUE && PRODUCT.contentEquals("p78")
+
+        // Boyue Likebook P101
+        BOYUE_P101 = BOYUE && PRODUCT.contentEquals("p101")
 
         // Boyue Likebook LemonRead S62A
         BOYUE_S62 = BOYUE && PRODUCT.contentEquals("s62")
@@ -714,6 +719,7 @@ object DeviceInfo {
         deviceMap[EinkDevice.BOYUE_P6] = BOYUE_P6
         deviceMap[EinkDevice.BOYUE_P61] = BOYUE_P61
         deviceMap[EinkDevice.BOYUE_P78] = BOYUE_P78
+        deviceMap[EinkDevice.BOYUE_P101] = BOYUE_P101
         deviceMap[EinkDevice.BOYUE_S62] = BOYUE_S62
         deviceMap[EinkDevice.BOYUE_T61] = BOYUE_T61
         deviceMap[EinkDevice.BOYUE_T62] = BOYUE_T62
