@@ -18,6 +18,7 @@ object LightsFactory {
                 DeviceInfo.LightsDevice.MEEBOOK_P6,
                 DeviceInfo.LightsDevice.RIDI_PAPER_3,
                 DeviceInfo.LightsDevice.TOLINO_EPOS1,
+                DeviceInfo.LightsDevice.TOLINO_EPOS2,
                 DeviceInfo.LightsDevice.TOLINO_SHINE3,
                 DeviceInfo.LightsDevice.TOLINO_VISION4,
                 DeviceInfo.LightsDevice.TOLINO_VISION5 -> {

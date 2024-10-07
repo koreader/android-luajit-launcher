@@ -165,6 +165,7 @@ object DeviceInfo {
         RIDI_PAPER_3,
         TAGUS_GEA,
         TOLINO_EPOS1,
+        TOLINO_EPOS2,
         TOLINO_PAGE2,
         TOLINO_SHINE3,
         TOLINO_VISION4,
@@ -275,6 +276,7 @@ object DeviceInfo {
     private val SONY_RP1: Boolean
     private val TAGUS_GEA: Boolean
     private val TOLINO_EPOS1: Boolean
+    private val TOLINO_EPOS2: Boolean
     private val TOLINO_EPOS3: Boolean
     private val TOLINO_PAGE2: Boolean
     private val TOLINO_SHINE3: Boolean
@@ -651,6 +653,12 @@ object DeviceInfo {
             && DEVICE.contentEquals(STR_NTX)
             && HARDWARE.contentEquals("e70q20")
 
+        // Tolino Epos 2
+        TOLINO_EPOS2 = BRAND.contentEquals(STR_KOBO)
+            && MODEL.contentEquals(STR_TOLINO)
+            && DEVICE.contentEquals(STR_NTX)
+            && HARDWARE.contentEquals("e80k00")
+
         // Tolino Epos 3
         TOLINO_EPOS3 = BRAND.contentEquals(STR_KOBO)
             && MODEL.contentEquals("tolino epos 3")
@@ -846,6 +854,7 @@ object DeviceInfo {
         lightsMap[LightsDevice.RIDI_PAPER_3] = RIDI_PAPER_3
         lightsMap[LightsDevice.TAGUS_GEA] = TAGUS_GEA
         lightsMap[LightsDevice.TOLINO_EPOS1] = TOLINO_EPOS1
+        lightsMap[LightsDevice.TOLINO_EPOS2] = TOLINO_EPOS2
         lightsMap[LightsDevice.TOLINO_PAGE2] = TOLINO_PAGE2
         lightsMap[LightsDevice.TOLINO_SHINE3] = TOLINO_SHINE3
         lightsMap[LightsDevice.TOLINO_VISION4] = TOLINO_VISION4
