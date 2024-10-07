@@ -1,16 +1,16 @@
 package org.koreader.launcher
 
+import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Environment
 import android.os.StrictMode
-import androidx.multidex.MultiDexApplication
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
 
-class MainApp : MultiDexApplication() {
+class MainApp : Application() {
     companion object {
         const val NAME = BuildConfig.APP_NAME
         const val FLAVOR = BuildConfig.FLAVOR_CHANNEL

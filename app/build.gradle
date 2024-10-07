@@ -14,7 +14,6 @@ android {
         minSdkVersion rootProject.ext.minSdk
         targetSdkVersion rootProject.ext.targetSdk
 
-        multiDexEnabled true
         manifestPlaceholders.APP_NAME = projectName
 
         buildConfigField "String", "APP_NAME", '"' + projectName + '"'
