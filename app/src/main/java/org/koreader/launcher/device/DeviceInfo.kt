@@ -113,7 +113,6 @@ object DeviceInfo {
         SONY_RP1,
         TAGUS_GEA,
         TOLINO,
-        TOLINO_EPOS1,
         TOLINO_EPOS3,
         TOLINO_VISION6,
         XIAOMI_READER
@@ -791,7 +790,6 @@ object DeviceInfo {
         deviceMap[EinkDevice.SONY_RP1] = SONY_RP1
         deviceMap[EinkDevice.TAGUS_GEA] = TAGUS_GEA
         deviceMap[EinkDevice.TOLINO] = TOLINO
-        deviceMap[EinkDevice.TOLINO_EPOS1] = TOLINO_EPOS1
         deviceMap[EinkDevice.TOLINO_EPOS3] = TOLINO_EPOS3
         deviceMap[EinkDevice.XIAOMI_READER] = XIAOMI_READER
 
