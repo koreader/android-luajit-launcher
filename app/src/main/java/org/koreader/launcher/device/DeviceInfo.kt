@@ -743,9 +743,13 @@ object DeviceInfo {
         deviceMap[EinkDevice.ENERGY] = ENERGY
         deviceMap[EinkDevice.FIDIBOOK] = FIDIBOOK
         deviceMap[EinkDevice.INKBOOK] = INKBOOK
+        deviceMap[EinkDevice.INKPALM_PLUS] = INKPALM_PLUS
         deviceMap[EinkDevice.JDREAD] = JDREAD
         deviceMap[EinkDevice.LINFINY_ENOTE] = LINFINY_ENOTE
+        deviceMap[EinkDevice.MEEBOOK_M6] = MEEBOOK_M6
+        deviceMap[EinkDevice.MEEBOOK_M7] = MEEBOOK_M7
         deviceMap[EinkDevice.MEEBOOK_P6] = MEEBOOK_P6
+        deviceMap[EinkDevice.MOAAN_MIX7] = MOAAN_MIX7
         deviceMap[EinkDevice.MOOINKPLUS2C] = MOOINKPLUS2C
         deviceMap[EinkDevice.NABUK] = NABUK_REGAL_HD
         deviceMap[EinkDevice.NOOK] = NOOK
