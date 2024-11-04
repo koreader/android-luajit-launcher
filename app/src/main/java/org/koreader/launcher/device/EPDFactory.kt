@@ -18,119 +18,127 @@ import java.util.*
 object EPDFactory {
     val epdController: EPDInterface
         get() {
-            return when (DeviceInfo.EINK) {
-                DeviceInfo.EinkDevice.BOYUE_T61,
-                DeviceInfo.EinkDevice.BOYUE_T62,
-                DeviceInfo.EinkDevice.BOYUE_T80S,
-                DeviceInfo.EinkDevice.CREMA_0650L,
-                DeviceInfo.EinkDevice.ENERGY,
-                DeviceInfo.EinkDevice.FIDIBOOK,
-                DeviceInfo.EinkDevice.INKBOOK,
-                DeviceInfo.EinkDevice.MEEBOOK_P6,
-                DeviceInfo.EinkDevice.ONYX_C67,
-                DeviceInfo.EinkDevice.ONYX_MAGICBOOK,
-                DeviceInfo.EinkDevice.ONYX_MONTECRISTO3 -> {
+            return when (DeviceInfo.ID) {
+                DeviceInfo.Id.BOYUE_T61,
+                DeviceInfo.Id.BOYUE_T62,
+                DeviceInfo.Id.BOYUE_T80S,
+                DeviceInfo.Id.CREMA_0650L,
+                DeviceInfo.Id.ENERGY,
+                DeviceInfo.Id.FIDIBOOK,
+                DeviceInfo.Id.INKBOOK,
+                DeviceInfo.Id.MEEBOOK_P6,
+                DeviceInfo.Id.ONYX_C67,
+                DeviceInfo.Id.ONYX_MAGICBOOK,
+                DeviceInfo.Id.ONYX_MONTECRISTO3,
+                -> {
                     logController("Rockchip RK3026")
                     RK3026EPDController()
                 }
 
-                DeviceInfo.EinkDevice.BOYUE_C64P,
-                DeviceInfo.EinkDevice.BOYUE_K78W,
-                DeviceInfo.EinkDevice.BOYUE_K103,
-                DeviceInfo.EinkDevice.BOYUE_P6,
-                DeviceInfo.EinkDevice.BOYUE_P61,
-                DeviceInfo.EinkDevice.BOYUE_P78,
-                DeviceInfo.EinkDevice.BOYUE_P101,
-                DeviceInfo.EinkDevice.BOYUE_S62,
-                DeviceInfo.EinkDevice.BOYUE_T78D,
-                DeviceInfo.EinkDevice.BOYUE_T80D,
-                DeviceInfo.EinkDevice.BOYUE_T103D -> {
+                DeviceInfo.Id.BOYUE_C64P,
+                DeviceInfo.Id.BOYUE_K78W,
+                DeviceInfo.Id.BOYUE_K103,
+                DeviceInfo.Id.BOYUE_P6,
+                DeviceInfo.Id.BOYUE_P61,
+                DeviceInfo.Id.BOYUE_P78,
+                DeviceInfo.Id.BOYUE_P101,
+                DeviceInfo.Id.BOYUE_S62,
+                DeviceInfo.Id.BOYUE_T78D,
+                DeviceInfo.Id.BOYUE_T80D,
+                DeviceInfo.Id.BOYUE_T103D,
+                -> {
                     logController("Rockchip RK3368")
                     RK3368EPDController()
                 }
 
-                DeviceInfo.EinkDevice.BOYUE_T65S,
-                DeviceInfo.EinkDevice.CREMA_0710C,
-                DeviceInfo.EinkDevice.JDREAD,
-                DeviceInfo.EinkDevice.LINFINY_ENOTE,
-                DeviceInfo.EinkDevice.NOOK,
-                DeviceInfo.EinkDevice.SONY_CP1,
-                DeviceInfo.EinkDevice.SONY_RP1 -> {
+                DeviceInfo.Id.BOYUE_T65S,
+                DeviceInfo.Id.CREMA_0710C,
+                DeviceInfo.Id.JDREAD,
+                DeviceInfo.Id.LINFINY_ENOTE,
+                DeviceInfo.Id.NOOK,
+                DeviceInfo.Id.SONY_CP1,
+                DeviceInfo.Id.SONY_RP1,
+                -> {
                     logController("Nook/NTX")
                     NookEPDController()
                 }
 
-                DeviceInfo.EinkDevice.MOOINKPLUS2C,
-                DeviceInfo.EinkDevice.NOOK_GL4,
-                DeviceInfo.EinkDevice.TOLINO_EPOS3,
-                DeviceInfo.EinkDevice.TOLINO_VISION6 -> {
+                DeviceInfo.Id.MOOINKPLUS2C,
+                DeviceInfo.Id.NOOK_GL4,
+                DeviceInfo.Id.TOLINO_EPOS3,
+                DeviceInfo.Id.TOLINO_VISION6,
+                -> {
                     logController("NOOK_GL4")
                     NGL4EPDController()
                 }
 
-                DeviceInfo.EinkDevice.CREMA,
-                DeviceInfo.EinkDevice.CREMA_CARTA_G,
-                DeviceInfo.EinkDevice.HANVON_960,
-                DeviceInfo.EinkDevice.ONYX_JDREAD,
-                DeviceInfo.EinkDevice.RIDI_PAPER_3,
-                DeviceInfo.EinkDevice.TOLINO -> {
+                DeviceInfo.Id.CREMA,
+                DeviceInfo.Id.CREMA_CARTA_G,
+                DeviceInfo.Id.HANVON_960,
+                DeviceInfo.Id.ONYX_JDREAD,
+                DeviceInfo.Id.RIDI_PAPER_3,
+                DeviceInfo.Id.TOLINO,
+                -> {
                     logController("Tolino/NTX")
                     TolinoEPDController()
                 }
 
-                DeviceInfo.EinkDevice.ONYX_EDISON,
-                DeviceInfo.EinkDevice.ONYX_GO_103,
-                DeviceInfo.EinkDevice.ONYX_GO_COLOR7,
-                DeviceInfo.EinkDevice.ONYX_KON_TIKI2,
-                DeviceInfo.EinkDevice.ONYX_LEAF,
-                DeviceInfo.EinkDevice.ONYX_LEAF2,
-                DeviceInfo.EinkDevice.ONYX_DARWIN9,
-                DeviceInfo.EinkDevice.ONYX_LOMONOSOV,
-                DeviceInfo.EinkDevice.ONYX_MAX,
-                DeviceInfo.EinkDevice.ONYX_NOTE,
-                DeviceInfo.EinkDevice.ONYX_NOTE3,
-                DeviceInfo.EinkDevice.ONYX_NOTE4,
-                DeviceInfo.EinkDevice.ONYX_NOTE5,
-                DeviceInfo.EinkDevice.ONYX_NOTE_AIR,
-                DeviceInfo.EinkDevice.ONYX_NOTE_AIR2,
-                DeviceInfo.EinkDevice.ONYX_NOTE_PRO,
-                DeviceInfo.EinkDevice.ONYX_NOTE_X2,
-                DeviceInfo.EinkDevice.ONYX_NOVA,
-                DeviceInfo.EinkDevice.ONYX_NOVA2,
-                DeviceInfo.EinkDevice.ONYX_NOVA3,
-                DeviceInfo.EinkDevice.ONYX_NOVA3_COLOR,
-                DeviceInfo.EinkDevice.ONYX_NOVA_AIR,
-                DeviceInfo.EinkDevice.ONYX_NOVA_AIR_2,
-                DeviceInfo.EinkDevice.ONYX_NOVA_AIR_C,
-                DeviceInfo.EinkDevice.ONYX_NOVA_PRO,
-                DeviceInfo.EinkDevice.ONYX_PAGE,
-                DeviceInfo.EinkDevice.ONYX_PALMA,
-                DeviceInfo.EinkDevice.ONYX_POKE3,
-                DeviceInfo.EinkDevice.ONYX_POKE4,
-                DeviceInfo.EinkDevice.ONYX_POKE5,
-                DeviceInfo.EinkDevice.ONYX_POKE4LITE,
-                DeviceInfo.EinkDevice.ONYX_POKE_PRO,
-                DeviceInfo.EinkDevice.ONYX_TAB_ULTRA_C,
-                DeviceInfo.EinkDevice.ONYX_TAB_ULTRA -> {
+                DeviceInfo.Id.ONYX_EDISON,
+                DeviceInfo.Id.ONYX_GO_103,
+                DeviceInfo.Id.ONYX_GO_COLOR7,
+                DeviceInfo.Id.ONYX_KON_TIKI2,
+                DeviceInfo.Id.ONYX_LEAF,
+                DeviceInfo.Id.ONYX_LEAF2,
+                DeviceInfo.Id.ONYX_DARWIN9,
+                DeviceInfo.Id.ONYX_LOMONOSOV,
+                DeviceInfo.Id.ONYX_MAX,
+                DeviceInfo.Id.ONYX_NOTE,
+                DeviceInfo.Id.ONYX_NOTE3,
+                DeviceInfo.Id.ONYX_NOTE4,
+                DeviceInfo.Id.ONYX_NOTE5,
+                DeviceInfo.Id.ONYX_NOTE_AIR,
+                DeviceInfo.Id.ONYX_NOTE_AIR2,
+                DeviceInfo.Id.ONYX_NOTE_PRO,
+                DeviceInfo.Id.ONYX_NOTE_X2,
+                DeviceInfo.Id.ONYX_NOVA,
+                DeviceInfo.Id.ONYX_NOVA2,
+                DeviceInfo.Id.ONYX_NOVA3,
+                DeviceInfo.Id.ONYX_NOVA3_COLOR,
+                DeviceInfo.Id.ONYX_NOVA_AIR,
+                DeviceInfo.Id.ONYX_NOVA_AIR_2,
+                DeviceInfo.Id.ONYX_NOVA_AIR_C,
+                DeviceInfo.Id.ONYX_NOVA_PRO,
+                DeviceInfo.Id.ONYX_PAGE,
+                DeviceInfo.Id.ONYX_PALMA,
+                DeviceInfo.Id.ONYX_POKE3,
+                DeviceInfo.Id.ONYX_POKE4,
+                DeviceInfo.Id.ONYX_POKE5,
+                DeviceInfo.Id.ONYX_POKE4LITE,
+                DeviceInfo.Id.ONYX_POKE_PRO,
+                DeviceInfo.Id.ONYX_TAB_ULTRA,
+                DeviceInfo.Id.ONYX_TAB_ULTRA_C,
+                -> {
                     logController("Onyx/Qualcomm")
                     OnyxEPDController()
                 }
 
-                DeviceInfo.EinkDevice.NABUK,
-                DeviceInfo.EinkDevice.ONYX_DARWIN7,
-                DeviceInfo.EinkDevice.ONYX_FAUST3,
-                DeviceInfo.EinkDevice.TAGUS_GEA-> {
+                DeviceInfo.Id.NABUK,
+                DeviceInfo.Id.ONYX_DARWIN7,
+                DeviceInfo.Id.ONYX_FAUST3,
+                DeviceInfo.Id.TAGUS_GEA,
+                -> {
                     logController("Old Tolino/NTX")
                     OldTolinoEPDController()
                 }
 
-                DeviceInfo.EinkDevice.HYREAD_MINI6,
-                DeviceInfo.EinkDevice.INKPALM_PLUS,
-                DeviceInfo.EinkDevice.MEEBOOK_M6,
-                DeviceInfo.EinkDevice.MEEBOOK_M7,
-                DeviceInfo.EinkDevice.MOAAN_MIX7,
-                DeviceInfo.EinkDevice.PUBU_PUBOOK,
-                DeviceInfo.EinkDevice.XIAOMI_READER -> {
+                DeviceInfo.Id.HYREAD_MINI6,
+                DeviceInfo.Id.INKPALM_PLUS,
+                DeviceInfo.Id.MEEBOOK_M6,
+                DeviceInfo.Id.MEEBOOK_M7,
+                DeviceInfo.Id.MOAAN_MIX7,
+                DeviceInfo.Id.PUBU_PUBOOK,
+                DeviceInfo.Id.XIAOMI_READER,
+                -> {
                     logController("Rockchip RK3566")
                     RK3566EPDController()
                 }

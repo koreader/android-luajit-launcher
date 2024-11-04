@@ -31,13 +31,12 @@ class Device(activity: Activity) {
     val einkPlatform = epd.getPlatform()
 
     val properties: String
-      get() = String.format("%s;%s;%s;%s;%s;%s;%b;%b",
+      get() = String.format("%s;%s;%s;%s;%s;%s;%s",
           DeviceInfo.MANUFACTURER,
           DeviceInfo.BRAND,
           DeviceInfo.MODEL,
           DeviceInfo.DEVICE,
           DeviceInfo.PRODUCT,
           DeviceInfo.HARDWARE,
-          DeviceInfo.BOYUE,
-          DeviceInfo.TOLINO)
+      )
 }
