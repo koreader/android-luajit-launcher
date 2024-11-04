@@ -1943,7 +1943,7 @@ local function run(android_app_state)
         end)
     end
 
-    local manufacturer, brand, model, device, product, hardware, is_boyue, is_tolino =
+    local manufacturer, brand, model, device, product, hardware =
         JNI:context(android.app.activity.vm, function(jni)
             local properties = jni:callObjectMethod(
                 android.app.activity.clazz,
@@ -1952,7 +1952,7 @@ local function run(android_app_state)
             )
 
             return string.match(jni:to_string(properties),
-                "(.*);(.*);(.*);(.*);(.*);(.*);(.*);(.*)")
+                "(.*);(.*);(.*);(.*);(.*);(.*)")
         end)
 
     -- properties that don't change during the execution of the program.
@@ -1963,8 +1963,6 @@ local function run(android_app_state)
         device = device,
         product = product,
         hardware = hardware,
-        is_boyue = is_boyue == "true",
-        is_tolino = is_tolino == "true",
     }
 
     -- build properties

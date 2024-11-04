@@ -530,11 +530,7 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun hasNativeRotation(): Boolean {
-        return if (platform == "android") {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                !(device.bugRotation)
-            } else false
-        } else false
+        return platform == "android" && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT
     }
 
     override fun hasOTAUpdates(): Boolean {
