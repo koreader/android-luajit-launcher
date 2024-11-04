@@ -7,10 +7,12 @@
 package org.koreader.launcher.device
 
 import android.os.Build
-import kotlin.collections.HashMap
+import android.util.Log
 import java.util.Locale
 
 object DeviceInfo {
+    private const val TAG = "DeviceInfo"
+
     private const val STR_KOBO = "rakutenkobo"
     private const val STR_NTX = "ntx_6sl"
     private const val STR_ROCKCHIP = "rockchip"
@@ -26,12 +28,11 @@ object DeviceInfo {
     // known quirks
     val QUIRK_BROKEN_LIFECYCLE: Boolean
     val QUIRK_NEEDS_WAKELOCKS: Boolean
-    val QUIRK_NO_HW_ROTATION: Boolean
     val QUIRK_NO_LIGHTS: Boolean
 
     val HAS_COLOR_SCREEN: Boolean
 
-    enum class EinkDevice {
+    enum class Id {
         NONE,
         BOYUE_C64P,
         BOYUE_K78W,
@@ -101,6 +102,7 @@ object DeviceInfo {
         ONYX_NOVA_PRO,
         ONYX_PAGE,
         ONYX_PALMA,
+        ONYX_POKE2,
         ONYX_POKE3,
         ONYX_POKE4,
         ONYX_POKE5,
@@ -114,176 +116,18 @@ object DeviceInfo {
         SONY_RP1,
         TAGUS_GEA,
         TOLINO,
-        TOLINO_EPOS3,
-        TOLINO_VISION6,
-        XIAOMI_READER
-    }
-
-    enum class LightsDevice {
-        NONE,
-        BOYUE_S62,
-        CREMA_0710C,
-        CREMA_CARTA_G,
-        MEEBOOK_P6,
-        NOOK_GL4,
-        ONYX_C67,
-        ONYX_DARWIN7,
-        ONYX_DARWIN9,
-        ONYX_EDISON,
-        ONYX_FAUST3,
-        ONYX_GO_COLOR7,
-        ONYX_JDREAD,
-        ONYX_KON_TIKI2,
-        ONYX_LEAF,
-        ONYX_LEAF2,
-        ONYX_LOMONOSOV,
-        ONYX_MAGICBOOK,
-        ONYX_MONTECRISTO3,
-        ONYX_NOTE3,
-        ONYX_NOTE4,
-        ONYX_NOTE_AIR,
-        ONYX_NOTE_AIR2,
-        ONYX_NOTE_PRO,
-        ONYX_NOTE_X2,
-        ONYX_NOVA,
-        ONYX_NOVA2,
-        ONYX_NOVA3,
-        ONYX_NOVA3_COLOR,
-        ONYX_NOVA_AIR,
-        ONYX_NOVA_AIR_2,
-        ONYX_NOVA_AIR_C,
-        ONYX_NOVA_PRO,
-        ONYX_PAGE,
-        ONYX_PALMA,
-        ONYX_POKE3,
-        ONYX_POKE4,
-        ONYX_POKE5,
-        ONYX_POKE4LITE,
-        ONYX_POKE_PRO,
-        ONYX_TAB_ULTRA,
-        ONYX_TAB_ULTRA_C,
-        RIDI_PAPER_3,
-        TAGUS_GEA,
         TOLINO_EPOS1,
         TOLINO_EPOS2,
+        TOLINO_EPOS3,
         TOLINO_PAGE2,
         TOLINO_SHINE3,
         TOLINO_VISION4,
         TOLINO_VISION5,
-        XIAOMI_READER
+        TOLINO_VISION6,
+        XIAOMI_READER,
     }
 
-    enum class QuirkDevice {
-        NONE,
-        EMULATOR,
-        LINFINY_ENOTE,
-        ONYX_MAX,
-        ONYX_NOTE,
-        ONYX_POKE2,
-        SONY_CP1,
-        SONY_RP1
-    }
-
-    // default values for generic devices.
-    internal var EINK = EinkDevice.NONE
-    internal var LIGHTS = LightsDevice.NONE
-    private var QUIRK = QuirkDevice.NONE
-
-    internal val BOYUE: Boolean
-    internal val TOLINO: Boolean
-
-    // device probe
-    private val BOYUE_C64P: Boolean
-    private val BOYUE_K78W: Boolean
-    private val BOYUE_K103: Boolean
-    private val BOYUE_P6: Boolean
-    private val BOYUE_P61: Boolean
-    private val BOYUE_P78: Boolean
-    private val BOYUE_P101: Boolean
-    private val BOYUE_S62: Boolean
-    private val BOYUE_T61: Boolean
-    private val BOYUE_T62: Boolean
-    private val BOYUE_T65S: Boolean
-    private val BOYUE_T78D: Boolean
-    private val BOYUE_T80D: Boolean
-    private val BOYUE_T80S: Boolean
-    private val BOYUE_T103D: Boolean
-    private val CREMA: Boolean
-    private val CREMA_0650L: Boolean
-    private val CREMA_0710C: Boolean
-    private val CREMA_CARTA_G: Boolean
-    private val EMULATOR_X86: Boolean
-    private val ENERGY: Boolean
-    private val FIDIBOOK: Boolean
-    private val HANVON_960: Boolean
-    private val HYREAD_MINI6: Boolean
-    private val INKBOOK: Boolean
-    private val INKPALM_PLUS: Boolean
-    private val JDREAD: Boolean
-    private val LINFINY_ENOTE: Boolean
-    private val MEEBOOK_M6: Boolean
-    private val MEEBOOK_M7: Boolean
-    private val MEEBOOK_P6: Boolean
-    private val MOAAN_MIX7: Boolean
-    private val MOOINKPLUS2C: Boolean
-    private val NABUK_REGAL_HD: Boolean
-    private val NOOK: Boolean
-    private val NOOK_GL4: Boolean
-    private val ONYX_C67: Boolean
-    private val ONYX_DARWIN7: Boolean
-    private val ONYX_DARWIN9: Boolean
-    private val ONYX_EDISON: Boolean
-    private val ONYX_FAUST3: Boolean
-    private val ONYX_GO_103: Boolean
-    private val ONYX_GO_COLOR7: Boolean
-    private val ONYX_JDREAD: Boolean
-    private val ONYX_KON_TIKI2: Boolean
-    private val ONYX_LEAF: Boolean
-    private val ONYX_LEAF2: Boolean
-    private val ONYX_LOMONOSOV: Boolean
-    private val ONYX_MAGICBOOK: Boolean
-    private val ONYX_MONTECRISTO3: Boolean
-    private val ONYX_MAX: Boolean
-    private val ONYX_NOTE: Boolean
-    private val ONYX_NOTE3: Boolean
-    private val ONYX_NOTE4: Boolean
-    private val ONYX_NOTE5: Boolean
-    private val ONYX_NOTE_AIR: Boolean
-    private val ONYX_NOTE_AIR2: Boolean
-    private val ONYX_NOTE_PRO: Boolean
-    private val ONYX_NOTE_X2: Boolean
-    private val ONYX_NOVA: Boolean
-    private val ONYX_NOVA2: Boolean
-    private val ONYX_NOVA3: Boolean
-    private val ONYX_NOVA3_COLOR: Boolean
-    private val ONYX_NOVA_AIR: Boolean
-    private val ONYX_NOVA_AIR_2: Boolean
-    private val ONYX_NOVA_AIR_C: Boolean
-    private val ONYX_NOVA_PRO: Boolean
-    private val ONYX_PAGE: Boolean
-    private val ONYX_PALMA: Boolean
-    private val ONYX_POKE2: Boolean
-    private val ONYX_POKE3: Boolean
-    private val ONYX_POKE4: Boolean
-    private val ONYX_POKE5: Boolean
-    private val ONYX_POKE4LITE: Boolean
-    private val ONYX_POKE_PRO: Boolean
-    private val ONYX_TAB_ULTRA: Boolean
-    private val ONYX_TAB_ULTRA_C: Boolean
-    private val PUBU_PUBOOK: Boolean
-    private val RIDI_PAPER_3: Boolean
-    private val SONY_CP1: Boolean
-    private val SONY_RP1: Boolean
-    private val TAGUS_GEA: Boolean
-    private val TOLINO_EPOS1: Boolean
-    private val TOLINO_EPOS2: Boolean
-    private val TOLINO_EPOS3: Boolean
-    private val TOLINO_PAGE2: Boolean
-    private val TOLINO_SHINE3: Boolean
-    private val TOLINO_VISION4: Boolean
-    private val TOLINO_VISION5: Boolean
-    private val TOLINO_VISION6: Boolean
-    private val XIAOMI_READER: Boolean
+    internal val ID: Id
 
     init {
         MANUFACTURER = lowerCase(getBuildField("MANUFACTURER"))
@@ -292,621 +136,443 @@ object DeviceInfo {
         DEVICE = lowerCase(getBuildField("DEVICE"))
         PRODUCT = lowerCase(getBuildField("PRODUCT"))
         HARDWARE = lowerCase(getBuildField("HARDWARE"))
-        BOYUE = MANUFACTURER.contentEquals("boeye")
-            || MANUFACTURER.contentEquals("boyue")
 
-        // Boyue C64P (Boyue P6 Clone)
-        BOYUE_C64P = BRAND.contentEquals("c64p")
-            && PRODUCT.contentEquals("c64p")
+        Log.i(TAG, String.format(Locale.US,
+            """
+            MANUFACTURER: %s
+            BRAND       : %s
+            MODEL       : %s
+            DEVICE      : %s
+            PRODUCT     : %s
+            HARDWARE    : %s
+            """.trimIndent(),
+            MANUFACTURER,
+            BRAND,
+            MODEL,
+            DEVICE,
+            PRODUCT,
+            HARDWARE,
+        ))
 
-        // Boyue Likebook Ares
-        BOYUE_K78W = BOYUE
-            && (PRODUCT.contentEquals("k78w") || PRODUCT.contentEquals("ares"))
+        val BOYUE = MANUFACTURER == "boeye" || MANUFACTURER == "boyue"
+        val CREMA = BRAND == "crema"
 
-        // Boyue Likebook Alita
-        BOYUE_K103 = BOYUE
-            && (PRODUCT.contentEquals("k103") || PRODUCT.contentEquals("alita"))
+        ID = when {
 
-        // Boyue Likebook P6
-        BOYUE_P6 = BOYUE && PRODUCT.contentEquals("p6")
+            // Boyue C64P (Boyue P6 Clone)
+            BRAND == "c64p" && PRODUCT == "c64p"
+            -> Id.BOYUE_C64P
 
-        // Boyue Lemon
-        BOYUE_P61 = BOYUE && PRODUCT.contentEquals("p61-k12-l")
+            // Boyue Likebook Ares
+            BOYUE && (PRODUCT == "k78w" || PRODUCT == "ares")
+            -> Id.BOYUE_K78W
 
-        // Boyue Likebook P78
-        BOYUE_P78 = BOYUE && PRODUCT.contentEquals("p78")
+            // Boyue Likebook Alita
+            BOYUE && (PRODUCT == "k103" || PRODUCT == "alita")
+            -> Id.BOYUE_K103
 
-        // Boyue Likebook P101
-        BOYUE_P101 = BOYUE && PRODUCT.contentEquals("p101")
+            // Boyue Likebook P6
+            BOYUE && PRODUCT == "p6"
+            -> Id.BOYUE_P6
 
-        // Boyue Likebook LemonRead S62A
-        BOYUE_S62 = BOYUE && PRODUCT.contentEquals("s62")
+            // Boyue Lemon
+            BOYUE && PRODUCT == "p61-k12-l"
+            -> Id.BOYUE_P61
 
-        // Boyue T61
-        BOYUE_T61 = (BOYUE
-            && (PRODUCT.startsWith("t61") || MODEL.contentEquals("rk30sdk"))
-            && DEVICE.startsWith("t61"))
+            // Boyue Likebook P78
+            BOYUE && PRODUCT == "p78"
+            -> Id.BOYUE_P78
 
-        // Boyue T62
-        BOYUE_T62 = (BOYUE
-            && (PRODUCT.startsWith("t62") || MODEL.contentEquals("rk30sdk"))
-            && DEVICE.startsWith("t62"))
+            // Boyue Likebook P101
+            BOYUE && PRODUCT == "p101"
+            -> Id.BOYUE_P101
 
-        // Boyue/JDRead T65S
-        BOYUE_T65S = BOYUE && PRODUCT.contentEquals("t65s")
+            // Boyue Likebook LemonRead S62A
+            BOYUE && PRODUCT == "s62"
+            -> Id.BOYUE_S62
 
-        // Boyue Likebook Muses
-        BOYUE_T78D = BOYUE
-            && (PRODUCT.contentEquals("t78d") || PRODUCT.contentEquals("muses"))
+            // Boyue T61
+            BOYUE
+            && (PRODUCT.startsWith("t61") || MODEL == "rk30sdk")
+            && DEVICE.startsWith("t61")
+            -> Id.BOYUE_T61
 
-        // Boyue Likebook Mars
-        BOYUE_T80D = BOYUE
-            && (PRODUCT.contentEquals("t80d") || PRODUCT.contentEquals("mars"))
+            // Boyue T62
+            BOYUE
+            && PRODUCT.startsWith("t62") || MODEL == "rk30sdk"
+            && DEVICE.startsWith("t62")
+            -> Id.BOYUE_T62
 
-        // Boyue Likebook Plus
-        BOYUE_T80S = BOYUE && PRODUCT.contentEquals("t80s")
+            // Boyue/JDRead T65S
+            BOYUE && PRODUCT == "t65s"
+            -> Id.BOYUE_T65S
 
-        // Boyue Likebook Mimas
-        BOYUE_T103D = BOYUE
-            && (PRODUCT.contentEquals("t103d") || PRODUCT.contentEquals("mimas"))
+            // Boyue Likebook Muses
+            BOYUE && (PRODUCT == "t78d" || PRODUCT == "muses")
+            -> Id.BOYUE_T78D
 
-        // Crema Note (1010P)
-        CREMA = BRAND.contentEquals("crema")
-            && PRODUCT.contentEquals("note")
+            // Boyue Likebook Mars
+            BOYUE && (PRODUCT == "t80d" || PRODUCT == "mars")
+            -> Id.BOYUE_T80D
 
-        // Crema Carta+
-        CREMA_0650L = BRAND.contentEquals("crema")
-            && PRODUCT.contentEquals("keplerb")
+            // Boyue Likebook Plus
+            BOYUE && PRODUCT == "t80s"
+            -> Id.BOYUE_T80S
 
-        // Crema Grande
-        CREMA_0710C = BRAND.contentEquals("crema")
-            && MODEL.contentEquals("crema-0710c")
+            // Boyue Likebook Mimas
+            BOYUE && (PRODUCT == "t103d" || PRODUCT == "mimas")
+            -> Id.BOYUE_T103D
 
-        // Crema Carta G
-        CREMA_CARTA_G = BRAND.contentEquals("crema")
-            && MODEL.contentEquals("crema-0670c")
+            // Crema Note (1010P)
+            CREMA && PRODUCT == "note"
+            -> Id.CREMA
 
-        // Android emulator for x86
-        EMULATOR_X86 = MODEL.contentEquals("Android SDK built for x86")
+            // Crema Carta+
+            CREMA && PRODUCT == "keplerb"
+            -> Id.CREMA_0650L
 
-        // Energy Sistem eReaders. Tested on Energy Ereader Pro 4
-        ENERGY = (BRAND.contentEquals("energysistem") || BRAND.contentEquals("energy_sistem"))
-            && MODEL.startsWith("ereader")
+            // Crema Grande
+            CREMA && MODEL == "crema-0710c"
+            -> Id.CREMA_0710C
 
-        // Fidibook
-        FIDIBOOK = MANUFACTURER.contentEquals("fidibo")
-            && MODEL.contentEquals("fidibook")
+            // Crema Carta G
+            CREMA && MODEL == "crema-0670c"
+            -> Id.CREMA_CARTA_G
 
-        // Hanvon 960
-        HANVON_960 = BRAND.contentEquals("freescale")
-            && PRODUCT.contentEquals("evk_6sl_eink")
+            // Energy Sistem eReaders. Tested on Energy Ereader Pro 4
+            (BRAND == "energysistem" || BRAND == "energy_sistem") && MODEL.startsWith("ereader")
+            -> Id.ENERGY
 
-        // Hyread Mini 6
-        HYREAD_MINI6 = MANUFACTURER.contentEquals("hyread")
-            && MODEL.contentEquals("k06nu")
+            // Fidibook
+            MANUFACTURER == "fidibo" && MODEL == "fidibook"
+            -> Id.FIDIBOOK
 
-        // Artatech Inkbook Prime/Prime HD.
-        INKBOOK = (MANUFACTURER.contentEquals("artatech")
-            && BRAND.contentEquals("inkbook")
-            && MODEL.startsWith("prime"))
+            // Hanvon 960
+            BRAND == "freescale" && PRODUCT == "evk_6sl_eink"
+            -> Id.HANVON_960
 
-        // InkPalm Plus
-        INKPALM_PLUS = MANUFACTURER.contentEquals(STR_ROCKCHIP)
-            && MODEL.contentEquals("inkpalmplus")
+            // Hyread Mini 6
+            MANUFACTURER == "hyread" && MODEL == "k06nu"
+            -> Id.HYREAD_MINI6
 
-        // JDRead1
-        JDREAD = MANUFACTURER.contentEquals("onyx")
-            && MODEL.contentEquals("jdread")
+            // Artatech Inkbook Prime/Prime HD.
+            MANUFACTURER == "artatech" && BRAND == "inkbook" && MODEL.startsWith("prime")
+            -> Id.INKBOOK
 
-        // Linfiny A4 (13.3") eNote / Avalue ENT-13T1 / QuirkLogic Papyr
-        LINFINY_ENOTE = MANUFACTURER.contentEquals("linfiny")
-        && MODEL.contentEquals("ent-13t1")
+            // InkPalm Plus
+            MANUFACTURER == STR_ROCKCHIP && MODEL == "inkpalmplus"
+            -> Id.INKPALM_PLUS
 
-        // Meebook M6
-        MEEBOOK_M6 = MANUFACTURER.contentEquals("haoqing")
-            && MODEL.contentEquals("m6")
+            // JDRead1
+            MANUFACTURER == "onyx" && MODEL == "jdread"
+            -> Id.JDREAD
 
-        // Meebook M7
-        MEEBOOK_M7 = MANUFACTURER.contentEquals("haoqing")
-            && MODEL.contentEquals("m7")
+            // Linfiny A4 (13.3") eNote / Avalue ENT-13T1 / QuirkLogic Papyr
+            MANUFACTURER == "linfiny" && MODEL == "ent-13t1"
+            -> Id.LINFINY_ENOTE
 
-        // Meebook P6
-        MEEBOOK_P6 = MANUFACTURER.contentEquals("haoqing")
-            && MODEL.contentEquals("p6")
+            // Meebook M6
+            MANUFACTURER == "haoqing" && MODEL == "m6"
+            -> Id.MEEBOOK_M6
 
-        // Moaan Mix7
-        MOAAN_MIX7 = MANUFACTURER.contentEquals(STR_ROCKCHIP)
-            && MODEL.contentEquals("moaanmix7")
+            // Meebook M7
+            MANUFACTURER == "haoqing" && MODEL == "m7"
+            -> Id.MEEBOOK_M7
 
-        // Mooink Plus 2c
-        MOOINKPLUS2C = BRAND.contentEquals("allwinner")
-            && MODEL.contentEquals("mooink plus 2c")
+            // Meebook P6
+            MANUFACTURER == "haoqing" && MODEL == "p6"
+            -> Id.MEEBOOK_P6
 
-        // Nabuk Regal HD
-        NABUK_REGAL_HD = MANUFACTURER.contentEquals("onyx")
-            && MODEL.contentEquals("nabukreg_hd")
+            // Moaan Mix7
+            MANUFACTURER == STR_ROCKCHIP && MODEL == "moaanmix7"
+            -> Id.MOAAN_MIX7
 
-        // Nook (catch them all)
-        NOOK = (MANUFACTURER.contentEquals("barnesandnoble") || MANUFACTURER.contentEquals("freescale"))
-            && (MODEL.contentEquals("bnrv510") || MODEL.contentEquals("bnrv520") || MODEL.contentEquals("bnrv700")
-            || MODEL.contentEquals("evk_mx6sl") || MODEL.startsWith("ereader"))
+            // Mooink Plus 2c
+            BRAND == "allwinner" && MODEL == "mooink plus 2c"
+            -> Id.MOOINKPLUS2C
 
-        // Nook Glowlight 4  (4/4e/4plus)
-        NOOK_GL4 = (MANUFACTURER.contentEquals("barnesandnoble"))
-            && (MODEL.contentEquals("bnrv1000") || MODEL.contentEquals("bnrv1100") || MODEL.contentEquals("bnrv1300"))
+            // Nabuk Regal HD
+            MANUFACTURER == "onyx" && MODEL == "nabukreg_hd"
+            -> Id.NABUK
 
-        // Onyx C67
-        ONYX_C67 = MANUFACTURER.contentEquals("onyx")
-            && (PRODUCT.startsWith("c67") || MODEL.contentEquals("rk30sdk"))
+            // Nook Glowlight 4 (4/4e/4plus)
+            (MANUFACTURER == "barnesandnoble")
+            && (MODEL == "bnrv1000" || MODEL == "bnrv1100" || MODEL == "bnrv1300")
+            -> Id.NOOK_GL4
+
+            // Nook (catch them all fallback for all other models)
+            (MANUFACTURER == "barnesandnoble" || MANUFACTURER == "freescale")
+            && (MODEL == "bnrv510" || MODEL == "bnrv520" || MODEL == "bnrv700"
+                || MODEL == "evk_mx6sl" || MODEL.startsWith("ereader"))
+            -> Id.NOOK
+
+            // Onyx C67
+            MANUFACTURER == "onyx"
+            && (PRODUCT.startsWith("c67") || MODEL == "rk30sdk")
             && DEVICE.startsWith("c67")
+            -> Id.ONYX_C67
 
-        // ONYX DARWIN 7
-        ONYX_DARWIN7 = MANUFACTURER.contentEquals("onyx")
-            && (PRODUCT.contentEquals("mc_darwin7") || PRODUCT.contentEquals("darwin7"))
-            && (DEVICE.contentEquals("mc_darwin7") || DEVICE.contentEquals("darwin7"))
+            // ONYX DARWIN 7
+            MANUFACTURER == "onyx"
+            && (PRODUCT == "mc_darwin7" || PRODUCT == "darwin7")
+            && (DEVICE == "mc_darwin7" || DEVICE == "darwin7")
+            -> Id.ONYX_DARWIN7
 
-        // ONYX DARWIN 9
-        ONYX_DARWIN9 = MANUFACTURER.contentEquals("onyx")
-            && (PRODUCT.contentEquals("mc_darwin9") || PRODUCT.contentEquals("darwin9"))
-            && (DEVICE.contentEquals("mc_darwin9") || DEVICE.contentEquals("darwin9"))
+            // ONYX DARWIN 9
+            MANUFACTURER == "onyx"
+            && (PRODUCT == "mc_darwin9" || PRODUCT == "darwin9")
+            && (DEVICE == "mc_darwin9" || DEVICE == "darwin9")
+            -> Id.ONYX_DARWIN9
 
-        // Onyx Edison
-        ONYX_EDISON = MANUFACTURER.contentEquals("onyx")
-            && PRODUCT.contentEquals("edison")
-            && DEVICE.contentEquals("edison")
+            // Onyx Edison
+            MANUFACTURER == "onyx" && PRODUCT == "edison" && DEVICE == "edison"
+            -> Id.ONYX_EDISON
 
-        // Onyx Faust 3
-        ONYX_FAUST3 = MANUFACTURER.contentEquals("onyx")
-            && PRODUCT.contentEquals("mc_faust3")
-            && DEVICE.contentEquals("mc_faust3")
+            // Onyx Faust 3
+            MANUFACTURER == "onyx" && PRODUCT == "mc_faust3" && DEVICE == "mc_faust3"
+            -> Id.ONYX_FAUST3
 
-        // Onyx Boox Go 10.3
-        ONYX_GO_103 = BRAND.contentEquals("onyx")
-            && MODEL.contentEquals("go103")
+            // Onyx Boox Go 10.3
+            BRAND == "onyx" && MODEL == "go103"
+            -> Id.ONYX_GO_103
 
-        // Onyx Boox Go Color 7
-        ONYX_GO_COLOR7 = BRAND.contentEquals("onyx")
-            && MODEL.contentEquals("gocolor7")
+            // Onyx Boox Go Color 7
+            BRAND == "onyx" && MODEL == "gocolor7"
+            -> Id.ONYX_GO_COLOR7
 
-        // Onyx JDRead
-        ONYX_JDREAD = BRAND.contentEquals("onyx")
-            && MODEL.contentEquals("jdread")
+            // Onyx JDRead
+            BRAND == "onyx" && MODEL == "jdread"
+            -> Id.ONYX_JDREAD
 
-        // Onyx Kon-Tiki 2
-        ONYX_KON_TIKI2 = MANUFACTURER.contentEquals("onyx")
-            && PRODUCT.contentEquals("kon_tiki2")
-            && DEVICE.contentEquals("kon_tiki2")
+            // Onyx Kon-Tiki 2
+            MANUFACTURER == "onyx" && PRODUCT == "kon_tiki2" && DEVICE == "kon_tiki2"
+            -> Id.ONYX_KON_TIKI2
 
-        // Onyx Leaf
-        ONYX_LEAF = MANUFACTURER.contentEquals("onyx")
-            && PRODUCT.contentEquals("leaf")
-            && DEVICE.contentEquals("leaf")
+            // Onyx Leaf
+            MANUFACTURER == "onyx" && PRODUCT == "leaf" && DEVICE == "leaf"
+            -> Id.ONYX_LEAF
 
-        // Onyx Leaf 2 && Onyx Leaf 2 Plus
-        ONYX_LEAF2 = MANUFACTURER.contentEquals("onyx")
-            && (PRODUCT.contentEquals("leaf2") || PRODUCT.contentEquals("leaf2_p"))
-            && (DEVICE.contentEquals("leaf2") || DEVICE.contentEquals("leaf2_p"))
+            // Onyx Leaf 2 && Onyx Leaf 2 Plus
+            MANUFACTURER == "onyx"
+            && (PRODUCT == "leaf2" || PRODUCT == "leaf2_p")
+            && (DEVICE == "leaf2" || DEVICE == "leaf2_p")
+            -> Id.ONYX_LEAF2
 
-        // Onyx Lomonosov
-        ONYX_LOMONOSOV = MANUFACTURER.contentEquals("onyx")
-            && DEVICE.contentEquals("lomonosov")
+            // Onyx Lomonosov
+            MANUFACTURER == "onyx" && DEVICE == "lomonosov"
+            -> Id.ONYX_LOMONOSOV
 
-        // Onyx MagicBook
-        ONYX_MAGICBOOK = MANUFACTURER.contentEquals("onyx")
-            && BRAND.contentEquals("magicbook")
+            // Onyx MagicBook
+            MANUFACTURER == "onyx" && BRAND == "magicbook"
+            -> Id.ONYX_MAGICBOOK
 
-        // Onyx Max
-        ONYX_MAX = MANUFACTURER.contentEquals("onyx")
-            && PRODUCT.contentEquals("max")
-            && DEVICE.contentEquals("max")
+            // Onyx Max
+            MANUFACTURER == "onyx" && PRODUCT == "max" && DEVICE == "max"
+            -> Id.ONYX_MAX
 
-        // Onyx Montecristo 3
-        ONYX_MONTECRISTO3 = MANUFACTURER.contentEquals("onyx")
-            && PRODUCT.contentEquals("mc_kepler_c")
-            && DEVICE.contentEquals("mc_kepler_c")
+            // Onyx Montecristo 3
+            MANUFACTURER == "onyx" && PRODUCT == "mc_kepler_c" && DEVICE == "mc_kepler_c"
+            -> Id.ONYX_MONTECRISTO3
 
-        // Onyx Note
-        ONYX_NOTE = MANUFACTURER.contentEquals("onyx")
-            && PRODUCT.contentEquals("note")
-            && DEVICE.contentEquals("note")
+            // Onyx Note
+            MANUFACTURER == "onyx" && PRODUCT == "note" && DEVICE == "note"
+            -> Id.ONYX_NOTE
 
-        // Onyx Note 3
-        ONYX_NOTE3 = MANUFACTURER.contentEquals("onyx")
-            && PRODUCT.contentEquals("note3")
-            && DEVICE.contentEquals("note3")
+            // Onyx Note 3
+            MANUFACTURER == "onyx" && PRODUCT == "note3" && DEVICE == "note3"
+            -> Id.ONYX_NOTE3
 
-        // Onyx Note 4
-        ONYX_NOTE4 = MANUFACTURER.contentEquals("onyx")
-            && MODEL.contentEquals("mc_note4")
+            // Onyx Note 4
+            MANUFACTURER == "onyx" && MODEL == "mc_note4"
+            -> Id.ONYX_NOTE4
 
-        // Onyx Note 5
-        ONYX_NOTE5 = BRAND.contentEquals("onyx")
-            && PRODUCT.contentEquals("note5")
-            && DEVICE.contentEquals("note5")
+            // Onyx Note 5
+            BRAND == "onyx" && PRODUCT == "note5" && DEVICE == "note5"
+            -> Id.ONYX_NOTE5
 
-        // Onyx Note Air
-        ONYX_NOTE_AIR = MANUFACTURER.contentEquals("onyx")
-            && PRODUCT.contentEquals("noteair")
-            && DEVICE.contentEquals("noteair")
+            // Onyx Note Air
+            MANUFACTURER == "onyx" && PRODUCT == "noteair" && DEVICE == "noteair"
+            -> Id.ONYX_NOTE_AIR
 
-        // Onyx Note Air 2 && Note Air 2 Plus
-        ONYX_NOTE_AIR2 = BRAND.contentEquals("onyx")
-            && (MODEL.contentEquals("noteair2") || MODEL.contentEquals("noteair2p"))
+            // Onyx Note Air 2 && Note Air 2 Plus
+            BRAND == "onyx" && (MODEL == "noteair2" || MODEL == "noteair2p")
+            -> Id.ONYX_NOTE_AIR2
 
-        // Onyx Note Pro
-        ONYX_NOTE_PRO = MANUFACTURER.contentEquals("onyx")
-            && PRODUCT.contentEquals("notepro")
-            && DEVICE.contentEquals("notepro")
+            // Onyx Note Pro
+            MANUFACTURER == "onyx" && PRODUCT == "notepro" && DEVICE == "notepro"
+            -> Id.ONYX_NOTE_PRO
 
-        // Onyx Note X2
-        ONYX_NOTE_X2 = MANUFACTURER.contentEquals("onyx")
-            && MODEL.contentEquals("notex2")
+            // Onyx Note X2
+            MANUFACTURER == "onyx" && MODEL == "notex2"
+            -> Id.ONYX_NOTE_X2
 
-        // Onyx Nova
-        ONYX_NOVA = MANUFACTURER.contentEquals("onyx")
-            && PRODUCT.contentEquals("nova")
-            && DEVICE.contentEquals("nova")
+            // Onyx Nova
+            MANUFACTURER == "onyx" && PRODUCT == "nova" && DEVICE == "nova"
+            -> Id.ONYX_NOVA
 
-        // Onyx Nova 2
-        ONYX_NOVA2 = MANUFACTURER.contentEquals("onyx")
-            && PRODUCT.contentEquals("nova2")
-            && DEVICE.contentEquals("nova2")
+            // Onyx Nova 2
+            MANUFACTURER == "onyx" && PRODUCT == "nova2" && DEVICE == "nova2"
+            -> Id.ONYX_NOVA2
 
-        // Onyx Nova 3
-        ONYX_NOVA3 = MANUFACTURER.contentEquals("onyx")
-            && PRODUCT.contentEquals("nova3")
-            && DEVICE.contentEquals("nova3")
+            // Onyx Nova 3
+            MANUFACTURER == "onyx" && PRODUCT == "nova3" && DEVICE == "nova3"
+            -> Id.ONYX_NOVA3
 
-        // Onyx Nova 3 Color
-        ONYX_NOVA3_COLOR = MANUFACTURER.contentEquals("onyx")
-            && MODEL.contentEquals("nova3color")
+            // Onyx Nova 3 Color
+            MANUFACTURER == "onyx" && MODEL == "nova3color"
+            -> Id.ONYX_NOVA3_COLOR
 
-        // Onyx Nova Air
-        ONYX_NOVA_AIR = MANUFACTURER.contentEquals("onyx")
-            && MODEL.contentEquals("novaair")
+            // Onyx Nova Air
+            MANUFACTURER == "onyx" && MODEL == "novaair"
+            -> Id.ONYX_NOVA_AIR
 
-        // Onyx Nova Air 2
-        ONYX_NOVA_AIR_2 = MANUFACTURER.contentEquals("onyx")
-            && MODEL.contentEquals("novaair2")
+            // Onyx Nova Air 2
+            MANUFACTURER == "onyx" && MODEL == "novaair2"
+            -> Id.ONYX_NOVA_AIR_2
 
-        // Onyx Nova Air C
-        ONYX_NOVA_AIR_C = BRAND.contentEquals("onyx")
-            && MODEL.contentEquals("novaairc")
+            // Onyx Nova Air C
+            BRAND == "onyx" && MODEL == "novaairc"
+            -> Id.ONYX_NOVA_AIR_C
 
-        // Onyx Nova Pro
-        ONYX_NOVA_PRO = BRAND.contentEquals("onyx")
-            && MODEL.contentEquals("novapro")
+            // Onyx Nova Pro
+            BRAND == "onyx" && MODEL == "novapro"
+            -> Id.ONYX_NOVA_PRO
 
-        // Onyx Page
-        ONYX_PAGE = BRAND.contentEquals("onyx")
-            && MODEL.contentEquals("page")
+            // Onyx Page
+            BRAND == "onyx" && MODEL == "page"
+            -> Id.ONYX_PAGE
 
-        // Onyx Palma
-        ONYX_PALMA = BRAND.contentEquals("onyx")
-            && MODEL.contentEquals("palma")
+            // Onyx Palma
+            BRAND == "onyx" && MODEL == "palma"
+            -> Id.ONYX_PALMA
 
-        // Onyx Poke 2
-        ONYX_POKE2 = MANUFACTURER.contentEquals("onyx")
-            && PRODUCT.contentEquals("poke2")
+            // Onyx Poke 2
+            MANUFACTURER == "onyx" && PRODUCT == "poke2"
+            -> Id.ONYX_POKE2
 
-        // Onyx Poke 3
-        ONYX_POKE3 = MANUFACTURER.contentEquals("onyx")
-            && PRODUCT.contentEquals("poke3")
-            && DEVICE.contentEquals("poke3")
+            // Onyx Poke 3
+            MANUFACTURER == "onyx" && PRODUCT == "poke3" && DEVICE == "poke3"
+            -> Id.ONYX_POKE3
 
-        // Onyx Poke 4
-        ONYX_POKE4 = BRAND.contentEquals("onyx")
-            && MODEL.contentEquals("poke4")
+            // Onyx Poke 4
+            BRAND == "onyx" && MODEL == "poke4"
+            -> Id.ONYX_POKE4
 
-        // Onyx Poke 5
-        ONYX_POKE5 = BRAND.contentEquals("onyx")
-            && MODEL.contentEquals("poke5p")
+            // Onyx Poke 4 lite
+            BRAND == "onyx" && MODEL == "poke4lite"
+            -> Id.ONYX_POKE4LITE
 
-        // Onyx Poke 4 lite
-        ONYX_POKE4LITE = BRAND.contentEquals("onyx")
-            && MODEL.contentEquals("poke4lite")
+            // Onyx Poke 5
+            BRAND == "onyx" && MODEL == "poke5p"
+            -> Id.ONYX_POKE5
 
-        // Onyx Poke Pro
-        ONYX_POKE_PRO = MANUFACTURER.contentEquals("onyx")
-            && PRODUCT.contentEquals("poke_pro")
+            // Onyx Poke Pro
+            MANUFACTURER == "onyx" && PRODUCT == "poke_pro"
+            -> Id.ONYX_POKE_PRO
 
-        // Onyx Tab Ultra
-        ONYX_TAB_ULTRA = MANUFACTURER.contentEquals("onyx")
-            && MODEL.contentEquals("tabultra")
+            // Onyx Tab Ultra
+            MANUFACTURER == "onyx" && MODEL == "tabultra"
+            -> Id.ONYX_TAB_ULTRA
 
-        // Onyx Tab Ultra C
-        ONYX_TAB_ULTRA_C = MANUFACTURER.contentEquals("onyx")
-            && MODEL.contentEquals("tabultrac")
+            // Onyx Tab Ultra C
+            MANUFACTURER == "onyx" && MODEL == "tabultrac"
+            -> Id.ONYX_TAB_ULTRA_C
 
-        // Pubu Pubook
-        PUBU_PUBOOK = MANUFACTURER.contentEquals(STR_ROCKCHIP)
-            && BRAND.contentEquals(STR_ROCKCHIP)
-            && MODEL.contentEquals("pubook")
-            && DEVICE.contentEquals("pubook")
-            && HARDWARE.contentEquals("rk30board")
+            // Pubu Pubook
+            MANUFACTURER == STR_ROCKCHIP && BRAND == STR_ROCKCHIP && MODEL == "pubook" && DEVICE == "pubook" && HARDWARE == "rk30board"
+            -> Id.PUBU_PUBOOK
 
-        // Ridi Paper 3
-        RIDI_PAPER_3 = BRAND.contentEquals("ridi")
-            && MODEL.contentEquals("ridipaper")
-            && PRODUCT.contentEquals("rp1")
+            // Ridi Paper 3
+            BRAND == "ridi" && MODEL == "ridipaper" && PRODUCT == "rp1"
+            -> Id.RIDI_PAPER_3
 
-        // Sony DPT-CP1
-        SONY_CP1 = MANUFACTURER.contentEquals("sony")
-            && MODEL.contentEquals("dpt-cp1")
+            // Sony DPT-CP1
+            MANUFACTURER == "sony" && MODEL == "dpt-cp1"
+            -> Id.SONY_CP1
 
-        // Sony DPT-RP1
-        SONY_RP1 = MANUFACTURER.contentEquals("sony")
-            && MODEL.contentEquals("dpt-rp1")
+            // Sony DPT-RP1
+            MANUFACTURER == "sony" && MODEL == "dpt-rp1"
+            -> Id.SONY_RP1
 
-        // Tagus Gea
-        TAGUS_GEA = MANUFACTURER.contentEquals("onyx")
-            && MODEL.contentEquals("tagus_pokep")
+            // Tagus Gea
+            MANUFACTURER == "onyx" && MODEL == "tagus_pokep"
+            -> Id.TAGUS_GEA
 
-        // Tolino (catch them all)
-        TOLINO = BRAND.contentEquals(STR_TOLINO) && MODEL.contentEquals("imx50_rdp")
-            || MODEL.contentEquals(STR_TOLINO) && (DEVICE.contentEquals("tolino_vision2")
-            || DEVICE.contentEquals(STR_NTX))
+            // Tolino Epos 1
+            BRAND == STR_KOBO && MODEL == STR_TOLINO && DEVICE == STR_NTX && HARDWARE == "e70q20"
+            -> Id.TOLINO_EPOS1
 
-        // Tolino Epos 1
-        TOLINO_EPOS1 = BRAND.contentEquals(STR_KOBO)
-            && MODEL.contentEquals(STR_TOLINO)
-            && DEVICE.contentEquals(STR_NTX)
-            && HARDWARE.contentEquals("e70q20")
+            // Tolino Epos 2
+            BRAND == STR_KOBO && MODEL == STR_TOLINO && DEVICE == STR_NTX && HARDWARE == "e80k00"
+            -> Id.TOLINO_EPOS2
 
-        // Tolino Epos 2
-        TOLINO_EPOS2 = BRAND.contentEquals(STR_KOBO)
-            && MODEL.contentEquals(STR_TOLINO)
-            && DEVICE.contentEquals(STR_NTX)
-            && HARDWARE.contentEquals("e80k00")
+            // Tolino Epos 3
+            BRAND == STR_KOBO && MODEL == "tolino epos 3"
+            -> Id.TOLINO_EPOS3
 
-        // Tolino Epos 3
-        TOLINO_EPOS3 = BRAND.contentEquals(STR_KOBO)
-            && MODEL.contentEquals("tolino epos 3")
+            // Tolino Page 2 has no warmth lights
+            BRAND == STR_KOBO && MODEL == STR_TOLINO && DEVICE == STR_NTX && HARDWARE == "e60qv0"
+            -> Id.TOLINO_PAGE2
 
-        // Tolino Page 2 has no warmth lights
-        TOLINO_PAGE2 = BRAND.contentEquals(STR_KOBO)
-            && MODEL.contentEquals(STR_TOLINO)
-            && DEVICE.contentEquals(STR_NTX)
-            && HARDWARE.contentEquals("e60qv0")
+            // Tolino Shine 3 also has warmth lights, but with ntx_io file
+            BRAND == STR_KOBO && MODEL == STR_TOLINO && DEVICE == STR_NTX && HARDWARE == "e60k00"
+            -> Id.TOLINO_SHINE3
 
-        // Tolino Shine 3 also has warmth lights, but with ntx_io file
-        TOLINO_SHINE3 = BRAND.contentEquals(STR_KOBO)
-            && MODEL.contentEquals(STR_TOLINO)
-            && DEVICE.contentEquals(STR_NTX)
-            && HARDWARE.contentEquals("e60k00")
+            // Tolino Vision 4 also has warmth lights, but with ntx_io file
+            BRAND == STR_KOBO && MODEL == STR_TOLINO && DEVICE == STR_NTX && HARDWARE == "e60q50"
+            -> Id.TOLINO_VISION4
 
-        // Tolino Vision 4 also has warmth lights, but with ntx_io file
-        TOLINO_VISION4 = BRAND.contentEquals(STR_KOBO)
-            && MODEL.contentEquals(STR_TOLINO)
-            && DEVICE.contentEquals(STR_NTX)
-            && HARDWARE.contentEquals("e60q50")
+            // Tolino Vision 5 also has warmth lights, but with ntx_io file
+            BRAND == STR_KOBO && MODEL == STR_TOLINO && DEVICE == STR_NTX && HARDWARE == "e70k00"
+            -> Id.TOLINO_VISION5
 
-        // Tolino Vision 5 also has warmth lights, but with ntx_io file
-        TOLINO_VISION5 = BRAND.contentEquals(STR_KOBO)
-            && MODEL.contentEquals(STR_TOLINO)
-            && DEVICE.contentEquals(STR_NTX)
-            && HARDWARE.contentEquals("e70k00")
+            // Tolino Vision 6
+            BRAND == STR_KOBO && MODEL == "tolino vision 6" && DEVICE == STR_TOLINO && HARDWARE == "sun8iw15p1"
+            -> Id.TOLINO_VISION6
 
-        // Tolino Vision 6
-        TOLINO_VISION6 = BRAND.contentEquals(STR_KOBO)
-            && MODEL.contentEquals("tolino vision 6")
-            && DEVICE.contentEquals(STR_TOLINO)
-            && HARDWARE.contentEquals("sun8iw15p1")
+            // Tolino (catch them all fallback for all other models)
+            BRAND == STR_TOLINO && MODEL == "imx50_rdp"
+            || MODEL == STR_TOLINO && (DEVICE == "tolino_vision2" || DEVICE == STR_NTX)
+            -> Id.TOLINO
 
-        XIAOMI_READER = MANUFACTURER.contentEquals("xiaomi")
-            && BRAND.contentEquals("xiaomi")
-            && MODEL.contentEquals("xiaomi_reader")
-            && DEVICE.contentEquals("rk3566_eink")
-            && HARDWARE.contentEquals("rk30board")
+            // Xiaomi
+            MANUFACTURER == "xiaomi" && BRAND == "xiaomi" && MODEL == "xiaomi_reader" && DEVICE == "rk3566_eink" && HARDWARE == "rk30board"
+            -> Id.XIAOMI_READER
 
-        // devices with known bugs
-        val bugMap = HashMap<QuirkDevice, Boolean>()
-        bugMap[QuirkDevice.EMULATOR] = EMULATOR_X86
-        bugMap[QuirkDevice.LINFINY_ENOTE] = LINFINY_ENOTE
-        bugMap[QuirkDevice.ONYX_MAX] = ONYX_MAX
-        bugMap[QuirkDevice.ONYX_NOTE] = ONYX_NOTE
-        bugMap[QuirkDevice.ONYX_POKE2] = ONYX_POKE2
-        bugMap[QuirkDevice.SONY_CP1] = SONY_CP1
-        bugMap[QuirkDevice.SONY_RP1] = SONY_RP1
-
-        bugMap.keys.iterator().run {
-            while (this.hasNext()) {
-                val bug = this.next()
-                val flag = bugMap[bug]
-                if (flag != null && flag) {
-                    QUIRK = bug
-                }
-            }
-        }
-
-        // e-ink devices
-        val deviceMap = HashMap<EinkDevice, Boolean>()
-        deviceMap[EinkDevice.BOYUE_C64P] = BOYUE_C64P
-        deviceMap[EinkDevice.BOYUE_K103] = BOYUE_K103
-        deviceMap[EinkDevice.BOYUE_K78W] = BOYUE_K78W
-        deviceMap[EinkDevice.BOYUE_P6] = BOYUE_P6
-        deviceMap[EinkDevice.BOYUE_P61] = BOYUE_P61
-        deviceMap[EinkDevice.BOYUE_P78] = BOYUE_P78
-        deviceMap[EinkDevice.BOYUE_P101] = BOYUE_P101
-        deviceMap[EinkDevice.BOYUE_S62] = BOYUE_S62
-        deviceMap[EinkDevice.BOYUE_T61] = BOYUE_T61
-        deviceMap[EinkDevice.BOYUE_T62] = BOYUE_T62
-        deviceMap[EinkDevice.BOYUE_T65S] = BOYUE_T65S
-        deviceMap[EinkDevice.BOYUE_T78D] = BOYUE_T78D
-        deviceMap[EinkDevice.BOYUE_T80D] = BOYUE_T80D
-        deviceMap[EinkDevice.BOYUE_T80S] = BOYUE_T80S
-        deviceMap[EinkDevice.BOYUE_T103D] = BOYUE_T103D
-        deviceMap[EinkDevice.CREMA] = CREMA
-        deviceMap[EinkDevice.CREMA_0650L] = CREMA_0650L
-        deviceMap[EinkDevice.CREMA_0710C] = CREMA_0710C
-        deviceMap[EinkDevice.CREMA_CARTA_G] = CREMA_CARTA_G
-        deviceMap[EinkDevice.ENERGY] = ENERGY
-        deviceMap[EinkDevice.FIDIBOOK] = FIDIBOOK
-        deviceMap[EinkDevice.INKBOOK] = INKBOOK
-        deviceMap[EinkDevice.JDREAD] = JDREAD
-        deviceMap[EinkDevice.LINFINY_ENOTE] = LINFINY_ENOTE
-        deviceMap[EinkDevice.MEEBOOK_P6] = MEEBOOK_P6
-        deviceMap[EinkDevice.MOOINKPLUS2C] = MOOINKPLUS2C
-        deviceMap[EinkDevice.NABUK] = NABUK_REGAL_HD
-        deviceMap[EinkDevice.NOOK] = NOOK
-        deviceMap[EinkDevice.NOOK_GL4] = NOOK_GL4
-        deviceMap[EinkDevice.ONYX_C67] = ONYX_C67
-        deviceMap[EinkDevice.ONYX_DARWIN7] = ONYX_DARWIN7
-        deviceMap[EinkDevice.ONYX_DARWIN9] = ONYX_DARWIN9
-        deviceMap[EinkDevice.ONYX_EDISON] = ONYX_EDISON
-        deviceMap[EinkDevice.ONYX_FAUST3] = ONYX_FAUST3
-        deviceMap[EinkDevice.ONYX_GO_103] = ONYX_GO_103
-        deviceMap[EinkDevice.ONYX_GO_COLOR7] = ONYX_GO_COLOR7
-        deviceMap[EinkDevice.ONYX_JDREAD] = ONYX_JDREAD
-        deviceMap[EinkDevice.ONYX_KON_TIKI2] = ONYX_KON_TIKI2
-        deviceMap[EinkDevice.ONYX_LEAF] = ONYX_LEAF
-        deviceMap[EinkDevice.ONYX_LEAF2] = ONYX_LEAF2
-        deviceMap[EinkDevice.ONYX_LOMONOSOV] = ONYX_LOMONOSOV
-        deviceMap[EinkDevice.ONYX_MAGICBOOK] = ONYX_MAGICBOOK
-        deviceMap[EinkDevice.ONYX_MAX] = ONYX_MAX
-        deviceMap[EinkDevice.ONYX_MONTECRISTO3] = ONYX_MONTECRISTO3
-        deviceMap[EinkDevice.ONYX_NOTE] = ONYX_NOTE
-        deviceMap[EinkDevice.ONYX_NOTE3] = ONYX_NOTE3
-        deviceMap[EinkDevice.ONYX_NOTE4] = ONYX_NOTE4
-        deviceMap[EinkDevice.ONYX_NOTE5] = ONYX_NOTE5
-        deviceMap[EinkDevice.ONYX_NOTE_AIR] = ONYX_NOTE_AIR
-        deviceMap[EinkDevice.ONYX_NOTE_AIR2] = ONYX_NOTE_AIR2
-        deviceMap[EinkDevice.ONYX_NOTE_PRO] = ONYX_NOTE_PRO
-        deviceMap[EinkDevice.ONYX_NOTE_X2] = ONYX_NOTE_X2
-        deviceMap[EinkDevice.ONYX_NOVA] = ONYX_NOVA
-        deviceMap[EinkDevice.ONYX_NOVA2] = ONYX_NOVA2
-        deviceMap[EinkDevice.ONYX_NOVA3] = ONYX_NOVA3
-        deviceMap[EinkDevice.ONYX_NOVA3_COLOR] = ONYX_NOVA3_COLOR
-        deviceMap[EinkDevice.ONYX_NOVA_AIR] = ONYX_NOVA_AIR
-        deviceMap[EinkDevice.ONYX_NOVA_AIR_2] = ONYX_NOVA_AIR_2
-        deviceMap[EinkDevice.ONYX_NOVA_AIR_C] = ONYX_NOVA_AIR_C
-        deviceMap[EinkDevice.ONYX_NOVA_PRO] = ONYX_NOVA_PRO
-        deviceMap[EinkDevice.ONYX_PAGE] = ONYX_PAGE
-        deviceMap[EinkDevice.ONYX_PALMA] = ONYX_PALMA
-        deviceMap[EinkDevice.ONYX_POKE3] = ONYX_POKE3
-        deviceMap[EinkDevice.ONYX_POKE4] = ONYX_POKE4
-        deviceMap[EinkDevice.ONYX_POKE5] = ONYX_POKE5
-        deviceMap[EinkDevice.ONYX_POKE4LITE] = ONYX_POKE4LITE
-        deviceMap[EinkDevice.ONYX_POKE_PRO] = ONYX_POKE_PRO
-        deviceMap[EinkDevice.ONYX_TAB_ULTRA] = ONYX_TAB_ULTRA
-        deviceMap[EinkDevice.ONYX_TAB_ULTRA_C] = ONYX_TAB_ULTRA_C
-        deviceMap[EinkDevice.PUBU_PUBOOK] = PUBU_PUBOOK
-        deviceMap[EinkDevice.RIDI_PAPER_3] = RIDI_PAPER_3
-        deviceMap[EinkDevice.SONY_CP1] = SONY_CP1
-        deviceMap[EinkDevice.SONY_RP1] = SONY_RP1
-        deviceMap[EinkDevice.TAGUS_GEA] = TAGUS_GEA
-        deviceMap[EinkDevice.TOLINO] = TOLINO
-        deviceMap[EinkDevice.TOLINO_EPOS3] = TOLINO_EPOS3
-        deviceMap[EinkDevice.XIAOMI_READER] = XIAOMI_READER
-
-        deviceMap.keys.iterator().run {
-            while (this.hasNext()) {
-                val eink = this.next()
-                val flag = deviceMap[eink]
-                if (flag != null && flag) {
-                    EINK = eink
-                }
-            }
-        }
-
-        // devices with custom lights
-        val lightsMap = HashMap<LightsDevice, Boolean>()
-        lightsMap[LightsDevice.BOYUE_S62] = BOYUE_S62
-        lightsMap[LightsDevice.CREMA_0710C] = CREMA_0710C
-        lightsMap[LightsDevice.CREMA_CARTA_G] = CREMA_CARTA_G
-        lightsMap[LightsDevice.MEEBOOK_P6] = MEEBOOK_P6
-        lightsMap[LightsDevice.NOOK_GL4] = NOOK_GL4
-        lightsMap[LightsDevice.ONYX_C67] = ONYX_C67
-        lightsMap[LightsDevice.ONYX_DARWIN7] = ONYX_DARWIN7
-        lightsMap[LightsDevice.ONYX_DARWIN9] = ONYX_DARWIN9
-        lightsMap[LightsDevice.ONYX_EDISON] = ONYX_EDISON
-        lightsMap[LightsDevice.ONYX_FAUST3] = ONYX_FAUST3
-        lightsMap[LightsDevice.ONYX_GO_COLOR7] = ONYX_GO_COLOR7
-        lightsMap[LightsDevice.ONYX_JDREAD] = ONYX_JDREAD
-        lightsMap[LightsDevice.ONYX_KON_TIKI2] = ONYX_KON_TIKI2
-        lightsMap[LightsDevice.ONYX_LEAF] = ONYX_LEAF
-        lightsMap[LightsDevice.ONYX_LEAF2] = ONYX_LEAF2
-        lightsMap[LightsDevice.ONYX_LOMONOSOV] = ONYX_LOMONOSOV
-        lightsMap[LightsDevice.ONYX_MAGICBOOK] = ONYX_MAGICBOOK
-        lightsMap[LightsDevice.ONYX_MONTECRISTO3] = ONYX_MONTECRISTO3
-        lightsMap[LightsDevice.ONYX_NOTE3] = ONYX_NOTE3
-        lightsMap[LightsDevice.ONYX_NOTE4] = ONYX_NOTE4
-        lightsMap[LightsDevice.ONYX_NOTE_AIR] = ONYX_NOTE_AIR
-        lightsMap[LightsDevice.ONYX_NOTE_AIR2] = ONYX_NOTE_AIR2
-        lightsMap[LightsDevice.ONYX_NOTE_X2] = ONYX_NOTE_X2
-        lightsMap[LightsDevice.ONYX_NOVA] = ONYX_NOVA
-        lightsMap[LightsDevice.ONYX_NOVA2] = ONYX_NOVA2
-        lightsMap[LightsDevice.ONYX_NOVA3] = ONYX_NOVA3
-        lightsMap[LightsDevice.ONYX_NOVA3_COLOR] = ONYX_NOVA3_COLOR
-        lightsMap[LightsDevice.ONYX_NOVA_AIR] = ONYX_NOVA_AIR
-        lightsMap[LightsDevice.ONYX_NOVA_AIR_2] = ONYX_NOVA_AIR_2
-        lightsMap[LightsDevice.ONYX_NOVA_AIR_C] = ONYX_NOVA_AIR_C
-        lightsMap[LightsDevice.ONYX_NOVA_PRO] = ONYX_NOVA_PRO
-        lightsMap[LightsDevice.ONYX_PAGE] = ONYX_PAGE
-        lightsMap[LightsDevice.ONYX_PALMA] = ONYX_PALMA
-        lightsMap[LightsDevice.ONYX_POKE3] = ONYX_POKE3
-        lightsMap[LightsDevice.ONYX_POKE4] = ONYX_POKE4
-        lightsMap[LightsDevice.ONYX_POKE5] = ONYX_POKE5
-        lightsMap[LightsDevice.ONYX_POKE4LITE] = ONYX_POKE4LITE
-        lightsMap[LightsDevice.ONYX_POKE_PRO] = ONYX_POKE_PRO
-        lightsMap[LightsDevice.ONYX_TAB_ULTRA] = ONYX_TAB_ULTRA
-        lightsMap[LightsDevice.ONYX_TAB_ULTRA_C] = ONYX_TAB_ULTRA_C
-        lightsMap[LightsDevice.RIDI_PAPER_3] = RIDI_PAPER_3
-        lightsMap[LightsDevice.TAGUS_GEA] = TAGUS_GEA
-        lightsMap[LightsDevice.TOLINO_EPOS1] = TOLINO_EPOS1
-        lightsMap[LightsDevice.TOLINO_EPOS2] = TOLINO_EPOS2
-        lightsMap[LightsDevice.TOLINO_PAGE2] = TOLINO_PAGE2
-        lightsMap[LightsDevice.TOLINO_SHINE3] = TOLINO_SHINE3
-        lightsMap[LightsDevice.TOLINO_VISION4] = TOLINO_VISION4
-        lightsMap[LightsDevice.TOLINO_VISION5] = TOLINO_VISION5
-        lightsMap[LightsDevice.XIAOMI_READER] = XIAOMI_READER
-
-        lightsMap.keys.iterator().run {
-            while (this.hasNext()) {
-                val lights = this.next()
-                val flag = lightsMap[lights]
-                if (flag != null && flag) {
-                    LIGHTS = lights
-                }
-            }
+            // ???
+            else -> Id.NONE
         }
 
         // has broken lifecycle
-        QUIRK_BROKEN_LIFECYCLE = when (QUIRK) {
-            QuirkDevice.ONYX_POKE2 -> true
-            else -> false
+        QUIRK_BROKEN_LIFECYCLE = when (ID) {
+            Id.ONYX_POKE2,
+            -> true else -> false
         }
 
         // need wakelocks
-        QUIRK_NEEDS_WAKELOCKS = when (QUIRK) {
-            QuirkDevice.SONY_RP1 -> true
-            else -> false
-        }
-
-        // 4.4+ device without native surface rotation
-        QUIRK_NO_HW_ROTATION = when (QUIRK) {
-            QuirkDevice.EMULATOR -> true
-            else -> false
+        QUIRK_NEEDS_WAKELOCKS = when (ID) {
+            Id.SONY_RP1,
+            -> true else -> false
         }
 
         // Android devices without lights
-        QUIRK_NO_LIGHTS = when (QUIRK) {
-            QuirkDevice.LINFINY_ENOTE,
-            QuirkDevice.ONYX_MAX,
-            QuirkDevice.ONYX_NOTE,
-            QuirkDevice.SONY_CP1,
-            QuirkDevice.SONY_RP1 -> true
-            else -> false
+        QUIRK_NO_LIGHTS = when (ID) {
+            Id.LINFINY_ENOTE,
+            Id.ONYX_MAX,
+            Id.ONYX_NOTE,
+            Id.SONY_CP1,
+            Id.SONY_RP1,
+            -> true else -> false
         }
 
-        HAS_COLOR_SCREEN = when (EINK) {
-			EinkDevice.MOOINKPLUS2C,
-            EinkDevice.NONE,
-            EinkDevice.ONYX_GO_COLOR7,
-            EinkDevice.ONYX_NOVA3_COLOR,
-            EinkDevice.ONYX_TAB_ULTRA_C,
-            EinkDevice.ONYX_NOVA_AIR_C -> true
-            else -> false
+        HAS_COLOR_SCREEN = when (ID) {
+            Id.MOOINKPLUS2C,
+            Id.NONE,
+            Id.ONYX_GO_COLOR7,
+            Id.ONYX_NOVA3_COLOR,
+            Id.ONYX_TAB_ULTRA_C,
+            Id.ONYX_NOVA_AIR_C,
+            -> true else -> false
         }
     }
 
