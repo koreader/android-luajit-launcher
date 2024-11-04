@@ -31,13 +31,23 @@ class Device(activity: Activity) {
     val einkPlatform = epd.getPlatform()
 
     val properties: String
-      get() = String.format("%s;%s;%s;%s;%s;%s;%b;%b",
+      get() = String.format("%s;%s;%s;%s;%s;%s;%s",
           DeviceInfo.MANUFACTURER,
           DeviceInfo.BRAND,
           DeviceInfo.MODEL,
           DeviceInfo.DEVICE,
           DeviceInfo.PRODUCT,
           DeviceInfo.HARDWARE,
-          DeviceInfo.BOYUE,
-          DeviceInfo.TOLINO)
+          when (DeviceInfo.ID) {
+              DeviceInfo.Id.TOLINO,
+              DeviceInfo.Id.TOLINO_EPOS2,
+              DeviceInfo.Id.TOLINO_EPOS3,
+              DeviceInfo.Id.TOLINO_PAGE2,
+              DeviceInfo.Id.TOLINO_SHINE3,
+              DeviceInfo.Id.TOLINO_VISION4,
+              DeviceInfo.Id.TOLINO_VISION5,
+              DeviceInfo.Id.TOLINO_VISION6,
+              -> true else -> false
+          }
+      )
 }
