@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import android.widget.ProgressBar
 import androidx.core.content.ContextCompat
 import org.koreader.launcher.extensions.pruneCacheDir
-import org.koreader.launcher.extensions.symlink
 import java.io.*
 
 class Assets {
