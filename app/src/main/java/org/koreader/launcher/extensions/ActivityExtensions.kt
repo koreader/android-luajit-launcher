@@ -133,14 +133,6 @@ fun Activity.networkInfo(): String {
                             connectionType = ACTIVE_NETWORK_ETHERNET
                             true
                         }
-                        it.hasTransport(NetworkCapabilities.TRANSPORT_BLUETOOTH) -> {
-                            connectionType = ACTIVE_NETWORK_BLUETOOTH
-                            true
-                        }
-                        it.hasTransport(NetworkCapabilities.TRANSPORT_VPN) -> {
-                            connectionType = ACTIVE_NETWORK_VPN
-                            true
-                        }
                         else -> false
                     }
                 } ?: false
@@ -159,14 +151,6 @@ fun Activity.networkInfo(): String {
                         }
                         ConnectivityManager.TYPE_ETHERNET -> {
                             connectionType = ACTIVE_NETWORK_ETHERNET
-                            true
-                        }
-                        ConnectivityManager.TYPE_BLUETOOTH -> {
-                            connectionType = ACTIVE_NETWORK_BLUETOOTH
-                            true
-                        }
-                        ConnectivityManager.TYPE_VPN -> {
-                            connectionType = ACTIVE_NETWORK_VPN
                             true
                         }
                         else -> false
@@ -341,8 +325,6 @@ private const val ACTIVE_NETWORK_NONE = 0
 private const val ACTIVE_NETWORK_WIFI = 1
 private const val ACTIVE_NETWORK_MOBILE = 2
 private const val ACTIVE_NETWORK_ETHERNET = 3
-private const val ACTIVE_NETWORK_BLUETOOTH = 4
-private const val ACTIVE_NETWORK_VPN = 5
 
 // constants from https://developer.android.com/reference/android/content/res/Configuration
 private const val ANDROID_LANDSCAPE = 0
