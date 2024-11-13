@@ -553,8 +553,6 @@ enum {
     ANETWORK_WIFI = 1,
     ANETWORK_MOBILE = 2,
     ANETWORK_ETHERNET = 3,
-    ANETWORK_BLUETOOTH = 4,
-    ANETWORK_VPN = 5,
 };
 
 enum {
