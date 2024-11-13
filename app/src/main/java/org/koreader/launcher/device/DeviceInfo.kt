@@ -10,6 +10,7 @@ import android.os.Build
 import android.util.Log
 import java.util.Locale
 
+@Suppress("detekt:all")
 object DeviceInfo {
     private const val TAG = "DeviceInfo"
 
