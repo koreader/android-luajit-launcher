@@ -74,7 +74,7 @@ object LightsFactory {
                 DeviceInfo.Id.CREMA_CARTA_G,
                 DeviceInfo.Id.MEEBOOK_P6,
                 DeviceInfo.Id.RIDI_PAPER_3,
-                DeviceInfo.Id.TOLINO_EPOS1,                
+                DeviceInfo.Id.TOLINO_EPOS1,
                 DeviceInfo.Id.TOLINO_SHINE3,
                 DeviceInfo.Id.TOLINO_VISION4,
                 DeviceInfo.Id.TOLINO_VISION5,
