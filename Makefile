@@ -74,14 +74,6 @@ build-luajit:
 	cd jni/luajit && \
 		./mk-luajit.sh "$(ANDROID_FULL_ARCH)"
 
-prepare: update
-	@echo "Building LuaJIT for all supported ABIs"
-	cd jni/luajit &&  \
-		./mk-luajit.sh clean && \
-		./mk-luajit.sh x86 && \
-		./mk-luajit.sh clean && \
-		./mk-luajit.sh armeabi-v7a
-
 debug: update build-luajit-debug
 	@echo "Building $(APPNAME) debug APK: Version $(NAME), release $(VERSION), flavor $(FLAVOR)"
 	./gradlew -q -PversName=$(NAME) -PversCode=$(VERSION) -PprojectName=$(APPNAME) \
