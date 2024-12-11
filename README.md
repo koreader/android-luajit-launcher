@@ -49,11 +49,3 @@ ANDROID_ARCH=MY_ARCH make example
 ```
 
 where `MY_ARCH` is either `x86`, `x86_64` or `arm64`
-
-
-## To-do
-
-* a concept to deal with native Lua modules.
-* a loader for native modules that have been put into the activity's library directory?
-* a loader for obb storage, maybe? We could put native Lua modules there, for example.
-* example code for framebuffer access and more
