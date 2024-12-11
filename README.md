@@ -19,36 +19,37 @@ Have a look at KOReader's [llapp_main.lua](https://github.com/koreader/koreader/
 
 The real starting point, called from JNI/C, is the run() function in android.lua. It sets up a few things, namely FFI definitions for the Android native API (since it uses that itself for a few things) and some wrapper functions for logging. Also, it registers the "android" module in package.loaded, so you can access it in your own code via require("android"). It also registers a new package loader which can load Lua code from the activity's asset store, so you can use require() for Lua code stored there.
 
-## Starting
+## Disclaimer
 
-### Init and update the submodules
+This repo is used as glue code to run KOReader on android.
 
-```sh
-make update
-```
-
-### Compile LuaJIT for all target architecture(s)
-
-```sh
-make prepare
-```
+Usage on its own doesn't make much sense since you're expected to write your own drawing routines in lua!
+A standalone example is attached (with no drawing routines!) in case you're curious what you'll get.
 
 
-### Compile native code and package APK with gradle
+## Building the example app
 
-You can see available tasks with
+### Export `ANDROID_NDK_HOME`
 
 ```sh
-./gradlew tasks
+export ANDROID_NDK_HOME=/path/to/your/ndk/folder
 ```
 
-For example, you can build the debug variant for all supported ABIs with
+### Build example APK for arm 32 bits
 
 ```sh
-./gradlew assembleDebug
+make example
 ```
 
-For more examples please look at the Makefile.
+
+### Build example APK for any other arch
+
+```sh
+ANDROID_ARCH=MY_ARCH make example
+```
+
+where `MY_ARCH` is either `x86`, `x86_64` or `arm64`
+
 
 ## To-do
 
