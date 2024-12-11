@@ -21,7 +21,7 @@ The real starting point, called from JNI/C, is the run() function in android.lua
 
 ## Disclaimer
 
-This repo is used as glue code to run KOReader on android.
+This repo is used as glue code to run KOReader on Android.
 
 Usage on its own doesn't make much sense since you're expected to write your own drawing routines in lua!
 A standalone example is attached (with no drawing routines!) in case you're curious what you'll get.
