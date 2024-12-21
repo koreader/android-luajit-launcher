@@ -91,6 +91,7 @@ object DeviceInfo {
         ONYX_NOTE5,
         ONYX_NOTE_AIR,
         ONYX_NOTE_AIR2,
+        ONYX_NOTE_AIR_3C,
         ONYX_NOTE_PRO,
         ONYX_NOTE_X2,
         ONYX_NOVA,
@@ -399,6 +400,10 @@ object DeviceInfo {
             BRAND == "onyx" && (MODEL == "noteair2" || MODEL == "noteair2p")
             -> Id.ONYX_NOTE_AIR2
 
+            // Onyx Note Air 3C
+            BRAND == "onyx" && MODEL == "noteair3c"
+            -> Id.ONYX_NOTE_AIR_3C
+
             // Onyx Note Pro
             MANUFACTURER == "onyx" && PRODUCT == "notepro" && DEVICE == "notepro"
             -> Id.ONYX_NOTE_PRO
@@ -570,6 +575,7 @@ object DeviceInfo {
             Id.MOOINKPLUS2C,
             Id.NONE,
             Id.ONYX_GO_COLOR7,
+            Id.ONYX_NOTE_AIR_3C,
             Id.ONYX_NOVA3_COLOR,
             Id.ONYX_TAB_ULTRA_C,
             Id.ONYX_NOVA_AIR_C,
