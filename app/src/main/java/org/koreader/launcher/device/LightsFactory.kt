@@ -15,6 +15,7 @@ object LightsFactory {
                     BoyueS62RootController()
                 }
                 DeviceInfo.Id.ONYX_GO_COLOR7,
+                DeviceInfo.Id.ONYX_NOTE_AIR_3C,
                 DeviceInfo.Id.ONYX_NOVA_AIR,
                 DeviceInfo.Id.ONYX_PAGE,
                 DeviceInfo.Id.ONYX_POKE5,
@@ -48,6 +49,7 @@ object LightsFactory {
                 DeviceInfo.Id.ONYX_NOTE_PRO,
                 DeviceInfo.Id.ONYX_NOVA3,
                 DeviceInfo.Id.ONYX_NOVA_PRO,
+                DeviceInfo.Id.ONYX_POKE2,
                 DeviceInfo.Id.ONYX_POKE3,
                 DeviceInfo.Id.ONYX_POKE_PRO,
                 -> {
