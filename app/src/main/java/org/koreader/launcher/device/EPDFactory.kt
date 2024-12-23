@@ -144,6 +144,7 @@ object EPDFactory {
                 DeviceInfo.Id.MEEBOOK_M6,
                 DeviceInfo.Id.MEEBOOK_M7,
                 DeviceInfo.Id.MOAAN_MIX7,
+                DeviceInfo.Id.OBOOK_A8,
                 DeviceInfo.Id.PUBU_PUBOOK,
                 DeviceInfo.Id.XIAOMI_READER,
                 -> {
