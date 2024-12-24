@@ -481,7 +481,7 @@ object DeviceInfo {
             -> Id.ONYX_TAB_ULTRA_C
 
             // Onyx Tab Ultra C Pro
-            BRAND == "onyx" && PRODUCT == "tabultracpro"
+            BRAND == "onyx" && MODEL == "tabultracpro" 
             -> Id.ONYX_TAB_ULTRA_C_PRO
 
             // Pubu Pubook
