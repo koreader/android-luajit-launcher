@@ -111,6 +111,7 @@ object DeviceInfo {
         ONYX_POKE_PRO,
         ONYX_TAB_ULTRA,
         ONYX_TAB_ULTRA_C,
+        ONYX_TAB_ULTRA_C_PRO,
         PUBU_PUBOOK,
         RIDI_PAPER_3,
         SONY_CP1,
@@ -479,6 +480,10 @@ object DeviceInfo {
             MANUFACTURER == "onyx" && MODEL == "tabultrac"
             -> Id.ONYX_TAB_ULTRA_C
 
+            // Onyx Tab Ultra C Pro
+            BRAND == "onyx" && MODEL == "tabultracpro" 
+            -> Id.ONYX_TAB_ULTRA_C_PRO
+
             // Pubu Pubook
             MANUFACTURER == STR_ROCKCHIP && BRAND == STR_ROCKCHIP && MODEL == "pubook" && DEVICE == "pubook" && HARDWARE == "rk30board"
             -> Id.PUBU_PUBOOK
@@ -572,6 +577,7 @@ object DeviceInfo {
             Id.ONYX_GO_COLOR7,
             Id.ONYX_NOVA3_COLOR,
             Id.ONYX_TAB_ULTRA_C,
+            Id.ONYX_TAB_ULTRA_C_PRO,
             Id.ONYX_NOVA_AIR_C,
             -> true else -> false
         }
