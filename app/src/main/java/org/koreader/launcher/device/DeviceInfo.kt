@@ -70,7 +70,7 @@ object DeviceInfo {
         NABUK,
         NOOK,
         NOOK_GL4,
-        OBOOK_A8,
+        OBOOK_P78D,
         ONYX_C67,
         ONYX_DARWIN7,
         ONYX_DARWIN9,
@@ -309,9 +309,9 @@ object DeviceInfo {
                 || MODEL == "evk_mx6sl" || MODEL.startsWith("ereader"))
             -> Id.NOOK
 
-            // OBOOK A8
+            // OBOOK P78D
             MANUFACTURER == STR_ROCKCHIP && PRODUCT == "rk3566_78d" && MODEL == "p78d"
-            -> Id.OBOOK_A8
+            -> Id.OBOOK_P78D
 
             // Onyx C67
             MANUFACTURER == "onyx"
