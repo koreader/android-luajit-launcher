@@ -63,6 +63,7 @@ object DeviceInfo {
         JDREAD,
         LINFINY_ENOTE,
         MEEBOOK_M6,
+        MEEBOOK_M6C,
         MEEBOOK_M7,
         MEEBOOK_P6,
         MOAAN_MIX7,
@@ -277,6 +278,10 @@ object DeviceInfo {
             // Meebook M6
             MANUFACTURER == "haoqing" && MODEL == "m6"
             -> Id.MEEBOOK_M6
+
+            // Meebook M6C
+            MANUFACTURER == "haoqing" && MODEL == "m6c"
+            -> Id.MEEBOOK_M6C
 
             // Meebook M7
             MANUFACTURER == "haoqing" && MODEL == "m7"
@@ -577,13 +582,14 @@ object DeviceInfo {
         }
 
         HAS_COLOR_SCREEN = when (ID) {
+            Id.MEEBOOK_M6C,
             Id.MOOINKPLUS2C,
             Id.NONE,
             Id.ONYX_GO_COLOR7,
-            Id.ONYX_NOTE_AIR_3C,
             Id.ONYX_NOVA3_COLOR,
-            Id.ONYX_TAB_ULTRA_C,
             Id.ONYX_NOVA_AIR_C,
+            Id.ONYX_NOTE_AIR_3C,
+            Id.ONYX_TAB_ULTRA_C,
             -> true else -> false
         }
     }

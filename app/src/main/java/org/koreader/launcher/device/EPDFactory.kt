@@ -142,6 +142,7 @@ object EPDFactory {
                 DeviceInfo.Id.HYREAD_MINI6,
                 DeviceInfo.Id.INKPALM_PLUS,
                 DeviceInfo.Id.MEEBOOK_M6,
+                DeviceInfo.Id.MEEBOOK_M6C,
                 DeviceInfo.Id.MEEBOOK_M7,
                 DeviceInfo.Id.MOAAN_MIX7,
                 DeviceInfo.Id.OBOOK_P78D,
