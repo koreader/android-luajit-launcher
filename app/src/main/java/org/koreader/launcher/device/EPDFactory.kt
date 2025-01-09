@@ -125,6 +125,7 @@ object EPDFactory {
                 DeviceInfo.Id.ONYX_POKE_PRO,
                 DeviceInfo.Id.ONYX_TAB_ULTRA,
                 DeviceInfo.Id.ONYX_TAB_ULTRA_C,
+                DeviceInfo.Id.ONYX_TAB_ULTRA_C_PRO,
                 -> {
                     logController("Onyx/Qualcomm")
                     OnyxEPDController()
