@@ -63,6 +63,7 @@ object DeviceInfo {
         JDREAD,
         LINFINY_ENOTE,
         MEEBOOK_M6,
+        MEEBOOK_M6C,
         MEEBOOK_M7,
         MEEBOOK_P6,
         MOAAN_MIX7,
@@ -70,6 +71,7 @@ object DeviceInfo {
         NABUK,
         NOOK,
         NOOK_GL4,
+        OBOOK_P78D,
         ONYX_C67,
         ONYX_DARWIN7,
         ONYX_DARWIN9,
@@ -91,6 +93,7 @@ object DeviceInfo {
         ONYX_NOTE5,
         ONYX_NOTE_AIR,
         ONYX_NOTE_AIR2,
+        ONYX_NOTE_AIR_3C,
         ONYX_NOTE_PRO,
         ONYX_NOTE_X2,
         ONYX_NOVA,
@@ -276,6 +279,10 @@ object DeviceInfo {
             MANUFACTURER == "haoqing" && MODEL == "m6"
             -> Id.MEEBOOK_M6
 
+            // Meebook M6C
+            MANUFACTURER == "haoqing" && MODEL == "m6c"
+            -> Id.MEEBOOK_M6C
+
             // Meebook M7
             MANUFACTURER == "haoqing" && MODEL == "m7"
             -> Id.MEEBOOK_M7
@@ -306,6 +313,10 @@ object DeviceInfo {
             && (MODEL == "bnrv510" || MODEL == "bnrv520" || MODEL == "bnrv700"
                 || MODEL == "evk_mx6sl" || MODEL.startsWith("ereader"))
             -> Id.NOOK
+
+            // OBOOK P78D
+            MANUFACTURER == STR_ROCKCHIP && PRODUCT == "rk3566_78d" && MODEL == "p78d"
+            -> Id.OBOOK_P78D
 
             // Onyx C67
             MANUFACTURER == "onyx"
@@ -398,6 +409,10 @@ object DeviceInfo {
             // Onyx Note Air 2 && Note Air 2 Plus
             BRAND == "onyx" && (MODEL == "noteair2" || MODEL == "noteair2p")
             -> Id.ONYX_NOTE_AIR2
+
+            // Onyx Note Air 3C
+            BRAND == "onyx" && MODEL == "noteair3c"
+            -> Id.ONYX_NOTE_AIR_3C
 
             // Onyx Note Pro
             MANUFACTURER == "onyx" && PRODUCT == "notepro" && DEVICE == "notepro"
@@ -567,12 +582,14 @@ object DeviceInfo {
         }
 
         HAS_COLOR_SCREEN = when (ID) {
+            Id.MEEBOOK_M6C,
             Id.MOOINKPLUS2C,
             Id.NONE,
             Id.ONYX_GO_COLOR7,
             Id.ONYX_NOVA3_COLOR,
-            Id.ONYX_TAB_ULTRA_C,
             Id.ONYX_NOVA_AIR_C,
+            Id.ONYX_NOTE_AIR_3C,
+            Id.ONYX_TAB_ULTRA_C,
             -> true else -> false
         }
     }
