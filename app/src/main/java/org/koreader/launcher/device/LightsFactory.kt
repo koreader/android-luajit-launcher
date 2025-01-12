@@ -69,6 +69,7 @@ object LightsFactory {
                 DeviceInfo.Id.ONYX_POKE4,
                 DeviceInfo.Id.ONYX_POKE4LITE,
                 DeviceInfo.Id.ONYX_TAB_ULTRA,
+                DeviceInfo.Id.STORYTEL_READER2,
                 -> {
                     logController("Onyx/Sdk")
                     OnyxSdkLightsController()

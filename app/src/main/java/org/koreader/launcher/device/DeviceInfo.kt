@@ -119,6 +119,7 @@ object DeviceInfo {
         RIDI_PAPER_3,
         SONY_CP1,
         SONY_RP1,
+        STORYTEL_READER2,
         TAGUS_GEA,
         TOLINO,
         TOLINO_EPOS1,
@@ -514,6 +515,10 @@ object DeviceInfo {
             // Sony DPT-RP1
             MANUFACTURER == "sony" && MODEL == "dpt-rp1"
             -> Id.SONY_RP1
+
+            // Storytel Reader 2
+            MANUFACTURER == "storytel" && MODEL == "reader 2"
+            -> Id.STORYTEL_READER2
 
             // Tagus Gea
             MANUFACTURER == "onyx" && MODEL == "tagus_pokep"
