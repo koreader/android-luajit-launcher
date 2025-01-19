@@ -26,6 +26,7 @@ object EPDFactory {
                 DeviceInfo.Id.ENERGY,
                 DeviceInfo.Id.FIDIBOOK,
                 DeviceInfo.Id.INKBOOK,
+                DeviceInfo.Id.INKBOOKFOCUS,
                 DeviceInfo.Id.MEEBOOK_P6,
                 DeviceInfo.Id.ONYX_C67,
                 DeviceInfo.Id.ONYX_MAGICBOOK,
@@ -141,6 +142,7 @@ object EPDFactory {
                 }
 
                 DeviceInfo.Id.HYREAD_MINI6,
+                DeviceInfo.Id.INKBOOKFOCUS_PLUS,
                 DeviceInfo.Id.INKPALM_PLUS,
                 DeviceInfo.Id.MEEBOOK_M6,
                 DeviceInfo.Id.MEEBOOK_M6C,
