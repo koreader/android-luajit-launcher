@@ -59,6 +59,8 @@ object DeviceInfo {
         HANVON_960,
         HYREAD_MINI6,
         INKBOOK,
+        INKBOOKFOCUS,
+        INKBOOKFOCUS_PLUS,
         INKPALM_PLUS,
         JDREAD,
         LINFINY_ENOTE,
@@ -263,6 +265,14 @@ object DeviceInfo {
             // Artatech Inkbook Prime/Prime HD.
             MANUFACTURER == "artatech" && BRAND == "inkbook" && MODEL.startsWith("prime")
             -> Id.INKBOOK
+
+            // InkBook Focus
+            MANUFACTURER == STR_ROCKCHIP && PRODUCT == "r07801" && MODEL == "focus"
+            -> Id.INKBOOKFOCUS
+
+            // InkBook Focus Plus
+            MANUFACTURER == STR_ROCKCHIP && PRODUCT == "r07802" && MODEL == "focus plus"
+            -> Id.INKBOOKFOCUS_PLUS
 
             // InkPalm Plus
             MANUFACTURER == STR_ROCKCHIP && MODEL == "inkpalmplus"
