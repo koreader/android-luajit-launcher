@@ -268,11 +268,11 @@ object DeviceInfo {
             -> Id.INKBOOK
 
             // InkBook Focus
-            MANUFACTURER == STR_ROCKCHIP && PRODUCT == "r07801" && MODEL == "focus"
+            PRODUCT == "r07801" && MODEL == "focus"
             -> Id.INKBOOKFOCUS
 
             // InkBook Focus Plus
-            MANUFACTURER == STR_ROCKCHIP && PRODUCT == "r07802" && MODEL == "focus plus"
+            PRODUCT == "r07802" && MODEL == "focus plus"
             -> Id.INKBOOKFOCUS_PLUS
 
             // InkPalm Plus
