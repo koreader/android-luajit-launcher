@@ -272,7 +272,7 @@ object DeviceInfo {
             -> Id.INKBOOKFOCUS
 
             // InkBook Focus Plus
-            PRODUCT == "r07802" && MODEL == "focus plus"
+            PRODUCT == "ro7802" && MODEL == "focus plus"
             -> Id.INKBOOKFOCUS_PLUS
 
             // InkPalm Plus
