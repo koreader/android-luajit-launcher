@@ -90,13 +90,14 @@ object EPDFactory {
                     TolinoEPDController()
                 }
 
+                DeviceInfo.Id.ONYX_DARWIN9,
                 DeviceInfo.Id.ONYX_EDISON,
                 DeviceInfo.Id.ONYX_GO_103,
                 DeviceInfo.Id.ONYX_GO_COLOR7,
                 DeviceInfo.Id.ONYX_KON_TIKI2,
                 DeviceInfo.Id.ONYX_LEAF,
                 DeviceInfo.Id.ONYX_LEAF2,
-                DeviceInfo.Id.ONYX_DARWIN9,
+                DeviceInfo.Id.ONYX_LIVINGSTONE3,
                 DeviceInfo.Id.ONYX_LOMONOSOV,
                 DeviceInfo.Id.ONYX_MAX,
                 DeviceInfo.Id.ONYX_NOTE,

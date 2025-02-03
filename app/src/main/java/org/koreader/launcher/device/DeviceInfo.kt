@@ -85,6 +85,7 @@ object DeviceInfo {
         ONYX_KON_TIKI2,
         ONYX_LEAF,
         ONYX_LEAF2,
+        ONYX_LIVINGSTONE3,
         ONYX_LOMONOSOV,
         ONYX_MAGICBOOK,
         ONYX_MAX,
@@ -381,6 +382,10 @@ object DeviceInfo {
             && (PRODUCT == "leaf2" || PRODUCT == "leaf2_p")
             && (DEVICE == "leaf2" || DEVICE == "leaf2_p")
             -> Id.ONYX_LEAF2
+
+            // Onyx Boox Livingstone3
+            MANUFACTURER == "onyx" && DEVICE == "livingstone3"
+            -> Id.ONYX_LIVINGSTONE3
 
             // Onyx Lomonosov
             MANUFACTURER == "onyx" && DEVICE == "lomonosov"

@@ -59,6 +59,7 @@ object LightsFactory {
                 }
                 DeviceInfo.Id.ONYX_DARWIN9,
                 DeviceInfo.Id.ONYX_LEAF2,
+                DeviceInfo.Id.ONYX_LIVINGSTONE3,
                 DeviceInfo.Id.ONYX_NOTE4,
                 DeviceInfo.Id.ONYX_NOTE_AIR2,
                 DeviceInfo.Id.ONYX_NOTE_X2,
