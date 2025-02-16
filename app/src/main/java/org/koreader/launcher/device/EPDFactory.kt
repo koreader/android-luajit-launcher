@@ -107,6 +107,7 @@ object EPDFactory {
                 DeviceInfo.Id.ONYX_NOTE_AIR,
                 DeviceInfo.Id.ONYX_NOTE_AIR2,
                 DeviceInfo.Id.ONYX_NOTE_AIR_3C,
+                DeviceInfo.Id.ONYX_NOTE_MAX,
                 DeviceInfo.Id.ONYX_NOTE_PRO,
                 DeviceInfo.Id.ONYX_NOTE_X2,
                 DeviceInfo.Id.ONYX_NOVA,
