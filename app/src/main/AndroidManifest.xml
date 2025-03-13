@@ -52,6 +52,12 @@
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="file" />
+                <data android:scheme="content" />
+                <data android:host="*" />
+
                 <data android:mimeType="application/epub+zip" />
                 <data android:mimeType="application/fb2" />
                 <data android:mimeType="application/fb3" />
@@ -89,7 +95,44 @@
                 <data android:mimeType="image/x-portable-arbitrarymap" />
                 <data android:mimeType="image/x-portable-bitmap" />
                 <data android:mimeType="text/html" />
+                <data android:mimeType="text/markdown" />
+                <data android:mimeType="text/x-markdown" />
                 <data android:mimeType="text/plain" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="file" />
+                <data android:scheme="content" />
+                <data android:host="*" />
+
+                <data android:pathPattern=".*\\.epub" />
+                <data android:pathPattern=".*\\.fb2" />
+                <data android:pathPattern=".*\\.fb2.zip" />
+                <data android:pathPattern=".*\\.doc" />
+                <data android:pathPattern=".*\\.docx" />
+                <data android:pathPattern=".*\\.xps" />
+                <data android:pathPattern=".*\\.pdf" />
+                <data android:pathPattern=".*\\.rtf" />
+                <data android:pathPattern=".*\\.mobi" />
+                <data android:pathPattern=".*\\.cbt" />
+                <data android:pathPattern=".*\\.cbz" />
+                <data android:pathPattern=".*\\.odt" />
+                <data android:pathPattern=".*\\.chm" />
+                <data android:pathPattern=".*\\.tar" />
+                <data android:pathPattern=".*\\.xml" />
+                <data android:pathPattern=".*\\.htm" />
+                <data android:pathPattern=".*\\.html" />
+                <data android:pathPattern=".*\\.zip" />
+                <data android:pathPattern=".*\\.djvu" />
+                <data android:pathPattern=".*\\.gif" />
+                <data android:pathPattern=".*\\.jpeg" />
+                <data android:pathPattern=".*\\.png" />
+                <data android:pathPattern=".*\\.svg" />
+                <data android:pathPattern=".*\\.tiff" />
+                <data android:pathPattern=".*\\.md" />
             </intent-filter>
         </activity>
         <activity
