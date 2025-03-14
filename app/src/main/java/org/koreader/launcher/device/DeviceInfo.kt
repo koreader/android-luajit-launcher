@@ -79,6 +79,7 @@ object DeviceInfo {
         ONYX_DARWIN9,
         ONYX_EDISON,
         ONYX_FAUST3,
+        ONYX_GALILEO2,
         ONYX_GO_103,
         ONYX_GO_COLOR7,
         ONYX_JDREAD,
@@ -358,6 +359,10 @@ object DeviceInfo {
             // Onyx Faust 3
             MANUFACTURER == "onyx" && PRODUCT == "mc_faust3" && DEVICE == "mc_faust3"
             -> Id.ONYX_FAUST3
+
+            // Onyx Boox Galileo 2
+            BRAND == "onyx" && MODEL == "galileo2"
+            -> Id.ONYX_GALILEO2
 
             // Onyx Boox Go 10.3
             BRAND == "onyx" && MODEL == "go103"

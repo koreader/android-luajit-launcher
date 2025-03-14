@@ -92,6 +92,7 @@ object EPDFactory {
 
                 DeviceInfo.Id.ONYX_DARWIN9,
                 DeviceInfo.Id.ONYX_EDISON,
+                DeviceInfo.Id.ONYX_GALILEO2,
                 DeviceInfo.Id.ONYX_GO_103,
                 DeviceInfo.Id.ONYX_GO_COLOR7,
                 DeviceInfo.Id.ONYX_KON_TIKI2,
