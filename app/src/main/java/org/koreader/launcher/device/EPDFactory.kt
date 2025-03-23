@@ -126,6 +126,7 @@ object EPDFactory {
                 DeviceInfo.Id.ONYX_POKE3,
                 DeviceInfo.Id.ONYX_POKE4,
                 DeviceInfo.Id.ONYX_POKE5,
+                DeviceInfo.Id.ONYX_POKE6,
                 DeviceInfo.Id.ONYX_POKE4LITE,
                 DeviceInfo.Id.ONYX_POKE_PRO,
                 DeviceInfo.Id.ONYX_TAB_ULTRA,
