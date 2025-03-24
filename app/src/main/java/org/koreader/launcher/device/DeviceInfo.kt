@@ -116,6 +116,7 @@ object DeviceInfo {
         ONYX_POKE3,
         ONYX_POKE4,
         ONYX_POKE5,
+        ONYX_POKE6,
         ONYX_POKE4LITE,
         ONYX_POKE_PRO,
         ONYX_TAB_ULTRA,
@@ -513,6 +514,10 @@ object DeviceInfo {
             // Onyx Poke 5
             BRAND == "onyx" && MODEL == "poke5p"
             -> Id.ONYX_POKE5
+
+            // Onyx Poke 6
+            BRAND == "onyx" && MODEL == "poke6"
+            -> Id.ONYX_POKE6
 
             // Onyx Poke Pro
             MANUFACTURER == "onyx" && PRODUCT == "poke_pro"
