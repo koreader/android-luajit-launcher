@@ -90,6 +90,7 @@ object DeviceInfo {
         ONYX_LOMONOSOV,
         ONYX_MAGICBOOK,
         ONYX_MAX,
+        ONYX_MAX2_PRO,
         ONYX_MONTECRISTO3,
         ONYX_NOTE,
         ONYX_NOTE3,
@@ -407,6 +408,10 @@ object DeviceInfo {
             MANUFACTURER == "onyx" && PRODUCT == "max" && DEVICE == "max"
             -> Id.ONYX_MAX
 
+            // Onyx Max2 Pro
+            MANUFACTURER == "onyx" && PRODUCT == "max2pro" && DEVICE == "max2pro"
+            -> Id.ONYX_MAX2_PRO
+
             // Onyx Montecristo 3
             MANUFACTURER == "onyx" && PRODUCT == "mc_kepler_c" && DEVICE == "mc_kepler_c"
             -> Id.ONYX_MONTECRISTO3
@@ -620,6 +625,7 @@ object DeviceInfo {
         QUIRK_NO_LIGHTS = when (ID) {
             Id.LINFINY_ENOTE,
             Id.ONYX_MAX,
+            Id.ONYX_MAX2_PRO,
             Id.ONYX_NOTE,
             Id.SONY_CP1,
             Id.SONY_RP1,
