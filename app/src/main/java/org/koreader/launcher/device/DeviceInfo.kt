@@ -99,6 +99,7 @@ object DeviceInfo {
         ONYX_NOTE_AIR,
         ONYX_NOTE_AIR2,
         ONYX_NOTE_AIR_3C,
+        ONYX_NOTE_AIR_4C,
         ONYX_NOTE_MAX,
         ONYX_NOTE_PRO,
         ONYX_NOTE_X2,
@@ -444,6 +445,10 @@ object DeviceInfo {
             BRAND == "onyx" && MODEL == "noteair3c"
             -> Id.ONYX_NOTE_AIR_3C
 
+            // Onyx Note Air 4C
+            BRAND == "onyx" && MODEL == "noteair4c"
+            -> Id.ONYX_NOTE_AIR_4C
+
             // Onyx Boox Note Max
             BRAND == "onyx" && PRODUCT == "notemax" && DEVICE == "notemax"
             -> Id.ONYX_NOTE_MAX
@@ -640,6 +645,7 @@ object DeviceInfo {
             Id.ONYX_NOVA3_COLOR,
             Id.ONYX_NOVA_AIR_C,
             Id.ONYX_NOTE_AIR_3C,
+            Id.ONYX_NOTE_AIR_4C,
             Id.ONYX_TAB_ULTRA_C,
             Id.ONYX_TAB_ULTRA_C_PRO,
             -> true else -> false
