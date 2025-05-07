@@ -47,6 +47,7 @@ object EPDFactory {
                 DeviceInfo.Id.BOYUE_T78D,
                 DeviceInfo.Id.BOYUE_T80D,
                 DeviceInfo.Id.BOYUE_T103D,
+                DeviceInfo.Id.HYREAD_GAZE_NOTE,
                 -> {
                     logController("Rockchip RK3368")
                     RK3368EPDController()
@@ -149,6 +150,7 @@ object EPDFactory {
                     OldTolinoEPDController()
                 }
 
+                DeviceInfo.Id.HYREAD_GAZE_NOTE_CC,
                 DeviceInfo.Id.HYREAD_MINI6,
                 DeviceInfo.Id.INKBOOKFOCUS_PLUS,
                 DeviceInfo.Id.INKPALM_PLUS,

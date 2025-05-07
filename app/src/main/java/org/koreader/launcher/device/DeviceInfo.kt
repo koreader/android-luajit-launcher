@@ -57,6 +57,8 @@ object DeviceInfo {
         ENERGY,
         FIDIBOOK,
         HANVON_960,
+        HYREAD_GAZE_NOTE,
+        HYREAD_GAZE_NOTE_CC,
         HYREAD_MINI6,
         INKBOOK,
         INKBOOKFOCUS,
@@ -265,6 +267,14 @@ object DeviceInfo {
             // Hanvon 960
             BRAND == "freescale" && PRODUCT == "evk_6sl_eink"
             -> Id.HANVON_960
+
+            // Hyread Gaze Note
+            MANUFACTURER == "hyread" && MODEL == "r08p"
+            -> Id.HYREAD_GAZE_NOTE
+
+            // Hyread Gaze Note Plus CC
+            MANUFACTURER == "hyread" && MODEL == "k08cc"
+            -> Id.HYREAD_GAZE_NOTE_CC
 
             // Hyread Mini 6
             MANUFACTURER == "hyread" && MODEL == "k06nu"
