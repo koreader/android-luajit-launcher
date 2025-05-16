@@ -175,9 +175,6 @@ void android_app_post_exec_cmd(struct android_app* android_app, int8_t cmd) {
     }
 }
 
-void app_dummy() {
-}
-
 static void android_app_destroy(struct android_app* android_app) {
     LOGD("android_app_destroy!");
     free_saved_state(android_app);
