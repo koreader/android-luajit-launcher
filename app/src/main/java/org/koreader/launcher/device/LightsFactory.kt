@@ -15,6 +15,7 @@ object LightsFactory {
                     BoyueS62RootController()
                 }
                 DeviceInfo.Id.ONYX_GALILEO2,
+                DeviceInfo.Id.ONYX_GO6,
                 DeviceInfo.Id.ONYX_GO_COLOR7,
                 DeviceInfo.Id.ONYX_NOTE_AIR_3C,
                 DeviceInfo.Id.ONYX_NOTE_AIR_4C,
