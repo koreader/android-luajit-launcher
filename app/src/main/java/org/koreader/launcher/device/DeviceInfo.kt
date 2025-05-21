@@ -83,8 +83,9 @@ object DeviceInfo {
         ONYX_FAUST3,
         ONYX_GALILEO2,
         ONYX_GO_103,
-        ONYX_GO6,
         ONYX_GO_COLOR7,
+        ONYX_GO6,
+        ONYX_GO7,
         ONYX_JDREAD,
         ONYX_KON_TIKI2,
         ONYX_LEAF,
@@ -382,13 +383,17 @@ object DeviceInfo {
             BRAND == "onyx" && MODEL == "go103"
             -> Id.ONYX_GO_103
 
+            // Onyx Boox Go Color 7
+            BRAND == "onyx" && MODEL == "gocolor7"
+            -> Id.ONYX_GO_COLOR7
+
             // Onyx Boox Go 6
             BRAND == "onyx" && MODEL == "go6"
             -> Id.ONYX_GO6
 
-            // Onyx Boox Go Color 7
-            BRAND == "onyx" && MODEL == "gocolor7"
-            -> Id.ONYX_GO_COLOR7
+            // Onyx Boox Go 7
+            BRAND == "onyx" && MODEL == "go7"
+            -> Id.ONYX_GO7
 
             // Onyx JDRead
             BRAND == "onyx" && MODEL == "jdread"
