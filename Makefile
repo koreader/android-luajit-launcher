@@ -91,15 +91,6 @@ release: update build-luajit
 	@echo "Application $(APPNAME) was built, type: release (unsigned), flavor: $(FLAVOR), version: $(NAME), release $(VERSION)"
 	@echo "WARNING: You'll need to sign this application to be able to install it"
 
-example: update clean build-luajit
-	@echo "Building HelloWorld example"
-	mkdir -p assets/module/
-	cp -pv examples/helloWorld/*.lua assets/module/
-	./gradlew -q -PversName=1.0 -PversCode=1 -PprojectName=HelloFromLua \
-		-PndkCustomPath=$(ANDROID_NDK_FULLPATH) app:$(BUILD_TASK)Debug
-	mkdir -p bin/
-	find app/build/outputs/apk/ -type f -name '*.apk' -exec mv -v {} bin/ \;
-
 lint:
 	./gradlew -PndkCustomPath=$(ANDROID_NDK_FULLPATH) $(LINT_TASK)Release
 
