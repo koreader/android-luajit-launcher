@@ -745,10 +745,6 @@ class MainActivity : NativeActivity(), LuaInterface,
         startActivity(intent)
     }
 
-    override fun untar(filePath: String, outputPath: String): Boolean {
-        return File(filePath).uncompress(outputPath)
-    }
-
     /*---------------------------------------------------------------
      *                       private methods                        *
      *--------------------------------------------------------------*/
