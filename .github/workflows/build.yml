@@ -43,9 +43,6 @@ jobs:
       - name: Fix checkout ownership
         run: chown 'root:root' .
 
-      - name: Update submodules
-        run: make update
-
       # }}}
 
       # Build. {{{
@@ -54,7 +51,7 @@ jobs:
         run: |
           # Ensure the build fail if gradle tries to install/update an SDK package.
           echo 'android.builder.sdkDownload=false' >>gradle.properties
-          make ${{ matrix.variant }}
+          ./gradlew app:assembleArmRocks${{ matrix.variant }}
 
       # }}}
 
