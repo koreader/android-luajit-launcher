@@ -1,6 +1,0 @@
-[submodule "jni/luajit/luajit"]
-	path = jni/luajit/luajit
-	url = https://github.com/LuaJIT/LuaJIT.git
-[submodule "jni/lzma/7z"]
-	path = jni/lzma/7z
-	url = https://github.com/kornelski/7z.git

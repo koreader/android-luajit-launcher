@@ -309,6 +309,8 @@ enum {
     APP_CMD_DESTROY,
 };
 
+_Pragma("GCC visibility push(default)")
+
 /**
  * Call when ALooper_pollAll() returns LOOPER_ID_MAIN, reading the next
  * app command message.
@@ -330,20 +332,12 @@ void android_app_pre_exec_cmd(struct android_app* android_app, int8_t cmd);
 void android_app_post_exec_cmd(struct android_app* android_app, int8_t cmd);
 
 /**
- * Dummy function that used to be used to prevent the linker from stripping app
- * glue code. No longer necessary, since __attribute__((visibility("default")))
- * does this for us.
- */
-__attribute__((
-    deprecated("Calls to app_dummy are no longer necessary. See "
-               "https://github.com/android-ndk/ndk/issues/381."))) void
-app_dummy();
-
-/**
  * This is the function that application code must implement, representing
  * the main entry to the app.
  */
-extern void android_main(struct android_app* app);
+void android_main(struct android_app* app);
+
+_Pragma("GCC visibility pop")
 
 #ifdef __cplusplus
 }
