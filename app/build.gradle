@@ -34,14 +34,6 @@ android {
         includeInApk = false
     }
 
-    if (buildJni.toBoolean()) {
-	externalNativeBuild {
-	    ndkBuild {
-		path file('../jni/Android.mk')
-	    }
-	}
-    }
-
     buildFeatures {
         viewBinding = true
     }
