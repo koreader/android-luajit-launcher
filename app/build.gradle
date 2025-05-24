@@ -4,7 +4,6 @@ apply plugin: 'kotlin-android'
 android {
     namespace 'org.koreader.launcher'
     ndkVersion '23.2.8568313'
-    ndkPath ndkCustomPath
     compileSdk rootProject.ext.compileSdk
     def baseVersionCode = versCode as Integer
 
@@ -32,14 +31,6 @@ android {
 
     dependenciesInfo {
         includeInApk = false
-    }
-
-    if (buildJni.toBoolean()) {
-	externalNativeBuild {
-	    ndkBuild {
-		path file('../jni/Android.mk')
-	    }
-	}
     }
 
     buildFeatures {
