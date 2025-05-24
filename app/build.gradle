@@ -19,6 +19,8 @@ android {
         buildConfigField "String", "APP_NAME", '"' + projectName + '"'
         buildConfigField "boolean", "IN_APP_UPDATES", "false"
         buildConfigField "boolean", "SUPPORTS_RUNTIME_CHANGES", "false"
+
+        buildConfigField "String", "SEVENZIP_LIB", '"' + sevenZipLib + '"'
     }
 
     sourceSets {
@@ -32,10 +34,12 @@ android {
         includeInApk = false
     }
 
-    externalNativeBuild {
-        ndkBuild {
-            path file('../jni/Android.mk')
-        }
+    if (buildJni.toBoolean()) {
+	externalNativeBuild {
+	    ndkBuild {
+		path file('../jni/Android.mk')
+	    }
+	}
     }
 
     buildFeatures {
