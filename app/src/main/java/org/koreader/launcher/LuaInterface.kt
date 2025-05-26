@@ -81,5 +81,4 @@ interface LuaInterface {
     fun startTestActivity()
     fun showFrontlightDialog(title: String, dim: String, warmth: String, okButton: String, cancelButton: String)
     fun showToast(message: String, longTimeout: Boolean)
-    fun untar(filePath: String, outputPath: String): Boolean
 }
