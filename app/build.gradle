@@ -7,6 +7,10 @@ android {
     compileSdk rootProject.ext.compileSdk
     def baseVersionCode = versCode as Integer
 
+    aaptOptions {
+        noCompress '7z'
+    }
+
     defaultConfig {
         applicationId "org.koreader.launcher"
         versionName versName
