@@ -4,6 +4,7 @@ apply plugin: 'kotlin-android'
 android {
     namespace 'org.koreader.launcher'
     ndkVersion '23.2.8568313'
+    ndkPath System.getenv('ANDROID_NDK_HOME')
     compileSdk rootProject.ext.compileSdk
     def baseVersionCode = versCode as Integer
 
