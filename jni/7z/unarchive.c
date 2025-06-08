@@ -1,5 +1,3 @@
-extern "C" {
-
 #include <limits.h>
 #include <stdlib.h>
 
@@ -82,15 +80,13 @@ Java_org_koreader_launcher_Assets_extract(JNIEnv *env,
                                           jstring payload,
                                           jstring output)
 {
-    const char *name = env->GetStringUTFChars(payload, nullptr);
-    const char *destination = env->GetStringUTFChars(output, nullptr);
+    const char *name = (*env)->GetStringUTFChars(env, payload, NULL);
+    const char *destination = (*env)->GetStringUTFChars(env, output, NULL);
 
     int r = extract_asset(AAssetManager_fromJava(env, assetsManager), name, destination);
 
-    env->ReleaseStringUTFChars(payload, name);
-    env->ReleaseStringUTFChars(output, destination);
+    (*env)->ReleaseStringUTFChars(env, payload, name);
+    (*env)->ReleaseStringUTFChars(env, output, destination);
 
     return r != ARCHIVE_OK && r != ARCHIVE_EOF;
-}
-
 }

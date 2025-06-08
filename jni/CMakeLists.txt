@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16.3)
-project(android-luajit-launcher LANGUAGES C CXX)
+project(android-luajit-launcher LANGUAGES C)
 
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(LuaJIT luajit REQUIRED IMPORTED_TARGET)
@@ -12,15 +12,13 @@ if(NOT Threads_FOUND OR NOT CMAKE_USE_PTHREADS_INIT)
 endif()
 
 add_library(7z)
-set_target_properties(7z PROPERTIES CXX_VISIBILITY_PRESET hidden)
-set_target_properties(7z PROPERTIES VISIBILITY_INLINES_HIDDEN TRUE)
+set_target_properties(7z PROPERTIES C_VISIBILITY_PRESET hidden)
 target_link_libraries(7z PRIVATE PkgConfig::libarchive android log)
-target_sources(7z PRIVATE 7z/unarchive.cpp)
+target_sources(7z PRIVATE 7z/unarchive.c)
 
 add_library(ioctl SHARED)
-set_target_properties(ioctl PROPERTIES CXX_VISIBILITY_PRESET hidden)
-set_target_properties(ioctl PROPERTIES VISIBILITY_INLINES_HIDDEN TRUE)
-target_sources(ioctl PRIVATE ioctl/ioctl.cpp)
+set_target_properties(ioctl PROPERTIES C_VISIBILITY_PRESET hidden)
+target_sources(ioctl PRIVATE ioctl/ioctl.c)
 
 add_library(luajit-launcher SHARED)
 set_target_properties(luajit-launcher PROPERTIES C_VISIBILITY_PRESET hidden)

@@ -1,7 +1,3 @@
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <jni.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -29,15 +25,14 @@ int _ioctl(const char* device, int command, int args)
 }
 
 JNIEXPORT jint JNICALL
-Java_org_koreader_launcher_device_Ioctl_ioctl(JNIEnv *env, __unused jobject,
-        jstring device, jint command, jint args)
+Java_org_koreader_launcher_device_Ioctl_ioctl(JNIEnv *env,
+                                              __unused jobject obj,
+                                              jstring device,
+                                              jint command,
+                                              jint args)
 {
-    const char *dev = env->GetStringUTFChars(device, nullptr);
+    const char *dev = (*env)->GetStringUTFChars(env, device, NULL);
     jint res = _ioctl(dev, command, args);
-    env->ReleaseStringUTFChars(device, dev);
+    (*env)->ReleaseStringUTFChars(env, device, dev);
     return res;
 }
-
-#ifdef __cplusplus
-}
-#endif
