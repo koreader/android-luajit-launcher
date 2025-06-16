@@ -57,6 +57,7 @@ object DeviceInfo {
         ENERGY,
         FIDIBOOK,
         HANVON_960,
+        HISENSE_TOUCH_LITE,
         HYREAD_GAZE_NOTE,
         HYREAD_GAZE_NOTE_CC,
         HYREAD_MINI6,
@@ -269,6 +270,10 @@ object DeviceInfo {
             // Hanvon 960
             BRAND == "freescale" && PRODUCT == "evk_6sl_eink"
             -> Id.HANVON_960
+
+            // Hisense Touch Lite
+            BRAND == "hisense" && MODEL == "hitv205n"
+            -> Id.HISENSE_TOUCH_LITE
 
             // Hyread Gaze Note
             MANUFACTURER == "hyread" && MODEL == "r08p"
