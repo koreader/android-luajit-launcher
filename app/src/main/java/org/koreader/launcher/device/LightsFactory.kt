@@ -94,6 +94,7 @@ object LightsFactory {
                     logController("TolinoNTX")
                     TolinoNtxController()
                 }
+                DeviceInfo.Id.HISENSE_TOUCH_LITE,
                 DeviceInfo.Id.TOLINO_PAGE2,
                 -> {
                     logController("TolinoNTXNoWarmth")
