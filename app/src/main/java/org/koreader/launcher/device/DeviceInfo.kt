@@ -663,6 +663,7 @@ object DeviceInfo {
         }
 
         HAS_COLOR_SCREEN = when (ID) {
+            Id.HYREAD_GAZE_NOTE_CC,
             Id.MEEBOOK_M6C,
             Id.MOOINKPLUS2C,
             Id.NONE,
