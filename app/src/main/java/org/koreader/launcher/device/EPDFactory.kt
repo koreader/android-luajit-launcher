@@ -69,6 +69,7 @@ object EPDFactory {
                 DeviceInfo.Id.NOOK_GL4,
                 DeviceInfo.Id.TOLINO_EPOS3,
                 DeviceInfo.Id.TOLINO_VISION6,
+                DeviceInfo.Id.TOLINO_SHINE4,
                 -> {
                     logController("NOOK_GL4")
                     NGL4EPDController()

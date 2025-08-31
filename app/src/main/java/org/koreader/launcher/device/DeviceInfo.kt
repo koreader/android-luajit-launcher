@@ -614,6 +614,10 @@ object DeviceInfo {
             BRAND == STR_KOBO && MODEL == STR_TOLINO && DEVICE == STR_NTX && HARDWARE == "e60k00"
             -> Id.TOLINO_SHINE3
 
+            // Tolino Shine 4
+            BRAND == STR_KOBO && MODEL == "tolino shine 4" && DEVICE == STR_TOLINO && HARDWARE == "sun8iw15p1"
+            -> Id.TOLINO_SHINE4
+
             // Tolino Vision 4 also has warmth lights, but with ntx_io file
             BRAND == STR_KOBO && MODEL == STR_TOLINO && DEVICE == STR_NTX && HARDWARE == "e60q50"
             -> Id.TOLINO_VISION4
