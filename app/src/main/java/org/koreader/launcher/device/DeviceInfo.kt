@@ -141,6 +141,7 @@ object DeviceInfo {
         TOLINO_EPOS3,
         TOLINO_PAGE2,
         TOLINO_SHINE3,
+        TOLINO_SHINE4,
         TOLINO_VISION4,
         TOLINO_VISION5,
         TOLINO_VISION6,
