@@ -91,11 +91,7 @@ class TolinoB300Controller : Ioctl(), LightsInterface {
             )
 
             // crappy toggle brightness to force warmth refresh
-            val currentBrightness: Int =
-            Settings.System.getInt(
-                    activity.applicationContext.contentResolver,
-                    SCREEN_BRIGHTNESS
-            )
+            val currentBrightness: Int = getBrightness(activity)
             Settings.System.putInt(
                     activity.applicationContext.contentResolver,
                     SCREEN_BRIGHTNESS,
