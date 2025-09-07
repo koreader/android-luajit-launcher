@@ -7,8 +7,8 @@ import org.koreader.launcher.device.Ioctl
 import org.koreader.launcher.device.LightsInterface
 
 // Light and warmth controller for B300 Tolino devices (Epos 3, Vision 6, Shine 4)
-// Need testers for Shine 4, I'm operating under the assumption that this works.
-// Vision 6 has inverted warmth from personal testing.
+// Need testers for Shine 4 and Epos 3, Vision 6 tested personally.
+// Vision 6 has inverted warmth.
 class TolinoB300Controller : Ioctl(), LightsInterface {
 
     companion object {
