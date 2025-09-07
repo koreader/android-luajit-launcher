@@ -8,7 +8,7 @@ import org.koreader.launcher.device.LightsInterface
 
 // Light and warmth controller for B300 Tolino devices (Epos 3, Vision 6, Shine 4)
 // Need testers for Shine 4, I'm operating under the assumption that this works.
-// Vision 6 has inverted warmth from personal testing. 
+// Vision 6 has inverted warmth from personal testing.
 class TolinoB300Controller : Ioctl(), LightsInterface {
 
     companion object {
@@ -16,6 +16,8 @@ class TolinoB300Controller : Ioctl(), LightsInterface {
         private const val BRIGHTNESS_MAX = 100
         private const val WARMTH_MAX = 10
         private const val MIN = 0
+        private const val SCREEN_BRIGHTNESS = "screen_brightness"
+        private const val SCREEN_BRIGHTNESS_COLOR = "screen_brightness_color"
     }
 
     override fun getPlatform(): String {
@@ -40,7 +42,7 @@ class TolinoB300Controller : Ioctl(), LightsInterface {
 
     override fun getBrightness(activity: Activity): Int {
         return try {
-            Settings.System.getInt(activity.applicationContext.contentResolver, "screen_brightness")
+            Settings.System.getInt(activity.applicationContext.contentResolver, SCREEN_BRIGHTNESS)
         } catch (e: Exception) {
             Log.w(TAG, e.toString())
             0
@@ -51,7 +53,7 @@ class TolinoB300Controller : Ioctl(), LightsInterface {
         return try {
             Settings.System.getInt(
                     activity.applicationContext.contentResolver,
-                    "screen_brightness_color"
+                    SCREEN_BRIGHTNESS_COLOR
             )
         } catch (e: Exception) {
             Log.w(TAG, e.toString())
@@ -67,7 +69,7 @@ class TolinoB300Controller : Ioctl(), LightsInterface {
         try {
             Settings.System.putInt(
                     activity.applicationContext.contentResolver,
-                    "screen_brightness",
+                    SCREEN_BRIGHTNESS,
                     brightness
             )
         } catch (e: Exception) {
@@ -84,7 +86,7 @@ class TolinoB300Controller : Ioctl(), LightsInterface {
         try {
             Settings.System.putInt(
                     activity.applicationContext.contentResolver,
-                    "screen_brightness_color",
+                    SCREEN_BRIGHTNESS_COLOR,
                     warmth
             )
 
@@ -92,16 +94,16 @@ class TolinoB300Controller : Ioctl(), LightsInterface {
             val currentBrightness: Int =
             Settings.System.getInt(
                     activity.applicationContext.contentResolver,
-                    "screen_brightness"
+                    SCREEN_BRIGHTNESS
             )
             Settings.System.putInt(
                     activity.applicationContext.contentResolver,
-                    "screen_brightness",
+                    SCREEN_BRIGHTNESS,
                     currentBrightness + 1
             )
             Settings.System.putInt(
                     activity.applicationContext.contentResolver,
-                    "screen_brightness",
+                    SCREEN_BRIGHTNESS,
                     currentBrightness
             )
         } catch (e: Exception) {
