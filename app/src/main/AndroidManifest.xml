@@ -67,6 +67,8 @@
                 <data android:mimeType="application/rtf" />
                 <data android:mimeType="application/tcr" />
                 <data android:mimeType="application/vnd.amazon.mobi8-ebook" />
+                <data android:mimeType="application/vnd.comicbook-rar" />
+                <data android:mimeType="application/vnd.rar" />
                 <data android:mimeType="application/vnd.comicbook+tar" />
                 <data android:mimeType="application/vnd.comicbook+zip" />
                 <data android:mimeType="application/vnd.ms-htmlhelp" />
@@ -117,6 +119,7 @@
                 <data android:pathPattern=".*\\.pdf" />
                 <data android:pathPattern=".*\\.rtf" />
                 <data android:pathPattern=".*\\.mobi" />
+                <data android:pathPattern=".*\\.cbr" />
                 <data android:pathPattern=".*\\.cbt" />
                 <data android:pathPattern=".*\\.cbz" />
                 <data android:pathPattern=".*\\.odt" />
