@@ -83,7 +83,7 @@ class TolinoB300Controller : Ioctl(), LightsInterface {
             if (needsInvertedWarmth()) WARMTH_MAX - raw else raw
         } catch (e: Exception) {
             Log.w(TAG, e.toString())
-            0   
+            0
         }
     }
 
