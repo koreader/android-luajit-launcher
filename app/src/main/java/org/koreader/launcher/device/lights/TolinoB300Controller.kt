@@ -3,12 +3,14 @@ package org.koreader.launcher.device.lights
 import android.app.Activity
 import android.provider.Settings
 import android.util.Log
+import android.widget.Toast
+import android.os.Looper
+import android.os.Handler
 import org.koreader.launcher.device.Ioctl
 import org.koreader.launcher.device.LightsInterface
+import org.koreader.launcher.device.DeviceInfo
 
 // Light and warmth controller for B300 Tolino devices (Epos 3, Vision 6, Shine 4)
-// Need testers for Shine 4, I'm operating under the assumption that this works.
-// Vision 6 has inverted warmth from personal testing.
 class TolinoB300Controller : Ioctl(), LightsInterface {
 
     companion object {
@@ -18,6 +20,29 @@ class TolinoB300Controller : Ioctl(), LightsInterface {
         private const val MIN = 0
         private const val SCREEN_BRIGHTNESS = "screen_brightness"
         private const val SCREEN_BRIGHTNESS_COLOR = "screen_brightness_color"
+    }
+
+    private fun needsInvertedWarmth(): Boolean {
+        return DeviceInfo.ID == DeviceInfo.Id.TOLINO_VISION6 ||
+               DeviceInfo.ID == DeviceInfo.Id.TOLINO_SHINE4
+    }
+
+    private fun showToastOnUiThread(activity: Activity, message: String) {
+        Handler(Looper.getMainLooper()).post {
+            Toast.makeText(activity.applicationContext, message, Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun ensureWriteSettingsPermission(activity: Activity): Boolean {
+        if (!Settings.System.canWrite(activity.applicationContext)) {
+            showToastOnUiThread(
+                activity,
+                "Please enable 'Modify system settings' for KOReader in Android settings."
+            )
+            Log.w(TAG, "WRITE_SETTINGS permission not granted.")
+            return false
+        }
+        return true
     }
 
     override fun getPlatform(): String {
@@ -51,16 +76,19 @@ class TolinoB300Controller : Ioctl(), LightsInterface {
 
     override fun getWarmth(activity: Activity): Int {
         return try {
-            Settings.System.getInt(
-                    activity.applicationContext.contentResolver,
-                    SCREEN_BRIGHTNESS_COLOR
+            val raw = Settings.System.getInt(
+                activity.applicationContext.contentResolver,
+                SCREEN_BRIGHTNESS_COLOR
             )
+            if (needsInvertedWarmth()) WARMTH_MAX - raw else raw
         } catch (e: Exception) {
             Log.w(TAG, e.toString())
+            0   
         }
     }
 
     override fun setBrightness(activity: Activity, brightness: Int) {
+        if (!ensureWriteSettingsPermission(activity)) return
         if (brightness < MIN || brightness > BRIGHTNESS_MAX) {
             Log.w(TAG, "brightness value of of range: $brightness")
             return
@@ -78,29 +106,30 @@ class TolinoB300Controller : Ioctl(), LightsInterface {
     }
 
     override fun setWarmth(activity: Activity, warmth: Int) {
+        if (!ensureWriteSettingsPermission(activity)) return
         if (warmth < MIN || warmth > WARMTH_MAX) {
             Log.w(TAG, "warmth value of of range: $warmth")
             return
         }
-        Log.v(TAG, "Setting warmth to $warmth")
+        val warmthToSet = if (needsInvertedWarmth()) WARMTH_MAX - warmth else warmth
+        Log.v(TAG, "Setting warmth to $warmth (actual: $warmthToSet)")
         try {
             Settings.System.putInt(
-                    activity.applicationContext.contentResolver,
-                    SCREEN_BRIGHTNESS_COLOR,
-                    warmth
+                activity.applicationContext.contentResolver,
+                SCREEN_BRIGHTNESS_COLOR,
+                warmthToSet
             )
-
-            // crappy toggle brightness to force warmth refresh
+            // workaround, toggle brightness to force warmth refresh
             val currentBrightness: Int = getBrightness(activity)
             Settings.System.putInt(
-                    activity.applicationContext.contentResolver,
-                    SCREEN_BRIGHTNESS,
-                    currentBrightness + 1
+                activity.applicationContext.contentResolver,
+                SCREEN_BRIGHTNESS,
+                currentBrightness + 1
             )
             Settings.System.putInt(
-                    activity.applicationContext.contentResolver,
-                    SCREEN_BRIGHTNESS,
-                    currentBrightness
+                activity.applicationContext.contentResolver,
+                SCREEN_BRIGHTNESS,
+                currentBrightness
             )
         } catch (e: Exception) {
             Log.w(TAG, "$e")
