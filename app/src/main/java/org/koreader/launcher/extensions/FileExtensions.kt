@@ -41,10 +41,12 @@ fun File.read(): Int {
     }
 }
 
-fun File.write(value: Int) {
+fun File.write(value: Int): Boolean {
     try {
         writeText(value.toString())
+        return true
     } catch (e: Exception) {
         e.printStackTrace()
+        return false
     }
 }

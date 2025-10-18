@@ -106,6 +106,10 @@ object LightsFactory {
                     logController("TolinoRoot")
                     TolinoRootController()
                 }
+                DeviceInfo.Id.INKBOOKFOCUS_PLUS -> {
+                    logController("Rockchip3566Controller")
+                    Rockchip3566Controller()
+                }
                 else -> {
                     logController("Generic")
                     GenericController()
