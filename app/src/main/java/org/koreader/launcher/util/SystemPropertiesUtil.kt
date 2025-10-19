@@ -36,7 +36,7 @@ fun getSystemProperty(key: String, default: String): String? {
     try {
         return systemPropertiesMethodGet?.invoke(systemPropertiesClass, key, default) as String
     } catch (e: Exception) {
-        Log.e("SystemPropertiesUtil", "setSystemProperty has failed!", e)
+        Log.e("SystemPropertiesUtil", "getSystemProperty has failed!", e)
         return null
     }
 }

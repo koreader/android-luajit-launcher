@@ -14,7 +14,7 @@ fun Class<*>.getMethodOrNull(
         return this
             .getMethod(methodName, *parameterTypes)
     } catch (e: Exception) {
-        Log.e("ClassExtensions", "getMethod failed", e)
+        Log.e("ClassExtensions", "Class.getMethod failed", e)
         return null
     }
 }
@@ -26,7 +26,7 @@ fun forNameOrNull(className: String): Class<*>? {
     return try {
         Class.forName(className)
     } catch (e: Exception) {
-        Log.e("ClassExtensions", "forNameOrNull failed", e)
+        Log.e("ClassExtensions", "Class.forName failed", e)
         null
     }
 }
