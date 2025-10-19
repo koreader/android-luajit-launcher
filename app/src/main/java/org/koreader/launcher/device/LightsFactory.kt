@@ -106,6 +106,13 @@ object LightsFactory {
                     logController("TolinoRoot")
                     TolinoRootController()
                 }
+                DeviceInfo.Id.TOLINO_EPOS3,
+                DeviceInfo.Id.TOLINO_VISION6,
+                DeviceInfo.Id.TOLINO_SHINE4,
+                -> {
+                    logController("TolinoB300Controller")
+                    TolinoB300Controller()
+                }
                 else -> {
                     logController("Generic")
                     GenericController()
