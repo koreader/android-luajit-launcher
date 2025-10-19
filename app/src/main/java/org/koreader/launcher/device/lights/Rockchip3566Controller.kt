@@ -229,8 +229,8 @@ class Rockchip3566Controller : LightsInterface {
                 ?.invoke(sysUtil!!.instance, ledB)
         }
         Log.i(
-            TAG, "setLight=(brightness: ${brightness}, temperature: $temperature), " +
-                "setLeds=(leda: ${ledA}, ledb: $ledB)"
+            TAG, "setLight=(brightness: $brightness, temperature: $temperature), " +
+                "setLeds=(leda: $ledA, ledb: $ledB)"
         )
 
         // com.android.systemui has registered a broadcast receiver to this intent action
