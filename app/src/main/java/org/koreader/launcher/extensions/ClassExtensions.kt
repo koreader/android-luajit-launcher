@@ -20,6 +20,22 @@ fun Class<*>.getMethodOrNull(
 }
 
 /**
+ * Safe function for [Method.invoke].
+ */
+inline fun <reified T> Method.invokeOrNull(
+    instance: Any,
+    methodName: String,
+    vararg parameterTypes: Class<*>,
+): T? {
+    try {
+        return this.invoke(instance, methodName, *parameterTypes) as T
+    } catch (e: Exception) {
+        Log.e("ClassExtensions", "Method.invokeOrNull failed", e)
+        return null
+    }
+}
+
+/**
  * Safe function for [Class.forName].
  */
 fun forNameOrNull(className: String): Class<*>? {

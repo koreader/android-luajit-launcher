@@ -1,6 +1,7 @@
 package org.koreader.launcher.device
 
 import android.util.Log
+import org.koreader.launcher.BuildConfig
 import org.koreader.launcher.device.lights.*
 import java.util.*
 
@@ -107,7 +108,9 @@ object LightsFactory {
                     TolinoRootController()
                 }
                 DeviceInfo.Id.INKBOOKFOCUS_PLUS -> {
-                    logController("Rockchip3566Controller")
+                    logController("Rockchip3566Controller") {
+                        Rockchip3566Controller.reportApiAvailability()
+                    }
                     Rockchip3566Controller()
                 }
                 else -> {
@@ -117,8 +120,13 @@ object LightsFactory {
             }
         }
 
-    private fun logController(name: String?) {
+    private fun logController(name: String, extendedLog: (() -> String)? = null) {
         Log.i(TAG, String.format(Locale.US,
             "Using %s driver", name))
+        if (BuildConfig.DEBUG) {
+            extendedLog?.invoke()?.let {
+                Log.i(TAG, it)
+            }
+        }
     }
 }

@@ -12,8 +12,10 @@ import org.koreader.launcher.device.lights.Rockchip3566Controller.Companion.SYS_
 import org.koreader.launcher.device.lights.Rockchip3566Controller.Companion.SYS_UTIL_RK3566_CLASS_NAME
 import org.koreader.launcher.extensions.forNameOrNull
 import org.koreader.launcher.extensions.getMethodOrNull
-import org.koreader.launcher.extensions.read
+import org.koreader.launcher.extensions.invokeOrNull
+import org.koreader.launcher.extensions.readOrElse
 import org.koreader.launcher.extensions.write
+import org.koreader.launcher.util.ANDROID_OS_SYS_PROP_CLASS_NAME
 import org.koreader.launcher.util.getSystemProperty
 import org.koreader.launcher.util.setSystemProperty
 import java.io.File
@@ -39,40 +41,40 @@ import java.io.File
 class Rockchip3566Controller : LightsInterface {
 
     companion object Companion {
-        private const val TAG = "Rockchip3566Controller"
+        const val TAG = "Rockchip3566Controller"
         private const val BRIGHTNESS_MAX = 180
         private const val WARMTH_MAX = 200
         private const val MIN = 0
 
-        private const val SYS_UTIL_RK3566_CLASS_NAME = "android.yitoa.rk3566.SysUtil"
+        const val SYS_UTIL_RK3566_CLASS_NAME = "android.yitoa.rk3566.SysUtil"
 
-        private const val SYS_UTIL_METHOD_SET_LED_A_BRIGHTNESS = "setBackLightLedaBrightness"
-        private const val SYS_UTIL_METHOD_GET_MAX_LED_A_BRIGHTNESS = "getBackLightLedaMaxBrightness"
-        private const val SYS_UTIL_METHOD_SET_LED_B_BRIGHTNESS = "setBackLightLedbBrightness"
-        private const val SYS_UTIL_METHOD_GET_MAX_LED_B_BRIGHTNESS = "getBackLightLedbMaxBrightness"
+        const val SYS_UTIL_METHOD_SET_LED_A_BRIGHTNESS = "setBackLightLedaBrightness"
+        const val SYS_UTIL_METHOD_GET_MAX_LED_A_BRIGHTNESS = "getBackLightLedaMaxBrightness"
+        const val SYS_UTIL_METHOD_SET_LED_B_BRIGHTNESS = "setBackLightLedbBrightness"
+        const val SYS_UTIL_METHOD_GET_MAX_LED_B_BRIGHTNESS = "getBackLightLedbMaxBrightness"
 
-        private const val SYS_PROP_BRIGHTNESS = "persist.inkbook.frontlight.brightness"
-        private const val SYS_PROP_TEMPERATURE = "persist.inkbook.frontlight.temperature"
-
-        // typo exists in system property
-        private const val SYS_PROP_COLD_EFFICIENCY = "persist.inkbook.light.coldefficancy"
-        private const val SYS_PROP_COLD_EFF_DEFAULT = 1
+        const val SYS_PROP_BRIGHTNESS = "persist.inkbook.frontlight.brightness"
+        const val SYS_PROP_TEMPERATURE = "persist.inkbook.frontlight.temperature"
 
         // typo exists in system property
-        private const val SYS_PROP_WARM_EFFICIENCY = "persist.inkbook.light.warmefficancy"
-        private const val SYS_PROP_WARM_EFF_DEFAULT = 1
+        const val SYS_PROP_COLD_EFFICIENCY = "persist.inkbook.light.coldefficancy"
+        const val SYS_PROP_COLD_EFF_DEFAULT = 1
+
+        // typo exists in system property
+        const val SYS_PROP_WARM_EFFICIENCY = "persist.inkbook.light.warmefficancy"
+        const val SYS_PROP_WARM_EFF_DEFAULT = 1
 
         // system properties for led a and b
-        private const val SYS_PROP_LED_A = "persist.yitoa.backlight.leda.brightness"
-        private const val SYS_PROP_LED_B = "persist.yitoa.backlight.ledb.brightness"
+        const val SYS_PROP_LED_A = "persist.yitoa.backlight.leda.brightness"
+        const val SYS_PROP_LED_B = "persist.yitoa.backlight.ledb.brightness"
 
         // system files for backlight brightness led a and b
-        private const val LED_A_FILE = "/sys/class/backlight/lm3630a_leda/brightness"
-        private const val LED_B_FILE = "/sys/class/backlight/lm3630a_ledb/brightness"
+        val LED_A_FILE = File("/sys/class/backlight/lm3630a_leda/brightness")
+        val LED_B_FILE = File("/sys/class/backlight/lm3630a_ledb/brightness")
 
         // system files for the max backlight brightness for led a and b
-        private const val MAX_LED_A_FILE = "/sys/class/backlight/lm3630a_leda/max_brightness"
-        private const val MAX_LED_B_FILE = "/sys/class/backlight/lm3630a_ledb/max_brightness"
+        val MAX_LED_A_FILE = File("/sys/class/backlight/lm3630a_leda/max_brightness")
+        val MAX_LED_B_FILE = File("/sys/class/backlight/lm3630a_ledb/max_brightness")
         private const val DEFAULT_MAX = 200
     }
 
@@ -187,12 +189,12 @@ class Rockchip3566Controller : LightsInterface {
         val sysUtil: ClassWrapper? by lazy { getSysUtilClass(context) }
 
         // retrieves the max leda and ledb
-        val maxLedA = File(MAX_LED_A_FILE).readOrElse {
+        val maxLedA = MAX_LED_A_FILE.readOrElse {
             (sysUtil?.clazz?.getMethodOrNull(
                 methodName = SYS_UTIL_METHOD_GET_MAX_LED_A_BRIGHTNESS
             )?.invoke(sysUtil!!.instance) as? Int) ?: DEFAULT_MAX
         }
-        val maxLedB = File(MAX_LED_B_FILE).readOrElse {
+        val maxLedB = MAX_LED_B_FILE.readOrElse {
             (sysUtil?.clazz?.getMethodOrNull(
                 methodName = SYS_UTIL_METHOD_GET_MAX_LED_B_BRIGHTNESS
             )?.invoke(sysUtil!!.instance) as? Int) ?: DEFAULT_MAX
@@ -208,7 +210,7 @@ class Rockchip3566Controller : LightsInterface {
 
         // set the leda and ledb based on writing to the file directly
         // as a fallback, call the reflection function
-        if (File(LED_A_FILE).write(ledA)) {
+        if (LED_A_FILE.write(ledA)) {
             setSystemProperty(SYS_PROP_LED_A, ledA.toString())
         } else {
             sysUtil
@@ -218,7 +220,7 @@ class Rockchip3566Controller : LightsInterface {
                 )
                 ?.invoke(sysUtil!!.instance, ledA)
         }
-        if (File(LED_B_FILE).write(ledB)) {
+        if (LED_B_FILE.write(ledB)) {
             setSystemProperty(SYS_PROP_LED_B, ledB.toString())
         } else {
             sysUtil
@@ -286,11 +288,68 @@ class Rockchip3566Controller : LightsInterface {
     )
 }
 
-private fun File.readOrElse(block: () -> Int): Int {
-    val value = read()
-    return if (value == 0) {
-        block()
-    } else {
-        value
+/**
+ * Reports the availability of the used APIs to control lights.
+ */
+fun Rockchip3566Controller.Companion.reportApiAvailability(): String {
+    val logMessage = StringBuilder()
+
+    logMessage.appendLine("Checking API availability for driver $TAG")
+
+    logMessage.appendLine("Check read/write permissions for hardware system files")
+    val ledFiles = listOf(LED_A_FILE, LED_B_FILE, MAX_LED_A_FILE, MAX_LED_B_FILE)
+    ledFiles.forEach { file ->
+        logMessage.appendLine("\t${file.absolutePath} - readable: ${file.canRead()}, writable: ${file.canWrite()}")
     }
+
+    logMessage.appendLine("Check system utility class via reflection")
+    val sysUtilClass = forNameOrNull(SYS_UTIL_RK3566_CLASS_NAME)
+    logMessage.appendLine("Class $SYS_UTIL_RK3566_CLASS_NAME - available: ${sysUtilClass != null}")
+
+    if (sysUtilClass != null) {
+        val brightnessMethods = listOf(
+            SYS_UTIL_METHOD_SET_LED_A_BRIGHTNESS,
+            SYS_UTIL_METHOD_SET_LED_B_BRIGHTNESS
+        )
+        brightnessMethods.forEach { methodName ->
+            val isAvailable = sysUtilClass.getMethodOrNull(methodName, Int::class.java) != null
+            logMessage.appendLine("\tMethod $methodName - available: $isAvailable")
+        }
+
+        val maxBrightnessMethods = listOf(
+            SYS_UTIL_METHOD_GET_MAX_LED_A_BRIGHTNESS,
+            SYS_UTIL_METHOD_GET_MAX_LED_B_BRIGHTNESS
+        )
+        maxBrightnessMethods.forEach { methodName ->
+            val isAvailable = sysUtilClass.getMethodOrNull(methodName) != null
+            logMessage.appendLine("\tMethod $methodName - available: $isAvailable")
+        }
+    }
+
+    logMessage.appendLine("Check system properties")
+    val sysPropClass = forNameOrNull(ANDROID_OS_SYS_PROP_CLASS_NAME)
+    logMessage.appendLine("Class $ANDROID_OS_SYS_PROP_CLASS_NAME - available: ${sysPropClass != null}")
+
+    if (sysPropClass != null) {
+        val getSysPropMethod = sysPropClass.getMethodOrNull("get", String::class.java)
+        if (getSysPropMethod != null) {
+            val systemProperties = listOf(
+                SYS_PROP_BRIGHTNESS,
+                SYS_PROP_TEMPERATURE,
+                SYS_PROP_COLD_EFFICIENCY,
+                SYS_PROP_WARM_EFFICIENCY,
+                SYS_PROP_LED_A,
+                SYS_PROP_LED_B
+            )
+
+            systemProperties.forEach { propertyName ->
+                val value = getSysPropMethod.invokeOrNull<String>(sysPropClass, propertyName)
+                val displayValue = value?.ifEmpty { "n/a" }
+                logMessage.appendLine("\tSystem property $propertyName - value: $displayValue")
+            }
+        }
+    }
+
+    return logMessage.toString()
 }
+

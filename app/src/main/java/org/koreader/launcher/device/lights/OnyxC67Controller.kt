@@ -3,7 +3,7 @@ package org.koreader.launcher.device.lights
 import android.app.Activity
 import android.util.Log
 import org.koreader.launcher.device.LightsInterface
-import org.koreader.launcher.extensions.read
+import org.koreader.launcher.extensions.readOrElse
 import org.koreader.launcher.extensions.write
 import java.io.File
 
@@ -36,7 +36,7 @@ class OnyxC67Controller : LightsInterface {
     }
 
     override fun getBrightness(activity: Activity): Int {
-        return File(BRIGHTNESS_FILE).read()
+        return File(BRIGHTNESS_FILE).readOrElse()
     }
 
     override fun getWarmth(activity: Activity): Int {

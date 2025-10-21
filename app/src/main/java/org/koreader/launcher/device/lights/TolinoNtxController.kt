@@ -5,7 +5,7 @@ import android.provider.Settings
 import android.util.Log
 import org.koreader.launcher.device.Ioctl
 import org.koreader.launcher.device.LightsInterface
-import org.koreader.launcher.extensions.read
+import org.koreader.launcher.extensions.readOrElse
 import java.io.File
 
 /* Special controller for Tolino Vision5
@@ -61,7 +61,7 @@ class TolinoNtxController : Ioctl(), LightsInterface {
 
     override fun getWarmth(activity: Activity): Int {
         if (currentWarmth == null) {
-            currentWarmth = WARMTH_MAX - File(COLOR_FILE).read()
+            currentWarmth = WARMTH_MAX - File(COLOR_FILE).readOrElse()
         }
         return currentWarmth ?: WARMTH_MAX
     }

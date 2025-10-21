@@ -4,8 +4,10 @@ import android.util.Log
 import org.koreader.launcher.extensions.forNameOrNull
 import java.lang.reflect.Method
 
+const val ANDROID_OS_SYS_PROP_CLASS_NAME = "android.os.SystemProperties"
+
 private val systemPropertiesClass: Class<*>? by lazy {
-    forNameOrNull("android.os.SystemProperties")
+    forNameOrNull(ANDROID_OS_SYS_PROP_CLASS_NAME)
 }
 
 private val systemPropertiesMethodSet: Method? by lazy {
