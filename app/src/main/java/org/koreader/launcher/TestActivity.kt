@@ -27,6 +27,7 @@ import org.koreader.launcher.device.lights.OnyxWarmthController
 import org.koreader.launcher.device.lights.TolinoRootController
 import org.koreader.launcher.device.lights.TolinoNtxController
 import org.koreader.launcher.device.lights.TolinoNtxNoWarmthController
+import org.koreader.launcher.device.lights.TolinoB300Controller
 import org.koreader.launcher.device.lights.BoyueS62RootController
 import org.koreader.launcher.device.lights.Rockchip3566Controller
 import org.koreader.launcher.dialog.LightDialog
@@ -83,6 +84,7 @@ class TestActivity: AppCompatActivity() {
         lightsMap["Tolino Ntx"] = TolinoNtxController()
         lightsMap["Tolino Ntx (no warmth)"] = TolinoNtxNoWarmthController()
         lightsMap["Rockchip RK3566"] = Rockchip3566Controller()
+        lightsMap["Tolino B300"] = TolinoB300Controller()
 
         // Device ID
         binding.info.append("Manufacturer: ${DeviceInfo.MANUFACTURER}\n")
