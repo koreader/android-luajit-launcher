@@ -153,18 +153,16 @@ class Rockchip3566Controller : LightsInterface {
     }
 
     private fun setBrightnessInternal(context: Context, brightness: Int) {
-        val defaultTemp = 0
         val temperature =
-            getSystemProperty(SYS_PROP_TEMPERATURE, 0.toString())
-                ?.toIntOrNull() ?: defaultTemp
+            getSystemProperty(SYS_PROP_TEMPERATURE, MIN.toString())
+                ?.toIntOrNull() ?: MIN
         setLight(context, brightness, temperature)
     }
 
     private fun setTemperatureInternal(context: Context, temperature: Int) {
-        val defaultTemp = 0
         val brightness =
-            getSystemProperty(SYS_PROP_BRIGHTNESS, 0.toString())
-                ?.toIntOrNull() ?: defaultTemp
+            getSystemProperty(SYS_PROP_BRIGHTNESS, MIN.toString())
+                ?.toIntOrNull() ?: MIN
         setLight(context, brightness, temperature)
     }
 
