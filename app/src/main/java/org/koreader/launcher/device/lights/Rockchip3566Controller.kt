@@ -297,7 +297,8 @@ fun Rockchip3566Controller.Companion.reportApiAvailability(): String {
     logMessage.appendLine("Check read/write permissions for hardware system files")
     val ledFiles = listOf(LED_A_FILE, LED_B_FILE, MAX_LED_A_FILE, MAX_LED_B_FILE)
     ledFiles.forEach { file ->
-        logMessage.appendLine("\t${file.absolutePath} - readable: ${file.canRead()}, writable: ${file.canWrite()}")
+        logMessage.appendLine("\t${file.absolutePath} - readable: ${file.canRead()}, " +
+            "writable: ${file.canWrite()}${if (file.canRead()) " - current value: ${file.readOrElse()}" else ""}")
     }
 
     logMessage.appendLine("Check system utility class via reflection")
