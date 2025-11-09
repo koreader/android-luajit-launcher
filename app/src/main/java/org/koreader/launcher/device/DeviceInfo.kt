@@ -361,6 +361,12 @@ object DeviceInfo {
             && DEVICE.startsWith("c67")
             -> Id.ONYX_C67
 
+            // Noblex ER6A02 (Rebranded Onyx C67)
+            MANUFACTURER == "onyx"
+            && PRODUCT == "er6a02"
+            && DEVICE == "er6a02"
+            -> Id.ONYX_C67
+
             // ONYX DARWIN 7
             MANUFACTURER == "onyx"
             && (PRODUCT == "mc_darwin7" || PRODUCT == "darwin7")
