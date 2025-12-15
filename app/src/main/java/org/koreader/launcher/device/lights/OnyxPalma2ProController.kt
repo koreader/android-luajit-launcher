@@ -25,33 +25,24 @@ class OnyxPalma2ProController : LightsInterface {
         private const val WARMTH_MAX_FILE = "/sys/class/backlight/onyx_bl_ct/max_brightness"
     }
 
-    private lateinit var cachedBrightnessMax: Int
-    private lateinit var cachedWarmthMax: Int
-
-    private fun readMaxBrightness(): Int {
-        if (::cachedBrightnessMax.isInitialized.not()) {
-            cachedBrightnessMax = try {
-                val value = File(BRIGHTNESS_MAX_FILE).read()
-                if (value > 0) value else DEFAULT_BRIGHTNESS_MAX
-            } catch (e: Exception) {
-                Log.w(TAG, "Failed to read max brightness, using default: $e")
-                DEFAULT_BRIGHTNESS_MAX
-            }
+    private val cachedBrightnessMax: Int by lazy {
+        try {
+            val value = File(BRIGHTNESS_MAX_FILE).read()
+            if (value > 0) value else DEFAULT_BRIGHTNESS_MAX
+        } catch (e: Exception) {
+            Log.w(TAG, "Failed to read max brightness, using default: $e")
+            DEFAULT_BRIGHTNESS_MAX
         }
-        return cachedBrightnessMax
     }
 
-    private fun readMaxWarmth(): Int {
-        if (::cachedWarmthMax.isInitialized.not()) {
-            cachedWarmthMax = try {
-                val value = File(WARMTH_MAX_FILE).read()
-                if (value > 0) value else DEFAULT_WARMTH_MAX
-            } catch (e: Exception) {
-                Log.w(TAG, "Failed to read max warmth, using default: $e")
-                DEFAULT_WARMTH_MAX
-            }
+    private val cachedWarmthMax: Int by lazy {
+        try {
+            val value = File(WARMTH_MAX_FILE).read()
+            if (value > 0) value else DEFAULT_WARMTH_MAX
+        } catch (e: Exception) {
+            Log.w(TAG, "Failed to read max warmth, using default: $e")
+            DEFAULT_WARMTH_MAX
         }
-        return cachedWarmthMax
     }
 
     override fun getPlatform(): String {
@@ -89,9 +80,8 @@ class OnyxPalma2ProController : LightsInterface {
     }
 
     override fun setBrightness(activity: Activity, brightness: Int) {
-        val maxBrightness = readMaxBrightness()
-        if (brightness !in MIN..maxBrightness) {
-            Log.w(TAG, "brightness value out of range: $brightness (max: $maxBrightness)")
+        if (brightness !in MIN..cachedBrightnessMax) {
+            Log.w(TAG, "brightness value out of range: $brightness (max: $cachedBrightnessMax)")
             return
         }
         Log.v(TAG, "Setting brightness to $brightness")
@@ -103,9 +93,8 @@ class OnyxPalma2ProController : LightsInterface {
     }
 
     override fun setWarmth(activity: Activity, warmth: Int) {
-        val maxWarmth = readMaxWarmth()
-        if (warmth !in MIN..maxWarmth) {
-            Log.w(TAG, "warmth value out of range: $warmth (max: $maxWarmth)")
+        if (warmth !in MIN..cachedWarmthMax) {
+            Log.w(TAG, "warmth value out of range: $warmth (max: $cachedWarmthMax)")
             return
         }
         Log.v(TAG, "Setting warmth to $warmth")
@@ -121,7 +110,7 @@ class OnyxPalma2ProController : LightsInterface {
     }
 
     override fun getMaxWarmth(): Int {
-        return readMaxWarmth()
+        return cachedWarmthMax
     }
 
     override fun getMinBrightness(): Int {
@@ -129,7 +118,7 @@ class OnyxPalma2ProController : LightsInterface {
     }
 
     override fun getMaxBrightness(): Int {
-        return readMaxBrightness()
+        return cachedBrightnessMax
     }
 
     override fun enableFrontlightSwitch(activity: Activity): Int {
