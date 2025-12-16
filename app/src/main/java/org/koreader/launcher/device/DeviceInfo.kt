@@ -73,13 +73,13 @@ object DeviceInfo {
         MEEBOOK_M6C,
         MEEBOOK_M7,
         MEEBOOK_P6,
-        MEEBOOK_P10,
         MOAAN_MIX7,
         MOOINKPLUS2C,
         NABUK,
         NOOK,
         NOOK_GL4,
         NOOK_GLPLUS,
+        OBOOK_P10D,
         OBOOK_P78D,
         ONYX_C67,
         ONYX_DARWIN5,
@@ -344,10 +344,6 @@ object DeviceInfo {
             MANUFACTURER == "haoqing" && MODEL == "p6"
             -> Id.MEEBOOK_P6
 
-            // Meebook P10
-            MANUFACTURER == STR_ROCKCHIP && MODEL == "p10d"
-            -> Id.MEEBOOK_P10
-
             // Moaan Mix7
             MANUFACTURER == STR_ROCKCHIP && MODEL == "moaanmix7"
             -> Id.MOAAN_MIX7
@@ -374,6 +370,10 @@ object DeviceInfo {
             && (MODEL == "bnrv510" || MODEL == "bnrv520" || MODEL == "bnrv700"
                 || MODEL == "evk_mx6sl" || MODEL.startsWith("ereader"))
             -> Id.NOOK
+
+            // OBOOK P10D
+            MANUFACTURER == STR_ROCKCHIP && MODEL == "p10d"
+            -> Id.OBOOK_P10D
 
             // OBOOK P78D
             MANUFACTURER == STR_ROCKCHIP && PRODUCT == "rk3566_78d" && MODEL == "p78d"
