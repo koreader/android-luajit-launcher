@@ -18,6 +18,7 @@ object LightsFactory {
                 DeviceInfo.Id.ONYX_GO_COLOR7,
                 DeviceInfo.Id.ONYX_GO6,
                 DeviceInfo.Id.ONYX_GO7,
+                DeviceInfo.Id.ONYX_GO7GEN2,
                 DeviceInfo.Id.ONYX_NOTE_AIR_3C,
                 DeviceInfo.Id.ONYX_NOTE_AIR_4C,
                 DeviceInfo.Id.ONYX_NOVA_AIR,
@@ -25,6 +26,7 @@ object LightsFactory {
                 DeviceInfo.Id.ONYX_PALMA,
                 DeviceInfo.Id.ONYX_PALMA2,
                 DeviceInfo.Id.ONYX_POKE5,
+                DeviceInfo.Id.ONYX_POKE5S,
                 DeviceInfo.Id.ONYX_POKE6,
                 DeviceInfo.Id.ONYX_TAB_ULTRA_C,
                 DeviceInfo.Id.ONYX_TAB_ULTRA_C_PRO,
@@ -64,6 +66,7 @@ object LightsFactory {
                     logController("Onyx/Qualcomm")
                     OnyxWarmthController()
                 }
+                DeviceInfo.Id.ONYX_DARWIN5,
                 DeviceInfo.Id.ONYX_DARWIN9,
                 DeviceInfo.Id.ONYX_LEAF2,
                 DeviceInfo.Id.ONYX_LIVINGSTONE3,
@@ -85,6 +88,7 @@ object LightsFactory {
                 DeviceInfo.Id.CREMA_0710C,
                 DeviceInfo.Id.CREMA_CARTA_G,
                 DeviceInfo.Id.MEEBOOK_P6,
+                DeviceInfo.Id.NOOK_GLPLUS,
                 DeviceInfo.Id.RIDI_PAPER_3,
                 DeviceInfo.Id.TOLINO_EPOS1,
                 DeviceInfo.Id.TOLINO_SHINE3,
@@ -94,6 +98,7 @@ object LightsFactory {
                     logController("TolinoNTX")
                     TolinoNtxController()
                 }
+                DeviceInfo.Id.CREMA_0660L,
                 DeviceInfo.Id.HISENSE_TOUCH_LITE,
                 DeviceInfo.Id.TOLINO_PAGE2,
                 -> {

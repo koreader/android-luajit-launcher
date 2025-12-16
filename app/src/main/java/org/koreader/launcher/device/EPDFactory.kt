@@ -58,6 +58,7 @@ object EPDFactory {
                 DeviceInfo.Id.JDREAD,
                 DeviceInfo.Id.LINFINY_ENOTE,
                 DeviceInfo.Id.NOOK,
+                DeviceInfo.Id.NOOK_GLPLUS,
                 DeviceInfo.Id.SONY_CP1,
                 DeviceInfo.Id.SONY_RP1,
                 -> {
@@ -76,6 +77,7 @@ object EPDFactory {
                 }
 
                 DeviceInfo.Id.CREMA,
+                DeviceInfo.Id.CREMA_0660L,
                 DeviceInfo.Id.CREMA_CARTA_G,
                 DeviceInfo.Id.HANVON_960,
                 DeviceInfo.Id.ONYX_JDREAD,
@@ -92,11 +94,13 @@ object EPDFactory {
                     TolinoEPDController()
                 }
 
+                DeviceInfo.Id.ONYX_DARWIN5,
                 DeviceInfo.Id.ONYX_DARWIN9,
                 DeviceInfo.Id.ONYX_EDISON,
                 DeviceInfo.Id.ONYX_GALILEO2,
                 DeviceInfo.Id.ONYX_GO_103,
                 DeviceInfo.Id.ONYX_GO6,
+                DeviceInfo.Id.ONYX_GO7GEN2,
                 DeviceInfo.Id.ONYX_KON_TIKI2,
                 DeviceInfo.Id.ONYX_LEAF,
                 DeviceInfo.Id.ONYX_LEAF2,
@@ -114,6 +118,7 @@ object EPDFactory {
                 DeviceInfo.Id.ONYX_NOTE_AIR_4C,
                 DeviceInfo.Id.ONYX_NOTE_MAX,
                 DeviceInfo.Id.ONYX_NOTE_PRO,
+                DeviceInfo.Id.ONYX_NOTE_S,
                 DeviceInfo.Id.ONYX_NOTE_X2,
                 DeviceInfo.Id.ONYX_NOVA,
                 DeviceInfo.Id.ONYX_NOVA2,
@@ -130,6 +135,7 @@ object EPDFactory {
                 DeviceInfo.Id.ONYX_POKE3,
                 DeviceInfo.Id.ONYX_POKE4,
                 DeviceInfo.Id.ONYX_POKE5,
+                DeviceInfo.Id.ONYX_POKE5S,
                 DeviceInfo.Id.ONYX_POKE6,
                 DeviceInfo.Id.ONYX_POKE4LITE,
                 DeviceInfo.Id.ONYX_POKE_PRO,
@@ -153,12 +159,14 @@ object EPDFactory {
 
                 DeviceInfo.Id.HYREAD_GAZE_NOTE_CC,
                 DeviceInfo.Id.HYREAD_MINI6,
+                DeviceInfo.Id.IFLYTEK_R3,
                 DeviceInfo.Id.INKBOOKFOCUS_PLUS,
                 DeviceInfo.Id.INKPALM_PLUS,
                 DeviceInfo.Id.MEEBOOK_M6,
                 DeviceInfo.Id.MEEBOOK_M6C,
                 DeviceInfo.Id.MEEBOOK_M7,
                 DeviceInfo.Id.MOAAN_MIX7,
+                DeviceInfo.Id.OBOOK_P10D,
                 DeviceInfo.Id.OBOOK_P78D,
                 DeviceInfo.Id.PUBU_PUBOOK,
                 DeviceInfo.Id.XIAOMI_READER,

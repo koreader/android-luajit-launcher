@@ -52,6 +52,7 @@ object DeviceInfo {
         BOYUE_T103D,
         CREMA,
         CREMA_0650L,
+        CREMA_0660L,
         CREMA_0710C,
         CREMA_CARTA_G,
         ENERGY,
@@ -61,6 +62,7 @@ object DeviceInfo {
         HYREAD_GAZE_NOTE,
         HYREAD_GAZE_NOTE_CC,
         HYREAD_MINI6,
+        IFLYTEK_R3,
         INKBOOK,
         INKBOOKFOCUS,
         INKBOOKFOCUS_PLUS,
@@ -76,8 +78,11 @@ object DeviceInfo {
         NABUK,
         NOOK,
         NOOK_GL4,
+        NOOK_GLPLUS,
+        OBOOK_P10D,
         OBOOK_P78D,
         ONYX_C67,
+        ONYX_DARWIN5,
         ONYX_DARWIN7,
         ONYX_DARWIN9,
         ONYX_EDISON,
@@ -87,6 +92,7 @@ object DeviceInfo {
         ONYX_GO_COLOR7,
         ONYX_GO6,
         ONYX_GO7,
+        ONYX_GO7GEN2,
         ONYX_JDREAD,
         ONYX_KON_TIKI2,
         ONYX_LEAF,
@@ -107,6 +113,7 @@ object DeviceInfo {
         ONYX_NOTE_AIR_4C,
         ONYX_NOTE_MAX,
         ONYX_NOTE_PRO,
+        ONYX_NOTE_S,
         ONYX_NOTE_X2,
         ONYX_NOVA,
         ONYX_NOVA2,
@@ -123,6 +130,7 @@ object DeviceInfo {
         ONYX_POKE3,
         ONYX_POKE4,
         ONYX_POKE5,
+        ONYX_POKE5S,
         ONYX_POKE6,
         ONYX_POKE4LITE,
         ONYX_POKE_PRO,
@@ -252,6 +260,10 @@ object DeviceInfo {
             CREMA && PRODUCT == "keplerb"
             -> Id.CREMA_0650L
 
+            // Crema Soundup
+            CREMA && PRODUCT == "sound2"
+            -> Id.CREMA_0660L
+
             // Crema Grande
             CREMA && MODEL == "crema-0710c"
             -> Id.CREMA_0710C
@@ -287,6 +299,10 @@ object DeviceInfo {
             // Hyread Mini 6
             MANUFACTURER == "hyread" && MODEL == "k06nu"
             -> Id.HYREAD_MINI6
+
+            // Iflytek ebook r3
+            MANUFACTURER == "iflytek" && MODEL == "iflytek ebook r3"
+            -> Id.IFLYTEK_R3
 
             // Artatech Inkbook Prime/Prime HD.
             MANUFACTURER == "artatech" && BRAND == "inkbook" && MODEL.startsWith("prime")
@@ -345,11 +361,19 @@ object DeviceInfo {
             && (MODEL == "bnrv1000" || MODEL == "bnrv1100" || MODEL == "bnrv1300")
             -> Id.NOOK_GL4
 
+            // Nook Glowlight plus 7.8" (2019)
+            MANUFACTURER == "barnesandnoble" && MODEL == "bnrv700" && PRODUCT == "ntx_6sl"
+            -> Id.NOOK_GLPLUS
+
             // Nook (catch them all fallback for all other models)
             (MANUFACTURER == "barnesandnoble" || MANUFACTURER == "freescale")
             && (MODEL == "bnrv510" || MODEL == "bnrv520" || MODEL == "bnrv700"
                 || MODEL == "evk_mx6sl" || MODEL.startsWith("ereader"))
             -> Id.NOOK
+
+            // OBOOK P10D
+            MANUFACTURER == STR_ROCKCHIP && MODEL == "p10d"
+            -> Id.OBOOK_P10D
 
             // OBOOK P78D
             MANUFACTURER == STR_ROCKCHIP && PRODUCT == "rk3566_78d" && MODEL == "p78d"
@@ -360,6 +384,11 @@ object DeviceInfo {
             && (PRODUCT.startsWith("c67") || MODEL == "rk30sdk")
             && DEVICE.startsWith("c67")
             -> Id.ONYX_C67
+
+            // ONYX DARWIN 5
+            MANUFACTURER == "onyx"
+            && BRAND == "maccentre" || MODEL == "mc_c68pctm"
+            -> Id.ONYX_DARWIN5
 
             // ONYX DARWIN 7
             MANUFACTURER == "onyx"
@@ -392,6 +421,10 @@ object DeviceInfo {
             // Onyx Boox Go Color 7
             BRAND == "onyx" && MODEL == "gocolor7"
             -> Id.ONYX_GO_COLOR7
+
+            // Onyx Boox Go Color 7 Gen II
+            BRAND == "onyx" && MODEL == "gocolor7_2"
+            -> Id.ONYX_GO7GEN2
 
             // Onyx Boox Go 6
             BRAND == "onyx" && MODEL == "go6"
@@ -483,6 +516,10 @@ object DeviceInfo {
             MANUFACTURER == "onyx" && PRODUCT == "notepro" && DEVICE == "notepro"
             -> Id.ONYX_NOTE_PRO
 
+            // Onyx Note S
+            MANUFACTURER == "onyx" && MODEL == "notes"
+            -> Id.ONYX_NOTE_S
+
             // Onyx Note X2
             MANUFACTURER == "onyx" && MODEL == "notex2"
             -> Id.ONYX_NOTE_X2
@@ -550,6 +587,10 @@ object DeviceInfo {
             // Onyx Poke 5
             BRAND == "onyx" && MODEL == "poke5p"
             -> Id.ONYX_POKE5
+
+            // Onyx Poke 5s
+            BRAND == "onyx" && MODEL == "poke5s"
+            -> Id.ONYX_POKE5S
 
             // Onyx Poke 6
             BRAND == "onyx" && MODEL == "poke6"
@@ -669,10 +710,12 @@ object DeviceInfo {
 
         HAS_COLOR_SCREEN = when (ID) {
             Id.HYREAD_GAZE_NOTE_CC,
+            Id.IFLYTEK_R3,
             Id.MEEBOOK_M6C,
             Id.MOOINKPLUS2C,
             Id.NONE,
             Id.ONYX_GO_COLOR7,
+            Id.ONYX_GO7GEN2,
             Id.ONYX_NOVA3_COLOR,
             Id.ONYX_NOVA_AIR_C,
             Id.ONYX_NOTE_AIR_3C,
