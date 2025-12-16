@@ -381,8 +381,8 @@ object DeviceInfo {
 
             // Onyx C67
             MANUFACTURER == "onyx"
-            && (PRODUCT.startsWith("c67") || MODEL == "rk30sdk" || MODEL == "er6a02")
-            && (DEVICE.startsWith("c67") || DEVICE == "er6a02")
+            && (PRODUCT.startsWith("c67") || MODEL == "rk30sdk")
+            && DEVICE.startsWith("c67")
             -> Id.ONYX_C67
 
             // ONYX DARWIN 5
