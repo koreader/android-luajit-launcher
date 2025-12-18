@@ -15,3 +15,4 @@ app/build
 assets/libs
 assets/module
 jni/luajit/build
+.DS_Store

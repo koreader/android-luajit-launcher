@@ -4,7 +4,7 @@ import android.app.Activity
 import android.provider.Settings
 import android.util.Log
 import org.koreader.launcher.device.LightsInterface
-import org.koreader.launcher.extensions.read
+import org.koreader.launcher.extensions.readOrElse
 import org.koreader.launcher.extensions.write
 import java.io.File
 
@@ -102,7 +102,7 @@ class TolinoRootController : LightsInterface {
     }
 
     override fun getWarmth(activity: Activity): Int {
-        return WARMTH_MAX - File(COLOR_FILE).read()
+        return WARMTH_MAX - File(COLOR_FILE).readOrElse()
     }
 
     override fun setBrightness(activity: Activity, brightness: Int) {
