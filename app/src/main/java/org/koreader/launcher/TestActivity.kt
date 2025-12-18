@@ -24,6 +24,7 @@ import org.koreader.launcher.device.lights.OnyxC67Controller
 import org.koreader.launcher.device.lights.OnyxColorController
 import org.koreader.launcher.device.lights.OnyxSdkLightsController
 import org.koreader.launcher.device.lights.OnyxWarmthController
+import org.koreader.launcher.device.lights.OnyxPalma2ProController
 import org.koreader.launcher.device.lights.TolinoRootController
 import org.koreader.launcher.device.lights.TolinoNtxController
 import org.koreader.launcher.device.lights.TolinoNtxNoWarmthController
@@ -79,6 +80,7 @@ class TestActivity: AppCompatActivity() {
         lightsMap["Onyx Color"] = OnyxColorController()
         lightsMap["Onyx SDK (lights)"] = OnyxSdkLightsController()
         lightsMap["Onyx (warmth)"] = OnyxWarmthController()
+        lightsMap["Onyx Palma2 Pro"] = OnyxPalma2ProController()
         lightsMap["Tolino Root"] = TolinoRootController()
         lightsMap["Tolino Ntx"] = TolinoNtxController()
         lightsMap["Tolino Ntx (no warmth)"] = TolinoNtxNoWarmthController()

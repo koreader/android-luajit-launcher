@@ -126,6 +126,7 @@ object DeviceInfo {
         ONYX_PAGE,
         ONYX_PALMA,
         ONYX_PALMA2,
+        ONYX_PALMA2_PRO,
         ONYX_POKE2,
         ONYX_POKE3,
         ONYX_POKE4,
@@ -567,6 +568,10 @@ object DeviceInfo {
             // Onyx Palma2
             BRAND == "onyx" && MODEL == "palma2"
             -> Id.ONYX_PALMA2
+
+            // Onyx Palma2 Pro (Palma2_Pro_C)
+            BRAND == "onyx" && MODEL == "palma2_pro_c"
+            -> Id.ONYX_PALMA2_PRO
 
             // Onyx Poke 2
             MANUFACTURER == "onyx" && PRODUCT == "poke2"

@@ -131,6 +131,7 @@ object EPDFactory {
                 DeviceInfo.Id.ONYX_PAGE,
                 DeviceInfo.Id.ONYX_PALMA,
                 DeviceInfo.Id.ONYX_PALMA2,
+                DeviceInfo.Id.ONYX_PALMA2_PRO,
                 DeviceInfo.Id.ONYX_POKE2,
                 DeviceInfo.Id.ONYX_POKE3,
                 DeviceInfo.Id.ONYX_POKE4,

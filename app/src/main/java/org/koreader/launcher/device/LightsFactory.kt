@@ -118,6 +118,11 @@ object LightsFactory {
                     logController("TolinoB300Controller")
                     TolinoB300Controller()
                 }
+                DeviceInfo.Id.ONYX_PALMA2_PRO,
+                -> {
+                    logController("OnyxPalma2Pro")
+                    OnyxPalma2ProController()
+                }
                 else -> {
                     logController("Generic")
                     GenericController()
