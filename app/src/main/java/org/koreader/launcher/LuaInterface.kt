@@ -81,4 +81,15 @@ interface LuaInterface {
     fun startTestActivity()
     fun showFrontlightDialog(title: String, dim: String, warmth: String, okButton: String, cancelButton: String)
     fun showToast(message: String, longTimeout: Boolean)
+
+    // TTS Methods
+    fun ttsInit(): Boolean
+    fun ttsSpeak(text: String, queueMode: Int): Boolean
+    fun ttsStop(): Boolean
+    fun ttsIsSpeaking(): Boolean
+    fun ttsSetSpeechRate(ratePercent: Int): Boolean
+    fun ttsSetPitch(pitchPercent: Int): Boolean
+    fun ttsSetLanguage(localeTag: String): Int
+    fun ttsOpenSettings()
+    fun ttsInstallData()
 }

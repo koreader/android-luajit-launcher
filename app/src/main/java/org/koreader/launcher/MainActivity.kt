@@ -15,6 +15,7 @@ import android.graphics.PixelFormat
 import android.net.Uri
 import android.os.*
 import android.provider.Settings
+import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.view.*
 import android.widget.Toast
@@ -27,6 +28,9 @@ import org.koreader.launcher.extensions.*
 import java.io.File
 import java.util.Locale
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
 
 class MainActivity : NativeActivity(), LuaInterface,
     ActivityCompat.OnRequestPermissionsResultCallback {
@@ -53,6 +57,13 @@ class MainActivity : NativeActivity(), LuaInterface,
 
     // Splashscreen is active
     private var splashScreen: Boolean = true
+
+    // TTS (Text-to-Speech) fields
+    @Volatile
+    private var tts: TextToSpeech? = null
+    @Volatile
+    private var ttsInitialized = false
+    private val ttsLock = Object()
 
     // surface used on devices that need a view
     private var view: NativeSurfaceView? = null
@@ -249,6 +260,7 @@ class MainActivity : NativeActivity(), LuaInterface,
     /* Called when the activity is going to be destroyed */
     public override fun onDestroy() {
         Log.v(tag, "onDestroy()")
+        ttsShutdown()
         unregisterReceiver(event)
         super.onDestroy()
     }
@@ -743,6 +755,301 @@ class MainActivity : NativeActivity(), LuaInterface,
         val intent = Intent(this, TestActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
         startActivity(intent)
+    }
+
+    /*---------------------------------------------------------------
+     *                       TTS Methods                            *
+     *--------------------------------------------------------------*/
+
+    override fun ttsInit(): Boolean {
+        synchronized(ttsLock) {
+            if (ttsInitialized && tts != null) {
+                return true
+            }
+        }
+
+        val resultRef = AtomicBoolean(false)
+        val latch = CountDownLatch(1)
+
+        runOnUiThread {
+            try {
+                ttsShutdownInternal()
+
+                tts = TextToSpeech(this) { status ->
+                    val success = status == TextToSpeech.SUCCESS
+                    synchronized(ttsLock) {
+                        ttsInitialized = success
+                    }
+                    resultRef.set(success)
+                    latch.countDown()
+                }
+            } catch (e: Exception) {
+                Log.e(tag, "TTS init failed", e)
+                latch.countDown()
+            }
+        }
+
+        val awaited = try {
+            latch.await(5, TimeUnit.SECONDS)
+        } catch (e: InterruptedException) {
+            Log.e(tag, "TTS init interrupted", e)
+            false
+        }
+        if (!awaited) {
+            Log.e(tag, "TTS init timed out")
+            // Best-effort cleanup; do not block.
+            ttsShutdown()
+            return false
+        }
+        return resultRef.get()
+    }
+
+    override fun ttsSpeak(text: String, queueMode: Int): Boolean {
+        if (!ttsEnsureInitialized()) return false
+
+        val resultRef = AtomicBoolean(false)
+        val latch = CountDownLatch(1)
+
+        runOnUiThread {
+            try {
+                val ttsInstance = tts
+                if (ttsInstance == null || !ttsInitialized) {
+                    latch.countDown()
+                    return@runOnUiThread
+                }
+
+                val status = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                    val params = android.os.Bundle()
+                    ttsInstance.speak(text, queueMode, params, "utteranceId")
+                } else {
+                    @Suppress("DEPRECATION")
+                    val params = HashMap<String, String>()
+                    params[TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID] = "utteranceId"
+                    ttsInstance.speak(text, queueMode, params)
+                }
+
+                resultRef.set(status == TextToSpeech.SUCCESS)
+            } catch (e: Exception) {
+                Log.e(tag, "TTS speak failed", e)
+            }
+            latch.countDown()
+        }
+
+        try {
+            latch.await(5, TimeUnit.SECONDS)
+        } catch (e: InterruptedException) {
+            Log.e(tag, "TTS speak interrupted", e)
+            return false
+        }
+        return resultRef.get()
+    }
+
+    override fun ttsStop(): Boolean {
+        if (!ttsInitialized || tts == null) {
+            return false
+        }
+
+        val resultRef = AtomicBoolean(false)
+        val latch = CountDownLatch(1)
+
+        runOnUiThread {
+            try {
+                val status = tts?.stop() ?: TextToSpeech.ERROR
+                resultRef.set(status == TextToSpeech.SUCCESS)
+            } catch (e: Exception) {
+                Log.e(tag, "TTS stop failed", e)
+            }
+            latch.countDown()
+        }
+
+        try {
+            latch.await(5, TimeUnit.SECONDS)
+        } catch (e: InterruptedException) {
+            Log.e(tag, "TTS stop interrupted", e)
+            return false
+        }
+        return resultRef.get()
+    }
+
+    override fun ttsIsSpeaking(): Boolean {
+        if (!ttsInitialized || tts == null) {
+            return false
+        }
+
+        val resultRef = AtomicBoolean(false)
+        val latch = CountDownLatch(1)
+
+        runOnUiThread {
+            try {
+                resultRef.set(tts?.isSpeaking == true)
+            } catch (e: Exception) {
+                Log.e(tag, "TTS isSpeaking failed", e)
+            }
+            latch.countDown()
+        }
+
+        try {
+            latch.await(5, TimeUnit.SECONDS)
+        } catch (e: InterruptedException) {
+            Log.e(tag, "TTS isSpeaking interrupted", e)
+            return false
+        }
+        return resultRef.get()
+    }
+
+    override fun ttsSetSpeechRate(ratePercent: Int): Boolean {
+        if (!ttsEnsureInitialized()) return false
+
+        val resultRef = AtomicBoolean(false)
+        val latch = CountDownLatch(1)
+
+        runOnUiThread {
+            try {
+                val rate = (ratePercent / 100.0f).coerceIn(0.1f, 4.0f)
+                val status = tts?.setSpeechRate(rate) ?: TextToSpeech.ERROR
+                resultRef.set(status == TextToSpeech.SUCCESS)
+            } catch (e: Exception) {
+                Log.e(tag, "TTS setSpeechRate failed", e)
+            }
+            latch.countDown()
+        }
+
+        try {
+            latch.await(5, TimeUnit.SECONDS)
+        } catch (e: InterruptedException) {
+            Log.e(tag, "TTS setSpeechRate interrupted", e)
+            return false
+        }
+        return resultRef.get()
+    }
+
+    override fun ttsSetPitch(pitchPercent: Int): Boolean {
+        if (!ttsEnsureInitialized()) return false
+
+        val resultRef = AtomicBoolean(false)
+        val latch = CountDownLatch(1)
+
+        runOnUiThread {
+            try {
+                val pitch = (pitchPercent / 100.0f).coerceIn(0.1f, 4.0f)
+                val status = tts?.setPitch(pitch) ?: TextToSpeech.ERROR
+                resultRef.set(status == TextToSpeech.SUCCESS)
+            } catch (e: Exception) {
+                Log.e(tag, "TTS setPitch failed", e)
+            }
+            latch.countDown()
+        }
+
+        try {
+            latch.await(5, TimeUnit.SECONDS)
+        } catch (e: InterruptedException) {
+            Log.e(tag, "TTS setPitch interrupted", e)
+            return false
+        }
+        return resultRef.get()
+    }
+
+    override fun ttsSetLanguage(localeTag: String): Int {
+        if (!ttsEnsureInitialized()) return -1
+
+        val resultRef = AtomicInteger(-1)
+        val latch = CountDownLatch(1)
+
+        runOnUiThread {
+            try {
+                val locale = localeFromTag(localeTag)
+                val result = tts?.setLanguage(locale) ?: TextToSpeech.LANG_NOT_SUPPORTED
+                resultRef.set(result)
+            } catch (e: Exception) {
+                Log.e(tag, "TTS setLanguage failed", e)
+                resultRef.set(-1)
+            }
+            latch.countDown()
+        }
+
+        try {
+            latch.await(5, TimeUnit.SECONDS)
+        } catch (e: InterruptedException) {
+            Log.e(tag, "TTS setLanguage interrupted", e)
+            return -1
+        }
+        return resultRef.get()
+    }
+
+    private fun localeFromTag(localeTag: String): Locale {
+        // Locale.forLanguageTag is only available on API 21+.
+        // We accept both BCP-47 (en-US) and legacy (en_US) formats.
+        val tag = localeTag.trim().replace('_', '-')
+        if (tag.isEmpty()) {
+            return Locale.getDefault()
+        }
+
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Locale.forLanguageTag(tag)
+        } else {
+            val parts = tag.split('-')
+            when (parts.size) {
+                1 -> Locale(parts[0])
+                2 -> Locale(parts[0], parts[1])
+                else -> Locale(parts[0], parts[1], parts.drop(2).joinToString("-"))
+            }
+        }
+    }
+
+    override fun ttsOpenSettings() {
+        runOnUiThread {
+            try {
+                val intent = Intent()
+                intent.action = TextToSpeech.Engine.ACTION_TTS_SETTINGS
+                if (intent.resolveActivity(packageManager) == null) {
+                    intent.action = android.provider.Settings.ACTION_SETTINGS
+                }
+                startActivity(intent)
+            } catch (e: Exception) {
+                Log.e(tag, "TTS openSettings failed", e)
+            }
+        }
+    }
+
+    override fun ttsInstallData() {
+        runOnUiThread {
+            try {
+                val intent = Intent()
+                intent.action = TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA
+                startActivity(intent)
+            } catch (e: Exception) {
+                Log.e(tag, "TTS installData failed", e)
+            }
+        }
+    }
+
+    private fun ttsShutdown() {
+        runOnUiThread {
+            ttsShutdownInternal()
+        }
+    }
+
+    private fun ttsShutdownInternal() {
+        synchronized(ttsLock) {
+            try {
+                tts?.stop()
+                tts?.shutdown()
+            } catch (e: Exception) {
+                Log.e(tag, "TTS shutdown failed", e)
+            } finally {
+                tts = null
+                ttsInitialized = false
+            }
+        }
+    }
+
+    private fun ttsEnsureInitialized(): Boolean {
+        synchronized(ttsLock) {
+            if (ttsInitialized && tts != null) {
+                return true
+            }
+        }
+        return ttsInit()
     }
 
     /*---------------------------------------------------------------
