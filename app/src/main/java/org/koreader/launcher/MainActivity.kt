@@ -1000,7 +1000,9 @@ class MainActivity : NativeActivity(), LuaInterface,
         runOnUiThread {
             try {
                 val intent = Intent()
-                intent.action = TextToSpeech.Engine.ACTION_TTS_SETTINGS
+                // There is no public Settings action constant for TTS settings across all API levels.
+                // This is the widely used Settings action string, with a safe fallback.
+                intent.action = "com.android.settings.TTS_SETTINGS"
                 if (intent.resolveActivity(packageManager) == null) {
                     intent.action = android.provider.Settings.ACTION_SETTINGS
                 }
