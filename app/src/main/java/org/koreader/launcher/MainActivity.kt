@@ -768,6 +768,17 @@ class MainActivity : NativeActivity(), LuaInterface,
         }
     }
 
+    private inline fun withReadyTtsOnUiThread(what: String, crossinline action: (TextToSpeech) -> Unit): Boolean {
+        val ttsInstance = tts
+        if (!ttsInitialized || ttsInstance == null) {
+            return false
+        }
+        runOnUiThreadSafe(what) {
+            action(ttsInstance)
+        }
+        return true
+    }
+
     @Suppress("DEPRECATION")
     private fun ttsSpeakInternal(ttsInstance: TextToSpeech, text: String, queueMode: Int): Int {
         val params = HashMap<String, String>()
@@ -805,22 +816,15 @@ class MainActivity : NativeActivity(), LuaInterface,
         }
 
         runOnUiThreadSafe("TTS speak") {
-            val ttsInstance = tts
-            if (ttsInitialized && ttsInstance != null) {
-                ttsSpeakInternal(ttsInstance, text, queueMode)
-            }
+            ttsSpeakInternal(tts!!, text, queueMode)
         }
         return true
     }
 
     override fun ttsStop(): Boolean {
-        if (!ttsInitialized || tts == null) {
-            return false
+        return withReadyTtsOnUiThread("TTS stop") {
+            it.stop()
         }
-        runOnUiThreadSafe("TTS stop") {
-            tts?.stop()
-        }
-        return true
     }
 
     override fun ttsIsSpeaking(): Boolean {
@@ -828,36 +832,25 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun ttsSetSpeechRate(ratePercent: Int): Boolean {
-        if (!ttsInitialized || tts == null) {
-            return false
-        }
         val rate = (ratePercent / 100.0f).coerceIn(0.1f, 4.0f)
-        runOnUiThreadSafe("TTS setSpeechRate") {
-            tts?.setSpeechRate(rate)
+        return withReadyTtsOnUiThread("TTS setSpeechRate") {
+            it.setSpeechRate(rate)
         }
-        return true
     }
 
     override fun ttsSetPitch(pitchPercent: Int): Boolean {
-        if (!ttsInitialized || tts == null) {
-            return false
-        }
         val pitch = (pitchPercent / 100.0f).coerceIn(0.1f, 4.0f)
-        runOnUiThreadSafe("TTS setPitch") {
-            tts?.setPitch(pitch)
+        return withReadyTtsOnUiThread("TTS setPitch") {
+            it.setPitch(pitch)
         }
-        return true
     }
 
     override fun ttsOpenSettings() {
         runOnUiThreadSafe("TTS openSettings") {
             val intent = Intent()
             // There is no public Settings action constant for TTS settings across all API levels.
-            // This is the widely used Settings action string, with a safe fallback.
+            // This is the widely used Settings action string.
             intent.action = "com.android.settings.TTS_SETTINGS"
-            if (intent.resolveActivity(packageManager) == null) {
-                intent.action = android.provider.Settings.ACTION_SETTINGS
-            }
             startActivity(intent)
         }
     }
