@@ -89,7 +89,6 @@ interface LuaInterface {
     fun ttsIsSpeaking(): Boolean
     fun ttsSetSpeechRate(ratePercent: Int): Boolean
     fun ttsSetPitch(pitchPercent: Int): Boolean
-    fun ttsSetLanguage(localeTag: String): Int
     fun ttsOpenSettings()
     fun ttsInstallData()
 }

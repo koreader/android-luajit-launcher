@@ -2606,13 +2606,6 @@ local function run(android_app_state)
     android.tts.QUEUE_FLUSH = 0  -- Interrupts current speech, flushes queue
     android.tts.QUEUE_ADD = 1    -- Adds to end of queue
 
-    -- TextToSpeech LANG_* return codes
-    android.tts.LANG_MISSING_DATA = -1
-    android.tts.LANG_NOT_SUPPORTED = -2
-    android.tts.LANG_AVAILABLE = 0
-    android.tts.LANG_COUNTRY_AVAILABLE = 1
-    android.tts.LANG_COUNTRY_VAR_AVAILABLE = 2
-
     --[[
         Initialize the TTS engine.
         Must be called before other TTS operations.
@@ -2714,32 +2707,6 @@ local function run(android_app_state)
                 "(I)Z",
                 ffi.new("int32_t", pitchPercent)
             )
-        end)
-    end
-
-    --[[
-        Set language/locale.
-        Parameters:
-            localeTag - string locale tag (e.g., "en-US", "ja-JP", "vi-VN")
-        Returns: integer - one of:
-            android.tts.LANG_MISSING_DATA (-1) - Language data missing
-            android.tts.LANG_NOT_SUPPORTED (-2) - Language not supported
-            android.tts.LANG_AVAILABLE (0) - Language available
-            android.tts.LANG_COUNTRY_AVAILABLE (1) - Language + country available
-            android.tts.LANG_COUNTRY_VAR_AVAILABLE (2) - Language + country + variant available
-            -1 on error
-    --]]
-    android.tts.setLanguage = function(localeTag)
-        return JNI:context(android.app.activity.vm, function(jni)
-            local jtag = jni.env[0].NewStringUTF(jni.env, localeTag)
-            local result = jni:callIntMethod(
-                android.app.activity.clazz,
-                "ttsSetLanguage",
-                "(Ljava/lang/String;)I",
-                jtag
-            )
-            jni.env[0].DeleteLocalRef(jni.env, jtag)
-            return result
         end)
     end
 
