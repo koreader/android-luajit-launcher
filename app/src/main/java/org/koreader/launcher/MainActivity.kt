@@ -15,8 +15,8 @@ import android.graphics.PixelFormat
 import android.net.Uri
 import android.os.*
 import android.provider.Settings
-import android.speech.tts.TextToSpeech
 import android.util.Log
+
 import android.view.*
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -55,12 +55,9 @@ class MainActivity : NativeActivity(), LuaInterface,
     // Splashscreen is active
     private var splashScreen: Boolean = true
 
-    // TTS (Text-to-Speech) fields
-    @Volatile
-    private var tts: TextToSpeech? = null
-    @Volatile
-    private var ttsInitialized = false
-    private val ttsLock = Object()
+    // TTS (Text-to-Speech)
+    private lateinit var ttsEngine: TTSEngine
+
 
     // surface used on devices that need a view
     private var view: NativeSurfaceView? = null
@@ -117,6 +114,8 @@ class MainActivity : NativeActivity(), LuaInterface,
         event = EventReceiver()
         updater = ApkUpdater()
         lightDialog = LightDialog()
+        ttsEngine = TTSEngine(this)
+
 
         setTheme(R.style.Fullscreen)
 
@@ -257,10 +256,11 @@ class MainActivity : NativeActivity(), LuaInterface,
     /* Called when the activity is going to be destroyed */
     public override fun onDestroy() {
         Log.v(tag, "onDestroy()")
-        ttsShutdownInternal()
+        ttsEngine.onDestroy()
         unregisterReceiver(event)
         super.onDestroy()
     }
+
 
     /*---------------------------------------------------------------
      *                         native callbacks                     *
@@ -758,124 +758,15 @@ class MainActivity : NativeActivity(), LuaInterface,
      *                       TTS Methods                            *
      *--------------------------------------------------------------*/
 
-    private fun runOnUiThreadSafe(what: String, action: () -> Unit) {
-        runOnUiThread {
-            try {
-                action()
-            } catch (e: Exception) {
-                Log.e(tag, "$what failed", e)
-            }
-        }
-    }
+    override fun ttsInit(): Boolean = ttsEngine.ttsInit()
+    override fun ttsSpeak(text: String, queueMode: Int): Boolean = ttsEngine.ttsSpeak(text, queueMode)
+    override fun ttsStop(): Boolean = ttsEngine.ttsStop()
+    override fun ttsIsSpeaking(): Boolean = ttsEngine.ttsIsSpeaking()
+    override fun ttsSetSpeechRate(ratePercent: Int): Boolean = ttsEngine.ttsSetSpeechRate(ratePercent)
+    override fun ttsSetPitch(pitchPercent: Int): Boolean = ttsEngine.ttsSetPitch(pitchPercent)
+    override fun ttsOpenSettings() = ttsEngine.ttsOpenSettings()
+    override fun ttsInstallData() = ttsEngine.ttsInstallData()
 
-    private inline fun withReadyTtsOnUiThread(what: String, crossinline action: (TextToSpeech) -> Unit): Boolean {
-        val ttsInstance = tts
-        if (!ttsInitialized || ttsInstance == null) {
-            return false
-        }
-        runOnUiThreadSafe(what) {
-            action(ttsInstance)
-        }
-        return true
-    }
-
-    @Suppress("DEPRECATION")
-    private fun ttsSpeakInternal(ttsInstance: TextToSpeech, text: String, queueMode: Int): Int {
-        val params = HashMap<String, String>()
-        params[TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID] = "utteranceId"
-        return ttsInstance.speak(text, queueMode, params)
-    }
-
-    override fun ttsInit(): Boolean {
-        synchronized(ttsLock) {
-            if (tts != null) {
-                return true
-            }
-        }
-
-        runOnUiThreadSafe("TTS init") {
-            ttsShutdownInternal()
-            tts = TextToSpeech(this) { status ->
-                val success = status == TextToSpeech.SUCCESS
-                synchronized(ttsLock) {
-                    ttsInitialized = success
-                }
-                if (!success) {
-                    ttsShutdownInternal()
-                }
-            }
-        }
-
-        return true
-    }
-
-    override fun ttsSpeak(text: String, queueMode: Int): Boolean {
-        if (!ttsInitialized || tts == null) {
-            ttsInit()
-            return false
-        }
-
-        runOnUiThreadSafe("TTS speak") {
-            ttsSpeakInternal(tts!!, text, queueMode)
-        }
-        return true
-    }
-
-    override fun ttsStop(): Boolean {
-        return withReadyTtsOnUiThread("TTS stop") {
-            it.stop()
-        }
-    }
-
-    override fun ttsIsSpeaking(): Boolean {
-        return tts?.isSpeaking == true
-    }
-
-    override fun ttsSetSpeechRate(ratePercent: Int): Boolean {
-        val rate = (ratePercent / 100.0f).coerceIn(0.1f, 4.0f)
-        return withReadyTtsOnUiThread("TTS setSpeechRate") {
-            it.setSpeechRate(rate)
-        }
-    }
-
-    override fun ttsSetPitch(pitchPercent: Int): Boolean {
-        val pitch = (pitchPercent / 100.0f).coerceIn(0.1f, 4.0f)
-        return withReadyTtsOnUiThread("TTS setPitch") {
-            it.setPitch(pitch)
-        }
-    }
-
-    override fun ttsOpenSettings() {
-        runOnUiThreadSafe("TTS openSettings") {
-            val intent = Intent()
-            // There is no public Settings action constant for TTS settings across all API levels.
-            // This is the widely used Settings action string.
-            intent.action = "com.android.settings.TTS_SETTINGS"
-            startActivity(intent)
-        }
-    }
-
-    override fun ttsInstallData() {
-        runOnUiThreadSafe("TTS installData") {
-            val intent = Intent()
-            intent.action = TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA
-            startActivity(intent)
-        }
-    }
-
-    private fun ttsShutdownInternal() {
-        synchronized(ttsLock) {
-            try {
-                tts?.stop()
-                tts?.shutdown()
-            } catch (e: Exception) {
-                Log.e(tag, "TTS shutdown failed", e)
-            } finally {
-                tts = null
-                ttsInitialized = false
-            }
-        }
-    }
 
     /*---------------------------------------------------------------
      *                       private methods                        *
