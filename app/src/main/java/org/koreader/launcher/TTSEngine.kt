@@ -5,7 +5,6 @@ import android.content.Intent
 import android.speech.tts.TextToSpeech
 import android.util.Log
 import java.util.HashMap
-import java.util.Locale
 
 class TTSEngine(private val activity: Activity) {
     private val tag = this::class.java.simpleName

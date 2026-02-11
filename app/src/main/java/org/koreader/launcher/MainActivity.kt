@@ -16,7 +16,6 @@ import android.net.Uri
 import android.os.*
 import android.provider.Settings
 import android.util.Log
-
 import android.view.*
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -57,7 +56,6 @@ class MainActivity : NativeActivity(), LuaInterface,
 
     // TTS (Text-to-Speech)
     private lateinit var ttsEngine: TTSEngine
-
 
     // surface used on devices that need a view
     private var view: NativeSurfaceView? = null
@@ -115,7 +113,6 @@ class MainActivity : NativeActivity(), LuaInterface,
         updater = ApkUpdater()
         lightDialog = LightDialog()
         ttsEngine = TTSEngine(this)
-
 
         setTheme(R.style.Fullscreen)
 
@@ -260,7 +257,6 @@ class MainActivity : NativeActivity(), LuaInterface,
         unregisterReceiver(event)
         super.onDestroy()
     }
-
 
     /*---------------------------------------------------------------
      *                         native callbacks                     *
