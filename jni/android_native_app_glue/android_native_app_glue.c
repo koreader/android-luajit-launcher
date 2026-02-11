@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/socket.h>
 #include <sys/stat.h>
 
 #include <android/log.h>
@@ -30,7 +31,7 @@
 
 #define  TAG "NativeGlue"
 
-#define FIFO_NAME "alooper.fifo"
+static int g_event_write_fd = -1;
 
 #define LOGE(...) ((void)__android_log_print(ANDROID_LOG_ERROR, TAG, __VA_ARGS__))
 #define LOGV(...) ((void)__android_log_print(ANDROID_LOG_VERBOSE, TAG, __VA_ARGS__))
@@ -234,41 +235,41 @@ static void* android_app_entry(void* param) {
     pthread_cond_broadcast(&android_app->cond);
     pthread_mutex_unlock(&android_app->mutex);
 
-    /* from https://github.com/koreader/android-luajit-launcher/pull/294
-
-    We use a named pipe to push events to our main loop running in LuaJIT.
-    Here we create the file, open it and register it as a poll source if everything went well.
-
-    Its state is available as part of the android ffi module.
+    /*
+    We use a Unix domain socketpair to push events to our main loop running in LuaJIT.
+    The read end is registered with ALooper and the write end is exposed to Java via JNI.
     */
-    const char* fifo_path = android_app->activity->internalDataPath;
-    size_t len = strlen(fifo_path) + strlen(FIFO_NAME) + 2U; // +1 for "/" and +1 for NULL
-    char fifo_file[len];
-    snprintf(fifo_file, len, "%s/%s", fifo_path, FIFO_NAME);
+    int event_read_fd = -1;
+    int event_write_fd = -1;
+    int event_fds[2] = { -1, -1 };
+    if (socketpair(AF_UNIX, SOCK_DGRAM, 0, event_fds) == -1) {
+        LOGE("Failed to create event socketpair: %s", strerror(errno));
+    } else {
+        event_read_fd = event_fds[0];
+        event_write_fd = event_fds[1];
 
-    if (mkfifo(fifo_file, 0666) == -1) {
-        if (errno == EEXIST) {
-            LOGV("User FIFO already exists at `%s`", fifo_file);
-        } else {
-            LOGE("Failed to create user FIFO at `%s`: %s", fifo_file, strerror(errno));
+        for (size_t i = 0U; i < 2U; i++) {
+            int flflags = fcntl(event_fds[i], F_GETFL);
+            fcntl(event_fds[i], F_SETFL, flflags | O_NONBLOCK);
+            int fdflags = fcntl(event_fds[i], F_GETFD);
+            fcntl(event_fds[i], F_SETFD, fdflags | FD_CLOEXEC);
         }
-    } else {
-        LOGV("User FIFO created at `%s`", fifo_file);
-    }
 
-    int fifo_fd = open(fifo_file, O_RDWR | O_NONBLOCK | O_CLOEXEC);
-    if (fifo_fd  == -1) {
-        LOGE("Failed to open user FIFO at `%s`: %s", fifo_file, strerror(errno));
-    } else {
-        ALooper_addFd(looper, fifo_fd, LOOPER_ID_USER, ALOOPER_EVENT_INPUT, NULL, &android_app->cmdPollSource);
+        g_event_write_fd = event_write_fd;
+        ALooper_addFd(looper, event_read_fd, LOOPER_ID_USER, ALOOPER_EVENT_INPUT, NULL,
+                      &android_app->cmdPollSource);
     }
 
     android_main(android_app);
 
-    // clean up fifo
-    if (fifo_fd != -1) {
-        ALooper_removeFd(looper, fifo_fd);
-        close(fifo_fd);
+    // clean up event socket
+    if (event_read_fd != -1) {
+        ALooper_removeFd(looper, event_read_fd);
+        close(event_read_fd);
+    }
+    if (event_write_fd != -1) {
+        close(event_write_fd);
+        g_event_write_fd = -1;
     }
 
     android_app_destroy(android_app);
@@ -509,4 +510,11 @@ void ANativeActivity_onCreate(ANativeActivity* activity, void* savedState, size_
     activity->callbacks->onWindowFocusChanged = onWindowFocusChanged;
 
     activity->instance = android_app_create(activity, savedState, savedStateSize);
+}
+
+JNIEXPORT jint JNICALL
+Java_org_koreader_launcher_EventReceiver_nativeGetEventSocketFd(JNIEnv* env, jclass clazz) {
+    (void)env;
+    (void)clazz;
+    return g_event_write_fd;
 }

@@ -1,4 +1,4 @@
-// A broadcast receiver that writes event codes to a named pipe, so they can be consumed from lua
+// A broadcast receiver that writes event codes to a Unix domain socket, so they can be consumed from lua
 
 package org.koreader.launcher
 
@@ -8,14 +8,17 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.util.Log
-import java.io.File
-import java.io.FileWriter
+import java.io.FileOutputStream
+import android.os.ParcelFileDescriptor
 import kotlin.collections.HashMap
 
 class EventReceiver : BroadcastReceiver() {
     private val tag = this::class.java.simpleName
     private val eventMap = HashMap<String, Int>()
-    private val fifoPath: String = File(MainApp.assets_path, "alooper.fifo").path
+    private var eventOut: FileOutputStream? = null
+    private var eventPfd: ParcelFileDescriptor? = null
+    private var eventFd: Int = -1
+    private val eventLock = Any()
 
     init {
         eventMap[Intent.ACTION_POWER_CONNECTED] = 100
@@ -39,19 +42,37 @@ class EventReceiver : BroadcastReceiver() {
     private fun write(code: Int?) {
         code?.let {
             try {
+                val out = ensureSocketOpen() ?: return
                 // 32-bit event code, low byte first
-                val msg = CharArray(4)
-                msg[0] = (it and 0xFF).toChar()
-                msg[1] = ((it ushr 8) and 0xFF).toChar()
-                msg[2] = ((it ushr 16) and 0xFF).toChar()
-                msg[3] = ((it ushr 24) and 0xFF).toChar()
-                val writer = FileWriter(fifoPath, true)
-                writer.write(msg, 0, 4)
-                writer.close()
+                val msg = ByteArray(4)
+                msg[0] = (it and 0xFF).toByte()
+                msg[1] = ((it ushr 8) and 0xFF).toByte()
+                msg[2] = ((it ushr 16) and 0xFF).toByte()
+                msg[3] = ((it ushr 24) and 0xFF).toByte()
+                out.write(msg)
+                out.flush()
             } catch (e: Exception) {
-                Log.e(tag, "Cannot write to file $fifoPath: \n$e")
+                Log.e(tag, "Cannot write to event socket: \n$e")
             }
         } ?: Log.e(tag, "Invalid code: must be a 32-bit integer")
+    }
+
+    private fun ensureSocketOpen(): FileOutputStream? {
+        synchronized(eventLock) {
+            if (eventOut != null) {
+                return eventOut
+            }
+            if (eventFd < 0) {
+                eventFd = nativeGetEventSocketFd()
+                if (eventFd < 0) {
+                    Log.e(tag, "Event socket fd is not available")
+                    return null
+                }
+            }
+            eventPfd = ParcelFileDescriptor.adoptFd(eventFd)
+            eventOut = FileOutputStream(eventPfd!!.fileDescriptor)
+            return eventOut
+        }
     }
 
     override fun onReceive(context: Context?, intent: Intent?) {
@@ -61,5 +82,10 @@ class EventReceiver : BroadcastReceiver() {
                 write(eventMap[event.action])
             }
         }
+    }
+
+    companion object {
+        @JvmStatic
+        private external fun nativeGetEventSocketFd(): Int
     }
 }
