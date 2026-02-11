@@ -18,11 +18,11 @@ class TTSEngine(private val activity: Activity) {
         }
 
         activity.runOnUiThread {
-            ttsShutdownInternal()
+            shutdown()
             tts = TextToSpeech(activity) { status ->
                 ttsInitialized = status == TextToSpeech.SUCCESS
                 if (!ttsInitialized) {
-                    ttsShutdownInternal()
+                    shutdown()
                 }
             }
         }
@@ -45,11 +45,7 @@ class TTSEngine(private val activity: Activity) {
 
     fun ttsIsSpeaking(): Boolean = tts?.isSpeaking == true
 
-    fun onDestroy() {
-        ttsShutdownInternal()
-    }
-
-    private fun ttsShutdownInternal() {
+    fun shutdown() {
         try {
             tts?.stop()
             tts?.shutdown()
@@ -68,11 +64,7 @@ class TTSEngine(private val activity: Activity) {
         }
 
         activity.runOnUiThread {
-            try {
-                action(ttsInstance)
-            } catch (e: Exception) {
-                Log.e(tag, "TTS operation failed", e)
-            }
+            action(ttsInstance)
         }
 
         return true

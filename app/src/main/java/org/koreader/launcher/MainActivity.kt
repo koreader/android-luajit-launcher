@@ -254,7 +254,7 @@ class MainActivity : NativeActivity(), LuaInterface,
     /* Called when the activity is going to be destroyed */
     public override fun onDestroy() {
         Log.v(tag, "onDestroy()")
-        ttsEngine.onDestroy()
+        ttsEngine.shutdown()
         unregisterReceiver(event)
         super.onDestroy()
     }
