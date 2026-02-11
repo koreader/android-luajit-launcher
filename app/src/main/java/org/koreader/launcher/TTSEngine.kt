@@ -43,34 +43,7 @@ class TTSEngine(private val activity: Activity) {
         }
     }
 
-    fun ttsStop(): Boolean = withReadyTts {
-            it.stop()
-    }
-
     fun ttsIsSpeaking(): Boolean = tts?.isSpeaking == true
-
-    fun ttsSetSpeechRate(ratePercent: Int): Boolean {
-        val rate = (ratePercent / 100.0f).coerceIn(0.1f, 4.0f)
-        return withReadyTts {
-            it.setSpeechRate(rate)
-        }
-    }
-
-    fun ttsSetPitch(pitchPercent: Int): Boolean {
-        val pitch = (pitchPercent / 100.0f).coerceIn(0.1f, 4.0f)
-        return withReadyTts {
-            it.setPitch(pitch)
-        }
-    }
-
-    fun ttsOpenSettings() {
-        // There is no public Settings action constant for TTS settings across all API levels.
-        startActivitySafe("com.android.settings.TTS_SETTINGS", "Failed to open TTS settings")
-    }
-
-    fun ttsInstallData() {
-        startActivitySafe(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA, "Failed to install TTS data")
-    }
 
     fun onDestroy() {
         ttsShutdownInternal()
@@ -88,7 +61,7 @@ class TTSEngine(private val activity: Activity) {
         }
     }
 
-    private inline fun withReadyTts(crossinline action: (TextToSpeech) -> Unit): Boolean {
+    fun withReadyTts(action: (TextToSpeech) -> Unit): Boolean {
         val ttsInstance = tts
         if (!ttsInitialized || ttsInstance == null) {
             return false
@@ -105,7 +78,7 @@ class TTSEngine(private val activity: Activity) {
         return true
     }
 
-    private fun startActivitySafe(action: String, errorMessage: String) {
+    fun startActivitySafe(action: String, errorMessage: String) {
         activity.runOnUiThread {
             try {
                 activity.startActivity(Intent(action))

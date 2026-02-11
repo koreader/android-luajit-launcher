@@ -15,6 +15,7 @@ import android.graphics.PixelFormat
 import android.net.Uri
 import android.os.*
 import android.provider.Settings
+import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.view.*
 import android.widget.Toast
@@ -756,12 +757,23 @@ class MainActivity : NativeActivity(), LuaInterface,
 
     override fun ttsInit(): Boolean = ttsEngine.ttsInit()
     override fun ttsSpeak(text: String, queueMode: Int): Boolean = ttsEngine.ttsSpeak(text, queueMode)
-    override fun ttsStop(): Boolean = ttsEngine.ttsStop()
+    override fun ttsStop(): Boolean = ttsEngine.withReadyTts { it.stop() }
     override fun ttsIsSpeaking(): Boolean = ttsEngine.ttsIsSpeaking()
-    override fun ttsSetSpeechRate(ratePercent: Int): Boolean = ttsEngine.ttsSetSpeechRate(ratePercent)
-    override fun ttsSetPitch(pitchPercent: Int): Boolean = ttsEngine.ttsSetPitch(pitchPercent)
-    override fun ttsOpenSettings() = ttsEngine.ttsOpenSettings()
-    override fun ttsInstallData() = ttsEngine.ttsInstallData()
+    override fun ttsSetSpeechRate(ratePercent: Int): Boolean {
+        val rate = (ratePercent / 100.0f).coerceIn(0.1f, 4.0f)
+        return ttsEngine.withReadyTts { it.setSpeechRate(rate) }
+    }
+    override fun ttsSetPitch(pitchPercent: Int): Boolean {
+        val pitch = (pitchPercent / 100.0f).coerceIn(0.1f, 4.0f)
+        return ttsEngine.withReadyTts { it.setPitch(pitch) }
+    }
+    override fun ttsOpenSettings() {
+        // There is no public Settings action constant for TTS settings across all API levels.
+        ttsEngine.startActivitySafe("com.android.settings.TTS_SETTINGS", "Failed to open TTS settings")
+    }
+    override fun ttsInstallData() {
+        ttsEngine.startActivitySafe(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA, "Failed to install TTS data")
+    }
 
     /*---------------------------------------------------------------
      *                       private methods                        *
