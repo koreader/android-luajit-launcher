@@ -9,27 +9,19 @@ import java.util.HashMap
 class TTSEngine(private val activity: Activity) {
     private val tag = this::class.java.simpleName
 
-    @Volatile
     private var tts: TextToSpeech? = null
-    @Volatile
     private var ttsInitialized = false
-    private val ttsLock = Object()
 
     fun ttsInit(): Boolean {
-        synchronized(ttsLock) {
-            if (tts != null) {
-                return true
-            }
+        if (tts != null) {
+            return true
         }
 
-        runOnUiThreadSafe("TTS init") {
+        activity.runOnUiThread {
             ttsShutdownInternal()
             tts = TextToSpeech(activity) { status ->
-                val success = status == TextToSpeech.SUCCESS
-                synchronized(ttsLock) {
-                    ttsInitialized = success
-                }
-                if (!success) {
+                ttsInitialized = status == TextToSpeech.SUCCESS
+                if (!ttsInitialized) {
                     ttsShutdownInternal()
                 }
             }
@@ -39,69 +31,45 @@ class TTSEngine(private val activity: Activity) {
     }
 
     fun ttsSpeak(text: String, queueMode: Int): Boolean {
-        if (!ttsInitialized || tts == null) {
+        if (tts == null || !ttsInitialized) {
             ttsInit()
             return false
         }
 
-        runOnUiThreadSafe("TTS speak") {
-            ttsSpeakInternal(tts!!, text, queueMode)
+        return withReadyTts {
+            val params = HashMap<String, String>()
+            params[TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID] = "utteranceId"
+            it.speak(text, queueMode, params)
         }
-        return true
     }
 
-    fun ttsStop(): Boolean {
-        return withReadyTtsOnUiThread("TTS stop") {
+    fun ttsStop(): Boolean = withReadyTts {
             it.stop()
-        }
     }
 
-    fun ttsIsSpeaking(): Boolean {
-        return tts?.isSpeaking == true
-    }
+    fun ttsIsSpeaking(): Boolean = tts?.isSpeaking == true
 
     fun ttsSetSpeechRate(ratePercent: Int): Boolean {
         val rate = (ratePercent / 100.0f).coerceIn(0.1f, 4.0f)
-        return withReadyTtsOnUiThread("TTS setSpeechRate") {
+        return withReadyTts {
             it.setSpeechRate(rate)
         }
     }
 
     fun ttsSetPitch(pitchPercent: Int): Boolean {
         val pitch = (pitchPercent / 100.0f).coerceIn(0.1f, 4.0f)
-        return withReadyTtsOnUiThread("TTS setPitch") {
+        return withReadyTts {
             it.setPitch(pitch)
         }
     }
 
     fun ttsOpenSettings() {
-        runOnUiThreadSafe("TTS openSettings") {
-            val intent = Intent()
-            // There is no public Settings action constant for TTS settings across all API levels.
-            // This is the widely used Settings action string.
-            intent.action = "com.android.settings.TTS_SETTINGS"
-            try {
-                activity.startActivity(intent)
-            } catch (e: Exception) {
-                Log.e(tag, "Failed to open TTS settings", e)
-            }
-        }
+        // There is no public Settings action constant for TTS settings across all API levels.
+        startActivitySafe("com.android.settings.TTS_SETTINGS", "Failed to open TTS settings")
     }
 
     fun ttsInstallData() {
-        runOnUiThreadSafe("TTS installData") {
-            val intent = Intent()
-            intent.action = TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA
-            try {
-                activity.startActivity(intent)
-            } catch (e: Exception) {
-                Log.e(tag, "Failed to install TTS data", e)
-            }
-        }
-    }
-
-    fun onStop() {
-         // Optionally handle lifecycle here if needed, but MainActivity calls ttsShutdownInternal in onDestroy
+        startActivitySafe(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA, "Failed to install TTS data")
     }
 
     fun onDestroy() {
@@ -109,44 +77,41 @@ class TTSEngine(private val activity: Activity) {
     }
 
     private fun ttsShutdownInternal() {
-        synchronized(ttsLock) {
-            try {
-                tts?.stop()
-                tts?.shutdown()
-            } catch (e: Exception) {
-                Log.e(tag, "TTS shutdown failed", e)
-            } finally {
-                tts = null
-                ttsInitialized = false
-            }
+        try {
+            tts?.stop()
+            tts?.shutdown()
+        } catch (e: Exception) {
+            Log.e(tag, "TTS shutdown failed", e)
+        } finally {
+            tts = null
+            ttsInitialized = false
         }
     }
 
-    @Suppress("DEPRECATION")
-    private fun ttsSpeakInternal(ttsInstance: TextToSpeech, text: String, queueMode: Int): Int {
-        val params = HashMap<String, String>()
-        params[TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID] = "utteranceId"
-        return ttsInstance.speak(text, queueMode, params)
-    }
-
-    private fun runOnUiThreadSafe(what: String, action: () -> Unit) {
-        activity.runOnUiThread {
-            try {
-                action()
-            } catch (e: Exception) {
-                Log.e(tag, "$what failed", e)
-            }
-        }
-    }
-
-    private inline fun withReadyTtsOnUiThread(what: String, crossinline action: (TextToSpeech) -> Unit): Boolean {
+    private inline fun withReadyTts(crossinline action: (TextToSpeech) -> Unit): Boolean {
         val ttsInstance = tts
         if (!ttsInitialized || ttsInstance == null) {
             return false
         }
-        runOnUiThreadSafe(what) {
-            action(ttsInstance)
+
+        activity.runOnUiThread {
+            try {
+                action(ttsInstance)
+            } catch (e: Exception) {
+                Log.e(tag, "TTS operation failed", e)
+            }
         }
+
         return true
+    }
+
+    private fun startActivitySafe(action: String, errorMessage: String) {
+        activity.runOnUiThread {
+            try {
+                activity.startActivity(Intent(action))
+            } catch (e: Exception) {
+                Log.e(tag, errorMessage, e)
+            }
+        }
     }
 }
