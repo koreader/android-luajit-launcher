@@ -763,7 +763,6 @@ class MainActivity : NativeActivity(), LuaInterface,
     override fun ttsOpenSettings() = ttsEngine.ttsOpenSettings()
     override fun ttsInstallData() = ttsEngine.ttsInstallData()
 
-
     /*---------------------------------------------------------------
      *                       private methods                        *
      *--------------------------------------------------------------*/
