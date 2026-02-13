@@ -19,6 +19,7 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -513,8 +514,28 @@ void ANativeActivity_onCreate(ANativeActivity* activity, void* savedState, size_
 }
 
 JNIEXPORT jint JNICALL
-Java_org_koreader_launcher_EventReceiver_nativeGetEventSocketFd(JNIEnv* env, jclass clazz) {
+Java_org_koreader_launcher_EventReceiver_nativeSendEvent(JNIEnv* env, jclass clazz, jint code) {
     (void)env;
     (void)clazz;
-    return g_event_write_fd;
+
+    if (g_event_write_fd < 0) {
+        LOGE("Event socket fd is not available");
+        return -1;
+    }
+
+    // 32-bit event code, low byte first
+    uint8_t msg[4];
+    msg[0] = (uint8_t)(code & 0xFF);
+    msg[1] = (uint8_t)((code >> 8) & 0xFF);
+    msg[2] = (uint8_t)((code >> 16) & 0xFF);
+    msg[3] = (uint8_t)((code >> 24) & 0xFF);
+
+    ssize_t written = send(g_event_write_fd, msg, sizeof(msg), MSG_NOSIGNAL);
+    if (written != (ssize_t)sizeof(msg)) {
+        int err = errno;
+        LOGE("Failed to write event socket: %s", strerror(err));
+        return -err;
+    }
+
+    return 0;
 }

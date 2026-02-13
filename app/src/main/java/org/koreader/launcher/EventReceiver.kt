@@ -8,17 +8,11 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.util.Log
-import java.io.FileOutputStream
-import android.os.ParcelFileDescriptor
 import kotlin.collections.HashMap
 
 class EventReceiver : BroadcastReceiver() {
     private val tag = this::class.java.simpleName
     private val eventMap = HashMap<String, Int>()
-    private var eventOut: FileOutputStream? = null
-    private var eventPfd: ParcelFileDescriptor? = null
-    private var eventFd: Int = -1
-    private val eventLock = Any()
 
     init {
         eventMap[Intent.ACTION_POWER_CONNECTED] = 100
@@ -40,38 +34,18 @@ class EventReceiver : BroadcastReceiver() {
         }
 
     private fun write(code: Int?) {
-        code?.let {
-            try {
-                val out = ensureSocketOpen() ?: return
-                // 32-bit event code, low byte first
-                val msg = ByteArray(4)
-                msg[0] = (it and 0xFF).toByte()
-                msg[1] = ((it ushr 8) and 0xFF).toByte()
-                msg[2] = ((it ushr 16) and 0xFF).toByte()
-                msg[3] = ((it ushr 24) and 0xFF).toByte()
-                out.write(msg)
-                out.flush()
-            } catch (e: Exception) {
-                Log.e(tag, "Cannot write to event socket: \n$e")
-            }
-        } ?: Log.e(tag, "Invalid code: must be a 32-bit integer")
-    }
+        if (code == null) {
+            Log.e(tag, "Invalid code: must be a 32-bit integer")
+            return
+        }
 
-    private fun ensureSocketOpen(): FileOutputStream? {
-        synchronized(eventLock) {
-            if (eventOut != null) {
-                return eventOut
+        try {
+            val rc = nativeSendEvent(code)
+            if (rc != 0) {
+                Log.e(tag, "nativeSendEvent failed with code $rc")
             }
-            if (eventFd < 0) {
-                eventFd = nativeGetEventSocketFd()
-                if (eventFd < 0) {
-                    Log.e(tag, "Event socket fd is not available")
-                    return null
-                }
-            }
-            eventPfd = ParcelFileDescriptor.adoptFd(eventFd)
-            eventOut = FileOutputStream(eventPfd!!.fileDescriptor)
-            return eventOut
+        } catch (e: Throwable) {
+            Log.e(tag, "Cannot send event to native socket: $e")
         }
     }
 
@@ -86,6 +60,6 @@ class EventReceiver : BroadcastReceiver() {
 
     companion object {
         @JvmStatic
-        private external fun nativeGetEventSocketFd(): Int
+        private external fun nativeSendEvent(code: Int): Int
     }
 }
