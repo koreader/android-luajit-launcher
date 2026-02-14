@@ -77,6 +77,7 @@ object DeviceInfo {
         MOOINKPLUS2C,
         NABUK,
         NOOK,
+        NOOK_GL3,
         NOOK_GL4,
         NOOK_GLPLUS,
         OBOOK_P10D,
@@ -366,6 +367,10 @@ object DeviceInfo {
             // Nook Glowlight plus 7.8" (2019)
             MANUFACTURER == "barnesandnoble" && MODEL == "bnrv700" && PRODUCT == "ntx_6sl"
             -> Id.NOOK_GLPLUS
+
+            // Nook Glowlight 3 (BNRV520)
+            MANUFACTURER == "freescale" && MODEL == "bnrv520"
+            -> Id.NOOK_GL3
 
             // Nook (catch them all fallback for all other models)
             (MANUFACTURER == "barnesandnoble" || MANUFACTURER == "freescale")
