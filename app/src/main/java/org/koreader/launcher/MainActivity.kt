@@ -91,6 +91,8 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     init {
+        Log.i(tag, "loading libluajit-launcher")
+        System.loadLibrary("luajit-launcher")
         Log.i(tag, "loading libluajit")
         System.loadLibrary("luajit")
     }

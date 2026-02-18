@@ -1,4 +1,4 @@
-// A broadcast receiver that writes event codes to a named pipe, so they can be consumed from lua
+// A broadcast receiver that writes event codes to a Unix domain socket, so they can be consumed from lua
 
 package org.koreader.launcher
 
@@ -8,14 +8,11 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.util.Log
-import java.io.File
-import java.io.FileWriter
 import kotlin.collections.HashMap
 
 class EventReceiver : BroadcastReceiver() {
     private val tag = this::class.java.simpleName
     private val eventMap = HashMap<String, Int>()
-    private val fifoPath: String = File(MainApp.assets_path, "alooper.fifo").path
 
     init {
         eventMap[Intent.ACTION_POWER_CONNECTED] = 100
@@ -37,21 +34,19 @@ class EventReceiver : BroadcastReceiver() {
         }
 
     private fun write(code: Int?) {
-        code?.let {
-            try {
-                // 32-bit event code, low byte first
-                val msg = CharArray(4)
-                msg[0] = (it and 0xFF).toChar()
-                msg[1] = ((it ushr 8) and 0xFF).toChar()
-                msg[2] = ((it ushr 16) and 0xFF).toChar()
-                msg[3] = ((it ushr 24) and 0xFF).toChar()
-                val writer = FileWriter(fifoPath, true)
-                writer.write(msg, 0, 4)
-                writer.close()
-            } catch (e: Exception) {
-                Log.e(tag, "Cannot write to file $fifoPath: \n$e")
+        if (code == null) {
+            Log.e(tag, "Invalid code: must be a 32-bit integer")
+            return
+        }
+
+        try {
+            val rc = nativeSendEvent(code)
+            if (rc != 0) {
+                Log.e(tag, "nativeSendEvent failed with code $rc")
             }
-        } ?: Log.e(tag, "Invalid code: must be a 32-bit integer")
+        } catch (e: Throwable) {
+            Log.e(tag, "Cannot send event to native socket: $e")
+        }
     }
 
     override fun onReceive(context: Context?, intent: Intent?) {
@@ -61,5 +56,10 @@ class EventReceiver : BroadcastReceiver() {
                 write(eventMap[event.action])
             }
         }
+    }
+
+    companion object {
+        @JvmStatic
+        private external fun nativeSendEvent(code: Int): Int
     }
 }
