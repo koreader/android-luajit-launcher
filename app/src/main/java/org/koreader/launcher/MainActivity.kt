@@ -18,6 +18,12 @@ import android.provider.Settings
 import android.util.Log
 import android.view.*
 import android.widget.Toast
+import android.widget.EditText
+import android.text.TextWatcher
+import android.text.Editable
+import android.view.inputmethod.EditorInfo
+import android.text.InputType
+import android.view.inputmethod.InputMethodManager
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -27,6 +33,7 @@ import org.koreader.launcher.extensions.*
 import java.io.File
 import java.util.Locale
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.ConcurrentLinkedQueue
 
 class MainActivity : NativeActivity(), LuaInterface,
     ActivityCompat.OnRequestPermissionsResultCallback {
@@ -66,6 +73,88 @@ class MainActivity : NativeActivity(), LuaInterface,
 
     // Hardware orientation for this device (usually match android boot logo)
     private var screenIsLandscape: Boolean = false
+
+    /*---------------------------------------------------------------
+     *                        IME bridge state                       *
+     *--------------------------------------------------------------*/
+    private var imeEditText: EditText? = null
+    private val imeQueue = ConcurrentLinkedQueue<String>()
+
+    private fun ensureImeEditText(): EditText {
+        var et = imeEditText
+        if (et == null) {
+            et = EditText(this)
+            et.isSingleLine = false
+            et.imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_ACTION_NONE
+            et.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
+            et.isFocusable = true
+            et.isFocusableInTouchMode = true
+            et.visibility = View.VISIBLE
+            et.alpha = 0f
+            et.addTextChangedListener(object: TextWatcher {
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    Log.i(tag, "text changed!");
+                    if (s == null) return
+                    if (count > 0) {
+                        val end = start + count
+                        if (start >= 0 && end <= s.length) {
+                            val inserted = s.subSequence(start, end).toString()
+                            Log.i(tag, "in if");
+                            if (inserted.isNotEmpty()) {
+                                Log.i(tag, "got text $inserted")
+                                imeQueue.add(inserted)
+                                // 120 == AEVENT_TEXT_INPUT
+                                event.write(120)
+                                et.text?.clear()
+                            }
+                        }
+                    }
+                }
+                override fun afterTextChanged(s: Editable?) {}
+            })
+
+            // Attach to window without disturbing native content
+            val lp = ViewGroup.LayoutParams(1, 1)
+            addContentView(et, lp)
+            imeEditText = et
+        }
+        return et
+    }
+
+    @Suppress("unused")
+    override fun startTextInput() {
+        runOnUiThread {
+            val et = ensureImeEditText()
+            if (et.visibility != View.VISIBLE) et.visibility = View.VISIBLE
+            et.alpha = 0f
+            et.post {
+                if (!et.isFocused) et.requestFocus()
+                val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.showSoftInput(et, InputMethodManager.SHOW_IMPLICIT)
+            }
+        }
+    }
+
+    @Suppress("unused")
+    override fun stopTextInput() {
+        runOnUiThread {
+            imeEditText?.let { et ->
+                val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.hideSoftInputFromWindow(et.windowToken, 0)
+                et.clearFocus()
+                et.alpha = 0f
+                et.visibility = View.VISIBLE
+                et.text?.clear()
+            }
+        }
+    }
+
+    @Suppress("unused")
+    override fun dequeueCommittedText(): String? {
+        Log.i(tag, "dequeueCommittedText")
+        return imeQueue.poll()
+    }
 
     companion object {
         private const val TAG_SURFACE = "Surface"
@@ -116,6 +205,9 @@ class MainActivity : NativeActivity(), LuaInterface,
 
         // Window background must be black for vertical and horizontal lines to be visible
         window.setBackgroundDrawableResource(android.R.color.black)
+        // Allow IME to interact with this window and resize content with soft keyboard
+        window.clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
 
         val surfaceKind: String = if (device.needsView) {
             view = NativeSurfaceView(this)
