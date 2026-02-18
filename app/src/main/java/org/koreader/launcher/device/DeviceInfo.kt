@@ -18,6 +18,7 @@ object DeviceInfo {
     private const val STR_NTX = "ntx_6sl"
     private const val STR_ROCKCHIP = "rockchip"
     private const val STR_TOLINO = "tolino"
+    const val DEVICE_RK3566_EINK = "rk3566_eink"
 
     val MANUFACTURER: String
     val BRAND: String
@@ -315,7 +316,7 @@ object DeviceInfo {
             -> Id.INKBOOKFOCUS
 
             // InkBook Focus Plus
-            DEVICE == "rk3566_eink" && MODEL == "focus plus"
+            DEVICE == DEVICE_RK3566_EINK && MODEL == "focus plus"
             -> Id.INKBOOKFOCUS_PLUS
 
             // InkPalm Plus
@@ -688,7 +689,7 @@ object DeviceInfo {
             -> Id.TOLINO
 
             // Xiaomi
-            MANUFACTURER == "xiaomi" && BRAND == "xiaomi" && MODEL == "xiaomi_reader" && DEVICE == "rk3566_eink" && HARDWARE == "rk30board"
+            MANUFACTURER == "xiaomi" && BRAND == "xiaomi" && MODEL == "xiaomi_reader" && DEVICE == DEVICE_RK3566_EINK && HARDWARE == "rk30board"
             -> Id.XIAOMI_READER
 
             // ???
