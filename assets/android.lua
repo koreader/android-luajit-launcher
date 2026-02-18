@@ -581,6 +581,7 @@ enum {
     AEVENT_POWER_CONNECTED = 100,
     AEVENT_POWER_DISCONNECTED = 101,
     AEVENT_DOWNLOAD_COMPLETE = 110,
+    AEVENT_TEXT_INPUT = 120,
 };
 
 enum {
@@ -2420,6 +2421,38 @@ local function run(android_app_state)
                 "hasClipboardText",
                 "()Z"
             )
+        end)
+    end
+
+    -- IME/Text input bridge
+    android.startTextInput = function()
+        JNI:context(android.app.activity.vm, function(jni)
+            jni:callVoidMethod(
+                android.app.activity.clazz,
+                "startTextInput",
+                "()V"
+            )
+        end)
+    end
+
+    android.stopTextInput = function()
+        JNI:context(android.app.activity.vm, function(jni)
+            jni:callVoidMethod(
+                android.app.activity.clazz,
+                "stopTextInput",
+                "()V"
+            )
+        end)
+    end
+
+    android.dequeueCommittedText = function()
+        return JNI:context(android.app.activity.vm, function(jni)
+            local text = jni:callObjectMethod(
+                android.app.activity.clazz,
+                "dequeueCommittedText",
+                "()Ljava/lang/String;"
+            )
+            return jni:to_string(text)
         end)
     end
 
