@@ -591,6 +591,8 @@ enum {
     AEVENT_DOWNLOAD_COMPLETE = 110,
     AEVENT_TEXT_INPUT = 120,
     AEVENT_IME_COMPOSITION = 121,
+    AEVENT_IME_DELETE = 122,
+    AEVENT_IME_SELECTION = 123,
 };
 
 enum {
@@ -2482,6 +2484,28 @@ local function run(android_app_state)
             local text = jni:callObjectMethod(
                 android.app.activity.clazz,
                 "dequeueComposingText",
+                "()Ljava/lang/String;"
+            )
+            return jni:to_string(text)
+        end)
+    end
+
+    android.dequeueImeDelete = function()
+        return JNI:context(android.app.activity.vm, function(jni)
+            local text = jni:callObjectMethod(
+                android.app.activity.clazz,
+                "dequeueImeDelete",
+                "()Ljava/lang/String;"
+            )
+            return jni:to_string(text)
+        end)
+    end
+
+    android.dequeueImeSelection = function()
+        return JNI:context(android.app.activity.vm, function(jni)
+            local text = jni:callObjectMethod(
+                android.app.activity.clazz,
+                "dequeueImeSelection",
                 "()Ljava/lang/String;"
             )
             return jni:to_string(text)

@@ -87,4 +87,6 @@ interface LuaInterface {
     fun stopTextInput()
     fun dequeueCommittedText(): String?
     fun dequeueComposingText(): String?
+    fun dequeueImeDelete(): String?
+    fun dequeueImeSelection(): String?
 }

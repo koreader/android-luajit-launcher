@@ -80,6 +80,8 @@ class MainActivity : NativeActivity(), LuaInterface,
     private var imeEditText: EditText? = null
     private val imeQueue = ConcurrentLinkedQueue<String>()
     private val imeCompositionQueue = ConcurrentLinkedQueue<String>()
+    private val imeDeleteQueue = ConcurrentLinkedQueue<String>()
+    private val imeSelectionQueue = ConcurrentLinkedQueue<String>()
 
     private fun ensureImeEditText(): EditText {
         var et = imeEditText
@@ -141,6 +143,22 @@ class MainActivity : NativeActivity(), LuaInterface,
                 }
             }
 
+            // Capture IME deleteSurroundingText requests from IME
+            (et as? ImeCaptureEditText)?.onDeleteSurrounding = { before: Int, after: Int ->
+                val payload = "$before\t$after"
+                imeDeleteQueue.add(payload)
+                // 122 == AEVENT_IME_DELETE
+                event.write(122)
+            }
+
+            // Capture IME setSelection requests
+            (et as? ImeCaptureEditText)?.onSetSelection = { start: Int, end: Int ->
+                val payload = "$start\t$end"
+                imeSelectionQueue.add(payload)
+                // 123 == AEVENT_IME_SELECTION
+                event.write(123)
+            }
+
             // Attach to window without disturbing native content
             val lp = ViewGroup.LayoutParams(1, 1)
             addContentView(et, lp)
@@ -187,6 +205,18 @@ class MainActivity : NativeActivity(), LuaInterface,
     override fun dequeueComposingText(): String? {
         Log.i(tag, "dequeueComposingText")
         return imeCompositionQueue.poll()
+    }
+
+    @Suppress("unused")
+    override fun dequeueImeDelete(): String? {
+        Log.i(tag, "dequeueImeDelete")
+        return imeDeleteQueue.poll()
+    }
+
+    @Suppress("unused")
+    override fun dequeueImeSelection(): String? {
+        Log.i(tag, "dequeueImeSelection")
+        return imeSelectionQueue.poll()
     }
 
     companion object {
