@@ -101,6 +101,14 @@ class MainActivity : NativeActivity(), LuaInterface,
                     if (suppressTextWatcher) {
                         suppressTextWatcher = false
                         return
+                    }                    // These transient changes are normally produced by IME composing (preedit).
+                    // Keep diagnostic logs so we can see the transient text, but avoid enqueueing
+                    // committed text while composing — composing updates are handled via
+                    // setComposingText()/onCompose.
+                    if ((et as? ImeCaptureEditText)?.isComposing == true) {
+                        Log.i(tag, "TextWatcher observed composing change (skip enqueue)")
+                        // fall through so we still reach the later diagnostic logging of the
+                        // inserted text, but do not add the value to imeQueue.
                     }
                     Log.i(tag, "text changed!");
                     if (s == null) return
@@ -111,10 +119,14 @@ class MainActivity : NativeActivity(), LuaInterface,
                             Log.i(tag, "in if");
                             if (inserted.isNotEmpty()) {
                                 Log.i(tag, "got text $inserted")
-                                imeQueue.add(inserted)
-                                // 120 == AEVENT_TEXT_INPUT
-                                event.write(120)
-                                et.text?.clear()
+                                if ((et as? ImeCaptureEditText)?.isComposing == true) {
+                                    Log.i(tag, "skip enqueue: composing active")
+                                } else {
+                                    imeQueue.add(inserted)
+                                    // 120 == AEVENT_TEXT_INPUT
+                                    event.write(120)
+                                    et.text?.clear()
+                                }
                             }
                         }
                     }
