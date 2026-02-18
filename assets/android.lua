@@ -590,6 +590,7 @@ enum {
     AEVENT_POWER_DISCONNECTED = 101,
     AEVENT_DOWNLOAD_COMPLETE = 110,
     AEVENT_TEXT_INPUT = 120,
+    AEVENT_IME_COMPOSITION = 121,
 };
 
 enum {
@@ -2470,6 +2471,17 @@ local function run(android_app_state)
             local text = jni:callObjectMethod(
                 android.app.activity.clazz,
                 "dequeueCommittedText",
+                "()Ljava/lang/String;"
+            )
+            return jni:to_string(text)
+        end)
+    end
+
+    android.dequeueComposingText = function()
+        return JNI:context(android.app.activity.vm, function(jni)
+            local text = jni:callObjectMethod(
+                android.app.activity.clazz,
+                "dequeueComposingText",
                 "()Ljava/lang/String;"
             )
             return jni:to_string(text)

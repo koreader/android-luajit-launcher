@@ -79,11 +79,12 @@ class MainActivity : NativeActivity(), LuaInterface,
      *--------------------------------------------------------------*/
     private var imeEditText: EditText? = null
     private val imeQueue = ConcurrentLinkedQueue<String>()
+    private val imeCompositionQueue = ConcurrentLinkedQueue<String>()
 
     private fun ensureImeEditText(): EditText {
         var et = imeEditText
         if (et == null) {
-            et = EditText(this)
+            et = ImeCaptureEditText(this)
             et.isSingleLine = false
             et.imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_ACTION_NONE
             et.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
@@ -91,9 +92,14 @@ class MainActivity : NativeActivity(), LuaInterface,
             et.isFocusableInTouchMode = true
             et.visibility = View.VISIBLE
             et.alpha = 0f
+            var suppressTextWatcher = false
             et.addTextChangedListener(object: TextWatcher {
                 override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    if (suppressTextWatcher) {
+                        suppressTextWatcher = false
+                        return
+                    }
                     Log.i(tag, "text changed!");
                     if (s == null) return
                     if (count > 0) {
@@ -113,6 +119,27 @@ class MainActivity : NativeActivity(), LuaInterface,
                 }
                 override fun afterTextChanged(s: Editable?) {}
             })
+
+            // Capture IME composition updates (setComposingText / finishComposingText)
+            (et as? ImeCaptureEditText)?.onCompose = { newCursorPos, composingText, finished ->
+                val op = if (finished) 'F' else 'U'
+                val payload = "$op\t$newCursorPos\t${composingText ?: ""}"
+                imeCompositionQueue.add(payload)
+                // 121 == AEVENT_IME_COMPOSITION
+                event.write(121)
+            }
+
+            // Also capture commitText via onCommit so committed text never gets lost
+            (et as? ImeCaptureEditText)?.onCommit = { committed ->
+                if (!committed.isNullOrEmpty()) {
+                    imeQueue.add(committed)
+                    // 120 == AEVENT_TEXT_INPUT
+                    event.write(120)
+                    // avoid duplicate insertion coming from TextWatcher
+                    suppressTextWatcher = true
+                    et.text?.clear()
+                }
+            }
 
             // Attach to window without disturbing native content
             val lp = ViewGroup.LayoutParams(1, 1)
@@ -154,6 +181,12 @@ class MainActivity : NativeActivity(), LuaInterface,
     override fun dequeueCommittedText(): String? {
         Log.i(tag, "dequeueCommittedText")
         return imeQueue.poll()
+    }
+
+    @Suppress("unused")
+    override fun dequeueComposingText(): String? {
+        Log.i(tag, "dequeueComposingText")
+        return imeCompositionQueue.poll()
     }
 
     companion object {
