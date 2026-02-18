@@ -33,7 +33,7 @@ class EventReceiver : BroadcastReceiver() {
             return filter
         }
 
-    private fun write(code: Int?) {
+    public fun write(code: Int?) {
         if (code == null) {
             Log.e(tag, "Invalid code: must be a 32-bit integer")
             return
