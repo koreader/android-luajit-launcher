@@ -15,6 +15,7 @@ import android.graphics.PixelFormat
 import android.net.Uri
 import android.os.*
 import android.provider.Settings
+import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.view.*
 import android.widget.Toast
@@ -53,6 +54,9 @@ class MainActivity : NativeActivity(), LuaInterface,
 
     // Splashscreen is active
     private var splashScreen: Boolean = true
+
+    // TTS (Text-to-Speech)
+    private lateinit var ttsEngine: TTSEngine
 
     // surface used on devices that need a view
     private var view: NativeSurfaceView? = null
@@ -111,6 +115,7 @@ class MainActivity : NativeActivity(), LuaInterface,
         event = EventReceiver()
         updater = ApkUpdater()
         lightDialog = LightDialog()
+        ttsEngine = TTSEngine(this)
 
         setTheme(R.style.Fullscreen)
 
@@ -251,6 +256,7 @@ class MainActivity : NativeActivity(), LuaInterface,
     /* Called when the activity is going to be destroyed */
     public override fun onDestroy() {
         Log.v(tag, "onDestroy()")
+        ttsEngine.shutdown()
         unregisterReceiver(event)
         super.onDestroy()
     }
@@ -745,6 +751,30 @@ class MainActivity : NativeActivity(), LuaInterface,
         val intent = Intent(this, TestActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
         startActivity(intent)
+    }
+
+    /*---------------------------------------------------------------
+     *                       TTS Methods                            *
+     *--------------------------------------------------------------*/
+
+    override fun ttsInit(): Boolean = ttsEngine.ttsInit()
+    override fun ttsSpeak(text: String, queueMode: Int): Boolean = ttsEngine.ttsSpeak(text, queueMode)
+    override fun ttsStop(): Boolean = ttsEngine.withReadyTts { it.stop() }
+    override fun ttsIsSpeaking(): Boolean = ttsEngine.ttsIsSpeaking()
+    override fun ttsSetSpeechRate(ratePercent: Int): Boolean {
+        val rate = (ratePercent / 100.0f).coerceIn(0.1f, 4.0f)
+        return ttsEngine.withReadyTts { it.setSpeechRate(rate) }
+    }
+    override fun ttsSetPitch(pitchPercent: Int): Boolean {
+        val pitch = (pitchPercent / 100.0f).coerceIn(0.1f, 4.0f)
+        return ttsEngine.withReadyTts { it.setPitch(pitch) }
+    }
+    override fun ttsOpenSettings() {
+        // There is no public Settings action constant for TTS settings across all API levels.
+        ttsEngine.startActivitySafe("com.android.settings.TTS_SETTINGS", "Failed to open TTS settings")
+    }
+    override fun ttsInstallData() {
+        ttsEngine.startActivitySafe(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA, "Failed to install TTS data")
     }
 
     /*---------------------------------------------------------------

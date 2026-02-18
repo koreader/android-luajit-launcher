@@ -2596,6 +2596,163 @@ local function run(android_app_state)
         end)
     end
 
+    --[[--
+    TTS (Text-to-Speech) namespace
+    Exposes Android TextToSpeech framework to Lua
+    --]]
+    android.tts = {}
+
+    -- TextToSpeech queue modes
+    android.tts.QUEUE_FLUSH = 0  -- Interrupts current speech, flushes queue
+    android.tts.QUEUE_ADD = 1    -- Adds to end of queue
+
+    --[[
+        Initialize the TTS engine.
+        Must be called before other TTS operations.
+        Idempotent - safe to call multiple times.
+        Returns: boolean - true if initialized successfully
+    --]]
+    android.tts.init = function()
+        return JNI:context(android.app.activity.vm, function(jni)
+            return jni:callBooleanMethod(
+                android.app.activity.clazz,
+                "ttsInit",
+                "()Z"
+            )
+        end)
+    end
+
+    --[[
+        Speak text.
+        Parameters:
+            text - string to speak
+            queueMode - android.tts.QUEUE_FLUSH or android.tts.QUEUE_ADD
+        Returns: boolean - true if queued successfully
+    --]]
+    android.tts.speak = function(text, queueMode)
+        queueMode = queueMode or android.tts.QUEUE_FLUSH
+        return JNI:context(android.app.activity.vm, function(jni)
+            local jtext = jni.env[0].NewStringUTF(jni.env, text)
+            local ok = jni:callBooleanMethod(
+                android.app.activity.clazz,
+                "ttsSpeak",
+                "(Ljava/lang/String;I)Z",
+                jtext,
+                ffi.new("int32_t", queueMode)
+            )
+            jni.env[0].DeleteLocalRef(jni.env, jtext)
+            return ok
+        end)
+    end
+
+    --[[
+        Stop speaking.
+        Clears the speech queue and stops current utterance.
+        Returns: boolean - true if stopped successfully
+    --]]
+    android.tts.stop = function()
+        return JNI:context(android.app.activity.vm, function(jni)
+            return jni:callBooleanMethod(
+                android.app.activity.clazz,
+                "ttsStop",
+                "()Z"
+            )
+        end)
+    end
+
+    --[[
+        Check if TTS is currently speaking.
+        Returns: boolean - true if speaking
+    --]]
+    android.tts.isSpeaking = function()
+        return JNI:context(android.app.activity.vm, function(jni)
+            return jni:callBooleanMethod(
+                android.app.activity.clazz,
+                "ttsIsSpeaking",
+                "()Z"
+            )
+        end)
+    end
+
+    --[[
+        Set speech rate.
+        Parameters:
+            ratePercent - integer 50..200 (maps to 0.5x..2.0x speed)
+                          100 = normal speed
+        Returns: boolean - true if set successfully
+    --]]
+    android.tts.setSpeechRate = function(ratePercent)
+        return JNI:context(android.app.activity.vm, function(jni)
+            return jni:callBooleanMethod(
+                android.app.activity.clazz,
+                "ttsSetSpeechRate",
+                "(I)Z",
+                ffi.new("int32_t", ratePercent)
+            )
+        end)
+    end
+
+    --[[
+        Set pitch.
+        Parameters:
+            pitchPercent - integer 50..200 (maps to 0.5x..2.0x pitch)
+                           100 = normal pitch
+        Returns: boolean - true if set successfully
+    --]]
+    android.tts.setPitch = function(pitchPercent)
+        return JNI:context(android.app.activity.vm, function(jni)
+            return jni:callBooleanMethod(
+                android.app.activity.clazz,
+                "ttsSetPitch",
+                "(I)Z",
+                ffi.new("int32_t", pitchPercent)
+            )
+        end)
+    end
+
+    --[[
+        Open TTS system settings.
+        Launches the Android TTS settings activity.
+    --]]
+    android.tts.openSettings = function()
+        JNI:context(android.app.activity.vm, function(jni)
+            jni:callVoidMethod(
+                android.app.activity.clazz,
+                "ttsOpenSettings",
+                "()V"
+            )
+        end)
+    end
+
+    --[[
+        Install TTS data.
+        Launches the system activity to download/install TTS voice data.
+    --]]
+    android.tts.installData = function()
+        JNI:context(android.app.activity.vm, function(jni)
+            jni:callVoidMethod(
+                android.app.activity.clazz,
+                "ttsInstallData",
+                "()V"
+            )
+        end)
+    end
+
+    --[[
+        Convenience function: Speak text with automatic initialization.
+        Initializes TTS if not already done, then speaks.
+        Parameters:
+            text - string to speak
+            queueMode - optional, defaults to QUEUE_FLUSH
+        Returns: boolean - true if successful
+    --]]
+    android.tts.say = function(text, queueMode)
+        if not android.tts.init() then
+            return false
+        end
+        return android.tts.speak(text, queueMode)
+    end
+
     android.getStatusBarHeight = function()
         return JNI:context(android.app.activity.vm, function(jni)
             return jni:callIntMethod(
