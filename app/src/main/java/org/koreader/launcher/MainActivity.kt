@@ -139,7 +139,11 @@ class MainActivity : NativeActivity(), LuaInterface,
         Log.v(tag, String.format(Locale.US,
             "native orientation: %s", if (this.screenIsLandscape) "landscape" else "portrait"))
 
-        registerReceiver(event, event.filter)
+        if (Build.VERSION.SDK_INT >= 33) {
+            registerReceiver(event, event.filter, Context.RECEIVER_EXPORTED)
+        } else {
+            registerReceiver(event, event.filter)
+        }
 
         if (!hasMandatoryPermissions()) {
             requestMandatoryPermissions()
