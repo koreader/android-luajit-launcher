@@ -1,3 +1,4 @@
+//file:noinspection GrDeprecatedAPIUsage
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
@@ -8,9 +9,6 @@ android {
     compileSdk rootProject.ext.compileSdk
     def baseVersionCode = versCode as Integer
 
-    aaptOptions {
-        noCompress '7z'
-    }
 
     defaultConfig {
         applicationId "org.koreader.launcher"
@@ -119,6 +117,9 @@ android {
         disable 'SameParameterValue'
         htmlReport false
         xmlReport false
+    }
+    androidResources {
+        noCompress '7z'
     }
 
     applicationVariants.configureEach { variant ->

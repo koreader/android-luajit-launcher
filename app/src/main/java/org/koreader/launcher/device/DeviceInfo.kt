@@ -10,7 +10,7 @@ import android.os.Build
 import android.util.Log
 import java.util.Locale
 
-@Suppress("detekt:all")
+@Suppress("detekt:all", "LocalVariableName")
 object DeviceInfo {
     private const val TAG = "DeviceInfo"
 
@@ -509,7 +509,7 @@ object DeviceInfo {
             // Onyx Note Air 4C
             BRAND == "onyx" && MODEL == "noteair4c"
             -> Id.ONYX_NOTE_AIR_4C
-            
+
             // Onyx Note Air 5C
             BRAND == "onyx" && MODEL == "noteair5c"
             -> Id.ONYX_NOTE_AIR_5C

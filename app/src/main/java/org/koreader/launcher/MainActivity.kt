@@ -2,8 +2,6 @@ package org.koreader.launcher
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.annotation.TargetApi
-import android.app.Activity
 import android.app.NativeActivity
 import android.content.ClipboardManager
 import android.content.ClipData
@@ -24,9 +22,9 @@ import androidx.core.content.ContextCompat
 import org.koreader.launcher.device.Device
 import org.koreader.launcher.dialog.LightDialog
 import org.koreader.launcher.extensions.*
-import java.io.File
 import java.util.Locale
 import java.util.concurrent.CountDownLatch
+import androidx.core.net.toUri
 
 class MainActivity : NativeActivity(), LuaInterface,
     ActivityCompat.OnRequestPermissionsResultCallback {
@@ -178,6 +176,7 @@ class MainActivity : NativeActivity(), LuaInterface,
         drawSplashScreen(holder)
     }
 
+    @SuppressLint("ObsoleteSdkInt")
     @RequiresApi(Build.VERSION_CODES.P)
     override fun onAttachedToWindow() {
         Log.d(TAG_SURFACE, "onAttachedToWindow()")
@@ -226,9 +225,9 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     /* Called on activity result, available from KitKat onwards */
-    @TargetApi(19)
+    @RequiresApi(19)
     override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
-        if (requestCode == ACTION_SAF_FILEPICKER_ID && resultCode == Activity.RESULT_OK) {
+        if (requestCode == ACTION_SAF_FILEPICKER_ID && resultCode == RESULT_OK) {
             val importPath = lastImportedPath ?: return
             resultData?.let {
                 val clipData = it.clipData
@@ -277,7 +276,7 @@ class MainActivity : NativeActivity(), LuaInterface,
     @Suppress("NewApi")
     override fun canIgnoreBatteryOptimizations(): Boolean {
         return if (MainApp.isAtLeastApi(Build.VERSION_CODES.M)) {
-            val pm = applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager
+            val pm = applicationContext.getSystemService(POWER_SERVICE) as PowerManager
             pm.isIgnoringBatteryOptimizations(packageName)
         } else false
     }
@@ -359,7 +358,7 @@ class MainActivity : NativeActivity(), LuaInterface,
         val result = Box<String>()
         runOnUiThread {
             result.value = try {
-                val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
                 val clipData: ClipData? = clipboard.primaryClip
                 clipData?.getItemAt(0)?.text?.toString()?.trim() ?: ""
             } catch (e: Exception) {
@@ -521,7 +520,7 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun hasClipboardText(): Boolean {
-        val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
         return clipboard.primaryClip?.let {
             (it.itemCount > 0)
         }?: false
@@ -629,7 +628,7 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun openLink(url: String): Boolean {
-        val webpage = Uri.parse(url)
+        val webpage = url.toUri()
         val intent = Intent(Intent.ACTION_VIEW, webpage)
         return try {
             startActivity(intent)
@@ -692,7 +691,7 @@ class MainActivity : NativeActivity(), LuaInterface,
 
     override fun setClipboardText(text: String) {
         runOnUiThread {
-            val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
             clipboard.setPrimaryClip(ClipData.newPlainText("KOReader_clipboard", text))
         }
     }

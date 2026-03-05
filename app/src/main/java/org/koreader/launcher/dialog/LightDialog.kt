@@ -2,7 +2,6 @@ package org.koreader.launcher.dialog
 
 import android.app.Activity
 import android.app.AlertDialog
-import android.graphics.Color
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +10,7 @@ import android.widget.RelativeLayout
 import android.widget.SeekBar
 import android.widget.TextView
 import org.koreader.launcher.device.LightsInterface
+import androidx.core.graphics.toColorInt
 
 class LightDialog {
 
@@ -61,7 +61,7 @@ class LightDialog {
             val linearLayout = LinearLayout(activity)
             linearLayout.orientation = LinearLayout.VERTICAL
             if (hasTitle) {
-                divider.setBackgroundColor(Color.parseColor("#B3B3B3"))
+                divider.setBackgroundColor("#B3B3B3".toColorInt())
                 val param = RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 3)
                 param.setMargins(0, 0, 0, 10)
                 divider.layoutParams = param
