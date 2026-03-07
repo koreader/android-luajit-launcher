@@ -1,6 +1,8 @@
 /* generic EPD Controller for Android devices,
  * based on https://github.com/unwmun/refreshU */
 
+@file:Suppress("EmptyMethod")
+
 package org.koreader.launcher.device
 
 import android.util.Log

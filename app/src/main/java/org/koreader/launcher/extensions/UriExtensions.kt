@@ -1,5 +1,6 @@
 package org.koreader.launcher.extensions
 
+import android.annotation.SuppressLint
 import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
@@ -21,6 +22,7 @@ fun Uri.absolutePath(context: Context): String? {
     }
 }
 
+@SuppressLint("Range")
 fun Uri.toFile(context: Context, path: String): String? {
     if (this.scheme != ContentResolver.SCHEME_CONTENT) {
         Log.e(TAG, "unsupported scheme")

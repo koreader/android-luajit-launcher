@@ -11,19 +11,23 @@
     <!-- common android permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS"
+        tools:ignore="ProtectedPermissions" />
+
+    <!-- legacy storage permissions -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="29" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" android:maxSdkVersion="29" />
-    <uses-permission android:name="android.permission.WRITE_SETTINGS"
-        tools:ignore="ProtectedPermissions" />
 
     <!-- These are used on API30+ -->
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
-        tools:ignore="ScopedStorage" />
-    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
+        tools:ignore="AllFilesAccessPolicy,ScopedStorage" />
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
+        tools:ignore="PackageVisibilityPolicy" />
 
     <application
+        tools:ignore="DataExtractionRules,DiscouragedApi,NonResizeableActivity"
         android:name=".MainApp"
         android:icon="@mipmap/icon"
         android:banner="@mipmap/banner"
@@ -41,8 +45,7 @@
             android:resizeableActivity="false"
             android:screenOrientation="nosensor"
             android:launchMode="singleInstance"
-            android:configChanges="colorMode|density|fontScale|keyboard|keyboardHidden|layoutDirection|locale|mcc|mnc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|touchscreen|uiMode"
-            tools:ignore="NonResizeableActivity">
+            android:configChanges="colorMode|density|fontScale|keyboard|keyboardHidden|layoutDirection|locale|mcc|mnc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|touchscreen|uiMode">
             <meta-data android:name="android.app.lib_name" android:value="luajit-launcher" />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

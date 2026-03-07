@@ -55,7 +55,7 @@ class TolinoNtxNoWarmthController : Ioctl(), LightsInterface {
     }
 
     override fun setBrightness(activity: Activity, brightness: Int) {
-        if (brightness < MIN || brightness > BRIGHTNESS_MAX) {
+        if (brightness !in MIN..BRIGHTNESS_MAX) {
             Log.w(TAG, "brightness value of of range: $brightness")
             return
         }

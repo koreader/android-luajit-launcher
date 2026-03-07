@@ -271,7 +271,7 @@ private fun startDictionaryActivity(context: Context, intent: Intent, domain: St
         try {
             val pm = context.packageManager
             val act = pm.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY)
-            if (act.size > 0) {
+            if (act.isNotEmpty()) {
                 context.startActivity(intent)
             }
         } catch (e: Exception) {
