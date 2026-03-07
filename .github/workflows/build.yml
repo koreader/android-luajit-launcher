@@ -25,7 +25,7 @@ jobs:
     name: ${{ matrix.variant }}
     runs-on: ubuntu-latest
     container:
-      image: koreader/koandroid:0.9.1-22.04
+      image: benoitpierre/koandroid:0.10.0-22.04
 
     steps:
 
