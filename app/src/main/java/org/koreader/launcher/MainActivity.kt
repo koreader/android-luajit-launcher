@@ -94,39 +94,24 @@ class MainActivity : NativeActivity(), LuaInterface,
             et.isFocusableInTouchMode = true
             et.visibility = View.VISIBLE
             et.alpha = 0f
-            var suppressTextWatcher = false
             et.addTextChangedListener(object: TextWatcher {
                 override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                    if (suppressTextWatcher) {
-                        suppressTextWatcher = false
-                        return
-                    }                    // These transient changes are normally produced by IME composing (preedit).
-                    // Keep diagnostic logs so we can see the transient text, but avoid enqueueing
-                    // committed text while composing — composing updates are handled via
-                    // setComposingText()/onCompose.
+                    // Keep TextWatcher as an observation point only. We want commitText() to be
+                    // the single authoritative source of committed text, because TextWatcher sees
+                    // both transient composition updates and the eventual committed mutation.
                     if ((et as? ImeCaptureEditText)?.isComposing == true) {
-                        Log.i(tag, "TextWatcher observed composing change (skip enqueue)")
-                        // fall through so we still reach the later diagnostic logging of the
-                        // inserted text, but do not add the value to imeQueue.
+                        Log.i(tag, "TextWatcher observed composing change")
                     }
-                    Log.i(tag, "text changed!");
+                    Log.i(tag, "text changed!")
                     if (s == null) return
                     if (count > 0) {
                         val end = start + count
                         if (start >= 0 && end <= s.length) {
                             val inserted = s.subSequence(start, end).toString()
-                            Log.i(tag, "in if");
+                            Log.i(tag, "in if")
                             if (inserted.isNotEmpty()) {
                                 Log.i(tag, "got text $inserted")
-                                if ((et as? ImeCaptureEditText)?.isComposing == true) {
-                                    Log.i(tag, "skip enqueue: composing active")
-                                } else {
-                                    imeQueue.add(inserted)
-                                    // 120 == AEVENT_TEXT_INPUT
-                                    event.write(120)
-                                    et.text?.clear()
-                                }
                             }
                         }
                     }
@@ -149,8 +134,6 @@ class MainActivity : NativeActivity(), LuaInterface,
                     imeQueue.add(committed)
                     // 120 == AEVENT_TEXT_INPUT
                     event.write(120)
-                    // avoid duplicate insertion coming from TextWatcher
-                    suppressTextWatcher = true
                     et.text?.clear()
                 }
             }
