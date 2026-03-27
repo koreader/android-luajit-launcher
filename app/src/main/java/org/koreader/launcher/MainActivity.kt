@@ -80,6 +80,7 @@ class MainActivity : NativeActivity(), LuaInterface,
     private var imeEditText: EditText? = null
     private val imeQueue = ConcurrentLinkedQueue<String>()
     private val imeCompositionQueue = ConcurrentLinkedQueue<String>()
+    private val imeComposingRegionQueue = ConcurrentLinkedQueue<String>()
     private val imeDeleteQueue = ConcurrentLinkedQueue<String>()
     private val imeSelectionQueue = ConcurrentLinkedQueue<String>()
 
@@ -131,6 +132,13 @@ class MainActivity : NativeActivity(), LuaInterface,
             // Also capture commitText via onCommit so committed text never gets lost
             (et as? ImeCaptureEditText)?.onCommit = { committed ->
                 if (!committed.isNullOrEmpty()) {
+                    // If there is an active composition, end it explicitly so the UI can reset composition state
+                    if ((et as? ImeCaptureEditText)?.isComposing == true) {
+                        imeCompositionQueue.add("F\t0\t")
+                        // 121 == AEVENT_IME_COMPOSITION
+                        event.write(121)
+                        (et as? ImeCaptureEditText)?.isComposing = false
+                    }
                     imeQueue.add(committed)
                     // 120 == AEVENT_TEXT_INPUT
                     event.write(120)
@@ -152,6 +160,14 @@ class MainActivity : NativeActivity(), LuaInterface,
                 imeSelectionQueue.add(payload)
                 // 123 == AEVENT_IME_SELECTION
                 event.write(123)
+            }
+
+            // Capture composing region updates (setComposingRegion)
+            (et as? ImeCaptureEditText)?.onSetComposingRegion = { start: Int, end: Int ->
+                val payload = "$start\t$end"
+                imeComposingRegionQueue.add(payload)
+                // 124 == AEVENT_IME_COMPOSITION_REGION
+                event.write(124)
             }
 
             // Attach to window without disturbing native content
@@ -212,6 +228,32 @@ class MainActivity : NativeActivity(), LuaInterface,
     override fun dequeueImeSelection(): String? {
         Log.i(tag, "dequeueImeSelection")
         return imeSelectionQueue.poll()
+    }
+
+    @Suppress("unused")
+    override fun dequeueImeComposingRegion(): String? {
+        Log.i(tag, "dequeueImeComposingRegion")
+        return imeComposingRegionQueue.poll()
+    }
+
+    @Suppress("unused")
+    override fun setImeSelection(start: Int, end: Int) {
+        runOnUiThread {
+            (imeEditText as? ImeCaptureEditText)?.syncEditorSelection(start, end)
+        }
+    }
+
+    @Suppress("unused")
+    override fun setImeComposingRegion(start: Int, end: Int) {
+        runOnUiThread {
+            (imeEditText as? ImeCaptureEditText)?.syncEditorState(
+                imeEditText?.text?.toString() ?: "",
+                start,
+                end,
+                start,
+                end
+            )
+        }
     }
 
     companion object {

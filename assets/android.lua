@@ -593,6 +593,7 @@ enum {
     AEVENT_IME_COMPOSITION = 121,
     AEVENT_IME_DELETE = 122,
     AEVENT_IME_SELECTION = 123,
+    AEVENT_IME_COMPOSITION_REGION = 124,
 };
 
 enum {
@@ -2509,6 +2510,41 @@ local function run(android_app_state)
                 "()Ljava/lang/String;"
             )
             return jni:to_string(text)
+        end)
+    end
+
+    android.dequeueImeComposingRegion = function()
+        return JNI:context(android.app.activity.vm, function(jni)
+            local text = jni:callObjectMethod(
+                android.app.activity.clazz,
+                "dequeueImeComposingRegion",
+                "()Ljava/lang/String;"
+            )
+            return jni:to_string(text)
+        end)
+    end
+
+    android.setImeSelection = function(sel_start, sel_end)
+        JNI:context(android.app.activity.vm, function(jni)
+            jni:callVoidMethod(
+                android.app.activity.clazz,
+                "setImeSelection",
+                "(II)V",
+                sel_start,
+                sel_end
+            )
+        end)
+    end
+
+    android.setImeComposingRegion = function(sel_start, sel_end)
+        JNI:context(android.app.activity.vm, function(jni)
+            jni:callVoidMethod(
+                android.app.activity.clazz,
+                "setImeComposingRegion",
+                "(II)V",
+                sel_start,
+                sel_end
+            )
         end)
     end
 

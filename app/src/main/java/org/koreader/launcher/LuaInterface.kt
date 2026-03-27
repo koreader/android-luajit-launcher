@@ -89,4 +89,7 @@ interface LuaInterface {
     fun dequeueComposingText(): String?
     fun dequeueImeDelete(): String?
     fun dequeueImeSelection(): String?
+    fun dequeueImeComposingRegion(): String?
+    fun setImeSelection(start: Int, end: Int)
+    fun setImeComposingRegion(start: Int, end: Int)
 }
