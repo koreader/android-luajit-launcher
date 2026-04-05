@@ -21,6 +21,7 @@ import android.widget.Toast
 import android.widget.EditText
 import android.text.TextWatcher
 import android.text.Editable
+import android.text.Selection
 import android.view.inputmethod.EditorInfo
 import android.text.InputType
 import android.view.inputmethod.InputMethodManager
@@ -58,6 +59,9 @@ class MainActivity : NativeActivity(), LuaInterface,
     // Fullscreen - only used on API levels 16-18
     private var fullscreen: Boolean = true
 
+    // Last composition text from IME (for finish-case fallback)
+    private var lastComposingText: String? = null
+
     // Splashscreen is active
     private var splashScreen: Boolean = true
 
@@ -83,6 +87,7 @@ class MainActivity : NativeActivity(), LuaInterface,
     private val imeComposingRegionQueue = ConcurrentLinkedQueue<String>()
     private val imeDeleteQueue = ConcurrentLinkedQueue<String>()
     private val imeSelectionQueue = ConcurrentLinkedQueue<String>()
+    private val imeStateQueue = ConcurrentLinkedQueue<String>()
 
     private fun ensureImeEditText(): EditText {
         var et = imeEditText
@@ -122,8 +127,17 @@ class MainActivity : NativeActivity(), LuaInterface,
 
             // Capture IME composition updates (setComposingText / finishComposingText)
             (et as? ImeCaptureEditText)?.onCompose = { newCursorPos, composingText, finished ->
+                var payloadText = composingText
+                if (!finished) {
+                    lastComposingText = composingText
+                } else {
+                    if (payloadText.isNullOrEmpty()) {
+                        payloadText = lastComposingText
+                    }
+                    lastComposingText = null
+                }
                 val op = if (finished) 'F' else 'U'
-                val payload = "$op\t$newCursorPos\t${composingText ?: ""}"
+                val payload = "$op\t$newCursorPos\t${payloadText ?: ""}"
                 imeCompositionQueue.add(payload)
                 // 121 == AEVENT_IME_COMPOSITION
                 event.write(121)
@@ -132,17 +146,9 @@ class MainActivity : NativeActivity(), LuaInterface,
             // Also capture commitText via onCommit so committed text never gets lost
             (et as? ImeCaptureEditText)?.onCommit = { committed ->
                 if (!committed.isNullOrEmpty()) {
-                    // If there is an active composition, end it explicitly so the UI can reset composition state
-                    if ((et as? ImeCaptureEditText)?.isComposing == true) {
-                        imeCompositionQueue.add("F\t0\t")
-                        // 121 == AEVENT_IME_COMPOSITION
-                        event.write(121)
-                        (et as? ImeCaptureEditText)?.isComposing = false
-                    }
                     imeQueue.add(committed)
                     // 120 == AEVENT_TEXT_INPUT
                     event.write(120)
-                    et.text?.clear()
                 }
             }
 
@@ -168,6 +174,12 @@ class MainActivity : NativeActivity(), LuaInterface,
                 imeComposingRegionQueue.add(payload)
                 // 124 == AEVENT_IME_COMPOSITION_REGION
                 event.write(124)
+            }
+
+            (et as? ImeCaptureEditText)?.onStateChanged = { snapshot: String ->
+                imeStateQueue.add(snapshot)
+                // 125 == AEVENT_IME_STATE
+                event.write(125)
             }
 
             // Attach to window without disturbing native content
@@ -201,7 +213,6 @@ class MainActivity : NativeActivity(), LuaInterface,
                 et.clearFocus()
                 et.alpha = 0f
                 et.visibility = View.VISIBLE
-                et.text?.clear()
             }
         }
     }
@@ -237,6 +248,20 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     @Suppress("unused")
+    override fun dequeueTextInputState(): String? {
+        Log.i(tag, "dequeueTextInputState")
+        return imeStateQueue.poll()
+    }
+
+    @Suppress("unused")
+    override fun syncTextInputState(text: String, selectionStart: Int, selectionEnd: Int, compositionStart: Int, compositionEnd: Int) {
+        runOnUiThread {
+            val editText = ensureImeEditText() as? ImeCaptureEditText ?: return@runOnUiThread
+            editText.syncEditorState(text, selectionStart, selectionEnd, compositionStart, compositionEnd)
+        }
+    }
+
+    @Suppress("unused")
     override fun setImeSelection(start: Int, end: Int) {
         runOnUiThread {
             (imeEditText as? ImeCaptureEditText)?.syncEditorSelection(start, end)
@@ -246,10 +271,14 @@ class MainActivity : NativeActivity(), LuaInterface,
     @Suppress("unused")
     override fun setImeComposingRegion(start: Int, end: Int) {
         runOnUiThread {
-            (imeEditText as? ImeCaptureEditText)?.syncEditorState(
-                imeEditText?.text?.toString() ?: "",
-                start,
-                end,
+            val editText = imeEditText as? ImeCaptureEditText ?: return@runOnUiThread
+            val editable = editText.editableText ?: return@runOnUiThread
+            val selectionStart = Selection.getSelectionStart(editable)
+            val selectionEnd = Selection.getSelectionEnd(editable)
+            editText.syncEditorState(
+                editable.toString(),
+                if (selectionStart >= 0) selectionStart else editable.length,
+                if (selectionEnd >= 0) selectionEnd else editable.length,
                 start,
                 end
             )

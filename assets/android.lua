@@ -594,6 +594,7 @@ enum {
     AEVENT_IME_DELETE = 122,
     AEVENT_IME_SELECTION = 123,
     AEVENT_IME_COMPOSITION_REGION = 124,
+    AEVENT_IME_STATE = 125,
 };
 
 enum {
@@ -2469,6 +2470,23 @@ local function run(android_app_state)
         end)
     end
 
+    android.syncTextInputState = function(text, selection_start, selection_end, composition_start, composition_end)
+        JNI:context(android.app.activity.vm, function(jni)
+            local state_text = jni.env[0].NewStringUTF(jni.env, text)
+            jni:callVoidMethod(
+                android.app.activity.clazz,
+                "syncTextInputState",
+                "(Ljava/lang/String;IIII)V",
+                state_text,
+                selection_start,
+                selection_end,
+                composition_start,
+                composition_end
+            )
+            jni.env[0].DeleteLocalRef(jni.env, state_text)
+        end)
+    end
+
     android.dequeueCommittedText = function()
         return JNI:context(android.app.activity.vm, function(jni)
             local text = jni:callObjectMethod(
@@ -2518,6 +2536,17 @@ local function run(android_app_state)
             local text = jni:callObjectMethod(
                 android.app.activity.clazz,
                 "dequeueImeComposingRegion",
+                "()Ljava/lang/String;"
+            )
+            return jni:to_string(text)
+        end)
+    end
+
+    android.dequeueTextInputState = function()
+        return JNI:context(android.app.activity.vm, function(jni)
+            local text = jni:callObjectMethod(
+                android.app.activity.clazz,
+                "dequeueTextInputState",
                 "()Ljava/lang/String;"
             )
             return jni:to_string(text)

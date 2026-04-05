@@ -90,6 +90,8 @@ interface LuaInterface {
     fun dequeueImeDelete(): String?
     fun dequeueImeSelection(): String?
     fun dequeueImeComposingRegion(): String?
+    fun dequeueTextInputState(): String?
+    fun syncTextInputState(text: String, selectionStart: Int, selectionEnd: Int, compositionStart: Int, compositionEnd: Int)
     fun setImeSelection(start: Int, end: Int)
     fun setImeComposingRegion(start: Int, end: Int)
 }
