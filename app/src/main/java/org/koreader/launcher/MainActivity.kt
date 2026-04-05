@@ -89,6 +89,19 @@ class MainActivity : NativeActivity(), LuaInterface,
     private val imeSelectionQueue = ConcurrentLinkedQueue<String>()
     private val imeStateQueue = ConcurrentLinkedQueue<String>()
 
+    private fun describeImeEditTextState(editText: EditText?): String {
+        val imeCaptureEditText = editText as? ImeCaptureEditText
+        if (imeCaptureEditText == null) {
+            return if (editText == null) {
+                "<no-edit-text>"
+            } else {
+                "type=${editText.javaClass.simpleName} focused=${editText.isFocused} windowFocused=${editText.hasWindowFocus()} visibility=${editText.visibility}"
+            }
+        }
+
+        return "focused=${imeCaptureEditText.isFocused} windowFocused=${imeCaptureEditText.hasWindowFocus()} visibility=${imeCaptureEditText.visibility} state=${imeCaptureEditText.snapshotEditorState()}"
+    }
+
     private fun ensureImeEditText(): EditText {
         var et = imeEditText
         if (et == null) {
@@ -192,14 +205,19 @@ class MainActivity : NativeActivity(), LuaInterface,
 
     @Suppress("unused")
     override fun startTextInput() {
+        Log.i(tag, "startTextInput queued current=${describeImeEditTextState(imeEditText)}")
         runOnUiThread {
             val et = ensureImeEditText()
+            Log.i(tag, "startTextInput ui before-show ${describeImeEditTextState(et)}")
             if (et.visibility != View.VISIBLE) et.visibility = View.VISIBLE
             et.alpha = 0f
             et.post {
+                Log.i(tag, "startTextInput post before-focus ${describeImeEditTextState(et)}")
                 if (!et.isFocused) et.requestFocus()
+                Log.i(tag, "startTextInput post after-focus ${describeImeEditTextState(et)}")
                 val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.showSoftInput(et, InputMethodManager.SHOW_IMPLICIT)
+                Log.i(tag, "startTextInput post after-show active=${imm.isActive(et)} acceptingText=${imm.isAcceptingText} ${describeImeEditTextState(et)}")
             }
         }
     }
@@ -255,16 +273,31 @@ class MainActivity : NativeActivity(), LuaInterface,
 
     @Suppress("unused")
     override fun syncTextInputState(text: String, selectionStart: Int, selectionEnd: Int, compositionStart: Int, compositionEnd: Int) {
+        Log.i(tag, "syncTextInputState queued textLength=${text.length} sel=${selectionStart}:${selectionEnd} comp=${compositionStart}:${compositionEnd} current=${describeImeEditTextState(imeEditText)}")
         runOnUiThread {
             val editText = ensureImeEditText() as? ImeCaptureEditText ?: return@runOnUiThread
+            Log.i(tag, "syncTextInputState apply before ${describeImeEditTextState(editText)}")
             editText.syncEditorState(text, selectionStart, selectionEnd, compositionStart, compositionEnd)
+            Log.i(tag, "syncTextInputState apply after ${describeImeEditTextState(editText)}")
         }
     }
 
     @Suppress("unused")
     override fun setImeSelection(start: Int, end: Int) {
+        Log.i(tag, "setImeSelection queued start=$start end=$end current=${describeImeEditTextState(imeEditText)}")
         runOnUiThread {
-            (imeEditText as? ImeCaptureEditText)?.syncEditorSelection(start, end)
+            lastComposingText = null
+            val editText = imeEditText as? ImeCaptureEditText ?: return@runOnUiThread
+            val editable = editText.editableText ?: return@runOnUiThread
+            Log.i(tag, "setImeSelection apply before ${describeImeEditTextState(editText)}")
+            editText.syncEditorState(
+                editable.toString(),
+                start,
+                end,
+                -1,
+                -1,
+            )
+            Log.i(tag, "setImeSelection apply after ${describeImeEditTextState(editText)}")
         }
     }
 

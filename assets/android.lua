@@ -2478,10 +2478,12 @@ local function run(android_app_state)
                 "syncTextInputState",
                 "(Ljava/lang/String;IIII)V",
                 state_text,
-                selection_start,
-                selection_end,
-                composition_start,
-                composition_end
+                ffi.new('int32_t', selection_start),
+                ffi.new('int32_t', selection_end),
+                ffi.new('int32_t', composition_start),
+                ffi.new('int32_t', composition_end)
+                -- Note that JNI won't covert lua number to int, we need to convert
+                -- it explictly.
             )
             jni.env[0].DeleteLocalRef(jni.env, state_text)
         end)
@@ -2559,8 +2561,10 @@ local function run(android_app_state)
                 android.app.activity.clazz,
                 "setImeSelection",
                 "(II)V",
-                sel_start,
-                sel_end
+                ffi.new('int32_t', sel_start),
+                ffi.new('int32_t', sel_end)
+                -- Note that JNI won't covert lua number to int, we need to convert
+                -- it explictly.
             )
         end)
     end
@@ -2571,8 +2575,10 @@ local function run(android_app_state)
                 android.app.activity.clazz,
                 "setImeComposingRegion",
                 "(II)V",
-                sel_start,
-                sel_end
+                ffi.new('int32_t', sel_start),
+                ffi.new('int32_t', sel_end)
+                -- Note that JNI won't covert lua number to int, we need to convert
+                -- it explictly.
             )
         end)
     end
