@@ -731,6 +731,7 @@ object DeviceInfo {
             Id.ONYX_NOTE_AIR_3C,
             Id.ONYX_NOTE_AIR_4C,
             Id.ONYX_NOTE_AIR_5C,
+            Id.ONYX_PALMA2_PRO,
             Id.ONYX_TAB_ULTRA_C,
             Id.ONYX_TAB_ULTRA_C_PRO,
             -> true else -> false
