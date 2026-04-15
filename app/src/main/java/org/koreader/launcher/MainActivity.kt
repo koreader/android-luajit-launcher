@@ -520,6 +520,10 @@ class MainActivity : NativeActivity(), LuaInterface,
         return device.bugLifecycle
     }
 
+    override fun hasBrokenTouchReport(): Boolean {
+        return device.brokenTouchReport
+    }
+
     override fun hasClipboardText(): Boolean {
         val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         return clipboard.primaryClip?.let {

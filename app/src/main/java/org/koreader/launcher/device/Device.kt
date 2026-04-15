@@ -9,6 +9,7 @@ class Device(activity: Activity) {
 
     @Suppress("unused")
     val product = DeviceInfo.PRODUCT
+    val brokenTouchReport = DeviceInfo.QUIRK_BROKEN_TOUCH_REPORT
     val needsWakelocks = DeviceInfo.QUIRK_NEEDS_WAKELOCKS
     val bugLifecycle = DeviceInfo.QUIRK_BROKEN_LIFECYCLE
     val hasColorScreen = DeviceInfo.HAS_COLOR_SCREEN
