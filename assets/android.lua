@@ -2499,6 +2499,17 @@ local function run(android_app_state)
         end)
     end
 
+    android.getWifiNetworkDetails = function()
+        return JNI:context(android.app.activity.vm, function(jni)
+            local details = jni:callObjectMethod(
+                android.app.activity.clazz,
+                "getWifiNetworkDetails",
+                "()Ljava/lang/String;"
+            )
+            return jni:to_string(details)
+        end)
+    end
+
     android.download = function(url, name)
         return JNI:context(android.app.activity.vm, function(jni)
             local uri_string = jni.env[0].NewStringUTF(jni.env, url)

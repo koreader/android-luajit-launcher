@@ -29,6 +29,7 @@ interface LuaInterface {
     fun getLightDialogState(): Int
     fun getName(): String
     fun getNetworkInfo(): String
+    fun getWifiNetworkDetails(): String
     fun getPlatformName(): String
     fun getScreenAvailableHeight(): Int
     fun getScreenAvailableWidth(): Int

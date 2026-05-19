@@ -438,6 +438,10 @@ class MainActivity : NativeActivity(), LuaInterface,
         return networkInfo()
     }
 
+    override fun getWifiNetworkDetails(): String {
+        return wifiNetworkDetails()
+    }
+
     override fun getPlatformName(): String {
         return platform
     }

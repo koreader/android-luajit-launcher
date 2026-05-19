@@ -19,6 +19,7 @@ import android.view.Surface
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import java.net.NetworkInterface
 import java.util.*
 
 val Activity.platform: String
@@ -209,6 +210,40 @@ fun Activity.setWifiRadio(enable: Boolean): Boolean {
     } catch (e: Exception) {
         false
     }
+}
+
+@Suppress("DEPRECATION")
+fun Activity.wifiNetworkDetails(): String {
+    if (!wifiEnabled()) return ""
+    val wifi = applicationContext.getSystemService(Context.WIFI_SERVICE) as? WifiManager ?: return ""
+    val info = wifi.connectionInfo
+
+    val ipInt = info?.ipAddress ?: 0
+    val ip = if (ipInt == 0) "" else "%d.%d.%d.%d".format(
+        ipInt and 0xFF, (ipInt shr 8) and 0xFF,
+        (ipInt shr 16) and 0xFF, (ipInt shr 24) and 0xFF
+    )
+
+    val mac = try {
+        NetworkInterface.getByName("wlan0")?.hardwareAddress
+            ?.joinToString(":") { "%02X".format(it) } ?: ""
+    } catch (e: Exception) { "" }
+
+    var ssid = info?.ssid?.removeSurrounding("\"") ?: ""
+    if (ssid.isEmpty() || ssid == "<unknown ssid>" || ssid.startsWith("0x")) {
+        ssid = try {
+            val proc = Runtime.getRuntime().exec(arrayOf("su", "-c",
+                "dumpsys wifi 2>/dev/null | grep -m1 'extra:'"))
+            val line = proc.inputStream.bufferedReader().readLine() ?: ""
+            Regex("""extra: "([^"]*)"""").find(line)?.groupValues?.get(1) ?: ""
+        } catch (e: Exception) { "" }
+    }
+
+    return listOfNotNull(
+        if (ssid.isNotEmpty()) "SSID: $ssid" else null,
+        if (ip.isNotEmpty()) "IP: $ip" else null,
+        if (mac.isNotEmpty()) "MAC: $mac" else null
+    ).joinToString("\n")
 }
 
 fun Activity.pruneCacheDir() {
