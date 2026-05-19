@@ -9,6 +9,7 @@ import android.content.pm.PackageManager
 import android.graphics.Point
 import android.graphics.Rect
 import android.net.ConnectivityManager
+import android.net.wifi.WifiManager
 import android.net.NetworkCapabilities
 import android.os.Build
 import android.os.Environment
@@ -189,6 +190,25 @@ fun Activity.openWifi() {
         action = Settings.ACTION_WIFI_SETTINGS
     }
     startActivityCompat(this, openWifiIntent)
+}
+
+fun Activity.wifiEnabled(): Boolean {
+    val wifi = applicationContext.getSystemService(Context.WIFI_SERVICE) as? WifiManager ?: return false
+    return wifi.isWifiEnabled
+}
+
+@Suppress("DEPRECATION")
+fun Activity.setWifiRadio(enable: Boolean): Boolean {
+    val wifi = applicationContext.getSystemService(Context.WIFI_SERVICE) as? WifiManager ?: return false
+    if (wifi.setWifiEnabled(enable)) return true
+    // WifiManager.setWifiEnabled() is blocked on many devices (restricted by OEM or Android 10+).
+    // Fall back to root shell command.
+    val cmd = if (enable) "svc wifi enable" else "svc wifi disable"
+    return try {
+        Runtime.getRuntime().exec(arrayOf("su", "-c", cmd)).waitFor() == 0
+    } catch (e: Exception) {
+        false
+    }
 }
 
 fun Activity.pruneCacheDir() {

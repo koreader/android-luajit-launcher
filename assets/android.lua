@@ -2478,6 +2478,27 @@ local function run(android_app_state)
         end)
     end
 
+    android.isWifiEnabled = function()
+        return JNI:context(android.app.activity.vm, function(jni)
+            return jni:callBooleanMethod(
+                android.app.activity.clazz,
+                "isWifiEnabled",
+                "()Z"
+            )
+        end)
+    end
+
+    android.setWifiEnabled = function(enable)
+        return JNI:context(android.app.activity.vm, function(jni)
+            return jni:callBooleanMethod(
+                android.app.activity.clazz,
+                "setWifiEnabled",
+                "(Z)Z",
+                ffi.new("bool", enable)
+            )
+        end)
+    end
+
     android.download = function(url, name)
         return JNI:context(android.app.activity.vm, function(jni)
             local uri_string = jni.env[0].NewStringUTF(jni.env, url)

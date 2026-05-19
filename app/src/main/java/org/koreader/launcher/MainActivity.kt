@@ -640,8 +640,16 @@ class MainActivity : NativeActivity(), LuaInterface,
         }
     }
 
+    override fun isWifiEnabled(): Boolean {
+        return wifiEnabled()
+    }
+
     override fun openWifiSettings() {
         openWifi()
+    }
+
+    override fun setWifiEnabled(enable: Boolean): Boolean {
+        return setWifiRadio(enable)
     }
 
     override fun performHapticFeedback(constant: Int, force: Int) {
