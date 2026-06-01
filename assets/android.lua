@@ -1926,6 +1926,16 @@ local function run(android_app_state)
         end)
     end
 
+    android.hasBrokenTouchReport = function()
+        return JNI:context(android.app.activity.vm, function(jni)
+            return jni:callBooleanMethod(
+                android.app.activity.clazz,
+                "hasBrokenTouchReport",
+                "()Z"
+            )
+        end)
+    end
+
     android.setHapticOverride = function(enable)
         android.hapticOverride = enable or false
     end
@@ -1972,6 +1982,7 @@ local function run(android_app_state)
     -- device properties
     android.prop.version = android.getVersion()
     android.prop.brokenLifecycle = android.hasBrokenLifecycle()
+    android.prop.brokenTouchReport = android.hasBrokenTouchReport()
 
     -- update logger name
     android.log_name = android.prop.name

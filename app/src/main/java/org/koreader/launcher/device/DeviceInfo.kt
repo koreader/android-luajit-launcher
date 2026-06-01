@@ -28,6 +28,7 @@ object DeviceInfo {
 
     // known quirks
     val QUIRK_BROKEN_LIFECYCLE: Boolean
+    val QUIRK_BROKEN_TOUCH_REPORT: Boolean
     val QUIRK_NEEDS_WAKELOCKS: Boolean
     val QUIRK_NO_LIGHTS: Boolean
 
@@ -73,6 +74,7 @@ object DeviceInfo {
         MEEBOOK_M6C,
         MEEBOOK_M7,
         MEEBOOK_P6,
+        MOBISCRIBE_WAVE,
         MOAAN_MIX7,
         MOOINKPLUS2C,
         NABUK,
@@ -345,6 +347,10 @@ object DeviceInfo {
             // Meebook P6
             MANUFACTURER == "haoqing" && MODEL == "p6"
             -> Id.MEEBOOK_P6
+
+            // Mobiscribe Wave
+            BRAND == "allwinner" && MODEL == "wave" && DEVICE == "e70p24_android"
+            -> Id.MOBISCRIBE_WAVE
 
             // Moaan Mix7
             MANUFACTURER == STR_ROCKCHIP && MODEL == "moaanmix7"
@@ -698,6 +704,12 @@ object DeviceInfo {
         // has broken lifecycle
         QUIRK_BROKEN_LIFECYCLE = when (ID) {
             Id.ONYX_POKE2,
+            -> true else -> false
+        }
+
+        // reports ACONFIGURATION_TOUCHSCREEN_NOTOUCH despite having a touchscreen
+        QUIRK_BROKEN_TOUCH_REPORT = when (ID) {
+            Id.MOBISCRIBE_WAVE,
             -> true else -> false
         }
 
