@@ -17,7 +17,6 @@ object LightsFactory {
                 DeviceInfo.Id.ONYX_GALILEO2,
                 DeviceInfo.Id.ONYX_GO_COLOR7,
                 DeviceInfo.Id.ONYX_GO6,
-                DeviceInfo.Id.ONYX_GO7,
                 DeviceInfo.Id.ONYX_GO7GEN2,
                 DeviceInfo.Id.ONYX_NOTE_AIR_3C,
                 DeviceInfo.Id.ONYX_NOTE_AIR_4C,
@@ -82,6 +81,7 @@ object LightsFactory {
                 DeviceInfo.Id.ONYX_POKE4LITE,
                 DeviceInfo.Id.ONYX_TAB_ULTRA,
                 DeviceInfo.Id.STORYTEL_READER2,
+                DeviceInfo.Id.ONYX_GO7,
                 -> {
                     logController("Onyx/Sdk")
                     OnyxSdkLightsController()
