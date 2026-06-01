@@ -1,3 +1,5 @@
+@file:Suppress("SameReturnValue")
+
 package org.koreader.launcher
 
 import androidx.annotation.WorkerThread

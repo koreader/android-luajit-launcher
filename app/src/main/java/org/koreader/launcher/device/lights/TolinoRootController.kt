@@ -66,7 +66,7 @@ class TolinoRootController : LightsInterface {
             setBrightness(activity, startBrightness + (BRIGHTNESS_MAX/100+1))
 
         // we have to wait until the android changes seep through to the file,
-        // 50ms is to less, 60ms seems to work, so use 80 to have some safety
+        // 50ms is too less, 60ms seems to work, so use 80 to have some safety
         Thread.sleep(80)
 
         val actualBrightnessFromFile = try {
@@ -106,7 +106,7 @@ class TolinoRootController : LightsInterface {
     }
 
     override fun setBrightness(activity: Activity, brightness: Int) {
-        if (brightness < MIN || brightness > BRIGHTNESS_MAX) {
+        if (brightness !in MIN..BRIGHTNESS_MAX) {
             Log.w(TAG, "brightness value of of range: $brightness")
             return
         }
@@ -120,7 +120,7 @@ class TolinoRootController : LightsInterface {
     }
 
     override fun setWarmth(activity: Activity, warmth: Int) {
-        if (warmth < MIN || warmth > WARMTH_MAX) {
+        if (warmth !in MIN..WARMTH_MAX) {
             Log.w(TAG, "warmth value of of range: $warmth")
             return
         }

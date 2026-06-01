@@ -53,7 +53,7 @@ class BoyueS62RootController : LightsInterface {
     }
 
     override fun setBrightness(activity: Activity, brightness: Int) {
-        if (brightness < BRIGHTNESS_MIN || brightness > BRIGHTNESS_MAX) {
+        if (brightness !in BRIGHTNESS_MIN..BRIGHTNESS_MAX) {
             Log.w(TAG, "brightness value out of range: $brightness")
             return
         }

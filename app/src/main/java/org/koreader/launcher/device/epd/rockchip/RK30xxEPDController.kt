@@ -46,7 +46,7 @@ abstract class RK30xxEPDController {
         init {
             try {
                 @Suppress("UNCHECKED_CAST")
-                eInkEnum = Class.forName("android.view.View\$EINK_MODE") as Class<Enum<*>>
+                eInkEnum = Class.forName($$"android.view.View$EINK_MODE") as Class<Enum<*>>
                 updateEpdMethod = View::class.java.getMethod("requestEpdMode",
                     eInkEnum, Boolean::class.javaPrimitiveType)
             } catch (e: ClassNotFoundException) {

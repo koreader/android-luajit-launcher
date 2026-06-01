@@ -1,5 +1,6 @@
 package org.koreader.launcher
 
+import android.annotation.SuppressLint
 import android.app.DownloadManager
 import android.content.Context
 import android.content.Intent
@@ -8,6 +9,7 @@ import android.os.Build
 import android.util.Log
 import androidx.core.content.FileProvider
 import java.io.File
+import androidx.core.net.toUri
 
 class ApkUpdater {
 
@@ -27,7 +29,7 @@ class ApkUpdater {
                 if (file.exists()) {
                     DOWNLOAD_EXISTS
                 } else {
-                    val request = DownloadManager.Request(Uri.parse(url))
+                    val request = DownloadManager.Request(url.toUri())
                     request.setMimeType("application/vnd.android.package-archive")
                     request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_HIDDEN)
                     request.setDestinationInExternalFilesDir(context, null, name)
@@ -56,6 +58,7 @@ class ApkUpdater {
         }
     }
 
+    @SuppressLint("RequestInstallPackagesPolicy")
     fun install(context: Context) {
         if (MainApp.OTA_UPDATES) {
             downloadPath?.let { apk ->

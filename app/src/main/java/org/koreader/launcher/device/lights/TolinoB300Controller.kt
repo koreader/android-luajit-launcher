@@ -1,11 +1,15 @@
+@file:Suppress("SameParameterValue")
+
 package org.koreader.launcher.device.lights
 
 import android.app.Activity
+import android.os.Build
 import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import android.os.Looper
 import android.os.Handler
+import androidx.annotation.RequiresApi
 import org.koreader.launcher.device.Ioctl
 import org.koreader.launcher.device.LightsInterface
 import org.koreader.launcher.device.DeviceInfo
@@ -33,6 +37,7 @@ class TolinoB300Controller : Ioctl(), LightsInterface {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     private fun ensureWriteSettingsPermission(activity: Activity): Boolean {
         if (!Settings.System.canWrite(activity.applicationContext)) {
             showToastOnUiThread(
@@ -87,9 +92,10 @@ class TolinoB300Controller : Ioctl(), LightsInterface {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     override fun setBrightness(activity: Activity, brightness: Int) {
         if (!ensureWriteSettingsPermission(activity)) return
-        if (brightness < MIN || brightness > BRIGHTNESS_MAX) {
+        if (brightness !in MIN..BRIGHTNESS_MAX) {
             Log.w(TAG, "brightness value of of range: $brightness")
             return
         }
@@ -105,9 +111,10 @@ class TolinoB300Controller : Ioctl(), LightsInterface {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     override fun setWarmth(activity: Activity, warmth: Int) {
         if (!ensureWriteSettingsPermission(activity)) return
-        if (warmth < MIN || warmth > WARMTH_MAX) {
+        if (warmth !in MIN..WARMTH_MAX) {
             Log.w(TAG, "warmth value of of range: $warmth")
             return
         }

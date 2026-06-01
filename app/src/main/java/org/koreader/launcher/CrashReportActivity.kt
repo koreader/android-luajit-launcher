@@ -15,8 +15,8 @@ class CrashReportActivity : AppCompatActivity() {
         intent?.extras?.let { bundle ->
             binding = CrashReportBinding.inflate(layoutInflater)
             setContentView(binding.root)
-            binding.title.text = bundle.get("title").toString()
-            binding.reason.text = bundle.get("reason").toString()
+            binding.title.text = bundle.getString("title")
+            binding.reason.text = bundle.getString("reason")
             if (binding.reason.text.equals("")) {
                 binding.reason.visibility = View.GONE
             }

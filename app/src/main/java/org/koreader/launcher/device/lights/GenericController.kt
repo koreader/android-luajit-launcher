@@ -60,7 +60,7 @@ class GenericController : LightsInterface {
         val level: Float? = when (brightness) {
             0 -> 0.0f
             else -> {
-                if ((brightness < BRIGHTNESS_MIN || brightness > BRIGHTNESS_MAX))
+                if ((brightness !in BRIGHTNESS_MIN..BRIGHTNESS_MAX))
                     null
                 else
                     (brightness - BRIGHTNESS_MIN) * 1.0f / (BRIGHTNESS_MAX - BRIGHTNESS_MIN)

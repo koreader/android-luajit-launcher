@@ -1,5 +1,6 @@
 package org.koreader.launcher
 
+import android.annotation.SuppressLint
 import android.graphics.Point
 import android.text.method.LinkMovementMethod
 import android.util.Log
@@ -151,6 +152,7 @@ class TestActivity: AppCompatActivity() {
         Log.i(tag, MARKER_END)
     }
 
+    @SuppressLint("DefaultLocale")
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         val msg = String.format("Pressed: %d", keyCode)
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()

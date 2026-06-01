@@ -1,20 +1,18 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
 
 android {
-    namespace 'org.koreader.launcher'
-    ndkVersion '23.2.8568313'
-    ndkPath System.getenv('ANDROID_NDK_HOME')
-    compileSdk rootProject.ext.compileSdk
+    namespace = 'org.koreader.launcher'
+    ndkVersion = '23.2.8568313'
+    ndkPath = System.getenv('ANDROID_NDK_HOME')
+    compileSdk = rootProject.ext.compileSdk
     def baseVersionCode = versCode as Integer
 
-    aaptOptions {
-        noCompress '7z'
-    }
 
     defaultConfig {
-        applicationId "org.koreader.launcher"
-        versionName versName
+        applicationId = "org.koreader.launcher"
+        versionName = versName
         minSdkVersion rootProject.ext.minSdk
         targetSdkVersion rootProject.ext.targetSdk
 
@@ -45,25 +43,27 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled true
-            shrinkResources true
+            minifyEnabled = true
+            shrinkResources = true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
 
         debug {
-            applicationIdSuffix ".debug"
-            minifyEnabled false
-            debuggable true
+            applicationIdSuffix = ".debug"
+            minifyEnabled = false
+            debuggable = true
         }
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = '17'
+    kotlin {
+	compilerOptions {
+	    jvmTarget = JvmTarget.JVM_17
+	}
     }
 
     flavorDimensions = [ 'ABI', 'CHANNEL'  ]
@@ -102,7 +102,7 @@ android {
 
     packagingOptions {
         jniLibs {
-            useLegacyPackaging true
+            useLegacyPackaging = true
         }
         resources {
             excludes += '/kotlin/**.kotlin_builtins'
@@ -117,14 +117,19 @@ android {
         disable 'GradleDependency'
         disable 'QueryAllPackagesPermission'
         disable 'SameParameterValue'
-        htmlReport false
-        xmlReport false
+        htmlReport = false
+        xmlReport = false
     }
+    androidResources {
+        noCompress '7z'
+    }
+}
 
-    applicationVariants.configureEach { variant ->
-        variant.outputs.configureEach {
-            outputFileName = "NativeActivity.apk"
-        }
+androidComponents {
+    onVariants(selector().all()) {
+	outputs.forEach {
+	    it.outputFileName.set("NativeActivity.apk")
+	}
     }
 }
 

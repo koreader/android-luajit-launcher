@@ -1,5 +1,6 @@
 package org.koreader.launcher
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
 import android.content.Intent
@@ -10,6 +11,7 @@ import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
 
+@Suppress("HasPlatformType")
 class MainApp : Application() {
     companion object {
         const val NAME = BuildConfig.APP_NAME
@@ -89,6 +91,7 @@ class MainApp : Application() {
         }
     }
 
+    @SuppressLint("DefaultUncaughtExceptionDelegation")
     @Suppress("DEPRECATION")
     override fun onCreate() {
         super.onCreate()

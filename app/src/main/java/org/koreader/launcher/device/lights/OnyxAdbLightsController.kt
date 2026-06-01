@@ -1,4 +1,4 @@
-@file:Suppress("SameParameterValue", "UNUSED_PARAMETER")
+@file:Suppress("SameParameterValue")
 
 package org.koreader.launcher.device.lights
 
@@ -82,6 +82,7 @@ class OnyxAdbLightsController : LightsInterface {
     }
 }
 
+@Suppress("RedundantSuppression")
 object FrontLightAdb {
     private const val TAG = "Lights"
 
@@ -163,18 +164,22 @@ object FrontLightAdb {
         }
     }
 
+    @Suppress("unused")
     fun getWarmth(context: Context?): Int {
         return getValue(getLightValueMethod, warmthType)
     }
 
+    @Suppress("unused")
     fun getBrightness(context: Context?): Int {
         return getValue(getLightValueMethod, brightnessType)
     }
 
+    @Suppress("unused")
     fun setWarmth(value: Int, context: Context?) {
         setValue(setLightValueMethod, warmthType, value)
     }
 
+    @Suppress("unused")
     fun setBrightness(value: Int, context: Context?) {
         setValue(setLightValueMethod, brightnessType, value)
     }
