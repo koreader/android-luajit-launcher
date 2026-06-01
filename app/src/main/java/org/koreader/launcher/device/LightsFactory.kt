@@ -82,7 +82,7 @@ object LightsFactory {
                 DeviceInfo.Id.ONYX_TAB_ULTRA,
                 DeviceInfo.Id.STORYTEL_READER2,
                 DeviceInfo.Id.ONYX_GO7,
-                    -> {
+                -> {
                     logController("Onyx/Sdk")
                     OnyxSdkLightsController()
                 }
