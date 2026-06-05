@@ -1,4 +1,5 @@
 package org.koreader.launcher.extensions
+import android.content.pm.ActivityInfo
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -302,6 +303,17 @@ fun Activity.getOrientationCompat(isLandscape: Boolean): Int {
 }
 
 fun Activity.setOrientationCompat(isLandscape: Boolean, orientation: Int) {
+	    // Pass through sensor modes without remapping
+	    if (orientation == ANDROID_FULL_SENSOR ||
+	        orientation == ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED ||
+	        orientation == ActivityInfo.SCREEN_ORIENTATION_SENSOR ||
+	        orientation == ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE ||
+	        orientation == ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT ||
+	        orientation == ActivityInfo.SCREEN_ORIENTATION_NOSENSOR ||
+	        orientation == ActivityInfo.SCREEN_ORIENTATION_USER) {
+	        requestedOrientation = orientation
+	        return
+	    }
     val newOrientation = if (isLandscape) {
         when (orientation) {
             ANDROID_LANDSCAPE -> ANDROID_PORTRAIT
@@ -320,6 +332,10 @@ fun Activity.setOrientationCompat(isLandscape: Boolean, orientation: Int) {
     requestedOrientation = newOrientation
 }
 
+fun Activity.setAutoOrientation() {
+    requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR
+}
+
 // constants from https://github.com/koreader/android-luajit-launcher/blob/master/assets/android.lua
 private const val ACTIVE_NETWORK_NONE = 0
 private const val ACTIVE_NETWORK_WIFI = 1
@@ -331,6 +347,7 @@ private const val ANDROID_LANDSCAPE = 0
 private const val ANDROID_PORTRAIT = 1
 private const val ANDROID_REVERSE_LANDSCAPE = 8
 private const val ANDROID_REVERSE_PORTRAIT = 9
+	private const val ANDROID_FULL_SENSOR = 10
 
 // constants from https://github.com/koreader/koreader-base/blob/master/ffi/framebuffer.lua
 private const val LINUX_PORTRAIT = 0

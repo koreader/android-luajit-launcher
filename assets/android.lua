@@ -2079,6 +2079,16 @@ local function run(android_app_state)
                 android.LOGW("ignoring invalid orientation", new_orientation)
             end
         end,
+	        setAuto = function(enabled)
+	            JNI:context(android.app.activity.vm, function(jni)
+	                jni:callVoidMethod(
+	                    android.app.activity.clazz,
+	                    "setScreenAutoRotation",
+	                    "(Z)V",
+	                    ffi.new("bool", enabled)
+	                )
+	            end)
+	        end,
     }
 
     android.enableFrontlightSwitch = function()

@@ -725,6 +725,15 @@ class MainActivity : NativeActivity(), LuaInterface,
         setOrientationCompat(screenIsLandscape, orientation)
     }
 
+    override fun setScreenAutoRotation(enabled: Boolean) {
+        if (enabled) {
+            setAutoOrientation()
+        } else {
+            // Lock to current orientation when disabling auto mode
+            setScreenOrientation(getScreenOrientation())
+        }
+    }
+
     override fun setScreenWarmth(warmth: Int) {
         device.lights.setWarmth(this, warmth)
     }
