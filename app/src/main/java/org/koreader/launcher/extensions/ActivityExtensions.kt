@@ -304,13 +304,7 @@ fun Activity.getOrientationCompat(isLandscape: Boolean): Int {
 
 fun Activity.setOrientationCompat(isLandscape: Boolean, orientation: Int) {
 	    // Pass through sensor modes without remapping
-	    if (orientation == ANDROID_FULL_SENSOR ||
-	        orientation == ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED ||
-	        orientation == ActivityInfo.SCREEN_ORIENTATION_SENSOR ||
-	        orientation == ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE ||
-	        orientation == ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT ||
-	        orientation == ActivityInfo.SCREEN_ORIENTATION_NOSENSOR ||
-	        orientation == ActivityInfo.SCREEN_ORIENTATION_USER) {
+	    if (isPassthroughOrientation(orientation)) {
 	        requestedOrientation = orientation
 	        return
 	    }
@@ -334,6 +328,16 @@ fun Activity.setOrientationCompat(isLandscape: Boolean, orientation: Int) {
 
 fun Activity.setAutoOrientation() {
     requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR
+}
+
+private fun isPassthroughOrientation(orientation: Int): Boolean {
+    return orientation == ANDROID_FULL_SENSOR ||
+        orientation == ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED ||
+        orientation == ActivityInfo.SCREEN_ORIENTATION_SENSOR ||
+        orientation == ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE ||
+        orientation == ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT ||
+        orientation == ActivityInfo.SCREEN_ORIENTATION_NOSENSOR ||
+        orientation == ActivityInfo.SCREEN_ORIENTATION_USER
 }
 
 // constants from https://github.com/koreader/android-luajit-launcher/blob/master/assets/android.lua
