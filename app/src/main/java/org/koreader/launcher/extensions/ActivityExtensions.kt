@@ -330,6 +330,17 @@ fun Activity.setAutoOrientation() {
     requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR
 }
 
+fun Activity.setLockedAutoOrientation(orientation: Int) {
+    // LinuxFB rotation constants: 0=UR, 2=UD (portrait axis, even);
+    // 1=CW, 3=CCW (landscape axis, odd).
+    // Restrict native sensor rotation to the same axis as the current orientation.
+    requestedOrientation = if (orientation.and(1) == 0) {
+        ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
+    } else {
+        ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+    }
+}
+
 private fun isPassthroughOrientation(orientation: Int): Boolean {
     return orientation == ANDROID_FULL_SENSOR ||
         orientation == ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED ||

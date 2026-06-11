@@ -2089,6 +2089,16 @@ local function run(android_app_state)
 	                )
 	            end)
 	        end,
+	setAutoLocked = function(orientation)
+	    JNI:context(android.app.activity.vm, function(jni)
+	        jni:callVoidMethod(
+	            android.app.activity.clazz,
+	            "setScreenAutoRotationLocked",
+	            "(I)V",
+	            ffi.new("int32_t", orientation)
+	        )
+	    end)
+	end,
     }
 
     android.enableFrontlightSwitch = function()

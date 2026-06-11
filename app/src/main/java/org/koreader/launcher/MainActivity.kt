@@ -734,6 +734,10 @@ class MainActivity : NativeActivity(), LuaInterface,
         }
     }
 
+    override fun setScreenAutoRotationLocked(orientation: Int) {
+        setLockedAutoOrientation(orientation)
+    }
+
     override fun setScreenWarmth(warmth: Int) {
         device.lights.setWarmth(this, warmth)
     }

@@ -78,6 +78,7 @@ interface LuaInterface {
     fun setScreenWarmth(warmth: Int)
     fun setScreenOffTimeout(ms: Int)
     fun setScreenAutoRotation(enabled: Boolean)
+    fun setScreenAutoRotationLocked(orientation: Int)
     fun setScreenOrientation(orientation: Int)
     fun startTestActivity()
     fun showFrontlightDialog(title: String, dim: String, warmth: String, okButton: String, cancelButton: String)
