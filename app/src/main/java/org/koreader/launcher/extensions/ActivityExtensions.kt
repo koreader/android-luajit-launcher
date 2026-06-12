@@ -303,11 +303,11 @@ fun Activity.getOrientationCompat(isLandscape: Boolean): Int {
 }
 
 fun Activity.setOrientationCompat(isLandscape: Boolean, orientation: Int) {
-	    // Pass through sensor modes without remapping
-	    if (isPassthroughOrientation(orientation)) {
-	        requestedOrientation = orientation
-	        return
-	    }
+    // Pass through sensor modes without remapping
+    if (isPassthroughOrientation(orientation)) {
+        requestedOrientation = orientation
+        return
+    }
     val newOrientation = if (isLandscape) {
         when (orientation) {
             ANDROID_LANDSCAPE -> ANDROID_PORTRAIT
