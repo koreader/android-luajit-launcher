@@ -332,11 +332,11 @@ fun Activity.setOrientationCompat(isLandscape: Boolean, orientation: Int) {
             else -> orientation
         }
     } else {
-        when (orientation) {
-            ANDROID_LANDSCAPE -> ANDROID_REVERSE_LANDSCAPE
-            ANDROID_REVERSE_LANDSCAPE -> ANDROID_LANDSCAPE
-            else -> orientation
-        }
+        // Native portrait: Lua already maps DEVICE_ROTATED_* to the
+        // correct ASCREEN_ORIENTATION_* constants. No further remapping
+        // needed — swapping LANDSCAPE↔REVERSE_LANDSCAPE would invert
+        // the CW/CCW direction (observed on this device).
+        orientation
     }
     Log.i("AROT_DIAG", String.format(Locale.US,
         "setOrientationCompat: orientation=%d isLandscape=%b -> requestedOrientation=%d",
