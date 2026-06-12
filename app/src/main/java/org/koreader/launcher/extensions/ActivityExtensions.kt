@@ -362,7 +362,7 @@ private const val ANDROID_LANDSCAPE = 0
 private const val ANDROID_PORTRAIT = 1
 private const val ANDROID_REVERSE_LANDSCAPE = 8
 private const val ANDROID_REVERSE_PORTRAIT = 9
-	private const val ANDROID_FULL_SENSOR = 10
+private const val ANDROID_FULL_SENSOR = 10
 
 // constants from https://github.com/koreader/koreader-base/blob/master/ffi/framebuffer.lua
 private const val LINUX_PORTRAIT = 0
