@@ -15,6 +15,7 @@ import android.os.Build
 import android.os.Environment
 import android.provider.Settings
 import android.util.DisplayMetrics
+import android.util.Log
 import android.view.Surface
 import android.view.View
 import androidx.appcompat.app.AlertDialog
@@ -294,17 +295,31 @@ private fun startActivityCompat(context: Context, intent: Intent) {
 /* Orientation */
 @Suppress("DEPRECATION")
 fun Activity.getOrientationCompat(isLandscape: Boolean): Int {
-    return when (windowManager.defaultDisplay.rotation) {
+    val rotation = windowManager.defaultDisplay.rotation
+    val result = when (rotation) {
         Surface.ROTATION_90 -> if (isLandscape) LINUX_PORTRAIT else LINUX_REVERSE_LANDSCAPE
         Surface.ROTATION_180 -> if (isLandscape) LINUX_REVERSE_LANDSCAPE else LINUX_REVERSE_PORTRAIT
         Surface.ROTATION_270 -> if (isLandscape) LINUX_REVERSE_PORTRAIT else LINUX_LANDSCAPE
         else -> if (isLandscape) LINUX_LANDSCAPE else LINUX_PORTRAIT
     }
+    Log.i("AROT_DIAG", String.format(Locale.US,
+        "getOrientationCompat: rotation=%d isLandscape=%b -> result=%d (%s)",
+        rotation, isLandscape, result,
+        when (result) {
+            0 -> "UR"
+            1 -> "CW"
+            2 -> "UD"
+            3 -> "CCW"
+            else -> "?"
+        }))
+    return result
 }
 
 fun Activity.setOrientationCompat(isLandscape: Boolean, orientation: Int) {
     // Pass through sensor modes without remapping
     if (isPassthroughOrientation(orientation)) {
+        Log.i("AROT_DIAG", String.format(Locale.US,
+            "setOrientationCompat: orientation=%d isPassthrough=true", orientation))
         requestedOrientation = orientation
         return
     }
@@ -323,6 +338,9 @@ fun Activity.setOrientationCompat(isLandscape: Boolean, orientation: Int) {
             else -> orientation
         }
     }
+    Log.i("AROT_DIAG", String.format(Locale.US,
+        "setOrientationCompat: orientation=%d isLandscape=%b -> requestedOrientation=%d",
+        orientation, isLandscape, newOrientation))
     requestedOrientation = newOrientation
 }
 
