@@ -297,9 +297,9 @@ private fun startActivityCompat(context: Context, intent: Intent) {
 fun Activity.getOrientationCompat(isLandscape: Boolean): Int {
     val rotation = windowManager.defaultDisplay.rotation
     val result = when (rotation) {
-        Surface.ROTATION_90 -> if (isLandscape) LINUX_PORTRAIT else LINUX_REVERSE_LANDSCAPE
+        Surface.ROTATION_90 -> if (isLandscape) LINUX_REVERSE_PORTRAIT else LINUX_LANDSCAPE
         Surface.ROTATION_180 -> if (isLandscape) LINUX_REVERSE_LANDSCAPE else LINUX_REVERSE_PORTRAIT
-        Surface.ROTATION_270 -> if (isLandscape) LINUX_REVERSE_PORTRAIT else LINUX_LANDSCAPE
+        Surface.ROTATION_270 -> if (isLandscape) LINUX_PORTRAIT else LINUX_REVERSE_LANDSCAPE
         else -> if (isLandscape) LINUX_LANDSCAPE else LINUX_PORTRAIT
     }
     Log.i("AROT_DIAG", String.format(Locale.US,
