@@ -302,7 +302,7 @@ fun Activity.getOrientationCompat(isLandscape: Boolean): Int {
         Surface.ROTATION_270 -> if (isLandscape) LINUX_PORTRAIT else LINUX_REVERSE_LANDSCAPE
         else -> if (isLandscape) LINUX_LANDSCAPE else LINUX_PORTRAIT
     }
-    Log.i("AROT_DIAG", String.format(Locale.US,
+    Log.d("AROT_DIAG", String.format(Locale.US,
         "getOrientationCompat: rotation=%d isLandscape=%b -> result=%d (%s)",
         rotation, isLandscape, result,
         when (result) {
@@ -318,7 +318,7 @@ fun Activity.getOrientationCompat(isLandscape: Boolean): Int {
 fun Activity.setOrientationCompat(isLandscape: Boolean, orientation: Int) {
     // Pass through sensor modes without remapping
     if (isPassthroughOrientation(orientation)) {
-        Log.i("AROT_DIAG", String.format(Locale.US,
+        Log.d("AROT_DIAG", String.format(Locale.US,
             "setOrientationCompat: orientation=%d isPassthrough=true", orientation))
         requestedOrientation = orientation
         return
@@ -338,7 +338,7 @@ fun Activity.setOrientationCompat(isLandscape: Boolean, orientation: Int) {
         // the CW/CCW direction (observed on this device).
         orientation
     }
-    Log.i("AROT_DIAG", String.format(Locale.US,
+    Log.d("AROT_DIAG", String.format(Locale.US,
         "setOrientationCompat: orientation=%d isLandscape=%b -> requestedOrientation=%d",
         orientation, isLandscape, newOrientation))
     requestedOrientation = newOrientation
