@@ -76,6 +76,7 @@ object DeviceInfo {
         MEEBOOK_P6,
         MOBISCRIBE_WAVE,
         MOAAN_MIX7,
+        MOAAN_W7,
         MOOINKPLUS2C,
         NABUK,
         NOOK,
@@ -355,6 +356,9 @@ object DeviceInfo {
             // Moaan Mix7
             MANUFACTURER == STR_ROCKCHIP && MODEL == "moaanmix7"
             -> Id.MOAAN_MIX7
+
+            BRAND == "allwinner" && MODEL == "epd103" && DEVICE == "virgo-perf1" && HARDWARE == "sun8iw15p1"
+            -> Id.MOAAN_W7
 
             // Mooink Plus 2c
             BRAND == "allwinner" && MODEL == "mooink plus 2c"
@@ -727,6 +731,7 @@ object DeviceInfo {
             Id.ONYX_NOTE,
             Id.SONY_CP1,
             Id.SONY_RP1,
+            Id.MOAAN_W7,
             -> true else -> false
         }
 
