@@ -357,6 +357,7 @@ object DeviceInfo {
             MANUFACTURER == STR_ROCKCHIP && MODEL == "moaanmix7"
             -> Id.MOAAN_MIX7
 
+            // Moaan W7
             BRAND == "allwinner" && MODEL == "epd103" && DEVICE == "virgo-perf1" && HARDWARE == "sun8iw15p1"
             -> Id.MOAAN_W7
 
