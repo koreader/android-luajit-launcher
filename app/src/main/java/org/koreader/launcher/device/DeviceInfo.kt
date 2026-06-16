@@ -727,12 +727,12 @@ object DeviceInfo {
         // Android devices without lights
         QUIRK_NO_LIGHTS = when (ID) {
             Id.LINFINY_ENOTE,
+            Id.MOAAN_W7,
             Id.ONYX_MAX,
             Id.ONYX_MAX2_PRO,
             Id.ONYX_NOTE,
             Id.SONY_CP1,
             Id.SONY_RP1,
-            Id.MOAAN_W7,
             -> true else -> false
         }
 
