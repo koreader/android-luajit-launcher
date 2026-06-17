@@ -76,6 +76,7 @@ object DeviceInfo {
         MEEBOOK_P6,
         MOBISCRIBE_WAVE,
         MOAAN_MIX7,
+        MOAAN_W7,
         MOOINKPLUS2C,
         NABUK,
         NOOK,
@@ -355,6 +356,10 @@ object DeviceInfo {
             // Moaan Mix7
             MANUFACTURER == STR_ROCKCHIP && MODEL == "moaanmix7"
             -> Id.MOAAN_MIX7
+
+            // Moaan W7
+            BRAND == "allwinner" && MODEL == "epd103" && DEVICE == "virgo-perf1" && HARDWARE == "sun8iw15p1"
+            -> Id.MOAAN_W7
 
             // Mooink Plus 2c
             BRAND == "allwinner" && MODEL == "mooink plus 2c"
@@ -722,6 +727,7 @@ object DeviceInfo {
         // Android devices without lights
         QUIRK_NO_LIGHTS = when (ID) {
             Id.LINFINY_ENOTE,
+            Id.MOAAN_W7,
             Id.ONYX_MAX,
             Id.ONYX_MAX2_PRO,
             Id.ONYX_NOTE,
