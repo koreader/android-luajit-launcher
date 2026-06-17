@@ -56,6 +56,9 @@ class MainActivity : NativeActivity(), LuaInterface,
 
     // surface used on devices that need a view
     private var view: NativeSurfaceView? = null
+
+    // cached root view for EPD mode calls from NativeThread (avoids window.decorView on non-UI thread)
+    private var epdRootView: android.view.View? = null
     private class NativeSurfaceView(context: Context): SurfaceView(context),
         SurfaceHolder.Callback {
         init { holder.addCallback(this) }
@@ -132,6 +135,10 @@ class MainActivity : NativeActivity(), LuaInterface,
             "Native Content"
         }
         Log.v(TAG_SURFACE, "Using $surfaceKind implementation")
+
+        // Cache root view for EPD calls from NativeThread (window.decorView must not be
+        // accessed from a non-UI thread; pre-cache it here on the main thread instead).
+        epdRootView = view ?: window.decorView.findViewById(android.R.id.content)
 
         @Suppress("DEPRECATION")
         screenIsLandscape = windowManager.defaultDisplay.width > windowManager.defaultDisplay.height
@@ -314,7 +321,7 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun einkUpdate(mode: Int) {
-        val rootView = view ?: window.decorView.findViewById<View>(android.R.id.content)
+        val rootView = epdRootView ?: return
         val modeName = when (mode) {
             1 -> "EPD_FULL"
             2 -> "EPD_PART"
@@ -332,7 +339,7 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun einkUpdate(mode: Int, delay: Long, x: Int, y: Int, width: Int, height: Int) {
-        val rootView = view ?: window.decorView.findViewById<View>(android.R.id.content)
+        val rootView = epdRootView ?: return
         Log.v(tag, String.format(Locale.US,
             "requesting epd update, mode:%d, delay:%d, [x:%d, y:%d, w:%d, h:%d]",
             mode, delay, x, y, width, height))
@@ -645,7 +652,7 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun performHapticFeedback(constant: Int, force: Int) {
-        val rootView = view ?: window.decorView.findViewById<View>(android.R.id.content)
+        val rootView = epdRootView ?: return
         hapticFeedback(constant, force > 0, rootView)
     }
 
