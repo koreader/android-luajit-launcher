@@ -172,6 +172,7 @@ class MainActivity : NativeActivity(), LuaInterface,
 
     override fun surfaceCreated(holder: SurfaceHolder) {
         super.surfaceCreated(holder)
+        epdRootView = view ?: window.decorView.rootView
         drawSplashScreen(holder)
     }
 
