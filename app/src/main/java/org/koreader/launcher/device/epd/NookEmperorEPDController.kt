@@ -22,20 +22,20 @@ class NookEmperorEPDController : EPDInterface {
 
         const val EMPEROR_EINK_GC16_MODE = 0x04
         const val EMPEROR_EINK_GU16_MODE = 0x84
-        const val EMPEROR_EINK_NO_MERGE  = Integer.MIN_VALUE  // 0x80000000
+        const val EMPEROR_EINK_NO_MERGE = Integer.MIN_VALUE // 0x80000000
     }
 
     override fun getPlatform(): String = "freescale"
     override fun getMode(): String = "full-only"
 
-    override fun getWaveformFull(): Int      = EMPEROR_EINK_NO_MERGE + EMPEROR_EINK_GC16_MODE
-    override fun getWaveformPartial(): Int   = EMPEROR_EINK_GU16_MODE
-    override fun getWaveformFullUi(): Int    = EMPEROR_EINK_NO_MERGE + NTXEPDController.EINK_WAVEFORM_MODE_GLR16
+    override fun getWaveformFull(): Int = EMPEROR_EINK_NO_MERGE + EMPEROR_EINK_GC16_MODE
+    override fun getWaveformPartial(): Int = EMPEROR_EINK_GU16_MODE
+    override fun getWaveformFullUi(): Int = EMPEROR_EINK_NO_MERGE + NTXEPDController.EINK_WAVEFORM_MODE_GLR16
     override fun getWaveformPartialUi(): Int = EMPEROR_EINK_GU16_MODE
-    override fun getWaveformFast(): Int      = EMPEROR_EINK_GU16_MODE
+    override fun getWaveformFast(): Int = EMPEROR_EINK_GU16_MODE
 
-    override fun getWaveformDelay(): Int     = 0
-    override fun getWaveformDelayUi(): Int   = 0
+    override fun getWaveformDelay(): Int = 0
+    override fun getWaveformDelayUi(): Int = 0
     override fun getWaveformDelayFast(): Int = 0
 
     // Do not use NativeSurfaceView — avoids surface setup crash on Emperor hardware.
