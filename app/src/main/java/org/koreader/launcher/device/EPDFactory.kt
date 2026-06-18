@@ -69,6 +69,7 @@ object EPDFactory {
 
                 DeviceInfo.Id.MOOINKPLUS2C,
                 DeviceInfo.Id.NOOK_GL4,
+                DeviceInfo.Id.NOOK_GL4PLUS,
                 DeviceInfo.Id.TOLINO_EPOS3,
                 DeviceInfo.Id.TOLINO_VISION6,
                 DeviceInfo.Id.TOLINO_SHINE4,
