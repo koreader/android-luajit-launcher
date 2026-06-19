@@ -81,6 +81,7 @@ object DeviceInfo {
         NABUK,
         NOOK,
         NOOK_GL4,
+        NOOK_GL4PLUS,
         NOOK_GLPLUS,
         OBOOK_P10D,
         OBOOK_P78D,
@@ -369,10 +370,14 @@ object DeviceInfo {
             MANUFACTURER == "onyx" && MODEL == "nabukreg_hd"
             -> Id.NABUK
 
-            // Nook Glowlight 4 (4/4e/4plus)
-            (MANUFACTURER == "barnesandnoble")
-            && (MODEL == "bnrv1000" || MODEL == "bnrv1100" || MODEL == "bnrv1300")
+            // Nook Glowlight 4 / 4e
+            MANUFACTURER == "barnesandnoble"
+            && (MODEL == "bnrv1000" || MODEL == "bnrv1100")
             -> Id.NOOK_GL4
+
+            // Nook Glowlight 4 Plus
+            MANUFACTURER == "barnesandnoble" && MODEL == "bnrv1300"
+            -> Id.NOOK_GL4PLUS
 
             // Nook Glowlight plus 7.8" (2019)
             MANUFACTURER == "barnesandnoble" && MODEL == "bnrv700" && PRODUCT == "ntx_6sl"

@@ -106,6 +106,11 @@ object LightsFactory {
                     logController("TolinoNTXNoWarmth")
                     TolinoNtxNoWarmthController()
                 }
+                DeviceInfo.Id.NOOK_GL4PLUS,
+                -> {
+                    logController("NookGL4plus")
+                    NookGL4plusController()
+                }
                 DeviceInfo.Id.NOOK_GL4,
                 DeviceInfo.Id.TOLINO_EPOS2,
                 -> {
