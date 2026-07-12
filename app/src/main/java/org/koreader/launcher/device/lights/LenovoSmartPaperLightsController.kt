@@ -69,7 +69,7 @@ class LenovoSmartPaperLightsController : LightsInterface {
         return try {
             val brightnessFloat = Settings.System.getFloat(
                 activity.contentResolver, "screen_brightness_float", 0f)
-            // Extract brightness raw value (0–99)
+            // Extract brightness raw value (0–99). The "rounding" logic purposefully follows original SystemUI.
             val raw = (brightnessFloat * 10000f).roundToInt() / 100
             raw.coerceIn(MIN, BRIGHTNESS_RAW_MAX)
         } catch (e: Exception) {
