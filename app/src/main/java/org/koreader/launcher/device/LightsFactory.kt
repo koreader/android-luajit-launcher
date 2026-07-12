@@ -14,6 +14,11 @@ object LightsFactory {
                     logController("Boyue S62")
                     BoyueS62RootController()
                 }
+                DeviceInfo.Id.LENOVO_SMARTPAPER,
+                    -> {
+                    logController("LenovoSmartPaper")
+                    LenovoSmartPaperLightsController()
+                }
                 DeviceInfo.Id.ONYX_GALILEO2,
                 DeviceInfo.Id.ONYX_GO_COLOR7,
                 DeviceInfo.Id.ONYX_GO6,
