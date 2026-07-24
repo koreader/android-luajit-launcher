@@ -31,6 +31,7 @@ local ffi = require("ffi")
 ffi.cdef[[
 // posix:
 int chdir(const char *path);
+int setenv(const char *name, const char *value, int overwrite);
 // logging:
 int __android_log_print(int prio, const char *tag,  const char *fmt, ...);
 typedef enum android_LogPriority {
@@ -2729,6 +2730,16 @@ local function run(android_app_state)
         android.LOGE(err)
         error(err)
     end
+
+    -- MuPDF resolves its built-in fallback fonts (eg. noto/NotoSans-Regular.ttf, used to
+    -- render the HTML dictionary popup) via a path relative to $FONTDIR, defaulting to
+    -- "./fonts" (see base/thirdparty/mupdf/external_fonts.patch) when unset. That default
+    -- is relative to the process' cwd, which we just changed to the app's private data
+    -- directory above -- not to the koreader home directory on external storage where the
+    -- actual "fonts" directory lives. Point FONTDIR there explicitly so MuPDF can always
+    -- find its fonts regardless of the process' cwd.
+    local koreader_home = os.getenv("KO_HOME") or (android.getExternalStoragePath() .. "/koreader")
+    C.setenv("FONTDIR", koreader_home .. "/fonts", 1)
 
     dofile(android.dir.."/llapp_main.lua")
 end
