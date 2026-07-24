@@ -2731,15 +2731,12 @@ local function run(android_app_state)
         error(err)
     end
 
-    -- MuPDF resolves its built-in fallback fonts (eg. noto/NotoSans-Regular.ttf, used to
-    -- render the HTML dictionary popup) via a path relative to $FONTDIR, defaulting to
-    -- "./fonts" (see base/thirdparty/mupdf/external_fonts.patch) when unset. That default
-    -- is relative to the process' cwd, which we just changed to the app's private data
-    -- directory above -- not to the koreader home directory on external storage where the
-    -- actual "fonts" directory lives. Point FONTDIR there explicitly so MuPDF can always
-    -- find its fonts regardless of the process' cwd.
-    local koreader_home = os.getenv("KO_HOME") or (android.getExternalStoragePath() .. "/koreader")
-    C.setenv("FONTDIR", koreader_home .. "/fonts", 1)
+    -- MuPDF looks up its fallback fonts (eg. noto/NotoSans-Regular.ttf, used to render the
+    -- HTML dictionary popup) relative to $FONTDIR, defaulting to "./fonts" when unset (see
+    -- base/thirdparty/mupdf/external_fonts.patch). Point it at android.dir/fonts, where
+    -- Assets.kt's bootstrap() extracts the app's bundled "fonts" dir -- guaranteed present,
+    -- no external-storage access required.
+    C.setenv("FONTDIR", android.dir .. "/fonts", 1)
 
     dofile(android.dir.."/llapp_main.lua")
 end
