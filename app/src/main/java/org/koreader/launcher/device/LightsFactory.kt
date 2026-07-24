@@ -30,6 +30,7 @@ object LightsFactory {
                 DeviceInfo.Id.ONYX_POKE6,
                 DeviceInfo.Id.ONYX_TAB_ULTRA_C,
                 DeviceInfo.Id.ONYX_TAB_ULTRA_C_PRO,
+                DeviceInfo.Id.ONYX_TAB_X_C,
                 -> {
                     logController("Onyx Adb")
                     OnyxAdbLightsController()
