@@ -13,6 +13,7 @@ import org.koreader.launcher.device.epd.OnyxEPDController
 import org.koreader.launcher.device.epd.OldTolinoEPDController
 import org.koreader.launcher.device.epd.NGL4EPDController
 import org.koreader.launcher.device.epd.RK3566EPDController
+import org.koreader.launcher.device.epd.SunxiEPDController
 
 import java.util.*
 
@@ -184,6 +185,12 @@ object EPDFactory {
                 -> {
                     logController("Rockchip RK3566")
                     RK3566EPDController()
+                }
+
+                DeviceInfo.Id.MOAAN_W7,
+                -> {
+                    logController("Allwinner/Sunxi")
+                    SunxiEPDController()
                 }
 
                 else -> {

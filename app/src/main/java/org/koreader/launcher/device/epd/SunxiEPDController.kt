@@ -1,0 +1,105 @@
+/* Tested on Moaan W7 */
+
+package org.koreader.launcher.device.epd
+
+import android.annotation.SuppressLint
+import android.util.Log
+import android.view.View
+import java.lang.reflect.Method
+import org.koreader.launcher.device.EPDInterface
+
+class SunxiEPDController : EPDInterface {
+
+    private var revertRunnable: Runnable? = null
+    private var revertView: View? = null
+
+    companion object {
+        private const val TAG = "EPD"
+
+        const val SUNXI_EINK_GC16_MODE = 0x04
+        const val SUNXI_EINK_GLR16_MODE = 0x40
+        const val SUNXI_EINK_GU16_MODE = 0x84
+        const val SUNXI_EINK_NO_MERGE = Integer.MIN_VALUE // 0x80000000
+        private const val REVERT_DELAY_MS = 150L
+
+        @Volatile private var reflectionReady = false
+        private var getViewRootImplFn: Method? = null
+        private var setRefreshModeFn: Method? = null
+
+        @SuppressLint("BlockedPrivateApi")
+        private fun initReflection() {
+            if (reflectionReady) return
+            try {
+                getViewRootImplFn = View::class.java.getMethod("getViewRootImpl")
+                val method = Class.forName("android.view.ViewRootImpl").getDeclaredMethod(
+                    "setRefreshMode", Int::class.javaPrimitiveType)
+                method.isAccessible = true
+                setRefreshModeFn = method
+            } catch (e: Exception) {
+                Log.w(TAG, "Sunxi EPD: reflection path unavailable: $e")
+            }
+            reflectionReady = true
+        }
+
+        private fun setRefreshMode(view: View, mode: Int): Boolean {
+            initReflection()
+            val getFn = getViewRootImplFn ?: return false
+            val setFn = setRefreshModeFn ?: return false
+            return try {
+                val vri = getFn.invoke(view.rootView) ?: return false
+                setFn.invoke(vri, mode)
+                true
+            } catch (e: Exception) {
+                Log.w(TAG, "Sunxi EPD: setRefreshMode failed: $e")
+                false
+            }
+        }
+    }
+
+    override fun getPlatform(): String = "sunxi"
+
+    override fun getMode(): String = "all"
+
+    override fun getWaveformFull(): Int = SUNXI_EINK_NO_MERGE + SUNXI_EINK_GC16_MODE
+    override fun getWaveformPartial(): Int = SUNXI_EINK_GU16_MODE
+    override fun getWaveformFullUi(): Int = SUNXI_EINK_NO_MERGE + SUNXI_EINK_GLR16_MODE
+    override fun getWaveformPartialUi(): Int = SUNXI_EINK_GU16_MODE
+    override fun getWaveformFast(): Int = SUNXI_EINK_GU16_MODE
+
+    override fun getWaveformDelay(): Int = 0
+    override fun getWaveformDelayUi(): Int = 0
+    override fun getWaveformDelayFast(): Int = 0
+
+    override fun needsView(): Boolean = false
+
+    override fun setEpdMode(
+        targetView: View,
+        mode: Int, delay: Long,
+        x: Int, y: Int, width: Int, height: Int, epdMode: String?
+    ) {
+        val rawMode = when {
+            epdMode == "EPD_FULL" || mode == getWaveformFull() -> SUNXI_EINK_GC16_MODE
+            mode == getWaveformFullUi() -> SUNXI_EINK_GLR16_MODE
+            else -> SUNXI_EINK_GU16_MODE
+        }
+
+        setRefreshMode(targetView, rawMode)
+        if (rawMode != SUNXI_EINK_GU16_MODE) {
+            // setRefreshMode is persistent, so revert to partial mode shortly after the
+            // refresh to avoid leaving the display in a flashing mode.
+            revertRunnable?.let { runnable ->
+                revertView?.removeCallbacks(runnable)
+            }
+            revertView = targetView
+            val runnable = Runnable {
+                setRefreshMode(targetView, SUNXI_EINK_GU16_MODE)
+            }
+            revertRunnable = runnable
+            targetView.postDelayed(runnable, REVERT_DELAY_MS)
+        }
+    }
+
+    override fun resume() {}
+
+    override fun pause() {}
+}
