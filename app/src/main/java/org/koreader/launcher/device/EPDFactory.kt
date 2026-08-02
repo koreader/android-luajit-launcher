@@ -5,6 +5,7 @@ package org.koreader.launcher.device
 
 import android.util.Log
 import org.koreader.launcher.device.epd.CremaEPDController
+import org.koreader.launcher.device.epd.LenovoSmartPaperEPDController
 import org.koreader.launcher.device.epd.NookEPDController
 import org.koreader.launcher.device.epd.TolinoEPDController
 import org.koreader.launcher.device.epd.RK3026EPDController
@@ -188,6 +189,12 @@ object EPDFactory {
                     RK3566EPDController()
                 }
 
+                DeviceInfo.Id.LENOVO_SMARTPAPER,
+                -> {
+                    logController("Lenovo SmartPaper")
+                    LenovoSmartPaperEPDController()
+                }
+                
                 DeviceInfo.Id.MOAAN_W7,
                 -> {
                     logController("Allwinner/Sunxi")

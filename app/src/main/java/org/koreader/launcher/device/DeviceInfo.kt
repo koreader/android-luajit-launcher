@@ -69,6 +69,7 @@ object DeviceInfo {
         INKBOOKFOCUS_PLUS,
         INKPALM_PLUS,
         JDREAD,
+        LENOVO_SMARTPAPER,
         LINFINY_ENOTE,
         MEEBOOK_M6,
         MEEBOOK_M6C,
@@ -331,6 +332,10 @@ object DeviceInfo {
             // JDRead1
             MANUFACTURER == "onyx" && MODEL == "jdread"
             -> Id.JDREAD
+
+            // Lenovo SmartPaper
+            "lenovo".equals(BRAND, ignoreCase = true) && "lenovo sp101fu".equals(MODEL, ignoreCase = true)
+                -> Id.LENOVO_SMARTPAPER
 
             // Linfiny A4 (13.3") eNote / Avalue ENT-13T1 / QuirkLogic Papyr
             MANUFACTURER == "linfiny" && MODEL == "ent-13t1"
