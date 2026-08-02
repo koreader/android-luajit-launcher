@@ -73,7 +73,7 @@ class TestActivity: AppCompatActivity() {
         epdMap["Rockchip RK3026"] = RK3026EPDController()
         epdMap["Rockchip RK3368"] = RK3368EPDController()
         epdMap["Rockchip RK3566"] = RK3566EPDController()
-        epdMap["Sunxi (Moaan W7)"] = SunxiEPDController()
+        epdMap["Sunxi"] = SunxiEPDController()
 
         // Lights drivers
         lightsMap["Boyue S62 Root"] = BoyueS62RootController()
@@ -207,7 +207,7 @@ class TestActivity: AppCompatActivity() {
                     "Rockchip RK3566" -> {
                         driver.setEpdMode(v, 0, 0, 0, 0, 0, 0, "EPD_FULL")
                     }
-                    "Sunxi (Moaan W7)" -> {
+                    "Sunxi" -> {
                         driver.setEpdMode(v, 0, 0, 0, 0, 0, 0, "EPD_FULL")
                     }
                     else -> {

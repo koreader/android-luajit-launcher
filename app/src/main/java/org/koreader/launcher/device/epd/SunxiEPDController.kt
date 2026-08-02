@@ -1,15 +1,14 @@
+/* Tested on Moaan W7 */
+
 package org.koreader.launcher.device.epd
 
 import android.annotation.SuppressLint
 import android.util.Log
 import android.view.View
-import java.lang.ref.WeakReference
 import java.lang.reflect.Method
 import org.koreader.launcher.device.EPDInterface
 
 class SunxiEPDController : EPDInterface {
-
-    private var lastView = WeakReference<View>(null)
 
     companion object {
         private const val TAG = "EPD"
@@ -74,8 +73,6 @@ class SunxiEPDController : EPDInterface {
         mode: Int, delay: Long,
         x: Int, y: Int, width: Int, height: Int, epdMode: String?
     ) {
-        lastView = WeakReference(targetView)
-
         val rawMode = when {
             epdMode == "EPD_FULL" || mode == getWaveformFull() -> SUNXI_EINK_GC16_MODE
             mode == getWaveformFullUi() -> SUNXI_EINK_GLR16_MODE
@@ -85,10 +82,7 @@ class SunxiEPDController : EPDInterface {
         setRefreshMode(targetView, rawMode)
     }
 
-    override fun resume() {
-        val view = lastView.get() ?: return
-        setRefreshMode(view, SUNXI_EINK_GU16_MODE)
-    }
+    override fun resume() {}
 
     override fun pause() {}
 }
