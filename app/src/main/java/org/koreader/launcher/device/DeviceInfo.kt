@@ -113,6 +113,7 @@ object DeviceInfo {
         ONYX_NOTE5,
         ONYX_NOTE_AIR,
         ONYX_NOTE_AIR2,
+        ONYX_NOTE_AIR_3,
         ONYX_NOTE_AIR_3C,
         ONYX_NOTE_AIR_4C,
         ONYX_NOTE_AIR_5C,
@@ -519,6 +520,10 @@ object DeviceInfo {
             BRAND == "onyx" && (MODEL == "noteair2" || MODEL == "noteair2p")
             -> Id.ONYX_NOTE_AIR2
 
+            // Onyx Note Air 3
+            BRAND == "onyx" && MODEL == "noteair3"
+            -> Id.ONYX_NOTE_AIR_3
+
             // Onyx Note Air 3C
             BRAND == "onyx" && MODEL == "noteair3c"
             -> Id.ONYX_NOTE_AIR_3C
@@ -526,7 +531,7 @@ object DeviceInfo {
             // Onyx Note Air 4C
             BRAND == "onyx" && MODEL == "noteair4c"
             -> Id.ONYX_NOTE_AIR_4C
-            
+
             // Onyx Note Air 5C
             BRAND == "onyx" && MODEL == "noteair5c"
             -> Id.ONYX_NOTE_AIR_5C

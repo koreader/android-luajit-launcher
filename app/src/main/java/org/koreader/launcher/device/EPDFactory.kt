@@ -123,6 +123,7 @@ object EPDFactory {
                 DeviceInfo.Id.ONYX_NOTE5,
                 DeviceInfo.Id.ONYX_NOTE_AIR,
                 DeviceInfo.Id.ONYX_NOTE_AIR2,
+                DeviceInfo.Id.ONYX_NOTE_AIR_3,
                 DeviceInfo.Id.ONYX_NOTE_AIR_3C,
                 DeviceInfo.Id.ONYX_NOTE_AIR_4C,
                 DeviceInfo.Id.ONYX_NOTE_AIR_5C,
