@@ -10,6 +10,9 @@ import org.koreader.launcher.device.EPDInterface
 
 class SunxiEPDController : EPDInterface {
 
+    private var revertRunnable: Runnable? = null
+    private var revertView: View? = null
+
     companion object {
         private const val TAG = "EPD"
 
@@ -17,6 +20,7 @@ class SunxiEPDController : EPDInterface {
         const val SUNXI_EINK_GLR16_MODE = 0x40
         const val SUNXI_EINK_GU16_MODE = 0x84
         const val SUNXI_EINK_NO_MERGE = Integer.MIN_VALUE // 0x80000000
+        private const val REVERT_DELAY_MS = 150L
 
         @Volatile private var reflectionReady = false
         private var getViewRootImplFn: Method? = null
@@ -80,6 +84,19 @@ class SunxiEPDController : EPDInterface {
         }
 
         setRefreshMode(targetView, rawMode)
+        if (rawMode != SUNXI_EINK_GU16_MODE) {
+            // setRefreshMode is persistent, so revert to partial mode shortly after the
+            // refresh to avoid leaving the display in a flashing mode.
+            revertRunnable?.let { runnable ->
+                revertView?.removeCallbacks(runnable)
+            }
+            revertView = targetView
+            val runnable = Runnable {
+                setRefreshMode(targetView, SUNXI_EINK_GU16_MODE)
+            }
+            revertRunnable = runnable
+            targetView.postDelayed(runnable, REVERT_DELAY_MS)
+        }
     }
 
     override fun resume() {}
