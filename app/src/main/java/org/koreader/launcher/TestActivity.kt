@@ -14,6 +14,7 @@ import org.koreader.launcher.device.DeviceInfo
 import org.koreader.launcher.device.EPDInterface
 import org.koreader.launcher.device.LightsInterface
 import org.koreader.launcher.device.epd.NGL4EPDController
+import org.koreader.launcher.device.epd.NookEmperorEPDController
 import org.koreader.launcher.device.epd.OnyxEPDController
 import org.koreader.launcher.device.epd.RK3026EPDController
 import org.koreader.launcher.device.epd.RK3368EPDController
@@ -69,6 +70,7 @@ class TestActivity: AppCompatActivity() {
         // EPD drivers
         epdMap["Freescale/NTX"] = TolinoEPDController()
         epdMap["Nook GL4"] = NGL4EPDController()
+        epdMap["Nook GL4 Plus"] = NookEmperorEPDController()
         epdMap["Onyx/Qualcomm"] = OnyxEPDController()
         epdMap["Rockchip RK3026"] = RK3026EPDController()
         epdMap["Rockchip RK3368"] = RK3368EPDController()

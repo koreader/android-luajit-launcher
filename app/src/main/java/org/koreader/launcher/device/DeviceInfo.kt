@@ -382,7 +382,7 @@ object DeviceInfo {
             && (MODEL == "bnrv1000" || MODEL == "bnrv1100")
             -> Id.NOOK_GL4
 
-            // Nook Glowlight 4 Plus
+            // Nook Glowlight 4 Plus (AllWinner "Emperor" platform)
             MANUFACTURER == "barnesandnoble" && MODEL == "bnrv1300"
             -> Id.NOOK_GL4PLUS
 
