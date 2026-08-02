@@ -14,6 +14,7 @@ import org.koreader.launcher.device.epd.OnyxEPDController
 import org.koreader.launcher.device.epd.OldTolinoEPDController
 import org.koreader.launcher.device.epd.NGL4EPDController
 import org.koreader.launcher.device.epd.RK3566EPDController
+import org.koreader.launcher.device.epd.SunxiEPDController
 
 import java.util.*
 
@@ -153,6 +154,7 @@ object EPDFactory {
                 DeviceInfo.Id.ONYX_TAB_ULTRA,
                 DeviceInfo.Id.ONYX_TAB_ULTRA_C,
                 DeviceInfo.Id.ONYX_TAB_ULTRA_C_PRO,
+                DeviceInfo.Id.ONYX_TAB_X_C,
                 DeviceInfo.Id.STORYTEL_READER2,
                 -> {
                     logController("Onyx/Qualcomm")
@@ -190,6 +192,12 @@ object EPDFactory {
                 -> {
                     logController("Lenovo SmartPaper")
                     LenovoSmartPaperEPDController()
+                }
+                
+                DeviceInfo.Id.MOAAN_W7,
+                -> {
+                    logController("Allwinner/Sunxi")
+                    SunxiEPDController()
                 }
 
                 else -> {
