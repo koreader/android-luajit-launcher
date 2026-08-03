@@ -30,6 +30,7 @@ class SunxiEPDController : EPDInterface {
         const val SUNXI_EINK_NO_MERGE = Integer.MIN_VALUE // 0x80000000
 
         const val SUNXI_EINK_DEFAULT_MODE = SUNXI_EINK_GU16_MODE
+        const val SUNXI_EINK_RESET_MODE = 0
 
         private const val REVERT_DELAY_MS = 150L
 
@@ -104,6 +105,7 @@ class SunxiEPDController : EPDInterface {
             }
             revertView = targetView
             val runnable = Runnable {
+                setRefreshMode(targetView, SUNXI_EINK_RESET_MODE)
                 setRefreshMode(targetView, SUNXI_EINK_DEFAULT_MODE)
             }
             revertRunnable = runnable
