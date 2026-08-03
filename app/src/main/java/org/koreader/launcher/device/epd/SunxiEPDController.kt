@@ -25,22 +25,8 @@ class SunxiEPDController : EPDInterface {
         const val SUNXI_EINK_GLR16_MODE = 0x40
         const val SUNXI_EINK_GLD16_MODE = 0x80
         const val SUNXI_EINK_GU16_MODE = 0x84
-        const val SUNXI_EINK_GCK16_MODE = 0x90
-        const val SUNXI_EINK_GLK16_MODE = 0x94
-        const val SUNXI_EINK_CLEAR_MODE = 0x88
         const val SUNXI_EINK_RUBBER_MODE = 0x88
-        const val SUNXI_EINK_GC4L_MODE = 0x8C
-        const val SUNXI_EINK_GCC16_MODE = 0xA0
-        const val SUNXI_EINK_PARTIAL_MODE = 0x400
         const val SUNXI_EINK_AUTO_MODE = 0x8000
-        const val SUNXI_EINK_NEGATIVE_MODE = 0x10000
-        const val SUNXI_EINK_REGAL_MODE = 0x80000
-        const val SUNXI_EINK_GAMMA_CORRECT = 0x200000
-        const val SUNXI_EINK_MONOCHROME = 0x400000
-        const val SUNXI_EINK_DITHERING_Y1 = 0x01800000
-        const val SUNXI_EINK_DITHERING_Y4 = 0x02800000
-        const val SUNXI_EINK_DITHERING_SIMPLE = 0x04800000
-        const val SUNXI_EINK_DITHERING_NTX_Y1 = 0x08800000
         const val SUNXI_EINK_NO_MERGE = Integer.MIN_VALUE // 0x80000000
 
         const val SUNXI_EINK_DEFAULT_MODE = SUNXI_EINK_GU16_MODE
