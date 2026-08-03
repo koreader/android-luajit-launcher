@@ -16,10 +16,21 @@ class SunxiEPDController : EPDInterface {
     companion object {
         private const val TAG = "EPD"
 
+        const val SUNXI_EINK_INIT_MODE = 0x01
+        const val SUNXI_EINK_DU_MODE = 0x02
         const val SUNXI_EINK_GC16_MODE = 0x04
+        const val SUNXI_EINK_GC4_MODE = 0x08
+        const val SUNXI_EINK_A2_MODE = 0x10
+        const val SUNXI_EINK_GL16_MODE = 0x20
         const val SUNXI_EINK_GLR16_MODE = 0x40
+        const val SUNXI_EINK_GLD16_MODE = 0x80
         const val SUNXI_EINK_GU16_MODE = 0x84
+        const val SUNXI_EINK_RUBBER_MODE = 0x88
+        const val SUNXI_EINK_AUTO_MODE = 0x8000
         const val SUNXI_EINK_NO_MERGE = Integer.MIN_VALUE // 0x80000000
+
+        const val SUNXI_EINK_DEFAULT_MODE = SUNXI_EINK_GU16_MODE
+
         private const val REVERT_DELAY_MS = 150L
 
         @Volatile private var reflectionReady = false
@@ -64,7 +75,7 @@ class SunxiEPDController : EPDInterface {
     override fun getWaveformPartial(): Int = SUNXI_EINK_GU16_MODE
     override fun getWaveformFullUi(): Int = SUNXI_EINK_NO_MERGE + SUNXI_EINK_GLR16_MODE
     override fun getWaveformPartialUi(): Int = SUNXI_EINK_GU16_MODE
-    override fun getWaveformFast(): Int = SUNXI_EINK_GU16_MODE
+    override fun getWaveformFast(): Int = SUNXI_EINK_A2_MODE
 
     override fun getWaveformDelay(): Int = 0
     override fun getWaveformDelayUi(): Int = 0
@@ -80,11 +91,12 @@ class SunxiEPDController : EPDInterface {
         val rawMode = when {
             epdMode == "EPD_FULL" || mode == getWaveformFull() -> SUNXI_EINK_GC16_MODE
             mode == getWaveformFullUi() -> SUNXI_EINK_GLR16_MODE
-            else -> SUNXI_EINK_GU16_MODE
+            mode == getWaveformFast() -> SUNXI_EINK_A2_MODE
+            else -> SUNXI_EINK_DEFAULT_MODE
         }
 
         setRefreshMode(targetView, rawMode)
-        if (rawMode != SUNXI_EINK_GU16_MODE) {
+        if (rawMode != SUNXI_EINK_DEFAULT_MODE) {
             // setRefreshMode is persistent, so revert to partial mode shortly after the
             // refresh to avoid leaving the display in a flashing mode.
             revertRunnable?.let { runnable ->
@@ -92,7 +104,7 @@ class SunxiEPDController : EPDInterface {
             }
             revertView = targetView
             val runnable = Runnable {
-                setRefreshMode(targetView, SUNXI_EINK_GU16_MODE)
+                setRefreshMode(targetView, SUNXI_EINK_DEFAULT_MODE)
             }
             revertRunnable = runnable
             targetView.postDelayed(runnable, REVERT_DELAY_MS)
