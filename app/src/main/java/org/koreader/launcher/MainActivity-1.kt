@@ -831,8 +831,8 @@ class MainActivity : NativeActivity(), LuaInterface,
                 // Android 15+ (API 35): Edge-to-Edge مفروض، نستخدم WindowInsetsController
                 WindowCompat.setDecorFitsSystemWindows(window, false)
                 val controller = WindowCompat.getInsetsController(window, decorView)
-                controller.hide(WindowInsetsCompat.Type.statusBars() or WindowInsetsCompat.Type.navigationBars())
-                controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                controller?.hide(WindowInsetsCompat.Type.statusBars() or WindowInsetsCompat.Type.navigationBars())
+                controller?.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
             }
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT ->
                 decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN or
