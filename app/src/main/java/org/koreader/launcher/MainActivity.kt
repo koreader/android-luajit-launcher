@@ -21,6 +21,9 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import org.koreader.launcher.device.Device
 import org.koreader.launcher.dialog.LightDialog
 import org.koreader.launcher.extensions.*
@@ -824,6 +827,13 @@ class MainActivity : NativeActivity(), LuaInterface,
     private fun setFullscreenLayout() {
         val decorView = window.decorView
         when {
+            Build.VERSION.SDK_INT >= 35 -> {
+                // Android 15+ (API 35): Edge-to-Edge مفروض، نستخدم WindowInsetsController
+                WindowCompat.setDecorFitsSystemWindows(window, false)
+                val controller = WindowCompat.getInsetsController(window, decorView)
+                controller.hide(WindowInsetsCompat.Type.statusBars() or WindowInsetsCompat.Type.navigationBars())
+                controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            }
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT ->
                 decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN or
                     View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
