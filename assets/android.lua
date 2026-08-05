@@ -188,6 +188,14 @@ enum {
 };
 
 enum {
+    AMOTION_EVENT_TOOL_TYPE_UNKNOWN = 0,
+    AMOTION_EVENT_TOOL_TYPE_FINGER = 1,
+    AMOTION_EVENT_TOOL_TYPE_STYLUS = 2,
+    AMOTION_EVENT_TOOL_TYPE_MOUSE = 3,
+    AMOTION_EVENT_TOOL_TYPE_ERASER = 4
+};
+
+enum {
     AINPUT_SOURCE_CLASS_MASK = 0x000000ff,
     AINPUT_SOURCE_CLASS_BUTTON = 0x00000001,
     AINPUT_SOURCE_CLASS_POINTER = 0x00000002,
@@ -623,6 +631,7 @@ float AMotionEvent_getTouchMajor(const AInputEvent* motion_event, size_t pointer
 float AMotionEvent_getTouchMinor(const AInputEvent* motion_event, size_t pointer_index);
 float AMotionEvent_getToolMajor(const AInputEvent* motion_event, size_t pointer_index);
 float AMotionEvent_getToolMinor(const AInputEvent* motion_event, size_t pointer_index);
+int32_t AMotionEvent_getToolType(const AInputEvent* motion_event, size_t pointer_index);
 float AMotionEvent_getOrientation(const AInputEvent* motion_event, size_t pointer_index);
 size_t AMotionEvent_getHistorySize(const AInputEvent* motion_event);
 int64_t AMotionEvent_getHistoricalEventTime(const AInputEvent* motion_event,
