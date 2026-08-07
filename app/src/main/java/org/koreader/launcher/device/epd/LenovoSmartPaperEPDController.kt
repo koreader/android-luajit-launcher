@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.util.Log
 import android.view.View
 import org.koreader.launcher.device.EPDInterface
-import org.koreader.launcher.device.epd.rockchip.RK35xxEPDController.Companion.EPD_AUTO
 
 /* EPD Controller for Lenovo SmartPaper (RK3566).
  *
@@ -20,6 +19,12 @@ class LenovoSmartPaperEPDController : EPDInterface {
 
     companion object {
         private const val TAG = "EPD"
+
+        // Waveform value for full-screen refresh. Must match the EPD_FULL constant
+        // in MainActivity.einkUpdate() (value 1) so the refresh request is not
+        // discarded as "invalid". The actual waveform used by EinkManager is
+        // determined inside setEpdMode(), not by this constant.
+        private const val WAVEFORM_FULL = 1
     }
 
     override fun getPlatform(): String {
@@ -31,35 +36,35 @@ class LenovoSmartPaperEPDController : EPDInterface {
     }
 
     override fun getWaveformFull(): Int {
-        return EPD_AUTO
+        return WAVEFORM_FULL
     }
 
     override fun getWaveformPartial(): Int {
-        return EPD_AUTO
+        return WAVEFORM_FULL
     }
 
     override fun getWaveformFullUi(): Int {
-        return EPD_AUTO
+        return WAVEFORM_FULL
     }
 
     override fun getWaveformPartialUi(): Int {
-        return EPD_AUTO
+        return WAVEFORM_FULL
     }
 
     override fun getWaveformFast(): Int {
-        return EPD_AUTO
+        return WAVEFORM_FULL
     }
 
     override fun getWaveformDelay(): Int {
-        return EPD_AUTO
+        return WAVEFORM_FULL
     }
 
     override fun getWaveformDelayUi(): Int {
-        return EPD_AUTO
+        return WAVEFORM_FULL
     }
 
     override fun getWaveformDelayFast(): Int {
-        return EPD_AUTO
+        return WAVEFORM_FULL
     }
 
     override fun needsView(): Boolean {
