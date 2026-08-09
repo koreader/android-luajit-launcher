@@ -91,6 +91,7 @@ object DeviceInfo {
         ONYX_DARWIN7,
         ONYX_DARWIN9,
         ONYX_EDISON,
+        ONYX_FARADAY2,
         ONYX_FAUST3,
         ONYX_GALILEO2,
         ONYX_GO_103,
@@ -435,6 +436,10 @@ object DeviceInfo {
             MANUFACTURER == "onyx" && PRODUCT == "mc_faust3" && DEVICE == "mc_faust3"
             -> Id.ONYX_FAUST3
 
+            // Onyx Boox Faraday 2
+            MANUFACTURER == "onyx" && MODEL == "faraday2"
+            -> Id.ONYX_FARADAY2
+
             // Onyx Boox Galileo 2
             BRAND == "onyx" && MODEL == "galileo2"
             -> Id.ONYX_GALILEO2
@@ -762,6 +767,7 @@ object DeviceInfo {
             Id.MEEBOOK_M6C,
             Id.MOOINKPLUS2C,
             Id.NONE,
+            Id.ONYX_FARADAY2,
             Id.ONYX_GO_COLOR7,
             Id.ONYX_GO7GEN2,
             Id.ONYX_NOVA3_COLOR,

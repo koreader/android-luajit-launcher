@@ -67,7 +67,6 @@ object LightsFactory {
                 DeviceInfo.Id.ONYX_NOVA3,
                 DeviceInfo.Id.ONYX_NOVA_PRO,
                 DeviceInfo.Id.ONYX_POKE2,
-                DeviceInfo.Id.ONYX_POKE3,
                 DeviceInfo.Id.ONYX_POKE_PRO,
                 -> {
                     logController("Onyx/Qualcomm")
@@ -75,6 +74,7 @@ object LightsFactory {
                 }
                 DeviceInfo.Id.ONYX_DARWIN5,
                 DeviceInfo.Id.ONYX_DARWIN9,
+                DeviceInfo.Id.ONYX_FARADAY2,
                 DeviceInfo.Id.ONYX_LEAF2,
                 DeviceInfo.Id.ONYX_LIVINGSTONE3,
                 DeviceInfo.Id.ONYX_NOTE4,
@@ -84,6 +84,7 @@ object LightsFactory {
                 DeviceInfo.Id.ONYX_NOVA2,
                 DeviceInfo.Id.ONYX_NOVA_AIR_2,
                 DeviceInfo.Id.ONYX_NOVA_AIR_C,
+                DeviceInfo.Id.ONYX_POKE3,
                 DeviceInfo.Id.ONYX_POKE4,
                 DeviceInfo.Id.ONYX_POKE4LITE,
                 DeviceInfo.Id.ONYX_TAB_ULTRA,
