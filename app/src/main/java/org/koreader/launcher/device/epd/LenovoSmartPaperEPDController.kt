@@ -4,6 +4,12 @@ import android.annotation.SuppressLint
 import android.util.Log
 import android.view.View
 import org.koreader.launcher.device.EPDInterface
+import org.koreader.launcher.device.epd.rockchip.RK33xxEPDController.Companion.EINK_MODE_FAST
+import org.koreader.launcher.device.epd.rockchip.RK33xxEPDController.Companion.EINK_MODE_FULL
+import org.koreader.launcher.device.epd.rockchip.RK33xxEPDController.Companion.EINK_MODE_FULL_UI
+import org.koreader.launcher.device.epd.rockchip.RK33xxEPDController.Companion.EINK_MODE_PARTIAL
+import org.koreader.launcher.device.epd.rockchip.RK33xxEPDController.Companion.EINK_MODE_PARTIAL_UI
+import org.koreader.launcher.device.epd.rockchip.RK33xxEPDController.Companion.EINK_WAVEFORM_DELAY
 
 /* EPD Controller for Lenovo SmartPaper (RK3566).
  *
@@ -19,12 +25,6 @@ class LenovoSmartPaperEPDController : EPDInterface {
 
     companion object {
         private const val TAG = "EPD"
-
-        // Waveform value for full-screen refresh. Must match the EPD_FULL constant
-        // in MainActivity.einkUpdate() (value 1) so the refresh request is not
-        // discarded as "invalid". The actual waveform used by EinkManager is
-        // determined inside setEpdMode(), not by this constant.
-        private const val WAVEFORM_FULL = 1
     }
 
     override fun getPlatform(): String {
@@ -36,35 +36,35 @@ class LenovoSmartPaperEPDController : EPDInterface {
     }
 
     override fun getWaveformFull(): Int {
-        return WAVEFORM_FULL
+        return EINK_MODE_FULL
     }
 
     override fun getWaveformPartial(): Int {
-        return WAVEFORM_FULL
+        return EINK_MODE_PARTIAL
     }
 
     override fun getWaveformFullUi(): Int {
-        return WAVEFORM_FULL
+        return EINK_MODE_FULL_UI
     }
 
     override fun getWaveformPartialUi(): Int {
-        return WAVEFORM_FULL
+        return EINK_MODE_PARTIAL_UI
     }
 
     override fun getWaveformFast(): Int {
-        return WAVEFORM_FULL
+        return EINK_MODE_FAST
     }
 
     override fun getWaveformDelay(): Int {
-        return WAVEFORM_FULL
+        return EINK_WAVEFORM_DELAY
     }
 
     override fun getWaveformDelayUi(): Int {
-        return WAVEFORM_FULL
+        return EINK_WAVEFORM_DELAY
     }
 
     override fun getWaveformDelayFast(): Int {
-        return WAVEFORM_FULL
+        return EINK_WAVEFORM_DELAY
     }
 
     override fun needsView(): Boolean {
@@ -72,10 +72,11 @@ class LenovoSmartPaperEPDController : EPDInterface {
     }
 
     @SuppressLint("WrongConstant")
-    override fun setEpdMode(targetView: View,
-                            mode: Int, delay: Long,
-                            x: Int, y: Int, width: Int, height: Int, epdMode: String?)
-    {
+    override fun setEpdMode(
+        targetView: View,
+        mode: Int, delay: Long,
+        x: Int, y: Int, width: Int, height: Int, epdMode: String?
+    ) {
         try {
             val einkManagerClass = Class.forName("android.os.EinkManager")
             val einkManager: Any? = targetView.context.getSystemService("eink")
@@ -84,7 +85,8 @@ class LenovoSmartPaperEPDController : EPDInterface {
                 // Use screenRefresh(true, 1) — the only working full-refresh
                 // path on Lenovo devices. sendOneFullFrame() is blocked by SELinux.
                 val screenRefresh = einkManagerClass.getMethod(
-                    "screenRefresh", Boolean::class.javaPrimitiveType, Int::class.javaPrimitiveType)
+                    "screenRefresh", Boolean::class.javaPrimitiveType, Int::class.javaPrimitiveType
+                )
                 screenRefresh.invoke(einkManager, true, 1)
             } else {
                 Log.w(TAG, "EinkManager service not available")
