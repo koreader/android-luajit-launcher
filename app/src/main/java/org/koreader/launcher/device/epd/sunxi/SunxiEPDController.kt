@@ -1,18 +1,13 @@
 /* Tested on Moaan W7 */
 
-package org.koreader.launcher.device.epd
+package org.koreader.launcher.device.epd.sunxi
 
 import android.annotation.SuppressLint
 import android.util.Log
 import android.view.View
 import java.lang.reflect.Method
-import org.koreader.launcher.device.EPDInterface
 
-class SunxiEPDController : EPDInterface {
-
-    private var resetRunnable: Runnable? = null
-    private var resetView: View? = null
-
+abstract class SunxiEPDController {
     companion object {
         private const val TAG = "EPD"
 
@@ -35,6 +30,8 @@ class SunxiEPDController : EPDInterface {
         @Volatile private var reflectionReady = false
         private var getViewRootImplFn: Method? = null
         private var setRefreshModeFn: Method? = null
+        private var resetRunnable: Runnable? = null
+        private var resetView: View? = null
 
         @SuppressLint("BlockedPrivateApi")
         private fun initReflection() {
@@ -51,6 +48,32 @@ class SunxiEPDController : EPDInterface {
             reflectionReady = true
         }
 
+        fun requestEpdMode(targetView: View, mode: Int, epdMode: String?): Boolean {
+            val rawMode = when {
+                epdMode == "EPD_FULL" || mode == SUNXI_EINK_NO_MERGE + SUNXI_EINK_GC16_MODE
+                -> SUNXI_EINK_GC16_MODE
+                mode == SUNXI_EINK_NO_MERGE + SUNXI_EINK_GLR16_MODE -> SUNXI_EINK_GLR16_MODE
+                mode == SUNXI_EINK_A2_MODE -> SUNXI_EINK_A2_MODE
+                else -> SUNXI_EINK_RESET_MODE
+            }
+
+            setRefreshMode(targetView, rawMode)
+            if (rawMode != SUNXI_EINK_RESET_MODE) {
+                // setRefreshMode is persistent, so reset to 0-mode shortly after the
+                // refresh to avoid leaving the display in a flashing mode.
+                resetRunnable?.let { runnable ->
+                    resetView?.removeCallbacks(runnable)
+                }
+                resetView = targetView
+                val runnable = Runnable {
+                    setRefreshMode(targetView, SUNXI_EINK_RESET_MODE)
+                }
+                resetRunnable = runnable
+                targetView.postDelayed(runnable, RESET_DELAY_MS)
+            }
+            return true
+        }
+
         private fun setRefreshMode(view: View, mode: Int): Boolean {
             initReflection()
             val getFn = getViewRootImplFn ?: return false
@@ -65,50 +88,4 @@ class SunxiEPDController : EPDInterface {
             }
         }
     }
-
-    override fun getPlatform(): String = "sunxi"
-    override fun getMode(): String = "all"
-
-    override fun getWaveformFull(): Int = SUNXI_EINK_NO_MERGE + SUNXI_EINK_GC16_MODE
-    override fun getWaveformPartial(): Int = SUNXI_EINK_GU16_MODE
-    override fun getWaveformFullUi(): Int = SUNXI_EINK_NO_MERGE + SUNXI_EINK_GLR16_MODE
-    override fun getWaveformPartialUi(): Int = SUNXI_EINK_GU16_MODE
-    override fun getWaveformFast(): Int = SUNXI_EINK_A2_MODE
-
-    override fun getWaveformDelay(): Int = 0
-    override fun getWaveformDelayUi(): Int = 0
-    override fun getWaveformDelayFast(): Int = 0
-
-    override fun needsView(): Boolean = false
-
-    override fun setEpdMode(
-        targetView: View,
-        mode: Int, delay: Long,
-        x: Int, y: Int, width: Int, height: Int, epdMode: String?
-    ) {
-        val rawMode = when {
-            epdMode == "EPD_FULL" || mode == getWaveformFull() -> SUNXI_EINK_GC16_MODE
-            mode == getWaveformFullUi() -> SUNXI_EINK_GLR16_MODE
-            mode == getWaveformFast() -> SUNXI_EINK_A2_MODE
-            else -> SUNXI_EINK_RESET_MODE
-        }
-
-        setRefreshMode(targetView, rawMode)
-        if (rawMode != SUNXI_EINK_RESET_MODE) {
-            // setRefreshMode is persistent, so reset to 0-mode shortly after the
-            // refresh to avoid leaving the display in a flashing mode.
-            resetRunnable?.let { runnable ->
-                resetView?.removeCallbacks(runnable)
-            }
-            resetView = targetView
-            val runnable = Runnable {
-                setRefreshMode(targetView, SUNXI_EINK_RESET_MODE)
-            }
-            resetRunnable = runnable
-            targetView.postDelayed(runnable, RESET_DELAY_MS)
-        }
-    }
-
-    override fun resume() {}
-    override fun pause() {}
 }

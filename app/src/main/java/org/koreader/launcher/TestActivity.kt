@@ -13,13 +13,13 @@ import org.koreader.launcher.device.Device
 import org.koreader.launcher.device.DeviceInfo
 import org.koreader.launcher.device.EPDInterface
 import org.koreader.launcher.device.LightsInterface
+import org.koreader.launcher.device.epd.MoaanW7EPDController
 import org.koreader.launcher.device.epd.NGL4EPDController
 import org.koreader.launcher.device.epd.NookEmperorEPDController
 import org.koreader.launcher.device.epd.OnyxEPDController
 import org.koreader.launcher.device.epd.RK3026EPDController
 import org.koreader.launcher.device.epd.RK3368EPDController
 import org.koreader.launcher.device.epd.RK3566EPDController
-import org.koreader.launcher.device.epd.SunxiEPDController
 import org.koreader.launcher.device.epd.TolinoEPDController
 import org.koreader.launcher.device.lights.OnyxAdbLightsController
 import org.koreader.launcher.device.lights.OnyxC67Controller
@@ -75,7 +75,7 @@ class TestActivity: AppCompatActivity() {
         epdMap["Rockchip RK3026"] = RK3026EPDController()
         epdMap["Rockchip RK3368"] = RK3368EPDController()
         epdMap["Rockchip RK3566"] = RK3566EPDController()
-        epdMap["Sunxi"] = SunxiEPDController()
+        epdMap["Sunxi"] = MoaanW7EPDController()
 
         // Lights drivers
         lightsMap["Boyue S62 Root"] = BoyueS62RootController()

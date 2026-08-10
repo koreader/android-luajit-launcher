@@ -6,6 +6,7 @@ package org.koreader.launcher.device
 import android.util.Log
 import org.koreader.launcher.device.epd.CremaEPDController
 import org.koreader.launcher.device.epd.LenovoSmartPaperEPDController
+import org.koreader.launcher.device.epd.MoaanW7EPDController
 import org.koreader.launcher.device.epd.NookEPDController
 import org.koreader.launcher.device.epd.TolinoEPDController
 import org.koreader.launcher.device.epd.RK3026EPDController
@@ -15,7 +16,6 @@ import org.koreader.launcher.device.epd.OldTolinoEPDController
 import org.koreader.launcher.device.epd.NGL4EPDController
 import org.koreader.launcher.device.epd.NookEmperorEPDController
 import org.koreader.launcher.device.epd.RK3566EPDController
-import org.koreader.launcher.device.epd.SunxiEPDController
 
 import java.util.*
 
@@ -203,8 +203,8 @@ object EPDFactory {
                 
                 DeviceInfo.Id.MOAAN_W7,
                 -> {
-                    logController("Allwinner/Sunxi")
-                    SunxiEPDController()
+                    logController("Sunxi (Moaan W7)")
+                    MoaanW7EPDController()
                 }
 
                 else -> {
