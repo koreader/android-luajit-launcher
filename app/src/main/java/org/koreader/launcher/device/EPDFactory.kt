@@ -200,10 +200,10 @@ object EPDFactory {
                     logController("Lenovo SmartPaper")
                     LenovoSmartPaperEPDController()
                 }
-                
+
                 DeviceInfo.Id.MOAAN_W7,
                 -> {
-                    logController("Sunxi (Moaan W7)")
+                    logController("Moaan/Sunxi")
                     MoaanW7EPDController()
                 }
 
