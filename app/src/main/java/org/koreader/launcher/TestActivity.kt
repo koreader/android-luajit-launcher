@@ -209,7 +209,7 @@ class TestActivity: AppCompatActivity() {
                     "Rockchip RK3566" -> {
                         driver.setEpdMode(v, 0, 0, 0, 0, 0, 0, "EPD_FULL")
                     }
-                    "Sunxi" -> {
+                    "Moaan/Sunxi" -> {
                         driver.setEpdMode(v, 0, 0, 0, 0, 0, 0, "EPD_FULL")
                     }
                     else -> {
