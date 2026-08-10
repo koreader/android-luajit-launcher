@@ -3,7 +3,7 @@ package org.koreader.launcher.device.epd
 import org.koreader.launcher.device.EPDInterface
 import org.koreader.launcher.device.epd.sunxi.SunxiEPDController
 
-class MoaanW7EPDController : SunxiEPDController(), EPDInterface {
+class MoaanSunxiEPDController : SunxiEPDController(), EPDInterface {
 
     override fun getPlatform(): String {
         return "sunxi"
