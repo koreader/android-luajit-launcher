@@ -203,6 +203,7 @@ object EPDFactory {
                 }
                 
                 DeviceInfo.Id.MOAAN_W7,
+                DeviceInfo.Id.MOAAN_FLOW_MINI,
                 -> {
                     logController("Allwinner/Sunxi")
                     SunxiEPDController()
