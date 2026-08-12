@@ -1,30 +1,26 @@
+/* EPD Controller for Lenovo Smart Paper (RK3566).
+ * Tested on Lenovo Smart Paper. sendOneFullFrame() does not work on this device,
+ * so setEpdMode() uses screenRefresh(true, 1) for full refresh instead.
+ */
+
 package org.koreader.launcher.device.epd
 
-import android.annotation.SuppressLint
 import android.util.Log
 import android.view.View
 import org.koreader.launcher.device.EPDInterface
-import org.koreader.launcher.device.epd.rockchip.RK33xxEPDController.Companion.EINK_MODE_FAST
-import org.koreader.launcher.device.epd.rockchip.RK33xxEPDController.Companion.EINK_MODE_FULL
-import org.koreader.launcher.device.epd.rockchip.RK33xxEPDController.Companion.EINK_MODE_FULL_UI
-import org.koreader.launcher.device.epd.rockchip.RK33xxEPDController.Companion.EINK_MODE_PARTIAL
-import org.koreader.launcher.device.epd.rockchip.RK33xxEPDController.Companion.EINK_MODE_PARTIAL_UI
-import org.koreader.launcher.device.epd.rockchip.RK33xxEPDController.Companion.EINK_WAVEFORM_DELAY
+import org.koreader.launcher.device.epd.rockchip.RK35xxEPDController
 
-/* EPD Controller for Lenovo SmartPaper (RK3566).
- *
- * Uses the hidden system service android.os.EinkManager via reflection.
- * The service is obtained via Context.getSystemService("eink").
- *
- * Note: sendOneFullFrame() is blocked by SELinux on Lenovo devices,
- * so we use screenRefresh(true, 1) instead, which correctly triggers
- * a full-screen GC16 refresh (black/white flash to clear ghosting).
- */
-
-class LenovoSmartPaperEPDController : EPDInterface {
+class LenovoSmartPaperEPDController : RK35xxEPDController(), EPDInterface {
 
     companion object {
         private const val TAG = "EPD"
+
+        // RK3566 EPD waveform modes (see RK35xxEPDController)
+        private const val EPD_FULL = 2      // EPD_FULL_GC16
+        private const val EPD_FULL_GL16 = 3 // EPD_FULL_GL16 (Balanced)
+        private const val EPD_PART = 7      // EPD_PART_GC16
+        private const val EPD_A2 = 12       // EPD_A2 (fast refresh)
+        private const val EPD_DELAY = 0
     }
 
     override fun getPlatform(): String {
@@ -36,42 +32,41 @@ class LenovoSmartPaperEPDController : EPDInterface {
     }
 
     override fun getWaveformFull(): Int {
-        return EINK_MODE_FULL
+        return EPD_FULL
     }
 
     override fun getWaveformPartial(): Int {
-        return EINK_MODE_PARTIAL
+        return EPD_PART
     }
 
     override fun getWaveformFullUi(): Int {
-        return EINK_MODE_FULL_UI
+        return EPD_FULL_GL16
     }
 
     override fun getWaveformPartialUi(): Int {
-        return EINK_MODE_PARTIAL_UI
+        return EPD_PART
     }
 
     override fun getWaveformFast(): Int {
-        return EINK_MODE_FAST
+        return EPD_A2
     }
 
     override fun getWaveformDelay(): Int {
-        return EINK_WAVEFORM_DELAY
+        return EPD_DELAY
     }
 
     override fun getWaveformDelayUi(): Int {
-        return EINK_WAVEFORM_DELAY
+        return EPD_DELAY
     }
 
     override fun getWaveformDelayFast(): Int {
-        return EINK_WAVEFORM_DELAY
+        return EPD_DELAY
     }
 
     override fun needsView(): Boolean {
         return true
     }
 
-    @SuppressLint("WrongConstant")
     override fun setEpdMode(
         targetView: View,
         mode: Int, delay: Long,
@@ -82,8 +77,6 @@ class LenovoSmartPaperEPDController : EPDInterface {
             val einkManager: Any? = targetView.context.getSystemService("eink")
 
             if (einkManager != null) {
-                // Use screenRefresh(true, 1) — the only working full-refresh
-                // path on Lenovo devices. sendOneFullFrame() is blocked by SELinux.
                 val screenRefresh = einkManagerClass.getMethod(
                     "screenRefresh", Boolean::class.javaPrimitiveType, Int::class.javaPrimitiveType
                 )
