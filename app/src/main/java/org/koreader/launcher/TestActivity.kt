@@ -18,9 +18,11 @@ import org.koreader.launcher.device.epd.NookEmperorEPDController
 import org.koreader.launcher.device.epd.OnyxEPDController
 import org.koreader.launcher.device.epd.RK3026EPDController
 import org.koreader.launcher.device.epd.RK3368EPDController
+import org.koreader.launcher.device.epd.LenovoSmartPaperEPDController
 import org.koreader.launcher.device.epd.RK3566EPDController
 import org.koreader.launcher.device.epd.SunxiEPDController
 import org.koreader.launcher.device.epd.TolinoEPDController
+import org.koreader.launcher.device.lights.LenovoSmartPaperLightsController
 import org.koreader.launcher.device.lights.OnyxAdbLightsController
 import org.koreader.launcher.device.lights.OnyxC67Controller
 import org.koreader.launcher.device.lights.OnyxColorController
@@ -69,6 +71,7 @@ class TestActivity: AppCompatActivity() {
 
         // EPD drivers
         epdMap["Freescale/NTX"] = TolinoEPDController()
+        epdMap["Lenovo Smart Paper"] = LenovoSmartPaperEPDController()
         epdMap["Nook GL4"] = NGL4EPDController()
         epdMap["Nook GL4 Plus"] = NookEmperorEPDController()
         epdMap["Onyx/Qualcomm"] = OnyxEPDController()
@@ -79,6 +82,7 @@ class TestActivity: AppCompatActivity() {
 
         // Lights drivers
         lightsMap["Boyue S62 Root"] = BoyueS62RootController()
+        lightsMap["Lenovo Smart Paper"] = LenovoSmartPaperLightsController()
         lightsMap["Onyx ADB (lights)"] = OnyxAdbLightsController()
         lightsMap["Onyx C67"] = OnyxC67Controller()
         lightsMap["Onyx Color"] = OnyxColorController()
@@ -165,6 +169,13 @@ class TestActivity: AppCompatActivity() {
         lightsMap[id]?.let { driver ->
             Log.i(tag, String.format("running lights test: %s", id))
 
+            if (id == "Lenovo Smart Paper") {
+                val tooltipText = "For $id, please grant the \"Modify system settings\" permission\n" +
+                    "in Android Settings before testing."
+                ToolTip.showTooltip(binding.root, tooltipText, this)
+                Log.i(tag, tooltipText)
+            }
+
             if (id == "Onyx ADB (lights)") {
                 val tooltipText = "For $id, please see the wiki to enable additional permissions:\n" +
                     "https://github.com/koreader/koreader/wiki/Android-tips-and-tricks#adb-stuff"
@@ -204,6 +215,7 @@ class TestActivity: AppCompatActivity() {
                         }
                     }
 
+                    "Lenovo Smart Paper",
                     "Rockchip RK3026",
                     "Rockchip RK3368",
                     "Rockchip RK3566" -> {
