@@ -8,19 +8,12 @@ package org.koreader.launcher.device.epd
 import android.util.Log
 import android.view.View
 import org.koreader.launcher.device.EPDInterface
-import org.koreader.launcher.device.epd.rockchip.RK35xxEPDController
+import org.koreader.launcher.device.epd.rockchip.RK33xxEPDController
 
-class LenovoSmartPaperEPDController : RK35xxEPDController(), EPDInterface {
+class LenovoSmartPaperEPDController : RK33xxEPDController(), EPDInterface {
 
     companion object {
         private const val TAG = "EPD"
-
-        // RK3566 EPD waveform modes (see RK35xxEPDController)
-        private const val EPD_FULL = 2      // EPD_FULL_GC16
-        private const val EPD_FULL_GL16 = 3 // EPD_FULL_GL16 (Balanced)
-        private const val EPD_PART = 7      // EPD_PART_GC16
-        private const val EPD_A2 = 12       // EPD_A2 (fast refresh)
-        private const val EPD_DELAY = 0
     }
 
     override fun getPlatform(): String {
@@ -32,35 +25,35 @@ class LenovoSmartPaperEPDController : RK35xxEPDController(), EPDInterface {
     }
 
     override fun getWaveformFull(): Int {
-        return EPD_FULL
+        return EINK_MODE_FULL
     }
 
     override fun getWaveformPartial(): Int {
-        return EPD_PART
+        return EINK_MODE_PARTIAL
     }
 
     override fun getWaveformFullUi(): Int {
-        return EPD_FULL_GL16
+        return EINK_MODE_FULL_UI
     }
 
     override fun getWaveformPartialUi(): Int {
-        return EPD_PART
+        return EINK_MODE_PARTIAL_UI
     }
 
     override fun getWaveformFast(): Int {
-        return EPD_A2
+        return EINK_MODE_FAST
     }
 
     override fun getWaveformDelay(): Int {
-        return EPD_DELAY
+        return EINK_WAVEFORM_DELAY
     }
 
     override fun getWaveformDelayUi(): Int {
-        return EPD_DELAY
+        return EINK_WAVEFORM_DELAY
     }
 
     override fun getWaveformDelayFast(): Int {
-        return EPD_DELAY
+        return EINK_WAVEFORM_DELAY
     }
 
     override fun needsView(): Boolean {
