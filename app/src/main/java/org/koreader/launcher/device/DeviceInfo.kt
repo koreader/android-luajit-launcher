@@ -372,7 +372,7 @@ object DeviceInfo {
             -> Id.MOAAN_W7
 
             // Moaan Flow Mini (迷你阅) — same sun8iw15p1 platform as W7
-            BRAND == "Allwinner" && MODEL == "FLOW.Mini" && DEVICE == "virgo-perf1" && HARDWARE == "sun8iw15p1"
+            BRAND == "allwinner" && MODEL == "flow.mini" && DEVICE == "virgo-perf1" && HARDWARE == "sun8iw15p1"
             -> Id.MOAAN_FLOW_MINI
 
             // Mooink Plus 2c
