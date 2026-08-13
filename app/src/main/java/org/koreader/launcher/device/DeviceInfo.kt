@@ -63,6 +63,7 @@ object DeviceInfo {
         HYREAD_GAZE_NOTE,
         HYREAD_GAZE_NOTE_CC,
         HYREAD_MINI6,
+        IFLYTEK_CUBE2,
         IFLYTEK_R3,
         INKBOOK,
         INKBOOKFOCUS,
@@ -310,6 +311,10 @@ object DeviceInfo {
             // Hyread Mini 6
             MANUFACTURER == "hyread" && MODEL == "k06nu"
             -> Id.HYREAD_MINI6
+
+            // Iflytek ebook Cube 2
+            MANUFACTURER == "iflytek" && MODEL == "iflytek ebook cube2"
+            -> Id.IFLYTEK_CUBE2
 
             // Iflytek ebook r3
             MANUFACTURER == "iflytek" && MODEL == "iflytek ebook r3"
