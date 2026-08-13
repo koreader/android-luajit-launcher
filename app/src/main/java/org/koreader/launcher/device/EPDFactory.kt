@@ -190,6 +190,7 @@ object EPDFactory {
                 DeviceInfo.Id.MOAAN_MIX7,
                 DeviceInfo.Id.OBOOK_P10D,
                 DeviceInfo.Id.OBOOK_P78D,
+                DeviceInfo.Id.OBOOK_R501,
                 DeviceInfo.Id.PUBU_PUBOOK,
                 DeviceInfo.Id.XIAOMI_READER,
                 -> {

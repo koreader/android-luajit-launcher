@@ -88,6 +88,7 @@ object DeviceInfo {
         NOOK_GLPLUS,
         OBOOK_P10D,
         OBOOK_P78D,
+        OBOOK_R501,
         ONYX_C67,
         ONYX_DARWIN5,
         ONYX_DARWIN7,
@@ -414,6 +415,10 @@ object DeviceInfo {
             // OBOOK P78D
             MANUFACTURER == STR_ROCKCHIP && PRODUCT == "rk3566_78d" && MODEL == "p78d"
             -> Id.OBOOK_P78D
+
+            // OBOOK R501
+            MANUFACTURER == STR_ROCKCHIP && MODEL == "obook" && DEVICE == "rk3566_r501"
+            -> Id.OBOOK_R501
 
             // Onyx C67
             MANUFACTURER == "onyx"
