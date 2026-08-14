@@ -78,6 +78,7 @@ object DeviceInfo {
         MOBISCRIBE_WAVE,
         MOAAN_MIX7,
         MOAAN_W7,
+        MOAAN_INKPALM5,
         MOOINKPLUS2C,
         NABUK,
         NOOK,
@@ -369,6 +370,10 @@ object DeviceInfo {
             // Moaan W7
             BRAND == "allwinner" && MODEL == "epd103" && DEVICE == "virgo-perf1" && HARDWARE == "sun8iw15p1"
             -> Id.MOAAN_W7
+
+            // Moaan InkPalm 5 (EPD105) — same sun8iw15p1 platform as Flow Mini/W7
+            BRAND == "allwinner" && MODEL == "epd105" && DEVICE == "virgo-perf1" && HARDWARE == "sun8iw15p1"
+            -> Id.MOAAN_INKPALM5
 
             // Mooink Plus 2c
             BRAND == "allwinner" && MODEL == "mooink plus 2c"
@@ -753,6 +758,7 @@ object DeviceInfo {
         QUIRK_NO_LIGHTS = when (ID) {
             Id.LINFINY_ENOTE,
             Id.MOAAN_W7,
+            Id.MOAAN_INKPALM5,
             Id.ONYX_MAX,
             Id.ONYX_MAX2_PRO,
             Id.ONYX_NOTE,
