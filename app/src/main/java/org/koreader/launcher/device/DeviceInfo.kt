@@ -39,6 +39,7 @@ object DeviceInfo {
         BOYUE_C64P,
         BOYUE_K78W,
         BOYUE_K103,
+        BOYUE_K6P,
         BOYUE_P6,
         BOYUE_P61,
         BOYUE_P78,
@@ -210,6 +211,10 @@ object DeviceInfo {
             // Boyue Likebook Alita
             BOYUE && (PRODUCT == "k103" || PRODUCT == "alita")
             -> Id.BOYUE_K103
+
+            // Boyue Likebook K6P (rk3326)
+            BOYUE && PRODUCT == "k6p"
+            -> Id.BOYUE_K6P
 
             // Boyue Likebook P6
             BOYUE && PRODUCT == "p6"

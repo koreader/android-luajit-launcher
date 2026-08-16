@@ -43,6 +43,7 @@ object EPDFactory {
                 DeviceInfo.Id.BOYUE_C64P,
                 DeviceInfo.Id.BOYUE_K78W,
                 DeviceInfo.Id.BOYUE_K103,
+                DeviceInfo.Id.BOYUE_K6P,
                 DeviceInfo.Id.BOYUE_P6,
                 DeviceInfo.Id.BOYUE_P61,
                 DeviceInfo.Id.BOYUE_P78,
