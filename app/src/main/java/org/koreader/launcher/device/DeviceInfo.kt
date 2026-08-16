@@ -69,6 +69,8 @@ object DeviceInfo {
         INKBOOKFOCUS,
         INKBOOKFOCUS_PLUS,
         INKPALM_PLUS,
+        IREADER,
+        IREADER_NEO2,
         JDREAD,
         LENOVO_SMARTPAPER,
         LINFINY_ENOTE,
@@ -335,6 +337,19 @@ object DeviceInfo {
             // InkPalm Plus
             MANUFACTURER == STR_ROCKCHIP && MODEL == "inkpalmplus"
             -> Id.INKPALM_PLUS
+
+            // iReader Neo 2 (2026-08-18): model="neo 2", device=rm06ie-ckcw,
+            //   product=rm06ie-ckcw, hardware/platform=mt8168. Touch reports fine.
+            (MANUFACTURER == "ireader" || BRAND == "ireader")
+            && (DEVICE == "rm06ie-ckcw" || MODEL == "neo 2")
+            -> Id.IREADER_NEO2
+
+            // iReader (zhangyue) Smart XS / Smart Air / Ocean 3 Plus / Ocean 4 evolt 2025
+            //   confirmed props: manufacturer/brand=ireader, mt8512
+            //   Ocean 4 evolt 2025: device=rm07b-ckbw; Smart XS: device=sr801s;
+            //   Ocean 3 Plus: device=rm08a-ckb; Smart Air: device=sm08a
+            MANUFACTURER == "ireader" || BRAND == "ireader"
+            -> Id.IREADER
 
             // JDRead1
             MANUFACTURER == "onyx" && MODEL == "jdread"
@@ -750,6 +765,7 @@ object DeviceInfo {
         // reports ACONFIGURATION_TOUCHSCREEN_NOTOUCH despite having a touchscreen
         QUIRK_BROKEN_TOUCH_REPORT = when (ID) {
             Id.MOBISCRIBE_WAVE,
+            Id.IREADER,
             -> true else -> false
         }
 
