@@ -115,6 +115,7 @@ object EPDFactory {
                 DeviceInfo.Id.ONYX_FARADAY2,
                 DeviceInfo.Id.ONYX_GALILEO2,
                 DeviceInfo.Id.ONYX_GO_103,
+                DeviceInfo.Id.ONYX_GO_103_2,
                 DeviceInfo.Id.ONYX_GO6,
                 DeviceInfo.Id.ONYX_GO7,
                 DeviceInfo.Id.ONYX_GO7GEN2,
