@@ -2,17 +2,61 @@
 
 package org.koreader.launcher.device.epd
 
+import android.util.Log
+import org.koreader.launcher.BuildConfig
 import org.koreader.launcher.device.EPDInterface
 import org.koreader.launcher.device.epd.qualcomm.QualcommEPDController
 
 class OnyxEPDController : QualcommEPDController(), EPDInterface {
+
+    private companion object {
+        const val TAG = "EPD"
+    }
+
+    private var debouncerPrevented = false
+
+    private fun preventBooxSystemRefresh(): Boolean {
+        return try {
+            // Official BOOX API: ViewUpdateHelper.debouncer(false, 0, 0, 0, 0).
+            Class.forName("android.onyx.ViewUpdateHelper").getMethod(
+                "debouncer",
+                Boolean::class.javaPrimitiveType,
+                Int::class.javaPrimitiveType,
+                Int::class.javaPrimitiveType,
+                Int::class.javaPrimitiveType,
+                Int::class.javaPrimitiveType
+            ).invoke(null, false, 0, 0, 0, 0)
+            Log.i(TAG, "called ViewUpdateHelper.debouncer(false, 0, 0, 0, 0)")
+            true
+        } catch (e: Exception) {
+            Log.e(TAG, "ViewUpdateHelper.debouncer reflection failed: ${e.message}", e)
+            false
+        }
+    }
+
+    private fun resumeBooxSystemRefresh(): Boolean {
+        return try {
+            // The firmware restores the configured SF debouncer through this
+            // internal OnyxEpdBypassManager method, rather than fixed values.
+            val managerClass = Class.forName("android.onyx.optimization.OnyxEpdBypassManager")
+            val manager = managerClass.getMethod("sharedInstance").invoke(null)
+            managerClass.getDeclaredMethod("resumeSFDebouncer", String::class.java).apply {
+                isAccessible = true
+            }.invoke(manager, BuildConfig.APPLICATION_ID)
+            Log.i(TAG, "called OnyxEpdBypassManager.resumeSFDebouncer(${BuildConfig.APPLICATION_ID})")
+            true
+        } catch (e: Exception) {
+            Log.e(TAG, "OnyxEpdBypassManager.resumeSFDebouncer reflection failed: ${e.message}", e)
+            false
+        }
+    }
 
     override fun getPlatform(): String {
         return "qualcomm"
     }
 
     override fun getMode(): String {
-        return "full-only"
+        return "all"
     }
 
     override fun getWaveformFull(): Int {
@@ -55,9 +99,21 @@ class OnyxEPDController : QualcommEPDController(), EPDInterface {
                             mode: Int, delay: Long,
                             x: Int, y: Int, width: Int, height: Int, epdMode: String?)
     {
-        requestEpdMode(targetView, mode, delay, x, y, width, height)
+        if (!debouncerPrevented) {
+            debouncerPrevented = preventBooxSystemRefresh()
+        }
+        // KOReader passes right/bottom, while current Onyx firmware expects width/height.
+        requestEpdMode(targetView, mode, delay, x, y, width - x, height - y)
     }
 
-    override fun resume() {}
-    override fun pause() {}
+    override fun resume() {
+        if (getMode() == "all") {
+            debouncerPrevented = false
+        }
+    }
+    override fun pause() {
+        if (getMode() == "all") {
+            debouncerPrevented = false
+        }
+    }
 }

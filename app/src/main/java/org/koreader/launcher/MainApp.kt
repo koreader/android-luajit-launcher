@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Build
 import android.os.Environment
 import android.os.StrictMode
+import org.lsposed.hiddenapibypass.HiddenApiBypass
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
@@ -92,6 +93,11 @@ class MainApp : Application() {
     @Suppress("DEPRECATION")
     override fun onCreate() {
         super.onCreate()
+        // Match the official BOOX demo: allow reflection of android.onyx APIs
+        // before the EPD controller resolves ViewUpdateHelper.debouncer.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            HiddenApiBypass.addHiddenApiExemptions("")
+        }
         assets_path = filesDir.absolutePath
         storage_path = Environment.getExternalStorageDirectory().absolutePath
         app_storage_path = String.format("%s%s%s", storage_path, File.separator, NAME.lowercase())
