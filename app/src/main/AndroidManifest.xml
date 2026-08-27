@@ -44,6 +44,7 @@
             android:configChanges="colorMode|density|fontScale|keyboard|keyboardHidden|layoutDirection|locale|mcc|mnc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|touchscreen|uiMode"
             tools:ignore="NonResizeableActivity">
             <meta-data android:name="android.app.lib_name" android:value="luajit-launcher" />
+            <meta-data android:name="android.supports_size_changes" android:value="true" />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
