@@ -95,6 +95,7 @@ object DeviceInfo {
         ONYX_FAUST3,
         ONYX_GALILEO2,
         ONYX_GO_103,
+        ONYX_GO_103_2,
         ONYX_GO_COLOR7,
         ONYX_GO6,
         ONYX_GO6GEN2,
@@ -448,6 +449,10 @@ object DeviceInfo {
             // Onyx Boox Go 10.3
             BRAND == "onyx" && MODEL == "go103"
             -> Id.ONYX_GO_103
+
+            // Onyx Boox Go 10.3 Gen II ("Lumi")
+            BRAND == "onyx" && MODEL == "go103_2lumi"
+            -> Id.ONYX_GO_103_2
 
             // Onyx Boox Go Color 7
             BRAND == "onyx" && MODEL == "gocolor7"

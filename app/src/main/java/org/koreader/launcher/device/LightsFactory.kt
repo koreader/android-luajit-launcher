@@ -20,6 +20,7 @@ object LightsFactory {
                     LenovoSmartPaperLightsController()
                 }
                 DeviceInfo.Id.ONYX_GALILEO2,
+                DeviceInfo.Id.ONYX_GO_103_2,
                 DeviceInfo.Id.ONYX_GO_COLOR7,
                 DeviceInfo.Id.ONYX_GO6,
                 DeviceInfo.Id.ONYX_GO6GEN2,
