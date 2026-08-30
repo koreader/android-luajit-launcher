@@ -2,19 +2,39 @@
 
 package org.koreader.launcher.device.epd
 
+import android.os.Build
 import android.util.Log
 import org.koreader.launcher.device.EPDInterface
 import org.koreader.launcher.device.epd.qualcomm.QualcommEPDController
+import org.lsposed.hiddenapibypass.HiddenApiBypass
 
 class OnyxEPDController : QualcommEPDController(), EPDInterface {
 
     private companion object {
         const val TAG = "EPD"
+
+        private val hiddenApiAccess: Boolean by lazy {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+                true
+            } else {
+                runCatching {
+                    HiddenApiBypass.addHiddenApiExemptions(
+                        "Landroid/onyx/ViewUpdateHelper;",
+                        "Landroid/onyx/optimization/EInkHelper;",
+                    )
+                }.onFailure { error ->
+                    Log.e(TAG, "BOOX EPD hidden API exemption failed", error)
+                }.getOrDefault(false)
+            }
+        }
     }
 
     private var debouncerPrevented = false
 
     private fun preventBooxSystemRefresh(): Boolean {
+        if (!hiddenApiAccess) {
+            return false
+        }
         return try {
             // Official BOOX API: ViewUpdateHelper.debouncer(false, 0, 0, 0, 0).
             Class.forName("android.onyx.ViewUpdateHelper").getMethod(
@@ -34,6 +54,9 @@ class OnyxEPDController : QualcommEPDController(), EPDInterface {
     }
 
     private fun resumeBooxSystemRefresh(): Boolean {
+        if (!hiddenApiAccess) {
+            return false
+        }
         return try {
             // Ask BOOX's EInkHelper to reapply the current debouncer setting.
             val helperClass = Class.forName("android.onyx.optimization.EInkHelper")
