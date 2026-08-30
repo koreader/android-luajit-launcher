@@ -3,7 +3,6 @@
 package org.koreader.launcher.device.epd
 
 import android.util.Log
-import org.koreader.launcher.BuildConfig
 import org.koreader.launcher.device.EPDInterface
 import org.koreader.launcher.device.epd.qualcomm.QualcommEPDController
 
@@ -36,17 +35,20 @@ class OnyxEPDController : QualcommEPDController(), EPDInterface {
 
     private fun resumeBooxSystemRefresh(): Boolean {
         return try {
-            // The firmware restores the configured SF debouncer through this
-            // internal OnyxEpdBypassManager method, rather than fixed values.
-            val managerClass = Class.forName("android.onyx.optimization.OnyxEpdBypassManager")
-            val manager = managerClass.getMethod("sharedInstance").invoke(null)
-            managerClass.getDeclaredMethod("resumeSFDebouncer", String::class.java).apply {
-                isAccessible = true
-            }.invoke(manager, BuildConfig.APPLICATION_ID)
-            Log.i(TAG, "called OnyxEpdBypassManager.resumeSFDebouncer(${BuildConfig.APPLICATION_ID})")
+            // Ask BOOX's EInkHelper to reapply the current debouncer setting.
+            val helperClass = Class.forName("android.onyx.optimization.EInkHelper")
+            val duration = (helperClass.getMethod("getAnimationDuration")
+                .invoke(null) as Number).toInt()
+            if (duration < 0) {
+                Log.w(TAG, "BOOX E-Ink service is not ready")
+                return false
+            }
+            helperClass.getMethod("setAnimationDuration", Integer.TYPE)
+                .invoke(null, duration)
+            Log.i(TAG, "reapplied BOOX debouncer setting (animationDuration=$duration)")
             true
         } catch (e: Exception) {
-            Log.e(TAG, "OnyxEpdBypassManager.resumeSFDebouncer reflection failed: ${e.message}", e)
+            Log.e(TAG, "EInkHelper debouncer restore failed: ${e.message}", e)
             false
         }
     }
