@@ -734,7 +734,7 @@ object DeviceInfo {
             || MODEL == STR_TOLINO && (DEVICE == "tolino_vision2" || DEVICE == STR_NTX)
             -> Id.TOLINO
 
-            //Topjoy
+            // Topjoy
 	        MANUFACTURER == "topjoy" && MODEL == "e602"
 	        -> Id.TOPJOY_E602
 
