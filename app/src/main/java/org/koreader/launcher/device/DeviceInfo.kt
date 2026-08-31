@@ -165,6 +165,7 @@ object DeviceInfo {
         TOLINO_VISION4,
         TOLINO_VISION5,
         TOLINO_VISION6,
+        TOPJOY_E602,
         XIAOMI_READER,
     }
 
@@ -732,6 +733,10 @@ object DeviceInfo {
             BRAND == STR_TOLINO && MODEL == "imx50_rdp"
             || MODEL == STR_TOLINO && (DEVICE == "tolino_vision2" || DEVICE == STR_NTX)
             -> Id.TOLINO
+
+            //Topjoy
+	        MANUFACTURER == "topjoy" && MODEL == "e602"
+	        -> Id.TOPJOY_E602
 
             // Xiaomi
             MANUFACTURER == "xiaomi" && BRAND == "xiaomi" && MODEL == "xiaomi_reader" && DEVICE == "rk3566_eink" && HARDWARE == "rk30board"
