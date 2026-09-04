@@ -35,6 +35,7 @@ object EPDFactory {
                 DeviceInfo.Id.ONYX_C67,
                 DeviceInfo.Id.ONYX_MAGICBOOK,
                 DeviceInfo.Id.ONYX_MONTECRISTO3,
+                DeviceInfo.Id.TOPJOY_E602,
                 -> {
                     logController("Rockchip RK3026")
                     RK3026EPDController()
