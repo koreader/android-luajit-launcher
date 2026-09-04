@@ -31,6 +31,7 @@ object DeviceInfo {
     val QUIRK_BROKEN_TOUCH_REPORT: Boolean
     val QUIRK_NEEDS_WAKELOCKS: Boolean
     val QUIRK_NO_LIGHTS: Boolean
+    val QUIRK_UNSUPPORTED_LIGHTS: Boolean
 
     val HAS_COLOR_SCREEN: Boolean
 
@@ -768,6 +769,14 @@ object DeviceInfo {
             Id.ONYX_NOTE,
             Id.SONY_CP1,
             Id.SONY_RP1,
+            -> true else -> false
+        }
+
+        // Android devices with lights that no available driver can control.
+        // Hide the frontlight UI instead of exposing controls that do nothing.
+        QUIRK_UNSUPPORTED_LIGHTS = when (ID) {
+            Id.MOAAN_MIX7,          // Moaan firmware, same MoanLedControl lights path as the Xiaomi reader
+            Id.XIAOMI_READER,
             -> true else -> false
         }
 
