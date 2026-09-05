@@ -14,14 +14,8 @@ import org.koreader.launcher.device.LightsInterface
  *   Sends action_set_color_temperature (0-100 scale); the service rescales to 0-10 for
  *   the lm3630a_led hardware and calls PowerManager.setFrontlightBrightnessColor() using
  *   its own DEVICE_POWER privilege.
- *
- * The same service owns B&N's Color Temperature Management (CTM), which re-applies a
- * warmth value on every SCREEN_ON. Its mode lives only in the service's shared prefs
- * (ctm_preference.xml, key ctm_mode) and defaults to -1 (CTM_MODE_DISABLE) when that
- * key is missing -- which is what an unclean shutdown leaves behind. In mode -1 the
- * service forces COLD_LIGHT (0) after every unlock and drops our stored value, so
- * warmth silently resets to cold. Mode 0 (CTM_MODE_MANUAL) instead re-applies the
- * value we set, so we assert it once per process before the first warmth write.
+ * The service also re-applies warmth on every SCREEN_ON, forcing it to cold unless its
+ * CTM mode is manual, so we assert that mode before the first warmth write.
  * see https://github.com/koreader/koreader/issues/14574
  */
 class NookGL4plusController : LightsInterface {
@@ -88,19 +82,15 @@ class NookGL4plusController : LightsInterface {
             Log.w(TAG, "warmth value out of range: $warmth")
             return
         }
-        // Skip redundant writes -- but never on the first call of the process: asserting
-        // CTM mode makes the service re-apply its own stored value, so it must always be
-        // followed by a warmth write that seeds that value with ours.
+        // Never skip the first write: it seeds the value the service re-applies.
         if (ctmModeAsserted && warmth == getWarmth(activity)) return
         Log.v(TAG, "Setting warmth to $warmth of $WARMTH_MAX")
         assertManualCtmMode(activity)
         setWarmthViaService(activity, warmth)
     }
 
-    /* Put B&N's Color Temperature Management into manual mode, so that the value written
-     * by setWarmthViaService() survives the next SCREEN_ON instead of being forced to cold.
-     * GlowLightService is an IntentService, so this is handled before the warmth intent
-     * that follows it. Idempotent, and a no-op cost after the first call. */
+    /* GlowLightService is an IntentService, so this is handled before the warmth intent
+     * that follows it. */
     private fun assertManualCtmMode(activity: Activity) {
         if (ctmModeAsserted) return
         try {
