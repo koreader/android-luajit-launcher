@@ -18,7 +18,7 @@ class Device(activity: Activity) {
     val hasFullEinkSupport = epd.getMode() == "all"
 
     val hasLights = when (activity.platform) {
-        "android" -> !DeviceInfo.QUIRK_NO_LIGHTS
+        "android" -> !(DeviceInfo.QUIRK_NO_LIGHTS || DeviceInfo.QUIRK_UNSUPPORTED_LIGHTS)
         else -> false
     }
 
