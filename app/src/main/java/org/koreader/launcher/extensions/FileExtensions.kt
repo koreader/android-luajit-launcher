@@ -32,19 +32,37 @@ fun File.symlink(link: String): Boolean {
     }
 }
 
-fun File.read(): Int {
+private const val FILE_READ_INT_DEFAULT = 0
+
+/**
+ * Reads from [this] and parses the result to [Int].
+ *
+ * In case of an error, [block] is invoked an returned.
+ */
+fun File.readOrElse(block: () -> Int = { FILE_READ_INT_DEFAULT }): Int {
+    return read() ?: return block()
+}
+
+private fun File.read(): Int? {
     return try {
         this.readText().replace("\n", "").toInt()
     } catch (e: Exception) {
         e.printStackTrace()
-        0
+        null
     }
 }
 
-fun File.write(value: Int) {
+/**
+ * Writes [value] to [this].
+ *
+ * @return true if the write op was successful, otherwise false.
+ */
+fun File.write(value: Int): Boolean {
     try {
         writeText(value.toString())
+        return true
     } catch (e: Exception) {
         e.printStackTrace()
+        return false
     }
 }
