@@ -39,6 +39,7 @@ object DeviceInfo {
         BOYUE_C64P,
         BOYUE_K78W,
         BOYUE_K103,
+        BOYUE_K6P,
         BOYUE_P6,
         BOYUE_P61,
         BOYUE_P78,
@@ -68,6 +69,8 @@ object DeviceInfo {
         INKBOOKFOCUS,
         INKBOOKFOCUS_PLUS,
         INKPALM_PLUS,
+        IREADER,
+        IREADER_NEO2,
         JDREAD,
         LENOVO_SMARTPAPER,
         LINFINY_ENOTE,
@@ -78,6 +81,7 @@ object DeviceInfo {
         MOBISCRIBE_WAVE,
         MOAAN_MIX7,
         MOAAN_W7,
+        MOAAN_INKPALM5,
         MOOINKPLUS2C,
         NABUK,
         NOOK,
@@ -213,6 +217,10 @@ object DeviceInfo {
             BOYUE && (PRODUCT == "k103" || PRODUCT == "alita")
             -> Id.BOYUE_K103
 
+            // Boyue Likebook K6P (rk3326)
+            BOYUE && PRODUCT == "k6p"
+            -> Id.BOYUE_K6P
+
             // Boyue Likebook P6
             BOYUE && PRODUCT == "p6"
             -> Id.BOYUE_P6
@@ -333,6 +341,19 @@ object DeviceInfo {
             MANUFACTURER == STR_ROCKCHIP && MODEL == "inkpalmplus"
             -> Id.INKPALM_PLUS
 
+            // iReader Neo 2 (2026-08-18): model="neo 2", device=rm06ie-ckcw,
+            //   product=rm06ie-ckcw, hardware/platform=mt8168. Touch reports fine.
+            (MANUFACTURER == "ireader" || BRAND == "ireader")
+            && (DEVICE == "rm06ie-ckcw" || MODEL == "neo 2")
+            -> Id.IREADER_NEO2
+
+            // iReader (zhangyue) Smart XS / Smart Air / Ocean 3 Plus / Ocean 4 evolt 2025
+            //   confirmed props: manufacturer/brand=ireader, mt8512
+            //   Ocean 4 evolt 2025: device=rm07b-ckbw; Smart XS: device=sr801s;
+            //   Ocean 3 Plus: device=rm08a-ckb; Smart Air: device=sm08a
+            MANUFACTURER == "ireader" || BRAND == "ireader"
+            -> Id.IREADER
+
             // JDRead1
             MANUFACTURER == "onyx" && MODEL == "jdread"
             -> Id.JDREAD
@@ -372,6 +393,10 @@ object DeviceInfo {
             // Moaan W7
             BRAND == "allwinner" && MODEL == "epd103" && DEVICE == "virgo-perf1" && HARDWARE == "sun8iw15p1"
             -> Id.MOAAN_W7
+
+            // Moaan InkPalm 5 (EPD105) — same sun8iw15p1 platform as Flow Mini/W7
+            BRAND == "allwinner" && MODEL == "epd105" && DEVICE == "virgo-perf1" && HARDWARE == "sun8iw15p1"
+            -> Id.MOAAN_INKPALM5
 
             // Mooink Plus 2c
             BRAND == "allwinner" && MODEL == "mooink plus 2c"
@@ -755,6 +780,7 @@ object DeviceInfo {
         // reports ACONFIGURATION_TOUCHSCREEN_NOTOUCH despite having a touchscreen
         QUIRK_BROKEN_TOUCH_REPORT = when (ID) {
             Id.MOBISCRIBE_WAVE,
+            Id.IREADER,
             -> true else -> false
         }
 
@@ -768,6 +794,7 @@ object DeviceInfo {
         QUIRK_NO_LIGHTS = when (ID) {
             Id.LINFINY_ENOTE,
             Id.MOAAN_W7,
+            Id.MOAAN_INKPALM5,
             Id.ONYX_MAX,
             Id.ONYX_MAX2_PRO,
             Id.ONYX_NOTE,
