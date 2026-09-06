@@ -63,6 +63,7 @@ object DeviceInfo {
         HYREAD_GAZE_NOTE,
         HYREAD_GAZE_NOTE_CC,
         HYREAD_MINI6,
+        IFLYTEK_CUBE2,
         IFLYTEK_R3,
         INKBOOK,
         INKBOOKFOCUS,
@@ -78,6 +79,7 @@ object DeviceInfo {
         MOBISCRIBE_WAVE,
         MOAAN_MIX7,
         MOAAN_W7,
+        MOAAN_FLOW_MINI,
         MOOINKPLUS2C,
         NABUK,
         NOOK,
@@ -86,6 +88,7 @@ object DeviceInfo {
         NOOK_GLPLUS,
         OBOOK_P10D,
         OBOOK_P78D,
+        OBOOK_R501,
         ONYX_C67,
         ONYX_DARWIN5,
         ONYX_DARWIN7,
@@ -313,6 +316,10 @@ object DeviceInfo {
             MANUFACTURER == "hyread" && MODEL == "k06nu"
             -> Id.HYREAD_MINI6
 
+            // Iflytek ebook Cube 2
+            MANUFACTURER == "iflytek" && MODEL == "iflytek ebook cube2"
+            -> Id.IFLYTEK_CUBE2
+
             // Iflytek ebook r3
             MANUFACTURER == "iflytek" && MODEL == "iflytek ebook r3"
             -> Id.IFLYTEK_R3
@@ -373,6 +380,10 @@ object DeviceInfo {
             BRAND == "allwinner" && MODEL == "epd103" && DEVICE == "virgo-perf1" && HARDWARE == "sun8iw15p1"
             -> Id.MOAAN_W7
 
+            // Moaan Flow Mini (迷你阅) — same sun8iw15p1 platform as W7
+            BRAND == "allwinner" && MODEL == "flow.mini" && DEVICE == "virgo-perf1" && HARDWARE == "sun8iw15p1"
+            -> Id.MOAAN_FLOW_MINI
+
             // Mooink Plus 2c
             BRAND == "allwinner" && MODEL == "mooink plus 2c"
             -> Id.MOOINKPLUS2C
@@ -407,6 +418,10 @@ object DeviceInfo {
             // OBOOK P78D
             MANUFACTURER == STR_ROCKCHIP && PRODUCT == "rk3566_78d" && MODEL == "p78d"
             -> Id.OBOOK_P78D
+
+            // OBOOK R501
+            MANUFACTURER == STR_ROCKCHIP && MODEL == "obook" && DEVICE == "rk3566_r501"
+            -> Id.OBOOK_R501
 
             // Onyx C67
             MANUFACTURER == "onyx"
@@ -768,6 +783,7 @@ object DeviceInfo {
         QUIRK_NO_LIGHTS = when (ID) {
             Id.LINFINY_ENOTE,
             Id.MOAAN_W7,
+            Id.MOAAN_FLOW_MINI,
             Id.ONYX_MAX,
             Id.ONYX_MAX2_PRO,
             Id.ONYX_NOTE,
