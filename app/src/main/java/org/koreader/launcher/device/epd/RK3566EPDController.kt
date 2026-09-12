@@ -14,7 +14,10 @@ class RK3566EPDController : RK35xxEPDController(), EPDInterface {
     }
 
     override fun getWaveformFull(): Int {
-        return EPD_AUTO
+        // 1 = EPD_FULL in MainActivity.einkUpdate()'s mode mapping (1..4).
+        // EPD_AUTO(0) would be treated as "invalid" and dropped there,
+        // making every full-refresh request a no-op.
+        return 1
     }
 
     override fun getWaveformPartial(): Int {

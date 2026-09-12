@@ -15,6 +15,7 @@ import org.koreader.launcher.device.epd.OldTolinoEPDController
 import org.koreader.launcher.device.epd.NGL4EPDController
 import org.koreader.launcher.device.epd.NookEmperorEPDController
 import org.koreader.launcher.device.epd.RK3566EPDController
+import org.koreader.launcher.device.epd.RK357xEPDController
 import org.koreader.launcher.device.epd.SunxiEPDController
 
 import java.util.*
@@ -192,11 +193,18 @@ object EPDFactory {
                 DeviceInfo.Id.MOAAN_MIX7,
                 DeviceInfo.Id.OBOOK_P10D,
                 DeviceInfo.Id.OBOOK_P78D,
+                DeviceInfo.Id.OBOOK_R501,
                 DeviceInfo.Id.PUBU_PUBOOK,
                 DeviceInfo.Id.XIAOMI_READER,
                 -> {
                     logController("Rockchip RK3566")
                     RK3566EPDController()
+                }
+
+                DeviceInfo.Id.IFLYTEK_CUBE2,
+                -> {
+                    logController("Rockchip RK357x (EbookManager)")
+                    RK357xEPDController()
                 }
 
                 DeviceInfo.Id.LENOVO_SMARTPAPER,
@@ -206,6 +214,7 @@ object EPDFactory {
                 }
                 
                 DeviceInfo.Id.MOAAN_W7,
+                DeviceInfo.Id.MOAAN_FLOW_MINI,
                 -> {
                     logController("Allwinner/Sunxi")
                     SunxiEPDController()
