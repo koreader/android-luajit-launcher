@@ -64,6 +64,7 @@ object EPDFactory {
                 DeviceInfo.Id.LINFINY_ENOTE,
                 DeviceInfo.Id.NOOK,
                 DeviceInfo.Id.NOOK_GLPLUS,
+                DeviceInfo.Id.RIDI_PAPER_3,
                 DeviceInfo.Id.SONY_CP1,
                 DeviceInfo.Id.SONY_RP1,
                 -> {
@@ -91,7 +92,6 @@ object EPDFactory {
                 DeviceInfo.Id.CREMA_CARTA_G,
                 DeviceInfo.Id.HANVON_960,
                 DeviceInfo.Id.ONYX_JDREAD,
-                DeviceInfo.Id.RIDI_PAPER_3,
                 DeviceInfo.Id.TOLINO,
                 DeviceInfo.Id.TOLINO_EPOS1,
                 DeviceInfo.Id.TOLINO_EPOS2,
