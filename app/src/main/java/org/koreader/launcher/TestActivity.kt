@@ -22,6 +22,7 @@ import org.koreader.launcher.device.epd.LenovoSmartPaperEPDController
 import org.koreader.launcher.device.epd.RK3566EPDController
 import org.koreader.launcher.device.epd.SunxiEPDController
 import org.koreader.launcher.device.epd.TolinoEPDController
+import org.koreader.launcher.device.epd.IReaderEPDController
 import org.koreader.launcher.device.lights.LenovoSmartPaperLightsController
 import org.koreader.launcher.device.lights.OnyxAdbLightsController
 import org.koreader.launcher.device.lights.OnyxC67Controller
@@ -79,6 +80,7 @@ class TestActivity: AppCompatActivity() {
         epdMap["Rockchip RK3368"] = RK3368EPDController()
         epdMap["Rockchip RK3566"] = RK3566EPDController()
         epdMap["Sunxi"] = SunxiEPDController()
+        epdMap["iReader"] = IReaderEPDController()
 
         // Lights drivers
         lightsMap["Boyue S62 Root"] = BoyueS62RootController()
