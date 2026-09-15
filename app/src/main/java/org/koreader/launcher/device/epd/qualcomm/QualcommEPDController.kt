@@ -39,10 +39,6 @@ abstract class QualcommEPDController {
                                 x: Int, y: Int, width: Int, height: Int) : Boolean
         {
             return try {
-                // We need to always call this, not sure why, if it's not called before
-                // system will refresh after us, it'll refresh anyway if user set
-                // Normal mode, or Regal mode works flawlessly otherwise
-                preventSystemRefresh()
                 // EpdController.refreshScreenRegion in onyxsdk
                 val refreshScreen = Class.forName("android.view.View").getMethod("refreshScreen",
                                         Integer.TYPE,
