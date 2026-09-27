@@ -68,6 +68,7 @@ object DeviceInfo {
         INKBOOKFOCUS,
         INKBOOKFOCUS_PLUS,
         INKPALM_PLUS,
+        IREADER_NEO3_ULTRA,
         JDREAD,
         LENOVO_SMARTPAPER,
         LINFINY_ENOTE,
@@ -332,6 +333,10 @@ object DeviceInfo {
             // InkPalm Plus
             MANUFACTURER == STR_ROCKCHIP && MODEL == "inkpalmplus"
             -> Id.INKPALM_PLUS
+
+            // iReader Neo 3 Ultra
+            BRAND == "ireader" && (MODEL == "neo 3 ultra" || DEVICE.startsWith("rm06l") || PRODUCT.startsWith("rm06l"))
+            -> Id.IREADER_NEO3_ULTRA
 
             // JDRead1
             MANUFACTURER == "onyx" && MODEL == "jdread"
