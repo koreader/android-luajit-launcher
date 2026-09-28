@@ -55,7 +55,7 @@ class MainActivity : NativeActivity(), LuaInterface,
     private var splashScreen: Boolean = true
 
     // surface used on devices that need a view
-    private var view: NativeSurfaceView? = null
+    private var view: SurfaceView? = null
     private class NativeSurfaceView(context: Context): SurfaceView(context),
         SurfaceHolder.Callback {
         init { holder.addCallback(this) }
@@ -118,11 +118,14 @@ class MainActivity : NativeActivity(), LuaInterface,
         window.setBackgroundDrawableResource(android.R.color.black)
 
         val surfaceKind: String = if (device.needsView) {
-            view = NativeSurfaceView(this)
+            view = device.epd.createSurface(this) ?: NativeSurfaceView(this)
 
               // The following two lines brings SurfaceView to "top" in order for NGL4 refresh to work, should be compatible with other controllers
             view?.setZOrderOnTop(true)
-            view?.holder?.setFormat(PixelFormat.TRANSPARENT)
+            view?.holder?.setFormat(
+                if (device.epd.usesOpaquePixelFormat()) PixelFormat.OPAQUE
+                else PixelFormat.TRANSPARENT
+            )
 
             window.takeSurface(null)
             view?.holder?.addCallback(this)
@@ -338,6 +341,10 @@ class MainActivity : NativeActivity(), LuaInterface,
             mode, delay, x, y, width, height))
 
         device.epd.setEpdMode(rootView, mode, delay, x, y, width, height, null)
+    }
+
+    override fun einkPrepareRipple(effect: Int) {
+        device.epd.prepareRipple(effect)
     }
 
     override fun enableFrontlightSwitch(): Boolean {

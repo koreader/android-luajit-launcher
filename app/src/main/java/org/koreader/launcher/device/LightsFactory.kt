@@ -139,6 +139,11 @@ object LightsFactory {
                     logController("OnyxPalma2Pro")
                     OnyxPalma2ProController()
                 }
+                DeviceInfo.Id.IREADER_NEO3_ULTRA,
+                -> {
+                    logController("iReader Neo 3 Ultra")
+                    IReaderNeo3LightsController()
+                }
                 else -> {
                     logController("Generic")
                     GenericController()

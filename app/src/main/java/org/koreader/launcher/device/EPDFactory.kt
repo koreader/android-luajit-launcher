@@ -5,6 +5,7 @@ package org.koreader.launcher.device
 
 import android.util.Log
 import org.koreader.launcher.device.epd.CremaEPDController
+import org.koreader.launcher.device.epd.IReaderNeo3EPDController
 import org.koreader.launcher.device.epd.LenovoSmartPaperEPDController
 import org.koreader.launcher.device.epd.NookEPDController
 import org.koreader.launcher.device.epd.TolinoEPDController
@@ -209,6 +210,12 @@ object EPDFactory {
                 -> {
                     logController("Allwinner/Sunxi")
                     SunxiEPDController()
+                }
+
+                DeviceInfo.Id.IREADER_NEO3_ULTRA,
+                -> {
+                    logController("iReader Neo 3 Ultra")
+                    IReaderNeo3EPDController()
                 }
 
                 else -> {

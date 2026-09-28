@@ -14,6 +14,7 @@ interface LuaInterface {
     fun dumpLogs()
     fun einkUpdate(mode: Int)
     fun einkUpdate(mode: Int, delay: Long, x: Int, y: Int, width: Int, height: Int)
+    fun einkPrepareRipple(effect: Int)
     fun enableFrontlightSwitch(): Boolean
     fun extractAssets(): Boolean
     fun getBatteryLevel(): Int
