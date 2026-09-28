@@ -22,7 +22,6 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import org.koreader.launcher.device.Device
-import org.koreader.launcher.device.epd.IReaderNeo3EPDController
 import org.koreader.launcher.dialog.LightDialog
 import org.koreader.launcher.extensions.*
 import java.io.File
@@ -119,12 +118,12 @@ class MainActivity : NativeActivity(), LuaInterface,
         window.setBackgroundDrawableResource(android.R.color.black)
 
         val surfaceKind: String = if (device.needsView) {
-            view = IReaderNeo3EPDController.createSurface(this) ?: NativeSurfaceView(this)
+            view = device.epd.createSurface(this) ?: NativeSurfaceView(this)
 
               // The following two lines brings SurfaceView to "top" in order for NGL4 refresh to work, should be compatible with other controllers
             view?.setZOrderOnTop(true)
             view?.holder?.setFormat(
-                if (IReaderNeo3EPDController.usesOpaquePixelFormat()) PixelFormat.OPAQUE
+                if (device.epd.usesOpaquePixelFormat()) PixelFormat.OPAQUE
                 else PixelFormat.TRANSPARENT
             )
 
@@ -345,7 +344,7 @@ class MainActivity : NativeActivity(), LuaInterface,
     }
 
     override fun einkPrepareRipple(effect: Int) {
-        IReaderNeo3EPDController.prepareRipple(effect)
+        device.epd.prepareRipple(effect)
     }
 
     override fun enableFrontlightSwitch(): Boolean {

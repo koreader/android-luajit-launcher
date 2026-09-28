@@ -4,7 +4,6 @@ import android.content.Context
 import android.util.Log
 import android.view.SurfaceView
 import android.view.View
-import org.koreader.launcher.device.DeviceInfo
 import org.koreader.launcher.device.EPDInterface
 
 /**
@@ -19,38 +18,34 @@ class IReaderNeo3EPDController : EPDInterface {
         private const val TAG = "EPD"
         // 0x01000002: FBSurface.invalidate mode the OEM uses to commit a full frame.
         private const val INVALIDATE_MODE = 16777218
-
-        // HWSurfaceView is needed for EPDCDevice.nativePostCommand PAGE_H ripple
-        fun usesOpaquePixelFormat(): Boolean =
-            DeviceInfo.ID == DeviceInfo.Id.IREADER_NEO3_ULTRA
-
-        fun createSurface(context: Context): SurfaceView? {
-            if (DeviceInfo.ID != DeviceInfo.Id.IREADER_NEO3_ULTRA) return null
-            return try {
-                val cls = Class.forName("android.eink.view.HWSurfaceView")
-                cls.getConstructor(Context::class.java).newInstance(context) as SurfaceView
-            } catch (t: Throwable) {
-                Log.w(TAG, "HWSurfaceView unavailable, fallback NativeSurfaceView", t)
-                null
-            }
-        }
-
-        fun prepareRipple(effect: Int) {
-            if (effect == 0) return
-            try {
-                val epdc = Class.forName("android.eink.EPDCDevice")
-                val post = epdc.getMethod("nativePostCommand", String::class.java)
-                post.invoke(null, "next-effect-type $effect")
-                Log.i(TAG, "next-effect-type $effect")
-            } catch (t: Throwable) {
-                Log.e(TAG, "nativePostCommand failed", t)
-            }
-        }
     }
 
     override fun getPlatform(): String = "ireader"
     override fun getMode(): String = "all"
     override fun needsView(): Boolean = true
+
+    // HWSurfaceView is needed for EPDCDevice.nativePostCommand PAGE_H ripple
+    override fun usesOpaquePixelFormat(): Boolean = true
+
+    override fun createSurface(context: Context): SurfaceView? = try {
+        val cls = Class.forName("android.eink.view.HWSurfaceView")
+        cls.getConstructor(Context::class.java).newInstance(context) as SurfaceView
+    } catch (t: Throwable) {
+        Log.w(TAG, "HWSurfaceView unavailable, fallback NativeSurfaceView", t)
+        null
+    }
+
+    override fun prepareRipple(effect: Int) {
+        if (effect == 0) return
+        try {
+            val epdc = Class.forName("android.eink.EPDCDevice")
+            val post = epdc.getMethod("nativePostCommand", String::class.java)
+            post.invoke(null, "next-effect-type $effect")
+            Log.i(TAG, "next-effect-type $effect")
+        } catch (t: Throwable) {
+            Log.e(TAG, "nativePostCommand failed", t)
+        }
+    }
 
     override fun getWaveformFull(): Int = 1
     override fun getWaveformPartial(): Int = 2
