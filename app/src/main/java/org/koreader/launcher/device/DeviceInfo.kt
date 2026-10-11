@@ -63,6 +63,7 @@ object DeviceInfo {
         HYREAD_GAZE_NOTE,
         HYREAD_GAZE_NOTE_CC,
         HYREAD_MINI6,
+        IFLYTEK_AINOTE_X1,
         IFLYTEK_R3,
         INKBOOK,
         INKBOOKFOCUS,
@@ -312,6 +313,13 @@ object DeviceInfo {
             // Hyread Mini 6
             MANUFACTURER == "hyread" && MODEL == "k06nu"
             -> Id.HYREAD_MINI6
+
+            // iFlytek AiNote X1 (rk3288, HTFYUN panel).
+            // The stock reader identifies it purely as Build.MODEL == "AInote"
+            // (DevTypeUtils.isAINoteX1), so match on that plus the rockchip
+            // board to stay unambiguous.
+            MODEL == "ainote" && MANUFACTURER == STR_ROCKCHIP && HARDWARE == "rk30board"
+            -> Id.IFLYTEK_AINOTE_X1
 
             // Iflytek ebook r3
             MANUFACTURER == "iflytek" && MODEL == "iflytek ebook r3"

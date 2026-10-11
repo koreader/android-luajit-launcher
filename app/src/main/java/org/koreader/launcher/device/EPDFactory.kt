@@ -11,6 +11,7 @@ import org.koreader.launcher.device.epd.TolinoEPDController
 import org.koreader.launcher.device.epd.RK3026EPDController
 import org.koreader.launcher.device.epd.RK3368EPDController
 import org.koreader.launcher.device.epd.OnyxEPDController
+import org.koreader.launcher.device.epd.IflytekAiNoteX1EPDController
 import org.koreader.launcher.device.epd.OldTolinoEPDController
 import org.koreader.launcher.device.epd.NGL4EPDController
 import org.koreader.launcher.device.epd.NookEmperorEPDController
@@ -197,6 +198,12 @@ object EPDFactory {
                 -> {
                     logController("Rockchip RK3566")
                     RK3566EPDController()
+                }
+
+                DeviceInfo.Id.IFLYTEK_AINOTE_X1,
+                -> {
+                    logController("iFlytek AiNote X1")
+                    IflytekAiNoteX1EPDController()
                 }
 
                 DeviceInfo.Id.LENOVO_SMARTPAPER,
