@@ -48,6 +48,7 @@ object LightsFactory {
                 DeviceInfo.Id.ONYX_C67,
                 DeviceInfo.Id.ONYX_MAGICBOOK,
                 DeviceInfo.Id.ONYX_MONTECRISTO3,
+                DeviceInfo.Id.ONYX_ROBINSON_CRUSOE2,
                 -> {
                     logController("Onyx C67")
                     OnyxC67Controller()
