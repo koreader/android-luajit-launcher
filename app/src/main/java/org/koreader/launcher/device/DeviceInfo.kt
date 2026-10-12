@@ -146,6 +146,7 @@ object DeviceInfo {
         ONYX_POKE6,
         ONYX_POKE4LITE,
         ONYX_POKE_PRO,
+        ONYX_ROBINSON_CRUSOE2,
         ONYX_TAB_ULTRA,
         ONYX_TAB_ULTRA_C,
         ONYX_TAB_ULTRA_C_PRO,
@@ -524,6 +525,10 @@ object DeviceInfo {
             // Onyx Montecristo 3
             MANUFACTURER == "onyx" && PRODUCT == "mc_kepler_c" && DEVICE == "mc_kepler_c"
             -> Id.ONYX_MONTECRISTO3
+
+            // Onyx Robinson Crusoe 2 (RK3026, same platform as Montecristo 3)
+            MANUFACTURER == "onyx" && PRODUCT == "mc_kepler_r2" && DEVICE == "mc_kepler_r2"
+            -> Id.ONYX_ROBINSON_CRUSOE2
 
             // Onyx Note
             MANUFACTURER == "onyx" && PRODUCT == "note" && DEVICE == "note"
