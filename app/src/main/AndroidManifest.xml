@@ -63,6 +63,9 @@
                 <data android:mimeType="application/fb2" />
                 <data android:mimeType="application/fb3" />
                 <data android:mimeType="application/msword" />
+                <!-- Download providers may expose FB2 without a filename in the URI. -->
+                <data android:mimeType="application/octet-stream" />
+                <data android:mimeType="application/x-fictionbook+xml" />
                 <data android:mimeType="application/oxps" />
                 <data android:mimeType="application/pdf" />
                 <data android:mimeType="application/rtf" />
