@@ -100,7 +100,9 @@ private fun pathFromContent(uri: Uri, context: Context): String? {
         // A URI grant may allow reading the descriptor but not its resolved path.
         // Import through the content resolver when that path cannot be reopened.
         val file = File(p)
-        if (p.startsWith("/data") || p.contains("/Android/data") || !file.isFile || !file.canRead()) {
+        val isPrivatePath = p.startsWith("/data") || p.contains("/Android/data")
+        val isReadableFile = file.isFile && file.canRead()
+        if (isPrivatePath || !isReadableFile) {
             pathFromImportedFile(uri, context, "Non readable file")
         } else {
             Log.i(TAG, "Guessed path -> $p")
