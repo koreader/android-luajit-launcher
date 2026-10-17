@@ -589,6 +589,12 @@ enum {
     AEVENT_POWER_CONNECTED = 100,
     AEVENT_POWER_DISCONNECTED = 101,
     AEVENT_DOWNLOAD_COMPLETE = 110,
+    AEVENT_TEXT_INPUT = 120,
+    AEVENT_IME_COMPOSITION = 121,
+    AEVENT_IME_DELETE = 122,
+    AEVENT_IME_SELECTION = 123,
+    AEVENT_IME_COMPOSITION_REGION = 124,
+    AEVENT_IME_STATE = 125,
 };
 
 enum {
@@ -2439,6 +2445,140 @@ local function run(android_app_state)
                 android.app.activity.clazz,
                 "hasClipboardText",
                 "()Z"
+            )
+        end)
+    end
+
+    -- IME/Text input bridge
+    android.startTextInput = function()
+        JNI:context(android.app.activity.vm, function(jni)
+            jni:callVoidMethod(
+                android.app.activity.clazz,
+                "startTextInput",
+                "()V"
+            )
+        end)
+    end
+
+    android.stopTextInput = function()
+        JNI:context(android.app.activity.vm, function(jni)
+            jni:callVoidMethod(
+                android.app.activity.clazz,
+                "stopTextInput",
+                "()V"
+            )
+        end)
+    end
+
+    android.syncTextInputState = function(text, selection_start, selection_end, composition_start, composition_end)
+        JNI:context(android.app.activity.vm, function(jni)
+            local state_text = jni.env[0].NewStringUTF(jni.env, text)
+            jni:callVoidMethod(
+                android.app.activity.clazz,
+                "syncTextInputState",
+                "(Ljava/lang/String;IIII)V",
+                state_text,
+                ffi.new('int32_t', selection_start),
+                ffi.new('int32_t', selection_end),
+                ffi.new('int32_t', composition_start),
+                ffi.new('int32_t', composition_end)
+                -- Note that JNI won't covert lua number to int, we need to convert
+                -- it explictly.
+            )
+            jni.env[0].DeleteLocalRef(jni.env, state_text)
+        end)
+    end
+
+    android.dequeueCommittedText = function()
+        return JNI:context(android.app.activity.vm, function(jni)
+            local text = jni:callObjectMethod(
+                android.app.activity.clazz,
+                "dequeueCommittedText",
+                "()Ljava/lang/String;"
+            )
+            return jni:to_string(text)
+        end)
+    end
+
+    android.dequeueComposingText = function()
+        return JNI:context(android.app.activity.vm, function(jni)
+            local text = jni:callObjectMethod(
+                android.app.activity.clazz,
+                "dequeueComposingText",
+                "()Ljava/lang/String;"
+            )
+            return jni:to_string(text)
+        end)
+    end
+
+    android.dequeueImeDelete = function()
+        return JNI:context(android.app.activity.vm, function(jni)
+            local text = jni:callObjectMethod(
+                android.app.activity.clazz,
+                "dequeueImeDelete",
+                "()Ljava/lang/String;"
+            )
+            return jni:to_string(text)
+        end)
+    end
+
+    android.dequeueImeSelection = function()
+        return JNI:context(android.app.activity.vm, function(jni)
+            local text = jni:callObjectMethod(
+                android.app.activity.clazz,
+                "dequeueImeSelection",
+                "()Ljava/lang/String;"
+            )
+            return jni:to_string(text)
+        end)
+    end
+
+    android.dequeueImeComposingRegion = function()
+        return JNI:context(android.app.activity.vm, function(jni)
+            local text = jni:callObjectMethod(
+                android.app.activity.clazz,
+                "dequeueImeComposingRegion",
+                "()Ljava/lang/String;"
+            )
+            return jni:to_string(text)
+        end)
+    end
+
+    android.dequeueTextInputState = function()
+        return JNI:context(android.app.activity.vm, function(jni)
+            local text = jni:callObjectMethod(
+                android.app.activity.clazz,
+                "dequeueTextInputState",
+                "()Ljava/lang/String;"
+            )
+            return jni:to_string(text)
+        end)
+    end
+
+    android.setImeSelection = function(sel_start, sel_end)
+        JNI:context(android.app.activity.vm, function(jni)
+            jni:callVoidMethod(
+                android.app.activity.clazz,
+                "setImeSelection",
+                "(II)V",
+                ffi.new('int32_t', sel_start),
+                ffi.new('int32_t', sel_end)
+                -- Note that JNI won't covert lua number to int, we need to convert
+                -- it explictly.
+            )
+        end)
+    end
+
+    android.setImeComposingRegion = function(sel_start, sel_end)
+        JNI:context(android.app.activity.vm, function(jni)
+            jni:callVoidMethod(
+                android.app.activity.clazz,
+                "setImeComposingRegion",
+                "(II)V",
+                ffi.new('int32_t', sel_start),
+                ffi.new('int32_t', sel_end)
+                -- Note that JNI won't covert lua number to int, we need to convert
+                -- it explictly.
             )
         end)
     end

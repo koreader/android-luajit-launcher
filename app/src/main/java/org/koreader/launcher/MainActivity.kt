@@ -18,6 +18,13 @@ import android.provider.Settings
 import android.util.Log
 import android.view.*
 import android.widget.Toast
+import android.widget.EditText
+import android.text.TextWatcher
+import android.text.Editable
+import android.text.Selection
+import android.view.inputmethod.EditorInfo
+import android.text.InputType
+import android.view.inputmethod.InputMethodManager
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -27,6 +34,7 @@ import org.koreader.launcher.extensions.*
 import java.io.File
 import java.util.Locale
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.ConcurrentLinkedQueue
 
 class MainActivity : NativeActivity(), LuaInterface,
     ActivityCompat.OnRequestPermissionsResultCallback {
@@ -51,6 +59,9 @@ class MainActivity : NativeActivity(), LuaInterface,
     // Fullscreen - only used on API levels 16-18
     private var fullscreen: Boolean = true
 
+    // Last composition text from IME (for finish-case fallback)
+    private var lastComposingText: String? = null
+
     // Splashscreen is active
     private var splashScreen: Boolean = true
 
@@ -66,6 +77,246 @@ class MainActivity : NativeActivity(), LuaInterface,
 
     // Hardware orientation for this device (usually match android boot logo)
     private var screenIsLandscape: Boolean = false
+
+    /*---------------------------------------------------------------
+     *                        IME bridge state                       *
+     *--------------------------------------------------------------*/
+    private var imeEditText: EditText? = null
+    private val imeQueue = ConcurrentLinkedQueue<String>()
+    private val imeCompositionQueue = ConcurrentLinkedQueue<String>()
+    private val imeComposingRegionQueue = ConcurrentLinkedQueue<String>()
+    private val imeDeleteQueue = ConcurrentLinkedQueue<String>()
+    private val imeSelectionQueue = ConcurrentLinkedQueue<String>()
+    private val imeStateQueue = ConcurrentLinkedQueue<String>()
+
+    private fun describeImeEditTextState(editText: EditText?): String {
+        val imeCaptureEditText = editText as? ImeCaptureEditText
+        if (imeCaptureEditText == null) {
+            return if (editText == null) {
+                "<no-edit-text>"
+            } else {
+                "type=${editText.javaClass.simpleName} focused=${editText.isFocused} windowFocused=${editText.hasWindowFocus()} visibility=${editText.visibility}"
+            }
+        }
+
+        return "focused=${imeCaptureEditText.isFocused} windowFocused=${imeCaptureEditText.hasWindowFocus()} visibility=${imeCaptureEditText.visibility} state=${imeCaptureEditText.snapshotEditorState()}"
+    }
+
+    private fun ensureImeEditText(): EditText {
+        var et = imeEditText
+        if (et == null) {
+            et = ImeCaptureEditText(this)
+            et.isSingleLine = false
+            et.imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_ACTION_NONE
+            et.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
+            et.isFocusable = true
+            et.isFocusableInTouchMode = true
+            et.visibility = View.VISIBLE
+            et.alpha = 0f
+            et.addTextChangedListener(object: TextWatcher {
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    // Keep TextWatcher as an observation point only. We want commitText() to be
+                    // the single authoritative source of committed text, because TextWatcher sees
+                    // both transient composition updates and the eventual committed mutation.
+                    if ((et as? ImeCaptureEditText)?.isComposing == true) {
+                        Log.i(tag, "TextWatcher observed composing change")
+                    }
+                    Log.i(tag, "text changed!")
+                    if (s == null) return
+                    if (count > 0) {
+                        val end = start + count
+                        if (start >= 0 && end <= s.length) {
+                            val inserted = s.subSequence(start, end).toString()
+                            Log.i(tag, "in if")
+                            if (inserted.isNotEmpty()) {
+                                Log.i(tag, "got text $inserted")
+                            }
+                        }
+                    }
+                }
+                override fun afterTextChanged(s: Editable?) {}
+            })
+
+            // Capture IME composition updates (setComposingText / finishComposingText)
+            (et as? ImeCaptureEditText)?.onCompose = { newCursorPos, composingText, finished ->
+                var payloadText = composingText
+                if (!finished) {
+                    lastComposingText = composingText
+                } else {
+                    if (payloadText.isNullOrEmpty()) {
+                        payloadText = lastComposingText
+                    }
+                    lastComposingText = null
+                }
+                val op = if (finished) 'F' else 'U'
+                val payload = "$op\t$newCursorPos\t${payloadText ?: ""}"
+                imeCompositionQueue.add(payload)
+                // 121 == AEVENT_IME_COMPOSITION
+                event.write(121)
+            }
+
+            // Also capture commitText via onCommit so committed text never gets lost
+            (et as? ImeCaptureEditText)?.onCommit = { committed ->
+                if (!committed.isNullOrEmpty()) {
+                    imeQueue.add(committed)
+                    // 120 == AEVENT_TEXT_INPUT
+                    event.write(120)
+                }
+            }
+
+            // Capture IME deleteSurroundingText requests from IME
+            (et as? ImeCaptureEditText)?.onDeleteSurrounding = { before: Int, after: Int ->
+                val payload = "$before\t$after"
+                imeDeleteQueue.add(payload)
+                // 122 == AEVENT_IME_DELETE
+                event.write(122)
+            }
+
+            // Capture IME setSelection requests
+            (et as? ImeCaptureEditText)?.onSetSelection = { start: Int, end: Int ->
+                val payload = "$start\t$end"
+                imeSelectionQueue.add(payload)
+                // 123 == AEVENT_IME_SELECTION
+                event.write(123)
+            }
+
+            // Capture composing region updates (setComposingRegion)
+            (et as? ImeCaptureEditText)?.onSetComposingRegion = { start: Int, end: Int ->
+                val payload = "$start\t$end"
+                imeComposingRegionQueue.add(payload)
+                // 124 == AEVENT_IME_COMPOSITION_REGION
+                event.write(124)
+            }
+
+            (et as? ImeCaptureEditText)?.onStateChanged = { snapshot: String ->
+                imeStateQueue.add(snapshot)
+                // 125 == AEVENT_IME_STATE
+                event.write(125)
+            }
+
+            // Attach to window without disturbing native content
+            val lp = ViewGroup.LayoutParams(1, 1)
+            addContentView(et, lp)
+            imeEditText = et
+        }
+        return et
+    }
+
+    @Suppress("unused")
+    override fun startTextInput() {
+        Log.i(tag, "startTextInput queued current=${describeImeEditTextState(imeEditText)}")
+        runOnUiThread {
+            val et = ensureImeEditText()
+            Log.i(tag, "startTextInput ui before-show ${describeImeEditTextState(et)}")
+            if (et.visibility != View.VISIBLE) et.visibility = View.VISIBLE
+            et.alpha = 0f
+            et.post {
+                Log.i(tag, "startTextInput post before-focus ${describeImeEditTextState(et)}")
+                if (!et.isFocused) et.requestFocus()
+                Log.i(tag, "startTextInput post after-focus ${describeImeEditTextState(et)}")
+                val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.showSoftInput(et, InputMethodManager.SHOW_IMPLICIT)
+                Log.i(tag, "startTextInput post after-show active=${imm.isActive(et)} acceptingText=${imm.isAcceptingText} ${describeImeEditTextState(et)}")
+            }
+        }
+    }
+
+    @Suppress("unused")
+    override fun stopTextInput() {
+        runOnUiThread {
+            imeEditText?.let { et ->
+                val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.hideSoftInputFromWindow(et.windowToken, 0)
+                et.clearFocus()
+                et.alpha = 0f
+                et.visibility = View.VISIBLE
+            }
+        }
+    }
+
+    @Suppress("unused")
+    override fun dequeueCommittedText(): String? {
+        Log.i(tag, "dequeueCommittedText")
+        return imeQueue.poll()
+    }
+
+    @Suppress("unused")
+    override fun dequeueComposingText(): String? {
+        Log.i(tag, "dequeueComposingText")
+        return imeCompositionQueue.poll()
+    }
+
+    @Suppress("unused")
+    override fun dequeueImeDelete(): String? {
+        Log.i(tag, "dequeueImeDelete")
+        return imeDeleteQueue.poll()
+    }
+
+    @Suppress("unused")
+    override fun dequeueImeSelection(): String? {
+        Log.i(tag, "dequeueImeSelection")
+        return imeSelectionQueue.poll()
+    }
+
+    @Suppress("unused")
+    override fun dequeueImeComposingRegion(): String? {
+        Log.i(tag, "dequeueImeComposingRegion")
+        return imeComposingRegionQueue.poll()
+    }
+
+    @Suppress("unused")
+    override fun dequeueTextInputState(): String? {
+        Log.i(tag, "dequeueTextInputState")
+        return imeStateQueue.poll()
+    }
+
+    @Suppress("unused")
+    override fun syncTextInputState(text: String, selectionStart: Int, selectionEnd: Int, compositionStart: Int, compositionEnd: Int) {
+        Log.i(tag, "syncTextInputState queued textLength=${text.length} sel=${selectionStart}:${selectionEnd} comp=${compositionStart}:${compositionEnd} current=${describeImeEditTextState(imeEditText)}")
+        runOnUiThread {
+            val editText = ensureImeEditText() as? ImeCaptureEditText ?: return@runOnUiThread
+            Log.i(tag, "syncTextInputState apply before ${describeImeEditTextState(editText)}")
+            editText.syncEditorState(text, selectionStart, selectionEnd, compositionStart, compositionEnd)
+            Log.i(tag, "syncTextInputState apply after ${describeImeEditTextState(editText)}")
+        }
+    }
+
+    @Suppress("unused")
+    override fun setImeSelection(start: Int, end: Int) {
+        Log.i(tag, "setImeSelection queued start=$start end=$end current=${describeImeEditTextState(imeEditText)}")
+        runOnUiThread {
+            lastComposingText = null
+            val editText = imeEditText as? ImeCaptureEditText ?: return@runOnUiThread
+            val editable = editText.editableText ?: return@runOnUiThread
+            Log.i(tag, "setImeSelection apply before ${describeImeEditTextState(editText)}")
+            editText.syncEditorState(
+                editable.toString(),
+                start,
+                end,
+                -1,
+                -1,
+            )
+            Log.i(tag, "setImeSelection apply after ${describeImeEditTextState(editText)}")
+        }
+    }
+
+    @Suppress("unused")
+    override fun setImeComposingRegion(start: Int, end: Int) {
+        runOnUiThread {
+            val editText = imeEditText as? ImeCaptureEditText ?: return@runOnUiThread
+            val editable = editText.editableText ?: return@runOnUiThread
+            val selectionStart = Selection.getSelectionStart(editable)
+            val selectionEnd = Selection.getSelectionEnd(editable)
+            editText.syncEditorState(
+                editable.toString(),
+                if (selectionStart >= 0) selectionStart else editable.length,
+                if (selectionEnd >= 0) selectionEnd else editable.length,
+                start,
+                end
+            )
+        }
+    }
 
     companion object {
         private const val TAG_SURFACE = "Surface"
@@ -116,6 +367,9 @@ class MainActivity : NativeActivity(), LuaInterface,
 
         // Window background must be black for vertical and horizontal lines to be visible
         window.setBackgroundDrawableResource(android.R.color.black)
+        // Allow IME to interact with this window and resize content with soft keyboard
+        window.clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
 
         val surfaceKind: String = if (device.needsView) {
             view = NativeSurfaceView(this)
