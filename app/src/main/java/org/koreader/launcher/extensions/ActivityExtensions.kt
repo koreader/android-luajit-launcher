@@ -1,4 +1,5 @@
 package org.koreader.launcher.extensions
+import android.content.pm.ActivityInfo
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -14,6 +15,7 @@ import android.os.Build
 import android.os.Environment
 import android.provider.Settings
 import android.util.DisplayMetrics
+import android.util.Log
 import android.view.Surface
 import android.view.View
 import androidx.appcompat.app.AlertDialog
@@ -293,15 +295,34 @@ private fun startActivityCompat(context: Context, intent: Intent) {
 /* Orientation */
 @Suppress("DEPRECATION")
 fun Activity.getOrientationCompat(isLandscape: Boolean): Int {
-    return when (windowManager.defaultDisplay.rotation) {
-        Surface.ROTATION_90 -> if (isLandscape) LINUX_PORTRAIT else LINUX_REVERSE_LANDSCAPE
+    val rotation = windowManager.defaultDisplay.rotation
+    val result = when (rotation) {
+        Surface.ROTATION_90 -> if (isLandscape) LINUX_REVERSE_PORTRAIT else LINUX_LANDSCAPE
         Surface.ROTATION_180 -> if (isLandscape) LINUX_REVERSE_LANDSCAPE else LINUX_REVERSE_PORTRAIT
-        Surface.ROTATION_270 -> if (isLandscape) LINUX_REVERSE_PORTRAIT else LINUX_LANDSCAPE
+        Surface.ROTATION_270 -> if (isLandscape) LINUX_PORTRAIT else LINUX_REVERSE_LANDSCAPE
         else -> if (isLandscape) LINUX_LANDSCAPE else LINUX_PORTRAIT
     }
+    Log.d("AROT_DIAG", String.format(Locale.US,
+        "getOrientationCompat: rotation=%d isLandscape=%b -> result=%d (%s)",
+        rotation, isLandscape, result,
+        when (result) {
+            0 -> "UR"
+            1 -> "CW"
+            2 -> "UD"
+            3 -> "CCW"
+            else -> "?"
+        }))
+    return result
 }
 
 fun Activity.setOrientationCompat(isLandscape: Boolean, orientation: Int) {
+    // Pass through sensor modes without remapping
+    if (isPassthroughOrientation(orientation)) {
+        Log.d("AROT_DIAG", String.format(Locale.US,
+            "setOrientationCompat: orientation=%d isPassthrough=true", orientation))
+        requestedOrientation = orientation
+        return
+    }
     val newOrientation = if (isLandscape) {
         when (orientation) {
             ANDROID_LANDSCAPE -> ANDROID_PORTRAIT
@@ -311,13 +332,41 @@ fun Activity.setOrientationCompat(isLandscape: Boolean, orientation: Int) {
             else -> orientation
         }
     } else {
-        when (orientation) {
-            ANDROID_LANDSCAPE -> ANDROID_REVERSE_LANDSCAPE
-            ANDROID_REVERSE_LANDSCAPE -> ANDROID_LANDSCAPE
-            else -> orientation
-        }
+        // Native portrait: Lua already maps DEVICE_ROTATED_* to the
+        // correct ASCREEN_ORIENTATION_* constants. No further remapping
+        // needed — swapping LANDSCAPE↔REVERSE_LANDSCAPE would invert
+        // the CW/CCW direction (observed on this device).
+        orientation
     }
+    Log.d("AROT_DIAG", String.format(Locale.US,
+        "setOrientationCompat: orientation=%d isLandscape=%b -> requestedOrientation=%d",
+        orientation, isLandscape, newOrientation))
     requestedOrientation = newOrientation
+}
+
+fun Activity.setAutoOrientation() {
+    requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR
+}
+
+fun Activity.setLockedAutoOrientation(orientation: Int) {
+    // LinuxFB rotation constants: 0=UR, 2=UD (portrait axis, even);
+    // 1=CW, 3=CCW (landscape axis, odd).
+    // Restrict native sensor rotation to the same axis as the current orientation.
+    requestedOrientation = if (orientation.and(1) == 0) {
+        ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
+    } else {
+        ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+    }
+}
+
+private fun isPassthroughOrientation(orientation: Int): Boolean {
+    return orientation == ANDROID_FULL_SENSOR ||
+        orientation == ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED ||
+        orientation == ActivityInfo.SCREEN_ORIENTATION_SENSOR ||
+        orientation == ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE ||
+        orientation == ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT ||
+        orientation == ActivityInfo.SCREEN_ORIENTATION_NOSENSOR ||
+        orientation == ActivityInfo.SCREEN_ORIENTATION_USER
 }
 
 // constants from https://github.com/koreader/android-luajit-launcher/blob/master/assets/android.lua
@@ -331,6 +380,7 @@ private const val ANDROID_LANDSCAPE = 0
 private const val ANDROID_PORTRAIT = 1
 private const val ANDROID_REVERSE_LANDSCAPE = 8
 private const val ANDROID_REVERSE_PORTRAIT = 9
+private const val ANDROID_FULL_SENSOR = 10
 
 // constants from https://github.com/koreader/koreader-base/blob/master/ffi/framebuffer.lua
 private const val LINUX_PORTRAIT = 0
