@@ -126,6 +126,7 @@ object EPDFactory {
                 DeviceInfo.Id.ONYX_KON_TIKI2,
                 DeviceInfo.Id.ONYX_LEAF,
                 DeviceInfo.Id.ONYX_LEAF2,
+                DeviceInfo.Id.ONYX_LEAF5C,
                 DeviceInfo.Id.ONYX_LIVINGSTONE3,
                 DeviceInfo.Id.ONYX_LOMONOSOV,
                 DeviceInfo.Id.ONYX_MAX,
@@ -168,6 +169,7 @@ object EPDFactory {
                 DeviceInfo.Id.ONYX_TAB_ULTRA_C,
                 DeviceInfo.Id.ONYX_TAB_ULTRA_C_PRO,
                 DeviceInfo.Id.ONYX_TAB_X_C,
+                DeviceInfo.Id.ONYX_VASCO_GAMA4,
                 DeviceInfo.Id.STORYTEL_READER2,
                 -> {
                     logController("Onyx/Qualcomm")
