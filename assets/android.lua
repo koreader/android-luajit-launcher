@@ -2399,6 +2399,18 @@ local function run(android_app_state)
         end
     end
 
+    android.einkPrepareRipple = function(effect)
+        if not effect then return end
+        JNI:context(android.app.activity.vm, function(jni)
+            jni:callVoidMethod(
+                android.app.activity.clazz,
+                "einkPrepareRipple",
+                "(I)V",
+                ffi.new("int32_t", effect)
+            )
+        end)
+    end
+
     android.runTest = function()
         JNI:context(android.app.activity.vm, function(jni)
             jni:callVoidMethod(
