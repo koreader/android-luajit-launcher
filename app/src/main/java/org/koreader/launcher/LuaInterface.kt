@@ -82,4 +82,16 @@ interface LuaInterface {
     fun startTestActivity()
     fun showFrontlightDialog(title: String, dim: String, warmth: String, okButton: String, cancelButton: String)
     fun showToast(message: String, longTimeout: Boolean)
+    // IME bridge
+    fun startTextInput()
+    fun stopTextInput()
+    fun dequeueCommittedText(): String?
+    fun dequeueComposingText(): String?
+    fun dequeueImeDelete(): String?
+    fun dequeueImeSelection(): String?
+    fun dequeueImeComposingRegion(): String?
+    fun dequeueTextInputState(): String?
+    fun syncTextInputState(text: String, selectionStart: Int, selectionEnd: Int, compositionStart: Int, compositionEnd: Int)
+    fun setImeSelection(start: Int, end: Int)
+    fun setImeComposingRegion(start: Int, end: Int)
 }
