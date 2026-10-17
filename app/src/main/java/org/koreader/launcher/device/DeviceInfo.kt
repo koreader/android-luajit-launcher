@@ -106,6 +106,7 @@ object DeviceInfo {
         ONYX_KON_TIKI2,
         ONYX_LEAF,
         ONYX_LEAF2,
+        ONYX_LEAF5C,
         ONYX_LIVINGSTONE3,
         ONYX_LOMONOSOV,
         ONYX_MAGICBOOK,
@@ -151,6 +152,7 @@ object DeviceInfo {
         ONYX_TAB_ULTRA_C,
         ONYX_TAB_ULTRA_C_PRO,
         ONYX_TAB_X_C,
+        ONYX_VASCO_GAMA4,
         PUBU_PUBOOK,
         RIDI_PAPER_3,
         SONY_CP1,
@@ -502,6 +504,10 @@ object DeviceInfo {
             && (DEVICE == "leaf2" || DEVICE == "leaf2_p")
             -> Id.ONYX_LEAF2
 
+            // Onyx Boox Leaf 5c
+            MANUFACTURER == "onyx" && DEVICE == "leaf5c"
+            -> Id.ONYX_LEAF5C
+
             // Onyx Boox Livingstone3
             MANUFACTURER == "onyx" && DEVICE == "livingstone3"
             -> Id.ONYX_LIVINGSTONE3
@@ -682,6 +688,10 @@ object DeviceInfo {
             BRAND == "onyx" && PRODUCT == "tabxc" && DEVICE == "tabxc"
             -> Id.ONYX_TAB_X_C
 
+            // Onyx Boox Vasco da Gama 4
+            MANUFACTURER == "onyx" && DEVICE == "mc_gama4"
+            -> Id.ONYX_VASCO_GAMA4
+
             // Pubu Pubook
             MANUFACTURER == STR_ROCKCHIP && BRAND == STR_ROCKCHIP && MODEL == "pubook" && DEVICE == "pubook" && HARDWARE == "rk30board"
             -> Id.PUBU_PUBOOK
@@ -800,6 +810,7 @@ object DeviceInfo {
             Id.ONYX_FARADAY2,
             Id.ONYX_GO_COLOR7,
             Id.ONYX_GO7GEN2,
+            Id.ONYX_LEAF5C,
             Id.ONYX_NOVA3_COLOR,
             Id.ONYX_NOVA_AIR_C,
             Id.ONYX_NOTE_AIR_3C,
