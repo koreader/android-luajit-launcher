@@ -12,7 +12,7 @@ import java.io.File
 class ApkUpdater {
 
     companion object {
-        private const val TAG = "ApkUpdater"
+        private val TAG = ApkUpdater::class.java.simpleName
         private const val OTA_DIRECTORY = "ota"
 
         fun pruneDownloads(context: Context) {
