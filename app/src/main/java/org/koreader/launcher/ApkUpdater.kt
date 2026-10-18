@@ -12,6 +12,7 @@ import java.io.File
 class ApkUpdater {
 
     companion object {
+        private const val TAG = "ApkUpdater"
         private const val OTA_DIRECTORY = "ota"
 
         fun pruneDownloads(context: Context) {
@@ -27,7 +28,7 @@ class ApkUpdater {
             // The root also contains imported documents. Only clean up OTA files.
             File(filesDir, OTA_DIRECTORY).listFiles()?.forEach { file ->
                 if (file.isFile && !file.delete()) {
-                    Log.w("ApkUpdater", "Could not remove OTA download: $file")
+                    Log.w(TAG, "Could not remove OTA download: $file")
                 }
             }
         }
@@ -37,7 +38,6 @@ class ApkUpdater {
         private const val DOWNLOAD_OK = 0
         private const val DOWNLOAD_EXISTS = 1
     }
-    private val tag = this::class.java.simpleName
     private var downloadPath: String? = null
 
     fun download(context: Context, url: String, name: String): Int {
@@ -76,7 +76,7 @@ class ApkUpdater {
             }
             result
         } else {
-            Log.w(tag, "Download APK is not supported in ${MainApp.FLAVOR}")
+            Log.w(TAG, "Download APK is not supported in ${MainApp.FLAVOR}")
             DOWNLOAD_NOT_SUPPORTED
         }
     }
@@ -100,7 +100,7 @@ class ApkUpdater {
                 downloadPath = null
             }
         } else {
-            Log.w(tag, "Install APK is not supported in ${MainApp.FLAVOR}")
+            Log.w(TAG, "Install APK is not supported in ${MainApp.FLAVOR}")
         }
     }
 }
