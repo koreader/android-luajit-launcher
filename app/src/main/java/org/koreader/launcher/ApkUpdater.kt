@@ -12,6 +12,26 @@ import java.io.File
 class ApkUpdater {
 
     companion object {
+        private const val OTA_DIRECTORY = "ota"
+
+        fun pruneDownloads(context: Context) {
+            try {
+                val filesDir = context.getExternalFilesDir(null) ?: return
+                pruneDownloadsIn(filesDir)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
+        internal fun pruneDownloadsIn(filesDir: File) {
+            // The root also contains imported documents. Only clean up OTA files.
+            File(filesDir, OTA_DIRECTORY).listFiles()?.forEach { file ->
+                if (file.isFile && !file.delete()) {
+                    Log.w("ApkUpdater", "Could not remove OTA download: $file")
+                }
+            }
+        }
+
         private const val DOWNLOAD_NOT_SUPPORTED = -2
         private const val DOWNLOAD_FAILED = -1
         private const val DOWNLOAD_OK = 0
@@ -22,15 +42,20 @@ class ApkUpdater {
 
     fun download(context: Context, url: String, name: String): Int {
         return if (MainApp.OTA_UPDATES) {
-            val file = File(context.getExternalFilesDir(null), name)
+            downloadPath = null
+            val filesDir = context.getExternalFilesDir(null) ?: return DOWNLOAD_FAILED
+            val directory = File(filesDir, OTA_DIRECTORY)
+            val file = File(directory, name)
             val result = try {
+                require(name == file.name) { "Expected an OTA filename without a path" }
+                check(directory.isDirectory || directory.mkdirs()) { "Cannot create OTA directory" }
                 if (file.exists()) {
                     DOWNLOAD_EXISTS
                 } else {
                     val request = DownloadManager.Request(Uri.parse(url))
                     request.setMimeType("application/vnd.android.package-archive")
                     request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_HIDDEN)
-                    request.setDestinationInExternalFilesDir(context, null, name)
+                    request.setDestinationInExternalFilesDir(context, null, "$OTA_DIRECTORY/$name")
                     val manager = context.getSystemService(Context.DOWNLOAD_SERVICE)
                         as DownloadManager
                     manager.enqueue(request)
