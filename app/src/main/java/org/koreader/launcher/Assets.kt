@@ -9,7 +9,6 @@ import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import androidx.core.content.ContextCompat
-import org.koreader.launcher.extensions.pruneCacheDir
 import java.io.*
 
 class Assets {
@@ -27,7 +26,7 @@ class Assets {
             val result = bootstrap(activity)
             val elapsedTime = System.nanoTime() - startTime
             Log.i(tag, "update installed in ${elapsedTime / 1000000} milliseconds")
-            activity.pruneCacheDir()
+            if (result) ApkUpdater.pruneDownloads(activity)
             result
         } else {
             true
