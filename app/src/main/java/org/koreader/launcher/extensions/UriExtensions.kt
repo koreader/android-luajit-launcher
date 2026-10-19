@@ -7,6 +7,7 @@ import android.os.Build
 import android.provider.MediaStore
 import android.system.Os
 import android.util.Log
+import org.koreader.launcher.MainApp
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
@@ -65,10 +66,18 @@ private fun pathFromFile(uri: Uri): String? {
 }
 
 private fun pathFromImportedFile(uri: Uri, context: Context, reason: String): String? {
-    return context.getExternalFilesDir(null)?.let { path ->
+    val path = File(MainApp.app_storage_path, "imported")
+    return try {
+        if (!path.isDirectory && !path.mkdirs()) {
+            Log.e(TAG, "Cannot create import directory: $path")
+            return null
+        }
         val result = uri.toFile(context, path.absolutePath)
         Log.i(TAG, "[$reason]: imported to $result")
         result
+    } catch (e: SecurityException) {
+        Log.e(TAG, "Cannot access import directory: $path", e)
+        null
     }
 }
 
