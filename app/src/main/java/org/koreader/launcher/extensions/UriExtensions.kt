@@ -41,7 +41,19 @@ fun Uri.toFile(context: Context, path: String): String? {
 
     return context.contentResolver.openInputStream(this)?.use {
         try {
-            val file = File(path, name)
+            val fileName = File(name).name
+            if (fileName.isEmpty() || fileName == "." || fileName == "..") {
+                Log.e(TAG, "Invalid imported file name: $name")
+                return null
+            }
+
+            val directory = File(path).canonicalFile
+            val file = File(directory, fileName).canonicalFile
+            if (file.parentFile != directory) {
+                Log.e(TAG, "Imported file path escapes destination: $name")
+                return null
+            }
+
             FileOutputStream(file).use { target ->
                 val buffer = ByteArray(8 * 1024)
                 var len = it.read(buffer)
