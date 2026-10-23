@@ -194,8 +194,11 @@ fun Activity.openWifi() {
 fun Activity.pruneCacheDir() {
     try {
         getExternalFilesDir(null)?.let {
+            // Older versions also imported documents here. Preserve those files.
             it.listFiles()?.forEach { file ->
-                file.delete()
+                if (file.isFile && file.extension.equals("apk", ignoreCase = true)) {
+                    file.delete()
+                }
             }
         }
     } catch (e: Exception) {
