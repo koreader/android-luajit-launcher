@@ -99,6 +99,11 @@ object LightsFactory {
                     logController("Onyx/Sdk")
                     OnyxSdkLightsController()
                 }
+                DeviceInfo.Id.MEEBOOK_M103,
+                -> {
+                    logController("Meebook M103")
+                    MeebookM103LightsController()
+                }
                 DeviceInfo.Id.CREMA_0710C,
                 DeviceInfo.Id.CREMA_CARTA_G,
                 DeviceInfo.Id.MEEBOOK_P6,

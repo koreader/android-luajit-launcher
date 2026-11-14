@@ -72,6 +72,7 @@ object DeviceInfo {
         JDREAD,
         LENOVO_SMARTPAPER,
         LINFINY_ENOTE,
+        MEEBOOK_M103,
         MEEBOOK_M6,
         MEEBOOK_M6C,
         MEEBOOK_M7,
@@ -355,6 +356,10 @@ object DeviceInfo {
             // Linfiny A4 (13.3") eNote / Avalue ENT-13T1 / QuirkLogic Papyr
             MANUFACTURER == "linfiny" && MODEL == "ent-13t1"
             -> Id.LINFINY_ENOTE
+
+            // Meebook M103
+            MANUFACTURER == "haoqing" && MODEL == "m103"
+            -> Id.MEEBOOK_M103
 
             // Meebook M6
             MANUFACTURER == "haoqing" && MODEL == "m6"
