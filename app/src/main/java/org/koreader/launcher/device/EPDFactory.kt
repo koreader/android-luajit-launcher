@@ -190,6 +190,7 @@ object EPDFactory {
                 DeviceInfo.Id.IFLYTEK_R3,
                 DeviceInfo.Id.INKBOOKFOCUS_PLUS,
                 DeviceInfo.Id.INKPALM_PLUS,
+                DeviceInfo.Id.MEEBOOK_M103,
                 DeviceInfo.Id.MEEBOOK_M6,
                 DeviceInfo.Id.MEEBOOK_M6C,
                 DeviceInfo.Id.MEEBOOK_M7,
