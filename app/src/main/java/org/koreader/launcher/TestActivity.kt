@@ -23,6 +23,7 @@ import org.koreader.launcher.device.epd.RK3566EPDController
 import org.koreader.launcher.device.epd.SunxiEPDController
 import org.koreader.launcher.device.epd.TolinoEPDController
 import org.koreader.launcher.device.lights.LenovoSmartPaperLightsController
+import org.koreader.launcher.device.lights.MeebookM103LightsController
 import org.koreader.launcher.device.lights.OnyxAdbLightsController
 import org.koreader.launcher.device.lights.OnyxC67Controller
 import org.koreader.launcher.device.lights.OnyxColorController
@@ -83,6 +84,7 @@ class TestActivity: AppCompatActivity() {
         // Lights drivers
         lightsMap["Boyue S62 Root"] = BoyueS62RootController()
         lightsMap["Lenovo Smart Paper"] = LenovoSmartPaperLightsController()
+        lightsMap["Meebook M103"] = MeebookM103LightsController()
         lightsMap["Onyx ADB (lights)"] = OnyxAdbLightsController()
         lightsMap["Onyx C67"] = OnyxC67Controller()
         lightsMap["Onyx Color"] = OnyxColorController()
