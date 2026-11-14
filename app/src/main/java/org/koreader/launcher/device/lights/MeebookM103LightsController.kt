@@ -7,12 +7,17 @@ import org.koreader.launcher.device.LightsInterface
 
 /* Lights controller for the Meebook M103.
  *
- * The frontlight exposes two independent channels:
+ * Frontlight has two independent channels:
  *  - cold (brightness): Settings.System "screen_brightness" (standard Android
- *    brightness, range 0..255);
- *  - warm: vendor-specific Settings.System "haoqing_warm_light" (0..254).
+ *    brightness, range 0..255) — works;
+ *  - warm: vendor-specific Settings.System "haoqing_warm_light" (0..254) —
+ *    NOT controllable by a non-privileged app: the key isn't in
+ *    Settings.System.PUBLIC_SETTINGS, so the ROM's SettingsProvider rejects
+ *    writes from a targetSdk 30 app, and the warm LED's sysfs node
+ *    (/sys/class/backlight/backlight_warm) is root-only. Warmth is therefore
+ *    reported as unsupported (hasWarmth() == false).
  *
- * Writing either channel requires the WRITE_SETTINGS permission, so
+ * Writing the brightness channel requires the WRITE_SETTINGS permission, so
  * needsPermission() returns true.
  */
 
@@ -35,7 +40,7 @@ class MeebookM103LightsController : LightsInterface {
     }
 
     override fun hasWarmth(): Boolean {
-        return true
+        return false
     }
 
     override fun needsPermission(): Boolean {
@@ -111,6 +116,6 @@ class MeebookM103LightsController : LightsInterface {
     }
 
     override fun hasStandaloneWarmth(): Boolean {
-        return true
+        return false
     }
 }
