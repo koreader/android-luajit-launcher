@@ -134,10 +134,21 @@ class MainActivity : NativeActivity(), LuaInterface,
         Log.v(TAG_SURFACE, "Using $surfaceKind implementation")
 
         @Suppress("DEPRECATION")
-        screenIsLandscape = windowManager.defaultDisplay.width > windowManager.defaultDisplay.height
+        val dw = windowManager.defaultDisplay.width
+        val dh = windowManager.defaultDisplay.height
+        val drotation = windowManager.defaultDisplay.rotation
+        // Display.width/height are adjusted for current rotation.
+        // For ROTATION_90/270, width and height are swapped relative to natural,
+        // so invert the comparison to determine the true natural orientation.
+        screenIsLandscape = if (drotation == Surface.ROTATION_90 || drotation == Surface.ROTATION_270) {
+            dh > dw
+        } else {
+            dw > dh
+        }
 
         Log.v(tag, String.format(Locale.US,
-            "native orientation: %s", if (this.screenIsLandscape) "landscape" else "portrait"))
+            "native orientation: %s (rotation=%d w=%d h=%d)",
+            if (this.screenIsLandscape) "landscape" else "portrait", drotation, dw, dh))
 
         registerReceiver(event, event.filter)
 
@@ -727,6 +738,19 @@ class MainActivity : NativeActivity(), LuaInterface,
 
     override fun setScreenOrientation(orientation: Int) {
         setOrientationCompat(screenIsLandscape, orientation)
+    }
+
+    override fun setScreenAutoRotation(enabled: Boolean) {
+        if (enabled) {
+            setAutoOrientation()
+        } else {
+            // Lock to current orientation when disabling auto mode
+            setScreenOrientation(getScreenOrientation())
+        }
+    }
+
+    override fun setScreenAutoRotationLocked(orientation: Int) {
+        setLockedAutoOrientation(orientation)
     }
 
     override fun setScreenWarmth(warmth: Int) {

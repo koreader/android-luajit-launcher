@@ -39,7 +39,7 @@
             android:exported="true"
             android:theme="@style/SplashScreen"
             android:resizeableActivity="false"
-            android:screenOrientation="nosensor"
+            android:screenOrientation="fullSensor"
             android:launchMode="singleInstance"
             android:configChanges="colorMode|density|fontScale|keyboard|keyboardHidden|layoutDirection|locale|mcc|mnc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|touchscreen|uiMode"
             tools:ignore="NonResizeableActivity">
